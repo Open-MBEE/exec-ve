@@ -1,8 +1,8 @@
 import _ from 'lodash'
 
 import { Insertion, InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import { EditService } from '@ve-utils/core'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import { Class } from '@ve-utils/utils'
@@ -40,7 +40,7 @@ class InsertElementController extends Insertion<InsertData> {
         utilsSvc: UtilsService,
         apiSvc: ApiService,
         utils: InsertionService,
-        editSvc: EditService
+        editorSvc: EditorService
     ) {
         super(
             $scope,
@@ -57,7 +57,7 @@ class InsertElementController extends Insertion<InsertData> {
             utilsSvc,
             apiSvc,
             utils,
-            editSvc
+            editorSvc
         )
     }
 
@@ -103,8 +103,7 @@ class InsertElementController extends Insertion<InsertData> {
         }
 
         promise.finally(() => {
-            this.editSvc.remove(this.editItem.key)
-            this.editSvc.clearAutosave(this.editItem.key)
+            this.editorSvc.removeEdit(this.editItem)
         })
 
         return promise
@@ -162,7 +161,7 @@ const InsertComponent: VeComponentOptions = {
             </div>
             <div class="form-group">
                 <label class="label-documentation">Documentation</label>
-                <editor ng-model="$ctrl.createItem.documentation" mms-editor-field="documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
+                <editor ng-model="$ctrl.createItem.documentation" edit-field="documentation" mms-element-id="{{$ctrl.createItem.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
             </div>
             <div class="form-group" ng-show="$ctrl.createType === 2">
                 <label>Value</label>

@@ -3,7 +3,6 @@ import _ from 'lodash'
 import Rx from 'rx-lite'
 
 import { veAppEvents } from '@ve-app/events'
-import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
 import { InsertViewData } from '@ve-components/insertions/components/insert-view.component'
 import { ExtensionService } from '@ve-components/services'
 import { TreeService } from '@ve-components/trees/services/Tree.service'
@@ -18,7 +17,7 @@ import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { InsertResolveFn } from '@ve-types/components'
-import { ElementObject, RefsResponse, ViewObject } from '@ve-types/mms'
+import { ElementObject, InstanceSpecObject, ViewObject } from '@ve-types/mms'
 import { TreeBranch } from '@ve-types/tree'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
@@ -91,7 +90,6 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 class ViewTreesController implements IComponentController {
     //Bindings
-    treesCategory: string
     toolbarId: string = 'toolbar'
     buttonId: string
 
@@ -207,10 +205,6 @@ class ViewTreesController implements IComponentController {
                             })
                             break
                         }
-                        case 'tree-delete': {
-                            this.deleteItem()
-                            break
-                        }
 
                         case 'tree-add-group': {
                             this.insert('Group').catch((reason) => {
@@ -225,6 +219,20 @@ class ViewTreesController implements IComponentController {
                     }
                 }
                 data.$event.stopPropagation()
+            }),
+            this.eventSvc.$on<InstanceSpecObject>('presentation.deleted', (data) => {
+                this.treeSvc.getBranch(data).then(
+                    (branch) => {
+                        if (branch) {
+                            this.treeSvc.removeSingleBranch(branch).catch((reason) => {
+                                this.growl.error(TreeService.treeError(reason))
+                            })
+                        }
+                    },
+                    (reason) => {
+                        this.growl.error(TreeService.treeError(reason))
+                    }
+                )
             })
         )
     }
@@ -471,131 +479,6 @@ class ViewTreesController implements IComponentController {
         return this.$q.resolve('view')
     }
 
-    deleteItem = (): void => {
-        const branch = this.treeSvc.getSelectedBranch()
-        if (!branch) {
-            this.growl.warning('Select item to remove.')
-            return
-        }
-        this.treeSvc.getPrevBranch(branch).then(
-            (prevBranch) => {
-                const type = this.viewSvc.getElementType(branch.data)
-                if (this.treesCategory === 'present') {
-                    if (type == 'Document') {
-                        this.growl.warning(
-                            'Cannot remove a document from this view. To remove this item, go to project home.'
-                        )
-                        return
-                    }
-                    if (branch.type !== 'view' || !this.apiSvc.isView(branch.data)) {
-                        this.growl.warning(
-                            'Cannot remove non-view item. To remove this item, open it in the center pane.'
-                        )
-                        return
-                    }
-                } else {
-                    if (
-                        branch.type !== 'view' &&
-                        !this.apiSvc.isDocument(branch.data) &&
-                        (branch.type !== 'group' || branch.children.length > 0)
-                    ) {
-                        this.growl.warning('Cannot remove group with contents. Empty contents and try again.')
-                        return
-                    }
-                }
-                const instance = this.$uibModal.open<ConfirmDeleteModalResolveFn, void>({
-                    component: 'confirmDeleteModal',
-                    resolve: {
-                        getType: () => {
-                            let type = branch.type
-                            if (this.apiSvc.isDocument(branch.data)) {
-                                type = 'Document'
-                            }
-                            return type
-                        },
-                        getName: () => {
-                            return branch.data.name
-                        },
-                        finalize: () => {
-                            return (): VePromise<void, RefsResponse> => {
-                                return new this.$q<void, RefsResponse>((resolve, reject) => {
-                                    if (branch.type === 'view') {
-                                        this.treeSvc.getParent(branch).then((parentBranch) => {
-                                            if (this.treesCategory === 'present') {
-                                                this.viewSvc.downgradeDocument(branch.data).then(resolve, reject)
-                                            } else {
-                                                this.viewSvc
-                                                    .removeViewFromParentView({
-                                                        projectId: parentBranch.data._projectId,
-                                                        refId: parentBranch.data._refId,
-                                                        parentViewId: parentBranch.data.id,
-                                                        viewId: branch.data.id,
-                                                    })
-                                                    .then(resolve, reject)
-                                            }
-                                        }, reject)
-                                    } else if (branch.type === 'group') {
-                                        this.viewSvc.removeGroup(branch.data).then(resolve, reject)
-                                    } else {
-                                        resolve()
-                                    }
-                                })
-                            }
-                        },
-                    },
-                })
-                instance.result.then(
-                    () => {
-                        this.treeSvc.removeBranch(branch).then(
-                            () => {
-                                this.treeSvc.getParent(branch).then(
-                                    (parentBranch) => {
-                                        const data = {
-                                            parentBranch,
-                                            prevBranch,
-                                            branch,
-                                        }
-                                        this.eventSvc.$broadcast<veAppEvents.viewDeletedData>('view.deleted', data)
-                                        if (this.treesCategory === 'present' && branch.type === 'view') {
-                                            this.treeSvc.processDeletedViewBranch(branch)
-                                        }
-                                        let selectBranch: TreeBranch = null
-                                        if (prevBranch) {
-                                            selectBranch = prevBranch
-                                        } else if (parentBranch) {
-                                            selectBranch = parentBranch
-                                        }
-                                        this.treeSvc.selectBranch(selectBranch).then(
-                                            () => {
-                                                this.eventSvc.$broadcast(TreeService.events.RELOAD)
-                                            },
-                                            (reason) => {
-                                                this.growl.error(TreeService.treeError(reason))
-                                            }
-                                        )
-                                    },
-                                    (reason) => {
-                                        this.growl.error(TreeService.treeError(reason))
-                                    }
-                                )
-                            },
-
-                            (reason) => {
-                                this.growl.error(TreeService.treeError(reason))
-                            }
-                        )
-                    },
-                    (reason) => {
-                        this.growl.error(reason.message)
-                    }
-                )
-            },
-            (reason) => {
-                this.growl.error(reason.message)
-            }
-        )
-    }
-
     addViewSections = (view: ViewObject): void => {
         const node = this.treeSvc.viewId2node[view.id]
         this.treeSvc.addSectionElements(view, node, node).catch((reason) => {
@@ -683,7 +566,6 @@ const ViewTreesComponent: VeComponentOptions = {
 </ng-pane>
 `,
     bindings: {
-        treesCategory: '<',
         toolbarId: '@',
         buttonId: '@',
     },

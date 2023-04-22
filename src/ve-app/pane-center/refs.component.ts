@@ -3,19 +3,19 @@ import angular, { IWindowService } from 'angular'
 import _ from 'lodash'
 import Rx from 'rx-lite'
 
-import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
 import { AppUtilsService } from '@ve-app/main/services'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
 import { InsertRefData } from '@ve-components/insertions/components/insert-ref.component'
+import { ConfirmDeleteModalResolveFn } from '@ve-core/modals'
 import { ApplicationService, RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { ProjectService, ElementService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import { InsertResolveFn } from '@ve-types/components'
-import { ParamsObject, ProjectObject, ProjectsResponse, RefObject, RefsResponse } from '@ve-types/mms'
+import { ProjectObject, RefObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 class RefsController {
@@ -104,7 +104,6 @@ class RefsController {
         this.project = this.mmsProject
 
         this.htmlTooltip = this.$sce.trustAsHtml('Branch temporarily unavailable during duplication.') as string
-
     }
 
     selectMasterDefault = (): void => {

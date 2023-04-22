@@ -27,6 +27,7 @@ import './components/present-paragraph.component'
 import './components/present-table.component'
 import './components/present-table-t.component'
 import './components/present-section.component'
+import './components/present-comment.component'
 
 //Compatibility
 import './mms-view-compatibility.component'

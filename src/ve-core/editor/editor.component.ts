@@ -49,11 +49,13 @@ export class EditorController implements angular.IComponentController {
     private ngModelCtrl: VeNgModelController<string>
     private ngModel: string
 
+    mmsElementId: string
     mmsProjectId: string
     mmsRefId: string
-    private mmsEditorType: string
-    private mmsEditingField: 'name' | 'value' | 'documentation'
-    private autosaveKey: string
+    private editorType: string
+    private editField: 'name' | 'value' | 'documentation' = 'documentation'
+    private editKey: string | string[]
+    private editIndex: string = ''
 
     private stylesToolbar = {
         name: 'styles',
@@ -102,7 +104,7 @@ export class EditorController implements angular.IComponentController {
     private extrasToolbar = { name: 'extras', items: ['mmsExtraFeature'] }
 
     protected $transcludeEl: JQuery<HTMLElement>
-    protected id: string
+    public id: string
     protected init: boolean = false
 
     private instance: CKEDITOR.editor = null
@@ -174,14 +176,21 @@ export class EditorController implements angular.IComponentController {
         if (onChangesObj.ngModel && !this.init) {
             this.init = true
 
-            this.id = this.editorSvc.createId(this.autosaveKey, this.mmsEditingField)
-            this.editorSvc.add(this.autosaveKey, this.id, this)
+            this.id = this.editorSvc.createId()
+            this.editKey = this.elementSvc.getRequestKey(
+                { refId: this.mmsRefId, projectId: this.mmsProjectId },
+                this.mmsElementId,
+                true
+            )
+            if (this.editKey) {
+                this.editorSvc.add(this.editKey, `${this.editField}${this.editIndex}`, this.update)
+            }
             this.startEditor()
         }
     }
 
     $onDestroy(): void {
-        this.editorSvc.remove(this.autosaveKey, this.id)
+        this.editorSvc.remove(this.editKey, `${this.editField}${this.editIndex}`)
     }
 
     public startEditor(): void {
@@ -202,10 +211,12 @@ export class EditorController implements angular.IComponentController {
             contentsCss: `${this.ckEditor.basePath}contents.css`,
             toolbar: this.getToolbar(),
         })
-        if (this.autosaveKey) {
+        if (this.editKey) {
             // Configuration for autosave plugin
             this.instance.config.autosave = {
-                SaveKey: this.autosaveKey,
+                SaveKey: `${Array.isArray(this.editKey) ? this.editKey.join('|') : this.editKey}${this.editField}${
+                    this.editIndex
+                }`,
                 delay: 5,
                 NotOlderThen: 7200, // 5 days in minutes
                 enableAutosave: true,
@@ -214,7 +225,7 @@ export class EditorController implements angular.IComponentController {
             this.instance.config.autosave = { enableAutosave: false }
         }
         this._waitForEditor(() => {
-            // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
+            // Enable Autosave plugin only when provided with unique identifier (editKey)
 
             this._addInlineMention()
 
@@ -224,7 +235,7 @@ export class EditorController implements angular.IComponentController {
         })
 
         const highlightActiveEditor = (instance: CKEDITOR.editor): void => {
-            const activeEditorClass = 'actieditor'
+            const activeEditorClass = 'activeditor'
             $('transclude-doc').children('div').removeClass(activeEditorClass)
             $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
 
@@ -464,7 +475,7 @@ export class EditorController implements angular.IComponentController {
             this.editingToolbar,
             this.sourceToolbar,
         ]
-        switch (this.mmsEditorType) {
+        switch (this.editorType) {
             // case 'TableT':
             //     thisToolbar = [
             //         this.stylesToolbar,
@@ -806,10 +817,9 @@ const EditorComponent: VeComponentOptions = {
         mmsElementId: '<',
         mmsProjectId: '@',
         mmsRefId: '@',
-        autosaveKey: '@',
-        mmsEditorType: '@',
-        mmsEditingField: '@',
-        field: '<',
+        editorType: '@',
+        editField: '@',
+        editIndex: '<',
     },
     controller: EditorController,
 }

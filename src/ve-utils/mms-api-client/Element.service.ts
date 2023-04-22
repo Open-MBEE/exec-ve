@@ -319,26 +319,27 @@ export class ElementService extends BaseApiService {
      */
     getElementForEdit<T extends ElementObject>(
         reqOb: ElementsRequest<string>,
-        weight?: number
+        weight?: number,
+        overwrite?: boolean
     ): VePromise<EditObject<T>, ElementsResponse<T>> {
         this.apiSvc.normalize(reqOb)
         const requestCacheKey = this.getRequestKey(reqOb, reqOb.elementId, true)
         const url = this.uRLSvc.getElementURL(reqOb) + 'edit'
         if (!this._isInProgress(url)) {
-            const cached = this.editSvc.get<T>(requestCacheKey)
-            if (cached) {
+            const openEdit = this.editSvc.get<T>(requestCacheKey)
+            if (openEdit && !overwrite) {
                 return new this.$q<EditObject<T>, ElementsResponse<T>>((resolve, reject) => {
-                    return resolve(cached)
+                    return resolve(openEdit)
                 })
             }
             this._addInProgress(
                 url,
                 new this.$q<EditObject<T>, ElementsResponse<T>>((resolve, reject) => {
-                    this.getElement<T>(reqOb, weight, false)
+                    this.getElement<T>(reqOb, weight)
                         .then(
                             (result) => {
                                 const copy = _.cloneDeep(result)
-                                resolve(this.editSvc.addOrUpdate(requestCacheKey, copy) as EditObject<T>)
+                                resolve(this.editSvc.addOrUpdate(requestCacheKey, copy, overwrite) as EditObject<T>)
                             },
                             (reason) => {
                                 reject(reason)

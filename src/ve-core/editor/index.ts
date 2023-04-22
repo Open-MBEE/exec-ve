@@ -2,6 +2,7 @@
 import './services'
 
 export * from './services'
+export * from './editor-buttons.config'
 
 //Components
 import './components/mention.component'

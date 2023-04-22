@@ -26,13 +26,13 @@ export class ExtensionService {
     allowedExtensions: string[] = ['present', 'transclude', 'spec', 'insert', 'tree-of']
 
     public AnnotationType = {
-        mmsTranscludeName: 1,
-        mmsTranscludeDoc: 2,
-        mmsTranscludeCom: 3,
-        mmsTranscludeVal: 4,
+        transcludeName: 1,
+        transcludeDoc: 2,
+        transcludeCom: 3,
+        transcludeVal: 4,
         mmsViewLink: 5,
-        mmsPresentationElement: 6,
-        mmsTranscludeView: 7,
+        presentationElement: 6,
+        transcludeView: 7,
     }
 
     static $inject = []

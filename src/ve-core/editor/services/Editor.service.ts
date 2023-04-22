@@ -1,27 +1,22 @@
 import $ from 'jquery'
-import _ from 'lodash'
 
-import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
 import { SaveConflictResolveFn } from '@ve-components/diffs'
-import { ButtonBarApi } from '@ve-core/button-bar'
-import { EditorController } from '@ve-core/editor/editor.component'
 import { EditDialogService } from '@ve-core/editor/services/EditDialog.service'
+import { ConfirmDeleteModalResolveFn } from '@ve-core/modals'
 import { ToolbarService } from '@ve-core/toolbar'
-import { CacheService, EditService, EventService } from '@ve-utils/core'
+import { CacheService, EditObject, EditService, EventService } from '@ve-utils/core'
 import { ApiService, ElementService, PermissionsService, ViewService } from '@ve-utils/mms-api-client'
 import { ValueService } from '@ve-utils/mms-api-client/Value.service'
 
 import { veCore } from '@ve-core'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
-import { ComponentController } from '@ve-types/components'
-import { ConstraintObject, ElementObject, ElementsResponse, SlotObject, ValueObject, ViewObject } from '@ve-types/mms'
+import { ElementObject, ElementsResponse } from '@ve-types/mms'
 import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 export class EditorService {
     public generatedIds: number = 0
-    private ckEditor = window.CKEDITOR
-    private edit2editor: { [autosaveKey: string]: { [editorId: string]: EditorController } }
+    private edit2editor: { [editKey: string]: { [field: string]: () => VePromise<void, string> } }
     public savingAll: boolean = false
 
     static $inject = [
@@ -58,46 +53,47 @@ export class EditorService {
         private editSvc: EditService
     ) {}
 
-    public get(autosaveKey: string): { [editorId: string]: EditorController } {
-        return this.edit2editor[autosaveKey]
+    public get(editKey: string): { [field: string]: () => VePromise<void, string> } {
+        return this.edit2editor[editKey]
     }
 
-    public updateAllData(editKey: string | string[]): VePromise<void, string> {
+    public updateAllData(editKey: string | string[], allowNone?: boolean): VePromise<void, string> {
         const key: string = this.editSvc.makeKey(editKey)
         return new this.$q<void, string>((resolve, reject) => {
             if (this.edit2editor[key]) {
                 const promises: VePromise<void, string>[] = []
                 for (const id of Object.keys(this.edit2editor[key])) {
-                    promises.push(this.edit2editor[key][id].update())
+                    promises.push(this.edit2editor[key][id]())
                 }
                 this.$q.all(promises).then(resolve, reject)
+            } else if (allowNone) {
+                resolve()
             } else {
                 reject({ status: 500, message: 'No editors present to update from' })
             }
         })
     }
 
-    public add(autosaveKey: string, editorId: string, ctrl: EditorController): void {
-        if (!this.edit2editor[autosaveKey]) this.edit2editor[autosaveKey] = {}
-        this.edit2editor[autosaveKey][editorId] = ctrl
+    public add(editKey: string | string[], field: string, updateFn: () => VePromise<void, string>): void {
+        editKey = this.editSvc.makeKey(editKey)
+        if (!this.edit2editor[editKey]) this.edit2editor[editKey] = {}
+        this.edit2editor[editKey][field] = updateFn
     }
 
-    public remove(autosaveKey: string, editorId: string): void {
-        if (this.edit2editor[autosaveKey] && this.edit2editor[autosaveKey][editorId]) {
-            this.ckEditor.instances[editorId].destroy()
-            delete this.edit2editor[autosaveKey][editorId]
-            if (Object.keys(this.edit2editor[autosaveKey]).length === 0) {
-                delete this.edit2editor[autosaveKey]
-            }
+    public remove(editKey: string | string[], field: string): void {
+        editKey = Array.isArray(editKey) ? editKey.join('|') : editKey
+        if (this.edit2editor[editKey] && this.edit2editor[editKey][field]) {
+            this.edit2editor[editKey][field]().finally(() => {
+                delete this.edit2editor[editKey as string][field]
+                if (Object.keys(this.edit2editor[editKey as string]).length === 0) {
+                    delete this.edit2editor[editKey as string]
+                }
+            })
         }
     }
 
-    public createId(editKey?: string, field?: string): string {
-        let id = ''
-        if (editKey) id = `${editKey}|${field}`
-        else id = `mmsCKEditor${this.generatedIds++}`
-        if (Object.keys(this.ckEditor.instances).includes(id)) id = `mmsCKEditor${this.generatedIds++}`
-        return id
+    public createId(): string {
+        return `mmsCKEditor${this.generatedIds++}`
     }
     public focusOnEditorAfterAddingWidgetTag(editor: CKEDITOR.editor): void {
         const element = editor.widgets.focused.element.getParent()
@@ -145,14 +141,13 @@ export class EditorService {
             this.elementSvc
                 .updateElements(
                     Object.values(this.editSvc.getAll()).map((editOb) => {
-                        return editOb.edit
+                        return editOb.element
                     })
                 )
                 .then((responses) => {
                     responses.forEach((elementOb) => {
-                        const editKey = this.elementSvc.getElementKey(elementOb)
-                        this.editSvc.clearAutosave(editKey)
-                        this.editSvc.remove(editKey)
+                        const edit = this.editSvc.get(this.elementSvc.getElementKey(elementOb))
+                        this.removeEdit(edit)
                         const data = {
                             element: elementOb,
                             continueEdit: false,
@@ -181,8 +176,8 @@ export class EditorService {
         return new this.$q<T>((resolve, reject) => {
             this.updateAllData(editKey).then(
                 () => {
-                    this.editSvc.clearAutosave(editKey)
-                    const edit = this.editSvc.get<T>(editKey).edit
+                    this.clearAutosave(editKey)
+                    const edit = this.editSvc.get<T>(editKey).element
                     this.elementSvc.updateElement(edit, false, true).then(
                         (element: T) => {
                             resolve(element)
@@ -260,37 +255,68 @@ export class EditorService {
      * @return {boolean} has changes or not
      */
     public hasEdits = (
-        editOb: ElementObject,
+        editOb: EditObject,
         field?: 'name' | 'value' | 'documentation'
     ): VePromise<boolean, ElementsResponse<ElementObject>> => {
-        editOb._commitId = 'latest'
+        const edit = editOb.element
+        edit._commitId = 'latest'
         return new this.$q<boolean, ElementsResponse<ElementObject>>((resolve) => {
-            this.elementSvc.getElement<ElementObject>(this.elementSvc.getElementRequest(editOb)).then(
-                (elementOb) => {
-                    if ((!field || field === 'name') && editOb.name !== elementOb.name) {
-                        resolve(true)
-                    }
-                    if ((!field || field === 'documentation') && editOb.documentation !== elementOb.documentation) {
-                        resolve(true)
-                    }
-                    if (!field || field === 'value') {
-                        if (
-                            (editOb.type === 'Property' || editOb.type === 'Port') &&
-                            !_.isEqual(editOb.defaultValue, elementOb.defaultValue)
-                        ) {
-                            resolve(true)
-                        } else if (editOb.type === 'Slot' && !_.isEqual(editOb.value, elementOb.value)) {
-                            resolve(true)
-                        } else if (editOb.type.endsWith('TaggedValue') && !_.isEqual(editOb.value, elementOb.value)) {
-                            resolve(true)
-                        } else if (
-                            editOb.type === 'Constraint' &&
-                            !_.isEqual(editOb.specification, elementOb.specification)
-                        ) {
-                            resolve(true)
+            this.updateAllData(editOb.key, true).then(
+                () => {
+                    this.elementSvc.getElement<ElementObject>(this.elementSvc.getElementRequest(edit)).then(
+                        (elementOb) => {
+                            if (elementOb) {
+                                if ((!field || field === 'name') && edit.name !== elementOb.name) {
+                                    resolve(true)
+                                }
+                                if (
+                                    (!field || field === 'documentation') &&
+                                    edit.documentation !== elementOb.documentation
+                                ) {
+                                    resolve(true)
+                                }
+                                if (
+                                    this.valueSvc.isValue(edit) &&
+                                    (!field || field === 'value') &&
+                                    !this.valueSvc.isEqual(edit, elementOb)
+                                ) {
+                                    resolve(true)
+                                    // if (
+                                    //     (edit.type === 'Property' || edit.type === 'Port') &&
+                                    //     !_.isEqual(edit.defaultValue, elementOb.defaultValue)
+                                    // ) {
+                                    //     resolve(true)
+                                    // } else if (
+                                    //     edit.type === 'Slot' &&
+                                    //     !_.isEqual((edit as SlotObject).value, elementOb.value)
+                                    // ) {
+                                    //     resolve(true)
+                                    // } else if (
+                                    //     edit.type.endsWith('TaggedValue') &&
+                                    //     !_.isEqual((edit as TaggedValueObject).value, elementOb.value)
+                                    // ) {
+                                    //     resolve(true)
+                                    // } else if (
+                                    //     edit.type === 'Constraint' &&
+                                    //     !_.isEqual((edit as ConstraintObject).specification, elementOb.specification)
+                                    // ) {
+                                    //     resolve(true)
+                                    // }
+                                }
+                                resolve(false)
+                            } else if (
+                                edit.id.endsWith('_temp') &&
+                                (edit.name || edit.documentation || this.valueSvc.hasValue(edit))
+                            ) {
+                                resolve(true)
+                            } else {
+                                resolve(false)
+                            }
+                        },
+                        () => {
+                            resolve(false)
                         }
-                    }
-                    resolve(false)
+                    )
                 },
                 () => {
                     resolve(false)
@@ -301,36 +327,58 @@ export class EditorService {
 
     /**
      * @name Utils#revertEdits
-     * reset editor object back to base element values for name, doc, values
+     * reset back to base element or remove editor object
      *
-     * @param editValues
      * @param {object} editOb scope with common properties
-     * @param {object} editorApi editor api to kill editor if reverting changes
+     * @param {boolean} continueEdit boolean to re-check out a clean copy
      */
-    public revertEdits(editValues: ValueObject[], editOb: ElementObject): ValueObject[] {
-        editOb._commitId = 'latest'
-        const cachedKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(editOb), editOb.id, false)
-        const elementOb: ElementObject = this.cacheSvc.get<ElementObject>(cachedKey)
-
-        if (elementOb.name) {
-            editOb.name = elementOb.name
-        }
-        editOb.documentation = elementOb.documentation
-        if (editOb.type === 'Property' || editOb.type === 'Port') {
-            editOb.defaultValue = _.cloneDeep(elementOb.defaultValue)
-            if (editOb.defaultValue) {
-                editValues = [editOb.defaultValue]
+    public resetEdit(editOb: EditObject, continueEdit?: boolean): VePromise<void, ElementsResponse<ElementObject>> {
+        return new this.$q((resolve, reject) => {
+            if (continueEdit) {
+                const reqOb = {
+                    elementId: editOb.element.id,
+                    projectId: editOb.element._projectId,
+                    refId: editOb.element._refId,
+                }
+                this.removeEdit(editOb, true)
+                this.elementSvc.getElementForEdit(reqOb).then(
+                    (edit) => {
+                        if (this.valueSvc.isValue(edit.element)) {
+                            edit.values = this.valueSvc.getValues(edit.element)
+                        }
+                        resolve()
+                    },
+                    (reason) => {
+                        reject(reason)
+                    }
+                )
             } else {
-                editValues = []
+                this.removeEdit(editOb)
+                resolve()
             }
-        } else if (editOb.type === 'Slot') {
-            ;(editOb as SlotObject).value = _.cloneDeep((elementOb as SlotObject).value)
-            editValues = (editOb as SlotObject).value
-        } else if (editOb.type === 'Constraint' && editOb.specification) {
-            ;(editOb as ConstraintObject).specification = _.cloneDeep((elementOb as ConstraintObject).specification)
-            editValues = [(editOb as ConstraintObject).specification]
+        })
+    }
+
+    public removeEdit(editOb: EditObject, silent?: boolean): void {
+        this.clearAutosave(editOb.key)
+        this.editSvc.remove(editOb.key)
+        if (!silent) {
+            this.eventSvc.$broadcast('editor.cancel')
         }
-        return editValues
+    }
+
+    public clearAutosave = (key: string | string[]): void => {
+        key = this.editSvc.makeKey(key)
+
+        Object.keys(window.localStorage).forEach((akey) => {
+            if (akey.indexOf(key as string) !== -1) {
+                window.localStorage.removeItem(akey)
+            }
+        })
+    }
+
+    private _makeKey(key: string | string[]): string {
+        return Array.isArray(key) ? key.join('|') : key
     }
 
     public handleError<T>(reason: { message: string; type: 'error' | 'warning' | 'info' } | VePromiseReason<T>): void {
@@ -339,135 +387,15 @@ export class EditorService {
         else if (reason.type === 'error') this.growl.error(reason.message)
     }
 
-    /**
-     * @name veUtils/directives.Utils#cancelAction     * called by transcludes and section, cancels edited element
-     * uses these in the scope:
-     *   element - element object for the element to edit (for sections it's the instance spec)
-     *   edit - edit object
-     *   elementSaving - boolean
-     *   isEditing - boolean
-     *   bbApi - button bar api - handles spinny
-     * sets these in the scope:
-     *   isEditing - false
-     *
-     * @param {object} ctrl scope of the transclude directives or view section directive
-     * @param {object} recompile recompile function object
-     * @param {object} domElement dom of the directive, jquery wrapped
-     */
-    public cancelAction(
-        ctrl: ComponentController,
-        recompile: (preview?) => void,
-        domElement: JQuery<HTMLElement>
-    ): void {
-        if (ctrl.elementSaving) {
-            this.growl.info('Please Wait...')
-            return
-        }
-        const cancelCleanUp = (): void => {
-            ctrl.isEditing = false
-            this.revertEdits(ctrl.editValues, ctrl.edit)
-            // Broadcast message for the ToolCtrl:
-            this.eventSvc.$broadcast('presentationElem.cancel', ctrl.edit)
-            recompile()
-            // scrollToElement(domElement);
-        }
-        if (ctrl.bbApi) {
-            ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
-        }
-        // const cancelFn: () => VePromise<boolean> = (): VePromise<boolean> => {
-        //     if (ctrl.editorApi && ctrl.editorApi.cancel) {
-        //         return ctrl.editorApi.cancel()
-        //     }
-        //     return this.$q.resolve<boolean>(true)
-        // }
-        this.updateEditor(ctrl).then(
-            (success) => {
-                // Only need to confirm the cancellation if edits have been made:
-                if (!success) {
-                    this.handleError({
-                        message: 'Problem Saving from Editor',
-                        type: 'warning',
-                    })
-                }
-                if (this.hasEdits(ctrl.edit)) {
-                    const deleteOb: { type: string; element: ElementObject } = {
-                        type: ctrl.edit.type,
-                        element: ctrl.element,
-                    }
-                    this.deleteEditModal(deleteOb)
-                        .result.then(() => {
-                            cancelCleanUp()
-                        })
-                        .finally(() => {
-                            if (ctrl.bbApi) {
-                                ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
-                            }
-                        })
-                } else {
-                    cancelCleanUp()
-                    if (ctrl.bbApi) {
-                        ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
-                    }
-                }
-            },
-            () => {
-                this.handleError({
-                    message: 'Error Saving from Editor; Please Retry',
-                    type: 'error',
-                })
+    public updateEditor(editKey: string | string[], field: string): VePromise<boolean> {
+        return new this.$q((resolve, reject) => {
+            editKey = this.editSvc.makeKey(editKey)
+            if (this.edit2editor[editKey] && this.edit2editor[editKey][field]) {
+                this.edit2editor[editKey][field]().then(resolve, reject)
+            } else {
+                reject()
             }
-        )
-    }
-
-    public updateEditor(ctrl: ComponentController): VePromise<boolean> {
-        if (ctrl.editorOptions && ctrl.editorOptions.callback) {
-            return ctrl.editorOptions.callback()
-        }
-        return this.$q.resolve<boolean>(true)
-    }
-
-    public deleteAction = (ctrl: ComponentController, bbApi: ButtonBarApi, section: ViewObject): void => {
-        if (ctrl.elementSaving) {
-            this.growl.info('Please Wait...')
-            return
-        }
-
-        bbApi.toggleButtonSpinner('presentation-element-delete')
-
-        this.deleteConfirmModal(ctrl.edit, ctrl.element)
-            .result.then(() => {
-                const viewOrSec = section ? section : ctrl.view
-                const reqOb = {
-                    elementId: viewOrSec.id,
-                    projectId: viewOrSec._projectId,
-                    refId: viewOrSec._refId,
-                    commitId: 'latest',
-                }
-                this.viewSvc.removeElementFromViewOrSection(reqOb, ctrl.instanceVal).then(
-                    (data) => {
-                        if (
-                            this.viewSvc.isSection(ctrl.instanceSpec) ||
-                            this.viewSvc.isTable(ctrl.instanceSpec) ||
-                            this.viewSvc.isFigure(ctrl.instanceSpec) ||
-                            this.viewSvc.isEquation(ctrl.instanceSpec)
-                        ) {
-                            // Broadcast message to TreeCtrl:
-                            this.eventSvc.$broadcast('viewctrl.delete.element', ctrl.instanceSpec)
-                        }
-
-                        this.eventSvc.$broadcast('content-reorder.refresh')
-
-                        // Broadcast message for the ToolCtrl:
-                        this.eventSvc.$broadcast('presentationElem.cancel', ctrl.edit)
-
-                        this.growl.success('Remove Successful')
-                    },
-                    (reason) => this.handleError(reason)
-                )
-            })
-            .finally(() => {
-                ctrl.bbApi.toggleButtonSpinner('presentation-element-delete')
-            })
+        })
     }
 
     /**
@@ -489,29 +417,6 @@ export class EditorService {
      * @param {object} recompile recompile function object
      * @param {object} domElement dom of the directive, jquery wrapped
      */
-    public previewAction(ctrl: ComponentController, recompile: () => void, domElement: JQuery<HTMLElement>): void {
-        if (ctrl.elementSaving) {
-            this.growl.info('Please Wait...')
-            return
-        }
-        if (ctrl.edit && this.hasEdits(ctrl.edit) && !ctrl.inPreviewMode) {
-            ctrl.skipBroadcast = true //preview next click to go into edit mode from broadcasting
-            ctrl.inPreviewMode = true
-            recompile()
-        } else {
-            //nothing has changed, cancel instead of preview
-            if (ctrl.edit && ctrl.isEditing) {
-                // Broadcast message for the ToolCtrl to clear out the tracker window:
-                this.eventSvc.$broadcast('presentationElem.cancel', ctrl.edit)
-                if (ctrl.element) {
-                    recompile()
-                }
-            }
-        }
-        ctrl.isEditing = false
-        ctrl.elementSaving = false
-        this.scrollToElement(domElement)
-    }
 
     public scrollToElement = (domElement: JQuery): void => {
         this.$timeout(
@@ -544,19 +449,18 @@ export class EditorService {
         })
     }
 
-    public deleteEditModal(deleteOb: { type: string; element: ElementObject }): VeModalInstanceService<string> {
+    public deleteEditModal(editOb: EditObject): VeModalInstanceService<string> {
         const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
             component: 'confirmDeleteModal',
             resolve: {
                 getName: () => {
-                    return `${deleteOb.type} ${deleteOb.element.id}`
+                    return `${editOb.element.type} ${editOb.element.id}`
                 },
                 getType: () => {
                     return 'edit'
                 },
                 finalize: () => {
                     return () => {
-                        this.editSvc.clearAutosave(this.elementSvc.getElementKey(deleteOb.element))
                         return this.$q.resolve()
                     }
                 },
@@ -565,19 +469,19 @@ export class EditorService {
         return this.$uibModal.open<ConfirmDeleteModalResolveFn, string>(settings)
     }
 
-    public deleteConfirmModal(edit: ElementObject, element: ElementObject): VeModalInstanceService<void> {
+    public deleteConfirmModal(edit: EditObject): VeModalInstanceService<void> {
         const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
             component: 'confirmDeleteModal',
             resolve: {
                 getType: () => {
-                    return edit.type ? edit.type : 'element'
+                    return edit.element.type ? edit.element.type : 'element'
                 },
                 getName: () => {
-                    return edit.name ? edit.name : 'Element'
+                    return edit.element.name ? edit.element.name : 'Element'
                 },
                 finalize: () => {
                     return () => {
-                        this.editSvc.clearAutosave(this.elementSvc.getElementKey(element))
+                        this.removeEdit(edit)
                         return this.$q.resolve()
                     }
                 },

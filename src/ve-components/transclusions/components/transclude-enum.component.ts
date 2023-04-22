@@ -8,8 +8,9 @@
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { EditorService } from '@ve-core/editor'
 import { MathService, UtilsService, ImageService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -61,6 +62,8 @@ export class TranscludeEnumController extends Transclusion implements ITransclus
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
+        editorSvc: EditorService,
+        editSvc: EditService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
@@ -77,6 +80,8 @@ export class TranscludeEnumController extends Transclusion implements ITransclus
             $element,
             growl,
             componentSvc,
+            editorSvc,
+            editSvc,
             elementSvc,
             utilsSvc,
             schemaSvc,
@@ -194,7 +199,7 @@ export class TranscludeEnumController extends Transclusion implements ITransclus
     //             }
     //             if (!ctrl.skipBroadcast) {
     //                 // Broadcast message for the toolCtrl:
-    //                 this.eventSvc.$broadcast('presentationElem.edit', ctrl.edit)
+    //                 this.eventSvc.$broadcast('editor.edit', ctrl.edit)
     //             } else {
     //                 ctrl.skipBroadcast = false
     //             }

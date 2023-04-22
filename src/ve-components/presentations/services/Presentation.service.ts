@@ -92,7 +92,7 @@ export class PresentationService {
                         //auto open editor for newly added pe
                         $('#' + data.id)
                             .find('transclude-doc,transclude-com')
-                            .click()
+                            .trigger('click')
                     },
                     0,
                     false

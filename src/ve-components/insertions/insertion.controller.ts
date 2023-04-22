@@ -2,8 +2,9 @@ import _ from 'lodash'
 
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import { EditObject, EditService } from '@ve-utils/core'
+import { EditObject } from '@ve-utils/core'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -67,7 +68,7 @@ export class Insertion<
         'UtilsService',
         'ApiService',
         'InsertService',
-        'EditService',
+        'EditorService',
     ]
 
     protected schema = 'cameo'
@@ -91,7 +92,7 @@ export class Insertion<
         protected utilsSvc: UtilsService,
         protected apiSvc: ApiService,
         protected utils: InsertionService,
-        protected editSvc: EditService
+        protected editorSvc: EditorService
     ) {}
 
     public parentData: ElementObject = {} as ElementObject

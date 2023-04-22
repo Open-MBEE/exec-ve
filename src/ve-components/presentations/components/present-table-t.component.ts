@@ -10,7 +10,7 @@ const PresentTableTComponent: IPresentationComponentOptions = {
 `,
     bindings: {
         peObject: '<',
-        element: '<',
+        instanceSpec: '<',
         peNumber: '<',
     },
     controller: PresentationLite,

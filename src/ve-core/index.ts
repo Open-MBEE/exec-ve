@@ -5,6 +5,7 @@
 import './ve-core.module'
 
 // Core Component Libraries
+import './modals'
 import './button-bar'
 import './toolbar'
 import './editor'

@@ -138,7 +138,7 @@ class PresentTableController extends Presentation {
             },
             (reason) => {
                 const reqOb = {
-                    elementId: this.element.id,
+                    elementId: this.instanceSpec.id,
                     projectId: this.projectId,
                     refId: this.refId,
                     commitId: this.commitId,
@@ -147,14 +147,14 @@ class PresentTableController extends Presentation {
                 this.$element.empty()
                 //TODO: Add reason/errorMessage handling here.
                 this.$transcludeEl = $(
-                    '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                    '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
                 )
                 this.$element.append(this.$transcludeEl)
                 this.$compile(this.$transcludeEl)(
                     Object.assign(this.$scope.$new(), {
-                        reqOb: reqOb,
+                        elementId: reqOb.elementId,
                         recentElement: reason.recentVersionOfElement,
-                        type: this.extensionSvc.AnnotationType,
+                        type: 'presentation',
                     })
                 )
             }
@@ -178,7 +178,7 @@ class PresentTableController extends Presentation {
     }
 
     getContent = (): VePromise<string, string> => {
-        const html = this.viewHtmlSvc.makeHtmlTable(this.table, true, true, this.element)
+        const html = this.viewHtmlSvc.makeHtmlTable(this.table, true, true, this.instanceSpec)
         return this.$q.resolve(`<div class="table-wrapper">${html}</div>`)
     }
 
@@ -485,7 +485,7 @@ class PresentTableController extends Presentation {
             this.$element.find('.table-wrapper').removeClass('table-fix-head').css('height', '')
             this._fixedHeadersElem.css('transform', '').css('will-change', '')
             this._fixedHeadersElem = null
-            window.localStorage.setItem('ve-table-header-' + this.element.id, 'false')
+            window.localStorage.setItem('ve-table-header-' + this.instanceSpec.id, 'false')
             return
         }
         this.$element
@@ -496,7 +496,7 @@ class PresentTableController extends Presentation {
         this._fixedHeadersElem = this.$element.find('thead, caption')
         this._fixedHeadersElem.css('will-change', 'transform') //browser optimization
         this.$element.find('.table-fix-head').on('scroll', this.scroll)
-        window.localStorage.setItem('ve-table-header-' + this.element.id, 'true')
+        window.localStorage.setItem('ve-table-header-' + this.instanceSpec.id, 'true')
     }
 
     public makeFixedColumn = (): void => {
@@ -504,7 +504,7 @@ class PresentTableController extends Presentation {
             this.$element.find('.table-wrapper').removeClass('table-fix-column').css('width', '')
             this._fixedColumnsElem.css('transform', '').css('will-change', '').removeClass('table-fixed-cell')
             this._fixedColumnsElem = null
-            window.localStorage.setItem('ve-table-column-' + this.element.id, 'false')
+            window.localStorage.setItem('ve-table-column-' + this.instanceSpec.id, 'false')
             return
         }
         this.$element
@@ -517,7 +517,7 @@ class PresentTableController extends Presentation {
         this._fixedColumnsElem.css('will-change', 'transform') //browser optimization
         this._fixedColumnsElem.addClass('table-fixed-cell')
         this.$element.find('.table-fix-column').on('scroll', this.scroll)
-        window.localStorage.setItem('ve-table-column-' + this.element.id, this.numFixedColumns.toString())
+        window.localStorage.setItem('ve-table-column-' + this.instanceSpec.id, this.numFixedColumns.toString())
     }
 
     public updateFixedColumns = (): void => {
@@ -592,11 +592,11 @@ class PresentTableController extends Presentation {
                 this.nextIndex = first + 300
                 if (this.nextIndex < this.lastIndex) this.compileTable()
                 else {
-                    if (window.localStorage.getItem('ve-table-header-' + this.element.id) == 'true') {
+                    if (window.localStorage.getItem('ve-table-header-' + this.instanceSpec.id) == 'true') {
                         this.fixedHeaders = true
                         this.makeFixedHeader()
                     }
-                    const columnFix = window.localStorage.getItem('ve-table-column-' + this.element.id)
+                    const columnFix = window.localStorage.getItem('ve-table-column-' + this.instanceSpec.id)
                     if (columnFix != 'false' && columnFix != null && columnFix != 'null') {
                         this.fixedColumns = true
                         this.numFixedColumns = Number.parseInt(columnFix)
@@ -629,7 +629,7 @@ const PresentTableComponent: IPresentationComponentOptions = {
 `,
     bindings: {
         peObject: '<',
-        element: '<',
+        instanceSpec: '<',
         peNumber: '<',
     },
     controller: PresentTableController,

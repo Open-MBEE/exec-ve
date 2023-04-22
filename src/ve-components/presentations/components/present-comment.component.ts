@@ -4,10 +4,9 @@ import { veComponents } from '@ve-components'
 
 import { IPresentationComponentOptions } from '@ve-types/components/presentation'
 
-const PresentEquationComponent: IPresentationComponentOptions = {
-    selector: 'presentEquation',
-    template: `<view-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></view-cf>
-`,
+const PresentCommentComponent: IPresentationComponentOptions = {
+    selector: 'presentComment',
+    template: `<view-cf mms-cf-type="com" mms-element-id="{{$ctrl.peObject.source}}"></view-cf>`,
     bindings: {
         peObject: '<',
         instanceSpec: '<',
@@ -16,4 +15,4 @@ const PresentEquationComponent: IPresentationComponentOptions = {
     controller: PresentationLite,
 }
 
-veComponents.component(PresentEquationComponent.selector, PresentEquationComponent)
+veComponents.component(PresentCommentComponent.selector, PresentCommentComponent)

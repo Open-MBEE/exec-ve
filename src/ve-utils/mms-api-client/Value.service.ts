@@ -1,4 +1,6 @@
-import { ITransclusion } from '@ve-components/transclusions'
+import _ from 'lodash'
+
+import { EditObject } from '@ve-utils/core'
 import { ApiService } from '@ve-utils/mms-api-client/Api.service'
 import { ElementService } from '@ve-utils/mms-api-client/Element.service'
 import { ValueSpec } from '@ve-utils/utils'
@@ -23,116 +25,121 @@ import {
 } from '@ve-types/mms'
 
 export class ValueService {
+    private valueTypes: { [type: string]: string } = {
+        property: 'defaultValue',
+        port: 'defaultValue',
+        slot: 'value',
+        constraint: 'specification',
+    }
+
+    public addValueTypes: { [primitiveType: string]: string } = {
+        string: 'LiteralString',
+        boolean: 'LiteralBoolean',
+        integer: 'LiteralInteger',
+        real: 'LiteralReal',
+    }
+
+    private taggedValue: string = 'value'
+
     constructor(
         private $q: VeQService,
         private growl: angular.growl.IGrowlService,
         private apiSvc: ApiService,
         private elementSvc: ElementService
     ) {}
-    public setupValEditFunctions(ctrl: { propertySpec: PropertySpec } & ITransclusion): void {
-        ctrl.addValueTypes = {
-            string: 'LiteralString',
-            boolean: 'LiteralBoolean',
-            integer: 'LiteralInteger',
-            real: 'LiteralReal',
+    public addValue = (editOb: EditObject, type: string): LiteralObject<unknown> => {
+        const edit = editOb.element
+        let newValueSpec: ValueSpec
+        let elementOb: LiteralObject<unknown> = {
+            id: '',
+            _projectId: edit._projectId,
+            _refId: edit._refId,
+            type: '',
         }
-        ctrl.addValue = (type: string): void => {
-            let newValueSpec: ValueSpec
-            let elementOb: LiteralObject<unknown> = {
-                id: '',
-                _projectId: ctrl.mmsProjectId,
-                _refId: ctrl.mmsRefId,
-                type: '',
-            }
-            switch (type) {
-                case 'LiteralBoolean': {
-                    elementOb = Object.assign(elementOb, {
-                        type: type,
-                        value: false,
-                        id: this.apiSvc.createUniqueId(),
-                        ownerId: ctrl.element.id,
-                    })
-                    newValueSpec = new ValueSpec(elementOb)
-                    break
-                }
-                case 'LiteralInteger': {
-                    elementOb = Object.assign(elementOb, {
-                        type: type,
-                        value: 0,
-                        id: this.apiSvc.createUniqueId(),
-                        ownerId: ctrl.element.id,
-                    })
-                    newValueSpec = new ValueSpec(elementOb)
-                    break
-                }
-                case 'LiteralString': {
-                    elementOb = Object.assign(elementOb, {
-                        type: type,
-                        value: '',
-                        id: this.apiSvc.createUniqueId(),
-                        ownerId: ctrl.element.id,
-                    })
-                    newValueSpec = new ValueSpec(elementOb)
-                    break
-                }
-                case 'LiteralReal': {
-                    elementOb = Object.assign(elementOb, {
-                        type: type,
-                        value: 0.0,
-                        id: this.apiSvc.createUniqueId(),
-                        ownerId: ctrl.element.id,
-                    })
-                    newValueSpec = new ValueSpec(elementOb)
-                    break
-                }
-                default: {
-                    elementOb = Object.assign(elementOb, {
-                        type: type,
-                        value: {},
-                        id: this.apiSvc.createUniqueId(),
-                        ownerId: ctrl.element.id,
-                    })
-                }
-            }
-
-            ctrl.editValues.push(newValueSpec)
-            if (ctrl.element.type == 'Property' || ctrl.element.type == 'Port') {
-                ctrl.edit.defaultValue = newValueSpec
-            }
-        }
-        ctrl.addValueType = 'LiteralString'
-
-        ctrl.addEnumerationValue = (): void => {
-            let newValueSpec: InstanceValueObject | ElementValueObject = new ValueSpec({
-                type: 'InstanceValue',
-                instanceId: ctrl.propertySpec.options[0],
-                _projectId: ctrl.mmsProjectId,
-                _refId: ctrl.mmsRefId,
-                id: this.apiSvc.createUniqueId(),
-                ownerId: ctrl.element.id,
-            })
-            if (ctrl.propertySpec.isTaggedValue) {
-                newValueSpec = new ValueSpec({
-                    type: 'ElementValue',
-                    elementId: ctrl.propertySpec.options[0],
-                    _projectId: ctrl.mmsProjectId,
-                    _refId: ctrl.mmsRefId,
+        switch (type) {
+            case 'LiteralBoolean': {
+                elementOb = Object.assign(elementOb, {
+                    type: type,
+                    value: false,
                     id: this.apiSvc.createUniqueId(),
-                    ownerId: ctrl.element.id,
+                    ownerId: edit.id,
+                })
+                newValueSpec = new ValueSpec(elementOb)
+                break
+            }
+            case 'LiteralInteger': {
+                elementOb = Object.assign(elementOb, {
+                    type: type,
+                    value: 0,
+                    id: this.apiSvc.createUniqueId(),
+                    ownerId: edit.id,
+                })
+                newValueSpec = new ValueSpec(elementOb)
+                break
+            }
+            case 'LiteralString': {
+                elementOb = Object.assign(elementOb, {
+                    type: type,
+                    value: '',
+                    id: this.apiSvc.createUniqueId(),
+                    ownerId: edit.id,
+                })
+                newValueSpec = new ValueSpec(elementOb)
+                break
+            }
+            case 'LiteralReal': {
+                elementOb = Object.assign(elementOb, {
+                    type: type,
+                    value: 0.0,
+                    id: this.apiSvc.createUniqueId(),
+                    ownerId: edit.id,
+                })
+                newValueSpec = new ValueSpec(elementOb)
+                break
+            }
+            default: {
+                elementOb = Object.assign(elementOb, {
+                    type: type,
+                    value: {},
+                    id: this.apiSvc.createUniqueId(),
+                    ownerId: edit.id,
                 })
             }
-            ctrl.editValues.push(newValueSpec)
-            if (ctrl.element.type == 'Property' || ctrl.element.type == 'Port') {
-                ctrl.edit.defaultValue = newValueSpec
-            }
         }
 
-        ctrl.removeVal = (i): void => {
-            ctrl.editValues.splice(i, 1)
+        if (edit.type == 'Property' || edit.type == 'Port') {
+            edit.defaultValue = newValueSpec
         }
+        return newValueSpec
     }
 
-    public setupValCf(elementOb: ElementObject): ValueObject[] {
+    public addEnumerationValue = (
+        propertySpec: PropertySpec,
+        editOb: EditObject
+    ): InstanceValueObject | ElementValueObject => {
+        const elementOb = editOb.element
+        let newValueSpec: InstanceValueObject | ElementValueObject = new ValueSpec({
+            type: 'InstanceValue',
+            instanceId: propertySpec.options[0],
+            _projectId: elementOb._projectId,
+            _refId: elementOb._refId,
+            id: this.apiSvc.createUniqueId(),
+            ownerId: elementOb.id,
+        })
+        if (propertySpec.isTaggedValue) {
+            newValueSpec = new ValueSpec({
+                type: 'ElementValue',
+                elementId: propertySpec.options[0],
+                _projectId: elementOb._projectId,
+                _refId: elementOb._refId,
+                id: this.apiSvc.createUniqueId(),
+                ownerId: elementOb.id,
+            })
+        }
+        return newValueSpec
+    }
+
+    public getValues(elementOb: ElementObject): ValueObject[] {
         if (elementOb.type === 'Property' || elementOb.type === 'Port') {
             if (elementOb.defaultValue) {
                 return [elementOb.defaultValue] as ValueObject[]
@@ -222,6 +229,35 @@ export class ValueService {
             deferred.resolve({ options: [], isEnumeration: false })
         }
         return deferred.promise
+    }
+
+    public isValue(elementOb: ElementObject): boolean {
+        const type = elementOb.type
+        return Object.keys(this.valueTypes).includes(type.toLowerCase()) || this.isTaggedValue(elementOb)
+    }
+
+    public isTaggedValue(elementOb: ElementObject): boolean {
+        return elementOb.type.endsWith('TaggedValue')
+    }
+
+    public hasValue(elementOb: ElementObject): boolean {
+        return (
+            this.isValue(elementOb) &&
+            // Check if Property/Port have defaultValues that are not just empty
+            ((elementOb.defaultValue && Object.keys(elementOb.defaultValue).length !== 0) ||
+                // Check if Constraints have specifications that are not just empty
+                (elementOb.specification && Object.keys((elementOb as ConstraintObject).specification).length !== 0) ||
+                // Check if Slots and Tagged Values have any entries
+                (elementOb.value && (elementOb as LiteralObject<LiteralObject<unknown>[]>).value.length > 0))
+        )
+    }
+
+    public isEqual(a: ElementObject, b: ElementObject): boolean {
+        if (this.valueTypes[a.type.toLowerCase()]) {
+            return _.isEqual(a[this.valueTypes[a.type.toLowerCase()]], b[this.valueTypes[a.type.toLowerCase()]])
+        } else if (this.isTaggedValue(a)) {
+            return _.isEqual(a[this.taggedValue], b[this.taggedValue])
+        }
     }
 
     public getPropertySpec(elementOb: ElementObject): VePromise<PropertySpec> {

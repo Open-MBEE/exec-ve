@@ -139,11 +139,9 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         this.specSvc.setEditing(true)
         const editOb = this.specSvc.getEdits()
         if (editOb) {
-            const key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId
-            this.specSvc.tracker.etrackerSelected = key
-            this.autosaveSvc.addOrUpdate(key, editOb)
+            this.specSvc.tracker.etrackerSelected = editOb.key
             this.specSvc.toggleSave(this.toolbarId)
-            this.elementSvc.isCacheOutdated(editOb).then(
+            this.elementSvc.isCacheOutdated(editOb.element).then(
                 (data) => {
                     const server = data.server ? data.server._modified : new Date()
                     const cache = data.cache ? data.cache._modified : new Date()
@@ -174,7 +172,7 @@ const SpecEditorComponent: VeComponentOptions = {
             
         
     <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-    <editor ng-model="$ctrl.edit.documentation" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></editor>
+    <editor ng-model="$ctrl.edit.documentation" edit-field="documentation" mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></editor>
 
     <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
     <span class="elem-type-wrapper prop">

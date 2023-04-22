@@ -1,6 +1,6 @@
 import { Insertion, InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import { EditService } from '@ve-utils/core'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import { Class } from '@ve-utils/utils'
@@ -31,7 +31,7 @@ class InsertCommentController extends Insertion<InsertData> {
         utilsSvc: UtilsService,
         apiSvc: ApiService,
         utils: InsertionService,
-        editSvc: EditService
+        editorSvc: EditorService
     ) {
         super(
             $scope,
@@ -48,7 +48,7 @@ class InsertCommentController extends Insertion<InsertData> {
             utilsSvc,
             apiSvc,
             utils,
-            editSvc
+            editorSvc
         )
     }
 

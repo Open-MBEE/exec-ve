@@ -1,3 +1,5 @@
+import $ from 'jquery'
+
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
 import { CrossReferenceController } from '@ve-components/transclusions/view-cf.component'
@@ -204,14 +206,14 @@ class ViewLinkController implements angular.IComponentController {
                 (reason) => {
                     this.$element.empty()
                     this.$transcludeEl = $(
-                        '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                        '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
                     )
                     this.$element.append(this.$transcludeEl)
                     this.$compile(this.$transcludeEl)(
                         Object.assign(this.$scope.$new(), {
-                            reqOb: reqOb,
+                            elementId: reqOb.elementId,
                             recentElement: reason.recentVersionOfElement,
-                            type: this.extensionSvc.AnnotationType.mmsPresentationElement,
+                            type: 'link',
                         })
                     )
                 }

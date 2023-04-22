@@ -9,7 +9,6 @@ import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import { ComponentController } from '@ve-types/components'
 import {
     ElementObject,
     InstanceSpecObject,
@@ -18,15 +17,10 @@ import {
     ViewObject,
 } from '@ve-types/mms'
 
-export interface IPresentation extends ComponentController {
-    number: string
-    level: number
-}
-
 export class PresentationLite {
     //Bindings
     public peObject: PresentationInstanceObject
-    public element: InstanceSpecObject
+    public instanceSpec: InstanceSpecObject
     public peNumber: string
 }
 
@@ -116,16 +110,15 @@ export class Presentation extends PresentationLite {
         if (this.mmsViewCtrl && this.mmsViewPresentationElemCtrl) {
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
             this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
+            //this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
             this.view = this.mmsViewCtrl.getView()
-            this.isDirectChildOfPresentationElement = this.componentSvc.isDirectChildOfPresentationElementFunc(
-                this.$element,
-                this.mmsViewCtrl
-            )
-            if (
-                this.element.classifierIds[0] ===
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Section', this.schema)
-            )
-                this.isDirectChildOfPresentationElement = false
+            const isOpaque =
+                this.instanceSpec.classifierIds &&
+                this.instanceSpec.classifierIds.length > 0 &&
+                this.schemaSvc
+                    .getMap<string[]>('OPAQUE_CLASSIFIERS', this.schema)
+                    .indexOf(this.instanceSpec.classifierIds[0]) >= 0
+            this.isDirectChildOfPresentationElement = !isOpaque
         }
 
         if (this.commitId === 'latest') {
@@ -134,12 +127,12 @@ export class Presentation extends PresentationLite {
                     const elementOb = data.element
                     const continueEdit = data.continueEdit
                     if (
-                        elementOb.id === this.element.id &&
-                        elementOb._projectId === this.element._projectId &&
-                        elementOb._refId === this.element._refId &&
+                        elementOb.id === this.instanceSpec.id &&
+                        elementOb._projectId === this.instanceSpec._projectId &&
+                        elementOb._refId === this.instanceSpec._refId &&
                         !continueEdit
                     ) {
-                        this.element = elementOb
+                        this.instanceSpec = elementOb
                         this.recompile()
                     }
                 })
@@ -194,7 +187,7 @@ export class Presentation extends PresentationLite {
             },
             (reason) => {
                 const reqOb = {
-                    elementId: this.element.id,
+                    elementId: this.instanceSpec.id,
                     projectId: this.projectId,
                     refId: this.refId,
                     commitId: this.commitId,
@@ -203,14 +196,14 @@ export class Presentation extends PresentationLite {
                 this.$element.empty()
                 //TODO: Add reason/errorMessage handling here.
                 this.$transcludeEl = $(
-                    '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                    '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
                 )
                 this.$element.append(this.$transcludeEl)
                 this.$compile(this.$transcludeEl)(
                     Object.assign(this.$scope.$new(), {
-                        reqOb: reqOb,
+                        elementId: reqOb.elementId,
                         recentElement: reason.recentVersionOfElement,
-                        type: this.extensionSvc.AnnotationType,
+                        type: 'presentation',
                     })
                 )
             }

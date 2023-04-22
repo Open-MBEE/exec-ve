@@ -10,7 +10,7 @@ const PresentFigureComponent: IPresentationComponentOptions = {
 `,
     bindings: {
         peObject: '<',
-        element: '<',
+        instanceSpec: '<',
         peNumber: '<',
     },
     controller: PresentationLite,

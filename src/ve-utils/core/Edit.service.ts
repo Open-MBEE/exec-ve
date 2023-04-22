@@ -2,11 +2,11 @@ import { veUtils } from '@ve-utils'
 
 import { EventService } from './Event.service'
 
-import { ConstraintObject, ElementObject, SlotObject, TaggedValueObject, ValueObject } from '@ve-types/mms'
+import { ElementObject, ValueObject } from '@ve-types/mms'
 
 export interface EditObject<T extends ElementObject = ElementObject> {
-    edit: T
-    editValues: ValueObject[]
+    element: T
+    values?: ValueObject[]
     key: string
 }
 
@@ -36,24 +36,13 @@ export class EditService {
         return Object.keys(this.edits).length
     }
 
-    addOrUpdate = (key: string | string[], data: ElementObject): EditObject => {
+    addOrUpdate = (key: string | string[], data: ElementObject, overwrite?: boolean): EditObject => {
         key = this.makeKey(key)
-        this.edits[key] = { key, edit: data, editValues: [] }
-        if (data.type === 'Property' || data.type === 'Port') {
-            if (data.defaultValue) {
-                this.edits[key].editValues = [data.defaultValue]
-            }
-        } else if (data.type === 'Slot') {
-            if (Array.isArray(data.value)) {
-                this.edits[key].editValues = (data as SlotObject).value
-            }
-        } else if (data.type.includes('TaggedValue')) {
-            if (Array.isArray(data.value)) {
-                this.edits[key].editValues = (data as TaggedValueObject).value
-            }
-        } else if (data.type === 'Constraint' && data.specification) {
-            this.edits[key].editValues = [(data as ConstraintObject).specification]
+        if (overwrite) {
+            delete this.edits[key]
         }
+        this.edits[key] = { key, element: data }
+
         this.trigger()
         return this.edits[key]
     }
@@ -70,20 +59,6 @@ export class EditService {
         const keys = Object.keys(this.edits)
         for (let i = 0; i < keys.length; i++) {
             delete this.edits[keys[i]]
-        }
-    }
-
-    public clearAutosave = (key: string | string[]): void => {
-        key = this.makeKey(key)
-        const elementType = this.edits[key].edit.type
-        if (elementType === 'Slot' || elementType.includes('TaggedValue')) {
-            Object.keys(window.localStorage).forEach((akey) => {
-                if (akey.indexOf(key as string) !== -1) {
-                    window.localStorage.removeItem(key as string)
-                }
-            })
-        } else {
-            window.localStorage.removeItem(key)
         }
     }
 

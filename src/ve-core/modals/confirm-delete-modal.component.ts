@@ -85,7 +85,7 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
                             this.growl.error(this.type + ' Removal Error: ' + reason.message)
                         }
                         this.oking = false
-                        this.modalInstance.dismiss(reason.message)
+                        this.modalInstance.dismiss()
                     }
                 )
             }

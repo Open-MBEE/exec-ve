@@ -1,7 +1,7 @@
 import { Insertion, InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
 import { SearchFilter } from '@ve-core/search/mms-search.component'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import { EditService } from '@ve-utils/core'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -39,7 +39,7 @@ class InsertViewController extends Insertion<InsertViewData> {
         utilsSvc: UtilsService,
         apiSvc: ApiService,
         utils: InsertionService,
-        editSvc: EditService
+        editorSvc: EditorService
     ) {
         super(
             $scope,
@@ -56,7 +56,7 @@ class InsertViewController extends Insertion<InsertViewData> {
             utilsSvc,
             apiSvc,
             utils,
-            editSvc
+            editorSvc
         )
     }
 
@@ -203,7 +203,7 @@ const InsertViewComponent: VeComponentOptions = {
                 </div>
                 <div class="form-group">
                     <label class="label-documentation">Documentation (optional):</label>
-                    <editor ng-model="$ctrl.createItem.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
+                    <editor ng-model="$ctrl.createItem.documentation" edit-field="documentation" mms-element-id="$ctrl.createItem.id" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
                 </div>
             </div>
         </div>

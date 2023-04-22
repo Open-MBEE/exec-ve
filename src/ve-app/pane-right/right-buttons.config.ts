@@ -31,7 +31,7 @@ export const right_default_toolbar: IToolBarButton[] = [
         permission: false,
         tooltip: 'Edit Element',
         spinner: false,
-        dynamic_ids: ['spec-editor.save', 'spec-editor.saveC', 'spec-editor.saveall', 'spec-editor.cancel'],
+        dynamic_ids: ['spec-editor.save', 'spec-editor.save-continue', 'spec-editor.saveall', 'spec-editor.cancel'],
         enabledFor: ['**.portal.**', '**.present.**'],
         disabledFor: ['main.project.ref.search'],
     },
@@ -71,7 +71,7 @@ export const right_dynamic_toolbar: IToolBarButton[] = [
         spinner: false,
     },
     {
-        id: 'spec-editor.saveC',
+        id: 'spec-editor.save-continue',
         icon: 'fa-regular fa-paper-plane',
         dynamic: true,
         selected: false,

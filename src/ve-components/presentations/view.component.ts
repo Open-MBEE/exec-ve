@@ -240,7 +240,7 @@ export class ViewController implements angular.IComponentController {
     //      window.setTimeout(() => {
     //          var peContainer = $($event.currentTarget).closest('.add-pe-button-container');
     //          if (peContainer.find('.dropdown-menu').css('display') == 'none') {
-    //              peContainer.find('hr').css('visibility', 'hidden');
+    // f             peContainer.find('hr').css('visibility', 'hidden');
     //          } else {
     //              peContainer.find('hr').css('visibility', 'visible');
     //          }
@@ -278,7 +278,7 @@ export class ViewController implements angular.IComponentController {
                         this.growl.warning('There are duplicates in this view, duplicates ignored!')
                     }
                     if (data._veNumber) {
-                        this.level = data._veNumber.split('.').length;
+                        this.level = data._veNumber.split('.').length
                     }
                     if (
                         //data._numElements && data._numElements > 5000 &&

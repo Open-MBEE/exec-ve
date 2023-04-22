@@ -7,6 +7,7 @@ import { search_default_buttons } from '@ve-core/search/mms-search-buttons.confi
 import { UtilsService } from '@ve-utils/application'
 import { CacheService, EventService } from '@ve-utils/core'
 import { ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
+import { ValueService } from '@ve-utils/mms-api-client/Value.service'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veCore } from '@ve-core'
@@ -173,6 +174,7 @@ export class SearchController implements angular.IComponentController {
         'ProjectService',
         'UtilsService',
         'ViewService',
+        'ValueService',
         'SchemaService',
         'ButtonBarService',
     ]
@@ -189,6 +191,7 @@ export class SearchController implements angular.IComponentController {
         private projectSvc: ProjectService,
         private utilsSvc: UtilsService,
         private viewSvc: ViewService,
+        private valueSvc: ValueService,
         private schemaSvc: SchemaService,
         private buttonBarSvc: ButtonBarService
     ) {}
@@ -283,11 +286,7 @@ export class SearchController implements angular.IComponentController {
                         const properties: ElementObject[] = []
                         //TODO might not be elements
                         data.forEach((elt) => {
-                            if (elt.type === 'Property' && elt.ownerId == elem.id) {
-                                properties.push(elt)
-                            } else if (elt.type === 'Slot') {
-                                properties.push(elt)
-                            }
+                            if (this.valueSvc.isValue(elt)) properties.push(elt)
                         })
                         elem._properties = properties
                         // OLD CODE - splits into 3cols

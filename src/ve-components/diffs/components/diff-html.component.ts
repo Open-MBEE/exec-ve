@@ -1,30 +1,41 @@
-import { Diff, IDiff, IDiffComponentOptions } from '@ve-components/diffs/diff.controller'
-
 import { veComponents } from '@ve-components'
 
 import { HtmlRenderedDiff } from '../../../lib/html-rendered-diff'
+import {handleChange} from "@ve-utils/utils";
+import {VeComponentOptions} from "@ve-types/angular";
 
-class DiffHtmlController extends Diff<string> implements IDiff<string> {
+class DiffHtmlController {
+
+    //bindings
+    private base: string
+    private compare: string
+    private diffCallback: () => void
+
+    //local
     private htmlRenderedDiff: HtmlRenderedDiff
     htmlDiffIdPrefix: string = 'html-diff-'
     htmlDiffId: string
     diffResult: string
 
-    static $inject = Diff.$inject
+    static $inject = ['$scope', '$timeout', 'growl']
 
-    constructor($scope: angular.IScope, $timeout: angular.ITimeoutService, growl: angular.growl.IGrowlService) {
-        super($scope, $timeout, growl)
+    constructor(private  $scope: angular.IScope, private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService) {
         this.htmlRenderedDiff = window.HtmlRenderedDiff
     }
 
     $onInit(): void {
         this.htmlDiffId = `${this.htmlDiffIdPrefix}${this.$scope.$id}`
+        this.performDiff()
     }
 
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
+        handleChange(onChangesObj, 'base', this.performDiff)
+        handleChange(onChangesObj, 'compare', this.performDiff)
+    }
     protected performDiff = (): void => {
         this.diffResult = this.htmlRenderedDiff.generateDiff(
-            DiffHtmlController._preformatHtml(this.baseContent),
-            DiffHtmlController._preformatHtml(this.comparedContent)
+            DiffHtmlController._preformatHtml(this.base),
+            DiffHtmlController._preformatHtml(this.compare)
         )
         this.$timeout(() => {
             const diffContainer = $('#' + this.htmlDiffId)
@@ -76,16 +87,15 @@ class DiffHtmlController extends Diff<string> implements IDiff<string> {
     }
 }
 
-const DiffHtmlComponent: IDiffComponentOptions = {
+const DiffHtmlComponent: VeComponentOptions = {
     selector: 'diffHtml',
     template: `
     <div id="{{$ctrl.htmlDiffId}}" class="htmlDiff" ng-bind-html="$ctrl.diffResult" ng-hide="$ctrl.spin"></div>
     <i class="fa fa-spin fa-spinner" ng-show="$ctrl.spin"></i>
 `,
     bindings: {
-        baseContent: '<',
-        comparedContent: '<',
-        attr: '<',
+        base: '<',
+        compare: '<',
         diffCallback: '&',
     },
     controller: DiffHtmlController,

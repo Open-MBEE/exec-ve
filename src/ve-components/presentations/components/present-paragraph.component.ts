@@ -55,7 +55,7 @@ const PresentParagraphComponent: IPresentationComponentOptions = {
     template: `<div></div>`,
     bindings: {
         peObject: '<',
-        element: '<',
+        instanceSpec: '<',
         peNumber: '<',
     },
     controller: PresentParagraph,

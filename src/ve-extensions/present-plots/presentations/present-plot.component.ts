@@ -24,7 +24,7 @@ const ViewPlotComponent: IPresentationComponentOptions = {
     template: ``,
     bindings: {
         peObject: '<',
-        element: '<',
+        instanceSpec: '<',
         peNumber: '<',
     },
     controller: class ViewPlotController extends Presentation {
