@@ -123,7 +123,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     protected checkCircular: boolean
 
     //Locals
-    protected isDirectChildOfPresentationElement: boolean
+    protected isDeletable: boolean
     protected editable: () => boolean = () => false
 
     public subs: Rx.IDisposable[]
@@ -210,7 +210,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         protected mathSvc: MathService,
         protected extensionSvc: ExtensionService,
         protected buttonBarSvc: ButtonBarService,
-        protected imageSvc: ImageService
+        protected imageSvc: ImageService,
     ) {}
 
     $onInit(): void {
@@ -229,7 +229,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         if (this.mmsSpecEditorCtrl && this.mmsSpecEditorCtrl.specApi.elementId === this.mmsElementId) {
             this.editable = (): boolean => this.mmsSpecEditorCtrl.specSvc.editable
         }
-        if (this.editTemplate) {
+        //if (this.editTemplate) {
             this.save = (e: JQuery.ClickEvent): void => {
                 if (e) e.stopPropagation()
                 this.saveAction(false)
@@ -247,7 +247,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             this.preview = (): void => {
                 this.previewAction()
             }
-        }
+        //}
     }
 
     $onDestroy(): void {
@@ -410,7 +410,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save-continue', this))
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-cancel', this))
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-delete', this))
-        api.setPermission('editor-delete', this.isDirectChildOfPresentationElement)
+        api.setPermission('editor-delete', this.isDeletable)
     }
 
     /**
@@ -453,7 +453,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
      *
      */
     protected startEdit(cb?: () => void): void {
-        if (this.editTemplate && this.editable() && !this.isEditing) {
+        if (this.editable() && !this.isEditing) {
             this.editLoading = true
             const reqOb = {
                 elementId: this.element.id,
@@ -472,12 +472,13 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                         if (cb) {
                             cb()
                         }
+                        if (this.editTemplate) {
+                            this.$element.empty()
+                            this.$transcludeEl = $(this.editTemplate)
 
-                        this.$element.empty()
-                        this.$transcludeEl = $(this.editTemplate)
-
-                        this.$element.append(this.$transcludeEl)
-                        this.$compile(this.$transcludeEl)(this.$scope.$new())
+                            this.$element.append(this.$transcludeEl)
+                            this.$compile(this.$transcludeEl)(this.$scope.$new())
+                        }
 
                         if (!this.skipBroadcast) {
                             // Broadcast message for the toolCtrl:

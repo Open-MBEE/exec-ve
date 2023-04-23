@@ -5,12 +5,13 @@ import { ButtonBarService } from '@ve-core/button-bar'
 import { EditorService } from '@ve-core/editor'
 import { ImageService, MathService, UtilsService } from '@ve-utils/application'
 import { EditService, EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
+import { ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
+import { DeletableTransclusion } from "@ve-components/transclusions/deletable-transclusion.controller";
 
 /**
  * @ngdoc directive
@@ -37,7 +38,7 @@ import { VePromise, VeQService } from '@ve-types/angular'
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 export class TranscludeComController extends TranscludeDocController implements ITransclusion {
-    static $inject = Transclusion.$inject
+    static $inject = DeletableTransclusion.$inject
 
     constructor(
         $q: VeQService,
@@ -55,7 +56,8 @@ export class TranscludeComController extends TranscludeDocController implements 
         mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
-        imageSvc: ImageService
+        imageSvc: ImageService,
+        viewSvc: ViewService
     ) {
         super(
             $q,
@@ -73,7 +75,8 @@ export class TranscludeComController extends TranscludeDocController implements 
             mathSvc,
             extensionSvc,
             buttonBarSvc,
-            imageSvc
+            imageSvc,
+            viewSvc
         )
         this.cfType = 'doc'
         this.cfTitle = 'comment'
@@ -84,7 +87,7 @@ export class TranscludeComController extends TranscludeDocController implements 
     $onInit(): void {
         super.$onInit()
         if (this.mmsViewPresentationElemCtrl) {
-            if (this.isDirectChildOfPresentationElement) {
+            if (this.isDeletable) {
                 const instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
                 this.panelTitle = instanceSpec ? instanceSpec.name : 'Comment'
             }

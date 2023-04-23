@@ -1,10 +1,10 @@
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { Transclusion, ITransclusion } from '@ve-components/transclusions'
+import { ITransclusion, DeletableTransclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { EditorService, editor_buttons } from '@ve-core/editor'
 import { UtilsService, MathService, ImageService } from '@ve-utils/application'
 import { EditService, EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
+import { ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veComponents } from '@ve-components'
@@ -45,7 +45,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeDocController extends Transclusion implements ITransclusion {
+export class TranscludeDocController extends DeletableTransclusion implements ITransclusion {
     protected editTemplate: string = `
     <div class="panel panel-default no-print">
     <div class="panel-heading clearfix">
@@ -67,7 +67,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
 </div>
 `
 
-    static $inject = Transclusion.$inject
+    static $inject = DeletableTransclusion.$inject
 
     constructor(
         $q: VeQService,
@@ -85,7 +85,8 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
-        imageSvc: ImageService
+        imageSvc: ImageService,
+        viewSvc: ViewService,
     ) {
         super(
             $q,
@@ -103,7 +104,8 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             mathSvc,
             extensionSvc,
             buttonBarSvc,
-            imageSvc
+            imageSvc,
+            viewSvc
         )
         this.cfType = 'doc'
         this.cfTitle = 'Documentation'
@@ -130,7 +132,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         if (this.mmsViewPresentationElemCtrl) {
             const instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
             const presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
-            if (this.isDirectChildOfPresentationElement) {
+            if (this.isDeletable) {
                 this.panelTitle = instanceSpec ? instanceSpec.name : ''
                 this.panelType = presentationElem ? presentationElem.type : '' //this is hack for fake table/list/equation until we get actual editors
                 if (this.panelType.charAt(this.panelType.length - 1) === 'T')

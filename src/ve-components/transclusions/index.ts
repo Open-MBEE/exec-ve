@@ -1,6 +1,6 @@
 // import "./transclusion.controller"
 export * from './transclusion.controller'
-
+export * from './deletable-transclusion.controller'
 import './services/Transclusion.service'
 
 export * from './services/Transclusion.service'
