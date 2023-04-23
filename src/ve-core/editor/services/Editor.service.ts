@@ -1,12 +1,11 @@
 import $ from 'jquery'
 
 import { SaveConflictResolveFn } from '@ve-components/diffs'
-import { EditDialogService } from '@ve-core/editor/services/EditDialog.service'
+import { EditDialogService } from '@ve-core/editor'
 import { ConfirmDeleteModalResolveFn } from '@ve-core/modals'
 import { ToolbarService } from '@ve-core/toolbar'
 import { CacheService, EditObject, EditService, EventService } from '@ve-utils/core'
-import { ApiService, ElementService, PermissionsService, ViewService } from '@ve-utils/mms-api-client'
-import { ValueService } from '@ve-utils/mms-api-client/Value.service'
+import { ApiService, ElementService, PermissionsService, ViewService, ValueService } from '@ve-utils/mms-api-client'
 
 import { veCore } from '@ve-core'
 
@@ -16,7 +15,7 @@ import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-typ
 
 export class EditorService {
     public generatedIds: number = 0
-    private edit2editor: { [editKey: string]: { [field: string]: () => VePromise<void, string> } }
+    private edit2editor: { [editKey: string]: { [field: string]: () => VePromise<void, string> } } = {}
     public savingAll: boolean = false
 
     static $inject = [
@@ -31,7 +30,7 @@ export class EditorService {
         'ValueService',
         'ViewService',
         'ToolbarService',
-        'EditdialogService',
+        'EditDialogService',
         'EventService',
         'EditService',
     ]

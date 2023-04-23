@@ -40,10 +40,10 @@ export class ValueService {
     }
 
     private taggedValue: string = 'value'
+    static $inject = ['$q', 'ApiService', 'ElementService']
 
     constructor(
         private $q: VeQService,
-        private growl: angular.growl.IGrowlService,
         private apiSvc: ApiService,
         private elementSvc: ElementService
     ) {}

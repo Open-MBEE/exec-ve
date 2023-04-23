@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
-import { veApp } from '@ve-app'
+import { veCore } from '@ve-core'
 
 import { VeComponentOptions, VePromise } from '@ve-types/angular'
 import { RefsResponse } from '@ve-types/mms'
@@ -97,4 +97,4 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
     },
 }
 
-veApp.component(ConfirmDeleteModalComponent.selector, ConfirmDeleteModalComponent)
+veCore.component(ConfirmDeleteModalComponent.selector, ConfirmDeleteModalComponent)

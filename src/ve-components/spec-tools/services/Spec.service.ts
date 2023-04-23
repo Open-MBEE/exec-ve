@@ -12,8 +12,8 @@ import {
     URLService,
     UserService,
     ViewService,
+    ValueService
 } from '@ve-utils/mms-api-client'
-import { ValueService } from '@ve-utils/mms-api-client/Value.service'
 
 import { PropertySpec, veComponents } from '@ve-components'
 

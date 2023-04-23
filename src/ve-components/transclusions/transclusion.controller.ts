@@ -377,7 +377,6 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                                 this.recompile()
                             }
                         )
-                        this.startEdit()
                     } else {
                         this.recompile()
                     }

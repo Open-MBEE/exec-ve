@@ -814,7 +814,7 @@ const EditorComponent: VeComponentOptions = {
     },
     bindings: {
         ngModel: '<',
-        mmsElementId: '<',
+        mmsElementId: '@',
         mmsProjectId: '@',
         mmsRefId: '@',
         editorType: '@',

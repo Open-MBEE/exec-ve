@@ -324,6 +324,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
                     field: this.cfField,
                 })
             )
+            return
         }
         if (!this.nonEditable && this.mmsSpecEditorCtrl && !this.edit) {
             this.startEdit()
@@ -367,7 +368,10 @@ export class TranscludeValController extends Transclusion implements ITransclusi
     }
 
     public addValue(): void {
-        this.valueSvc.addValue(this.edit, this.addValueType)
+        const newVal = this.valueSvc.addValue(this.edit, this.addValueType)
+        if (this.editValues.length == 0) {
+            this.editValues.push(newVal)
+        }
     }
 
     public addEnumerationValue(): void {

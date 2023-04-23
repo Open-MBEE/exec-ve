@@ -54,7 +54,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             <div class="form-group">
                 <span class="pe-type-{{$ctrl.panelType}}">{{$ctrl.panelType}} :</span>
                 <span ng-if="!$ctrl.isDirectChildOfPresentationElement">{{$ctrl.panelTitle}}</span>
-                <span ng-if="$ctrl.isDirectChildOfPresentationElement"><input type="text" class="form-control" ng-model="$ctrl.edit.name"/></span>
+                <span ng-if="$ctrl.isDirectChildOfPresentationElement"><input type="text" class="form-control" ng-model="$ctrl.edit.element.name"/></span>
             </div></form>
         </h3>
         <div class="btn-group pull-right" ng-hide="$ctrl.editLoading">
@@ -62,7 +62,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         </div>
     </div>
     <div class="panel-body no-padding-panel">
-        <editor ng-model="$ctrl.edit.documentation" editor-type="{{$ctrl.editorType}}" edit-field="documentation" mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></editor>
+        <editor ng-model="$ctrl.edit.element.documentation" editor-type="{{$ctrl.editorType}}" edit-field="documentation" mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></editor>
     </div>
 </div>
 `

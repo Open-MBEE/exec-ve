@@ -132,7 +132,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
                         $(newPe).append(
                             '<' +
                                 tag +
-                                ' pe-object="$ctrl.presentationElem" element="$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' +
+                                ' pe-object="$ctrl.presentationElem" instance-spec="$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' +
                                 '</' +
                                 tag +
                                 '>'
