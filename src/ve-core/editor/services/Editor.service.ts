@@ -173,7 +173,7 @@ export class EditorService {
      */
     private _save<T extends ElementObject>(editKey: string | string[], continueEdit?: boolean): VePromise<T> {
         return new this.$q<T>((resolve, reject) => {
-            this.updateAllData(editKey).then(
+            this.updateAllData(editKey, true).then(
                 () => {
                     this.clearAutosave(editKey)
                     const edit = this.editSvc.get<T>(editKey).element
