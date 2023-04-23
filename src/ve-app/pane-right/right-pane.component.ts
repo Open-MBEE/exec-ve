@@ -15,6 +15,7 @@ import { veApp } from '@ve-app'
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject, RefObject, RefsResponse } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
+import _ from "lodash";
 
 class RightPaneController implements IComponentController {
     //Bindings
@@ -137,11 +138,6 @@ class RightPaneController implements IComponentController {
             })
         )
 
-        this.subs.push(
-            this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
-                this.openEdits = this.autosaveSvc.openEdits()
-            })
-        )
         this.edits = this.autosaveSvc.getAll()
     }
 
@@ -173,7 +169,7 @@ class RightPaneController implements IComponentController {
 
         promise.then(
             (refType) => {
-                this.specApi = {
+                const specApi = {
                     elementId,
                     projectId,
                     refType,
@@ -181,8 +177,20 @@ class RightPaneController implements IComponentController {
                     commitId,
                     displayOldSpec,
                 }
-
-                this.specSvc.specApi = this.specApi
+                if (this.specSvc.specApi) {
+                    const current = {
+                        elementId: this.specSvc.specApi.elementId,
+                        projectId: this.specSvc.specApi.projectId,
+                        refId: this.specSvc.specApi.refId,
+                        refType: this.specSvc.specApi.refType,
+                        commitId: this.specSvc.specApi.commitId,
+                        displayOldSpec: this.specSvc.specApi.displayOldSpec
+                    }
+                    if (_.isEqual(specApi, current)) {
+                        return //don't do unnecessary updates
+                    }
+                }
+                this.specSvc.specApi = this.specApi = specApi
 
                 if (this.specSvc.setEditing) {
                     this.specSvc.setEditing(false)
@@ -213,9 +221,9 @@ class RightPaneController implements IComponentController {
         const id = this.specSvc.tracker.etrackerSelected
         if (!id) return
         const info = id.split('|')
-        this.specApi.elementId = info[0]
-        this.specApi.projectId = info[1]
-        this.specApi.refId = info[2]
+        this.specApi.elementId = info[2]
+        this.specApi.projectId = info[0]
+        this.specApi.refId = info[1]
         this.specApi.commitId = 'latest'
         this.toolbarSvc.waitForApi(this.toolbarId).then(
             (api) => {
@@ -238,7 +246,7 @@ const RightPaneComponent: VeComponentOptions = {
                 <label class="col-sm-3 control-label">Edits ({{$ctrl.openEdits}}):</label>
                 <div class="col-sm-9">
                     <select class="form-control"
-                        ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in $ctrl.edits"
+                        ng-options="eid as edit.element.type + ': ' + edit.element.name for (eid, edit) in $ctrl.edits"
                         ng-model="$ctrl.specSvc.tracker.etrackerSelected" ng-change="$ctrl.etrackerChange()">
                     </select>
                 </div>

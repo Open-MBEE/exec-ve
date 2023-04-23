@@ -145,7 +145,7 @@ export class EditorService {
                 )
                 .then((responses) => {
                     responses.forEach((elementOb) => {
-                        const edit = this.editSvc.get(this.elementSvc.getElementKey(elementOb))
+                        const edit = this.editSvc.get(this.elementSvc.getEditElementKey(elementOb))
                         this.removeEdit(edit)
                         const data = {
                             element: elementOb,

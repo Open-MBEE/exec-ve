@@ -177,10 +177,8 @@ export class EditorController implements angular.IComponentController {
             this.init = true
 
             this.id = this.editorSvc.createId()
-            this.editKey = this.elementSvc.getRequestKey(
-                { refId: this.mmsRefId, projectId: this.mmsProjectId },
-                this.mmsElementId,
-                true
+            this.editKey = this.elementSvc.getEditKey(
+                { refId: this.mmsRefId, projectId: this.mmsProjectId, elementId: this.mmsElementId },
             )
             if (this.editKey) {
                 this.editorSvc.add(this.editKey, `${this.editField}${this.editIndex}`, this.update)

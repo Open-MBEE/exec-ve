@@ -426,7 +426,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
      */
     private _reopenUnsaved = (): VePromise<boolean> => {
         return new this.$q((resolve, reject) => {
-            const key = this.elementSvc.getElementKey(this.element, true)
+            const key = this.elementSvc.getEditElementKey(this.element)
             const editOb = this.editSvc.get(key)
             if (!editOb || this.commitId !== 'latest') {
                 resolve(false)
@@ -660,7 +660,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         obj.value = parseInt(obj.value as string)
     }
 
-    protected addHtml(value: { value: string | number }): void {
+    protected addHtml(e: JQueryEventObject, value: { value: string | number }): void {
+        e.stopPropagation()
         value.value = `<p>${value.value}</p>`
     }
 }

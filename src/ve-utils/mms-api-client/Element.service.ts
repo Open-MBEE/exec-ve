@@ -264,7 +264,7 @@ export class ElementService extends BaseApiService {
     openEdit<T extends ElementObject>(elementOb: T): EditObject<T> {
         const result: T = this.apiSvc.cleanElement(elementOb, true)
         result._commitId = 'latest'
-        const editKey = this.getElementKey(elementOb, true)
+        const editKey = this.getEditElementKey(elementOb)
 
         return this.editSvc.addOrUpdate(editKey, result) as EditObject<T>
     }
@@ -323,7 +323,7 @@ export class ElementService extends BaseApiService {
         overwrite?: boolean
     ): VePromise<EditObject<T>, ElementsResponse<T>> {
         this.apiSvc.normalize(reqOb)
-        const requestCacheKey = this.getRequestKey(reqOb, reqOb.elementId, true)
+        const requestCacheKey = this.getEditKey(reqOb)
         const url = this.uRLSvc.getElementURL(reqOb) + 'edit'
         if (!this._isInProgress(url)) {
             const openEdit = this.editSvc.get<T>(requestCacheKey)
@@ -453,14 +453,12 @@ export class ElementService extends BaseApiService {
         */
         const ob = _.cloneDeep(elementOb) //make a copy
         ob._commitId = 'latest'
-        const editOb = this.cacheSvc.get<ElementObject>(
-            this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(ob), ob.id, true)
-        )
-        if (editOb) {
-            Object.keys(editOb).forEach((key) => {
+        const editOb = this.editSvc.get(this.getEditElementKey(elementOb))
+        if (editOb && editOb.element) {
+            Object.keys(editOb.element).forEach((key) => {
                 if (!elementOb.hasOwnProperty(key)) {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    ob[key] = editOb[key]
+                    ob[key] = editOb.element[key]
                 }
             })
         }
@@ -967,6 +965,20 @@ export class ElementService extends BaseApiService {
 
     public getElementKey(elementOb: ElementObject, edit?: boolean): string[] {
         return this.getRequestKey(this.getElementRequest(elementOb), elementOb.id, edit)
+    }
+
+    public getEditKey(reqOb: RequestObject): string[] {
+        const key: string[] = []
+        if (reqOb !== null) {
+            if (reqOb.projectId) key.push(reqOb.projectId)
+            if (reqOb.refId !== null) key.push(!reqOb.refId ? 'master' : reqOb.refId)
+        }
+        key.push(reqOb.elementId)
+        return key
+    }
+
+    public getEditElementKey(e: ElementObject): string[] {
+        return [e._projectId, e._refId, e.id]
     }
 
     public getElementQualifiedName(reqOb: ElementsRequest<string>): VePromise<string, SearchResponse<ElementObject>> {

@@ -174,7 +174,6 @@ export class SpecTool implements ISpecTool {
 
         this.subs.push(
             this.eventSvc.$on('element.selected', () => {
-                this.gettingSpec = true
                 if (this.edit && this.editorApi.save) {
                     void this.editorApi.save()
                 }
@@ -224,6 +223,7 @@ export class SpecTool implements ISpecTool {
 
     public changeElement = (ready?: boolean): void => {
         if (!ready) return
+        this.gettingSpec = true
         this.specApi = this.specSvc.specApi
         this.refId = this.specApi.refId
         this.projectId = this.specApi.projectId

@@ -377,7 +377,7 @@ class ToolsController {
                     api.toggleButtonSpinner('spec-editor.save-continue')
                 }
                 this.editorSvc
-                    .save(this.toolbarId, continueEdit)
+                    .save(this.specSvc.getEdits().key, continueEdit)
                     .then(
                         () => {
                             if (this.autosaveSvc.openEdits() > 0) {
@@ -385,9 +385,9 @@ class ToolsController {
                                 const id = next.split('|')
                                 this.specSvc.tracker.etrackerSelected = next
                                 this.specSvc.keepMode()
-                                this.specApi.elementId = id[0]
-                                this.specApi.projectId = id[1]
-                                this.specApi.refId = id[2]
+                                this.specApi.elementId = id[2]
+                                this.specApi.projectId = id[0]
+                                this.specApi.refId = id[1]
                                 this.specApi.commitId = 'latest'
                             } else {
                                 this.specSvc.setEditing(false)

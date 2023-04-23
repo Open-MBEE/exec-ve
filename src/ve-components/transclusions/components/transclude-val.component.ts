@@ -100,27 +100,27 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         <div ng-if="!$ctrl.propertySpec.isEnumeration">
             <div ng-if="$ctrl.editValues.length == 0">
                 <select ng-model="$ctrl.addValueType" ng-options="key for (key, value) in $ctrl.valueSvc.addValueTypes"></select>
-                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue(addValueType)">Add</button>
+                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue($event, addValueType)">Add</button>
             </div>
             <div ng-repeat="value in $ctrl.editValues" ng-switch on="value.type" ng-form="valForm">
                 <div ng-switch-when="LiteralInteger" ng-class="{'has-error': valForm.$error.pattern}">
                     <div class="form-inline">
                     <input class="form-control ve-plain-input" type="number" ng-model="value.value" ng-pattern="/^-?\\d+$/" ng-blur="$ctrl.cleanupVal(value)">&nbsp;
-                    <a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+                    <a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
                     </div>
                     <label class="control-label ve-error-icon" ng-show="valForm.$error.pattern">Not a valid integer</label>
                 </div>
                 <div ng-switch-when="LiteralUnlimitedNatural" ng-class="{'has-error': valForm.$error.pattern}">
                     <div class="form-inline">
                     <input class="form-control ve-plain-input" type="number" name="natVal" ng-model="value.value" ng-pattern="/^\\d+$/" ng-blur="$ctrl.cleanupVal(value)">&nbsp;
-                    <a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+                    <a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
                     </div>
                     <label class="control-label ve-error-icon" ng-show="valForm.$error.pattern">Not a valid natural number</label>
                 </div>
-                <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value">&nbsp;{{value.value}}&nbsp;<a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a></div>
+                <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value">&nbsp;{{value.value}}&nbsp;<a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a></div>
                 <div ng-switch-when="LiteralReal">
                     <div class="form-inline">
-                        <input class="form-control ve-plain-input" type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="$ctrl.removeVal($index)">&nbsp;<i class="fa fa-close"></i></a>
+                        <input class="form-control ve-plain-input" type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)">&nbsp;<i class="fa fa-close"></i></a>
                     </div>
                 </div>
                 <div ng-switch-when="LiteralString">
@@ -129,29 +129,29 @@ export class TranscludeValController extends Transclusion implements ITransclusi
                     </div>
                     <div ng-if="!$ctrl.hasHtml(value.value)">
                         <textarea ng-model="value.value"></textarea>
-                        <a ng-click="$ctrl.addHtml(value)"><i class="fa fa-html5"></i></a>
+                        <a ng-click="$ctrl.addHtml($event, value)"><i class="fa fa-html5"></i></a>
                     </div>
-                    <a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+                    <a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
                 </div>
                 <div ng-switch-when="OpaqueExpression">
-                    <textarea ng-model="value.body[0]"></textarea><a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+                    <textarea ng-model="value.body[0]"></textarea><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
                 </div>
                 <div ng-switch-default>Editing not supported for now</div>
             </div>
             <div ng-if="$ctrl.editValues.length != 0 && ($ctrl.propertySpec.isSlot || $ctrl.propertySpec.isTaggedValue)">
-                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue(editValues[0].type)">Add</button>
+                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue($event, editValues[0].type)">Add</button>
             </div>
         </div>
         <div ng-if="$ctrl.propertySpec.isEnumeration && $ctrl.propertySpec.isSlot" ng-repeat="val in $ctrl.editValues">
             <select ng-model="val.instanceId" ng-options="el.id as el.name for el in $ctrl.propertySpec.options">
-            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="$ctrl.propertySpec.isEnumeration && $ctrl.propertySpec.isTaggedValue" ng-repeat="val in $ctrl.editValues">
             <select ng-model="val.elementId" ng-options="el.id as el.name for el in $ctrl.propertySpec.options">
-            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="($ctrl.propertySpec.isSlot || $ctrl.propertySpec.isTaggedValue || $ctrl.editValues.length == 0) && $ctrl.propertySpec.isEnumeration">
-            <button class="btn btn-sm btn-default" ng-click="$ctrl.addEnumerationValue()">Add</button>
+            <button class="btn btn-sm btn-default" ng-click="$ctrl.addEnumerationValue($event)">Add</button>
         </div>
     </div>
 
@@ -226,9 +226,10 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons)
 
         this.$element.on('click', (e) => {
+            e.stopPropagation()
             if (this.noClick) return
 
-            if (!this.nonEditable) {
+            if (!this.nonEditable && !this.isEditing) {
                 this.startEdit()
             }
             if (this.mmsViewCtrl) {
@@ -237,7 +238,6 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
                 this.growl.warning('Cross Reference is not editable.')
             }
-            e.stopPropagation()
         })
     }
 
@@ -358,7 +358,8 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         this.saveAction(false)
     }
 
-    public saveC = (): void => {
+    public saveC = (e: JQuery.ClickEvent): void => {
+        e.stopPropagation()
         this.saveAction(true)
     }
 
@@ -367,14 +368,16 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         this.cancelAction()
     }
 
-    public addValue(): void {
+    public addValue(e: JQueryEventObject): void {
+        e.stopPropagation()
         const newVal = this.valueSvc.addValue(this.edit, this.addValueType)
         if (this.editValues.length == 0) {
             this.editValues.push(newVal)
         }
     }
 
-    public addEnumerationValue(): void {
+    public addEnumerationValue(e: JQueryEventObject): void {
+        e.stopPropagation()
         const enumValue = this.valueSvc.addEnumerationValue(this.propertySpec, this.edit)
         this.editValues.push(enumValue)
         if (this.element.type == 'Property' || this.element.type == 'Port') {
@@ -382,7 +385,8 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         }
     }
 
-    public removeVal = (i: number): void => {
+    public removeVal = (e: JQueryEventObject, i: number): void => {
+        e.stopPropagation()
         this.editValues.splice(i, 1)
     }
 }
