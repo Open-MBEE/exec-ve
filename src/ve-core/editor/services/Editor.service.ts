@@ -392,7 +392,7 @@ export class EditorService {
             if (this.edit2editor[editKey] && this.edit2editor[editKey][field]) {
                 this.edit2editor[editKey][field]().then(resolve, reject)
             } else {
-                reject()
+                resolve() // continue for non ckeditor transcludes
             }
         })
     }
