@@ -53,8 +53,8 @@ export class TranscludeDocController extends DeletableTransclusion implements IT
             <form class="form-inline">
             <div class="form-group">
                 <span class="pe-type-{{$ctrl.panelType}}">{{$ctrl.panelType}} :</span>
-                <span ng-if="!$ctrl.isDirectChildOfPresentationElement">{{$ctrl.panelTitle}}</span>
-                <span ng-if="$ctrl.isDirectChildOfPresentationElement"><input type="text" class="form-control" ng-model="$ctrl.edit.element.name"/></span>
+                <span ng-if="!$ctrl.isDeletable">{{$ctrl.panelTitle}}</span>
+                <span ng-if="$ctrl.isDeletable"><input type="text" class="form-control" ng-model="$ctrl.edit.element.name"/></span>
             </div></form>
         </h3>
         <div class="btn-group pull-right" ng-hide="$ctrl.editLoading">
