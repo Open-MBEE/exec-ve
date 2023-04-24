@@ -1,15 +1,17 @@
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions'
+import { TranscludeDocController } from '@ve-components/transclusions/components/transclude-doc.component'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { EditorService } from '@ve-core/editor'
 import { ImageService, MathService, UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
+import { EditService, EventService } from '@ve-utils/core'
+import { ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import {TranscludeDocController} from "@ve-components/transclusions/components/transclude-doc.component";
+import { DeletableTransclusion } from "@ve-components/transclusions/deletable-transclusion.controller";
 
 /**
  * @ngdoc directive
@@ -36,8 +38,7 @@ import {TranscludeDocController} from "@ve-components/transclusions/components/t
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 export class TranscludeComController extends TranscludeDocController implements ITransclusion {
-
-    static $inject = Transclusion.$inject
+    static $inject = DeletableTransclusion.$inject
 
     constructor(
         $q: VeQService,
@@ -46,6 +47,8 @@ export class TranscludeComController extends TranscludeDocController implements 
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
+        editorSvc: EditorService,
+        editSvc: EditService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
@@ -53,7 +56,8 @@ export class TranscludeComController extends TranscludeDocController implements 
         mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
-        imageSvc: ImageService
+        imageSvc: ImageService,
+        viewSvc: ViewService
     ) {
         super(
             $q,
@@ -62,6 +66,8 @@ export class TranscludeComController extends TranscludeDocController implements 
             $element,
             growl,
             componentSvc,
+            editorSvc,
+            editSvc,
             elementSvc,
             utilsSvc,
             schemaSvc,
@@ -69,7 +75,8 @@ export class TranscludeComController extends TranscludeDocController implements 
             mathSvc,
             extensionSvc,
             buttonBarSvc,
-            imageSvc
+            imageSvc,
+            viewSvc
         )
         this.cfType = 'doc'
         this.cfTitle = 'comment'
@@ -80,7 +87,10 @@ export class TranscludeComController extends TranscludeDocController implements 
     $onInit(): void {
         super.$onInit()
         if (this.mmsViewPresentationElemCtrl) {
-            if (this.isDirectChildOfPresentationElement) this.panelTitle = this.instanceSpec.name
+            if (this.isDeletable) {
+                const instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
+                this.panelTitle = instanceSpec ? instanceSpec.name : 'Comment'
+            }
             this.panelType = 'Comment'
         }
     }
@@ -88,7 +98,7 @@ export class TranscludeComController extends TranscludeDocController implements 
     public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
 
-        let doc = (preview ? this.edit.documentation : this.element.documentation) || '(No comment)'
+        let doc = (preview ? this.edit.element.documentation : this.element.documentation) || '(No comment)'
         doc += ' - <span class="mms-commenter"> Comment by <b>' + this.element._creator + '</b></span>'
 
         let result = ''

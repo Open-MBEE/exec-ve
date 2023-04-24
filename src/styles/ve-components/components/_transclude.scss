@@ -39,6 +39,7 @@ view {
   }
 }
 
+.transclude-target,
 view.outline,
 view.editing {
   /* Transclusions borders when editing mode */
@@ -46,7 +47,8 @@ view.editing {
   transclude-attr,
   transclude-name > span,
   transclude-val > span,
-  transclude-val > p {
+  transclude-val > p,
+  span.outline {
     @include globals.transition(border 0.3s);
     @include globals.border-radius(5px);
 

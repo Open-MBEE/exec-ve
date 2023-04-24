@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 import { AppUtilsService, DocumentStructure } from '@ve-app/main/services'
 import { UtilsService } from '@ve-utils/application'
-import { AutosaveService } from '@ve-utils/core'
+import { EditService } from '@ve-utils/core'
 import { ElementService, ViewService, DocumentMetadata, ProjectService } from '@ve-utils/mms-api-client'
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
@@ -44,7 +44,7 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
         'growl',
         'UtilsService',
         'ViewService',
-        'AutosaveService',
+        'EditService',
         'ElementService',
         'ProjectService',
         'AppUtilsService',
@@ -78,7 +78,7 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
         private growl: angular.growl.IGrowlService,
         private utilsSvc: UtilsService,
         private viewSvc: ViewService,
-        private autosaveSvc: AutosaveService,
+        private autosaveSvc: EditService,
         private elementSvc: ElementService,
         private projectSvc: ProjectService,
         private appUtilsSvc: AppUtilsService

@@ -1,3 +1,5 @@
+import $ from 'jquery'
+
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
 import { TreeService } from '@ve-components/trees'
@@ -105,49 +107,51 @@ export class ViewPresentationElemController implements angular.IComponentControl
         }
         this.elementSvc
             .getElement(reqOb, 1)
-            .then((instanceSpec) => {
-                this.viewSvc.getViewElements(reqOb, 1).finally(() => {
-                    this.instanceSpec = instanceSpec
-                    this.presentationElem = this.viewSvc.getPresentationInstanceObject(instanceSpec)
-                            this.presentationElemLoading = false
-                            //Init PeNumber
-                            if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
-                                this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
-                            }
-                            if (this.viewCtrl) {
-                                this.viewCtrl.elementTranscluded(instanceSpec, this.presentationElem.type)
-                            }
-                            this.$element.on('click', (e) => {
-                                if (this.viewCtrl) this.viewCtrl.transcludeClicked(instanceSpec)
-                                e.stopPropagation()
-                            })
-                            const tag = this.extensionSvc.getTagByType('present', this.presentationElem.type)
-
-                            const newPe = $(
-                                '<div id="' + this.instanceSpec.id + '" ng-if="!$ctrl.presentationElemLoading"></div>'
-                            )
-                            $(newPe).append(
-                                '<' +
-                                    tag +
-                                    ' pe-object="$ctrl.presentationElem" element="$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' +
-                                    '</' +
-                                    tag +
-                                    '>'
-                            )
-                            $(this.$element).append(newPe)
-                            this.$compile(newPe)(this.$scope)
-                            this.subs.push(
-                                this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
-                                    if (!data) return
-                                    if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
-                                        this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
-                                    }
-                                })
-                            )
-                })},
-                        (reason) => {
-                            this._error(reqOb, reason)
+            .then(
+                (instanceSpec) => {
+                    this.viewSvc.getViewElements(reqOb, 1).finally(() => {
+                        this.instanceSpec = instanceSpec
+                        this.presentationElem = this.viewSvc.getPresentationInstanceObject(instanceSpec)
+                        this.presentationElemLoading = false
+                        //Init PeNumber
+                        if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
+                            this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
                         }
+                        if (this.viewCtrl) {
+                            this.viewCtrl.elementTranscluded(instanceSpec, this.presentationElem.type)
+                        }
+                        this.$element.on('click', (e) => {
+                            if (this.viewCtrl) this.viewCtrl.transcludeClicked(instanceSpec)
+                            e.stopPropagation()
+                        })
+                        const tag = this.extensionSvc.getTagByType('present', this.presentationElem.type)
+
+                        const newPe = $(
+                            '<div id="' + this.instanceSpec.id + '" ng-if="!$ctrl.presentationElemLoading"></div>'
+                        )
+                        $(newPe).append(
+                            '<' +
+                                tag +
+                                ' pe-object="$ctrl.presentationElem" instance-spec="$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' +
+                                '</' +
+                                tag +
+                                '>'
+                        )
+                        $(this.$element).append(newPe)
+                        this.$compile(newPe)(this.$scope)
+                        this.subs.push(
+                            this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
+                                if (!data) return
+                                if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
+                                    this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
+                                }
+                            })
+                        )
+                    })
+                },
+                (reason) => {
+                    this._error(reqOb, reason)
+                }
             )
             .finally(() => {
                 this.$element.removeClass('isLoading')
@@ -181,14 +185,14 @@ export class ViewPresentationElemController implements angular.IComponentControl
             this.$element.empty()
 
             const annotation = $(
-                '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
             )
             this.$element.append(annotation)
             this.$compile(annotation)(
                 Object.assign(this.$scope.$new(), {
-                    reqOb: reqOb,
+                    elementId: reqOb.elementId,
                     recentElement: reason.recentVersionOfElement,
-                    type: this.extensionSvc.AnnotationType.mmsPresentationElement,
+                    type: 'presentation',
                 })
             )
         }

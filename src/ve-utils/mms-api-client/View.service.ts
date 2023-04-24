@@ -1,7 +1,7 @@
 import { IQResolveReject } from 'angular'
 import _ from 'lodash'
 
-import { ElementService, CacheService, URLService, ApiService } from '@ve-utils/mms-api-client'
+import { ElementService, URLService, ApiService } from '@ve-utils/mms-api-client'
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
 import { SchemaService } from '@ve-utils/model-schema'
 import { Class, Expression, InstanceSpec, Package, ValueSpec } from '@ve-utils/utils'
@@ -36,6 +36,7 @@ import {
     BasicResponse,
 } from '@ve-types/mms'
 import { TreeBranch, View2NodeMap } from '@ve-types/tree'
+import { CacheService } from '@ve-utils/core'
 
 export interface ViewData {
     id: string
@@ -1277,7 +1278,7 @@ export class ViewService extends BaseApiService {
         weight: number,
         refresh?: boolean
     ): VePromise<DocumentObject> {
-        const cacheKey = this.elementSvc.getElementKey(reqOb, reqOb.elementId)
+        const cacheKey = this.elementSvc.getRequestKey(reqOb, reqOb.elementId)
         const inProgKey = cacheKey.join('-')
         if (!this._isInProgress(inProgKey)) {
             this._addInProgress(

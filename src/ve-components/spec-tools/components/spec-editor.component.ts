@@ -4,7 +4,7 @@ import { ComponentService } from '@ve-components/services'
 import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools'
 import { ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import {
     URLService,
     ElementService,
@@ -12,11 +12,13 @@ import {
     PermissionsService,
     ProjectService,
     ApiService,
+    ValueService
 } from '@ve-utils/mms-api-client'
 
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import {ElementObject} from "@ve-types/mms";
 
 /**
  * @ngdoc directive
@@ -86,8 +88,9 @@ import { VeComponentOptions, VeQService } from '@ve-types/angular'
  */
 
 class SpecEditorController extends SpecTool implements ISpecTool {
-    static $inject = [...SpecTool.$inject, 'AutosaveService']
+    static $inject = [...SpecTool.$inject, 'EditService', 'ValueService']
 
+    private isValue: boolean
     constructor(
         $q: VeQService,
         $scope: angular.IScope,
@@ -104,7 +107,8 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService,
-        private autosaveSvc: AutosaveService
+        private autosaveSvc: EditService,
+        private valueSvc: ValueService
     ) {
         super(
             $q,
@@ -139,11 +143,9 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         this.specSvc.setEditing(true)
         const editOb = this.specSvc.getEdits()
         if (editOb) {
-            const key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId
-            this.specSvc.tracker.etrackerSelected = key
-            this.autosaveSvc.addOrUpdate(key, editOb)
-            this.specSvc.cleanUpSaveAll(this.toolbarId)
-            this.elementSvc.isCacheOutdated(editOb).then(
+            this.specSvc.tracker.etrackerSelected = editOb.key
+            this.specSvc.toggleSave(this.toolbarId)
+            this.elementSvc.isCacheOutdated(editOb.element).then(
                 (data) => {
                     const server = data.server ? data.server._modified : new Date()
                     const cache = data.cache ? data.cache._modified : new Date()
@@ -157,6 +159,7 @@ class SpecEditorController extends SpecTool implements ISpecTool {
                 }
             )
             this.edit = editOb
+            this.isValue = this.valueSvc.isValue(editOb.element)
         }
     }
 }
@@ -167,14 +170,16 @@ const SpecEditorComponent: VeComponentOptions = {
 <!-- HTML for edit mode -->
 <div ng-if="!$ctrl.noEdit && $ctrl.specSvc.editing" class="editing">
 
-    <h1 class="prop" ng-if="$ctrl.edit.name !== undefined"><input class="form-control ve-plain-input" type="text" ng-model="$ctrl.edit.name"></h1>
+    <h1 class="prop" ng-if="$ctrl.edit.element.name !== undefined"><input class="form-control ve-plain-input" type="text" ng-model="$ctrl.edit.element.name"></h1>
     <span class="elem-updated-wrapper">Last modified {{$ctrl.element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email != undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier }}</b></span>
 
-    <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" non-editable="false"></transclude-val>
+    <div ng-if="$ctrl.isValue">
+        <h2 class="prop-title spec-view-value-heading">Property Value</h2>
+        <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" non-editable="false"></transclude-val>
+    </div>
             
-        
     <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-    <editor ng-model="$ctrl.edit.documentation" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></editor>
+    <editor ng-model="$ctrl.edit.element.documentation" edit-field="documentation" mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></editor>
 
     <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
     <span class="elem-type-wrapper prop">

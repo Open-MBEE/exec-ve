@@ -1,4 +1,4 @@
-import { ApiService, CacheService, ElementService, ProjectService } from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ProjectService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
@@ -6,6 +6,7 @@ import { BrandingStyle } from './Branding.service'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject, UsersRequest } from '@ve-types/mms'
+import { CacheService } from '@ve-utils/core'
 /**
  * @ngdoc service
  * @name veUtils/ApplicationService

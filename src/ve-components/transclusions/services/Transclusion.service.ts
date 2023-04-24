@@ -12,10 +12,17 @@ export class TransclusionService {
 
     constructor(private applicationSvc: ApplicationService, private viewSvc: ViewService) {}
 
-    public createTransclusion = (element: ElementObject, cfType: string, nonEditable?: boolean): string => {
-        return `<view-cf mms-cf-type="${cfType}" mms-element-id="${element.id}"${
-            nonEditable ? ' non-editable="true">' : '>'
-        }[cf:${element.name}.${cfType}]</view-cf>`
+    public createTransclusion = (
+        element: ElementObject,
+        cfType: string,
+        nonEditable?: boolean,
+        addProjectandRef?: boolean
+    ): string => {
+        return `<view-cf mms-cf-type="${cfType}" mms-element-id="${element.id}"
+                  ${addProjectandRef ? ` mms-project-id="${element._projectId}"` : ''}
+                  ${addProjectandRef ? ` mms-ref-id="${element._refId}"` : ''}
+                  ${addProjectandRef && element._commitId ? ` mms-commit-id="${element._commitId}"` : ''}
+                  ${nonEditable ? ' non-editable="true"' : ''}>[cf:${element.name}.${cfType}]</view-cf>`
     }
 
     public createViewLink = (elem: ViewObject, linkType: number, linkText?: string): string => {

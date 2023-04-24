@@ -5,8 +5,9 @@ import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
 import { search_default_buttons } from '@ve-core/search/mms-search-buttons.config'
 import { UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { CacheService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
+import { CacheService, EventService } from '@ve-utils/core'
+import { ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
+import { ValueService } from '@ve-utils/mms-api-client/Value.service'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veCore } from '@ve-core'
@@ -23,8 +24,6 @@ import {
     ViewObject,
 } from '@ve-types/mms'
 import { VeSearchOptions } from '@ve-types/view-editor'
-
-//veCore.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 export interface SearchQuery {
     searchText: string
@@ -175,6 +174,7 @@ export class SearchController implements angular.IComponentController {
         'ProjectService',
         'UtilsService',
         'ViewService',
+        'ValueService',
         'SchemaService',
         'ButtonBarService',
     ]
@@ -191,6 +191,7 @@ export class SearchController implements angular.IComponentController {
         private projectSvc: ProjectService,
         private utilsSvc: UtilsService,
         private viewSvc: ViewService,
+        private valueSvc: ValueService,
         private schemaSvc: SchemaService,
         private buttonBarSvc: ButtonBarService
     ) {}
@@ -285,11 +286,7 @@ export class SearchController implements angular.IComponentController {
                         const properties: ElementObject[] = []
                         //TODO might not be elements
                         data.forEach((elt) => {
-                            if (elt.type === 'Property' && elt.ownerId == elem.id) {
-                                properties.push(elt)
-                            } else if (elt.type === 'Slot') {
-                                properties.push(elt)
-                            }
+                            if (this.valueSvc.isValue(elt)) properties.push(elt)
                         })
                         elem._properties = properties
                         // OLD CODE - splits into 3cols
@@ -344,7 +341,11 @@ export class SearchController implements angular.IComponentController {
     }
 
     public closeSearch = (): void => {
-        void this.$state.go('main.project.ref.portal', { search: null, field: null }, { reload: true })
+        if (this.mmsOptions.closeCallback) {
+            this.mmsOptions.closeCallback()
+        } else {
+            void this.$state.go('main.project.ref.portal', { search: null, field: null }, { reload: true })
+        }
     }
 
     public advancedSearchHandler = (): void => {
@@ -563,6 +564,8 @@ export class SearchController implements angular.IComponentController {
     }
 
     public newSearch = (query: SearchQuery): void => {
+        this.searchResults.length = 0
+        this.searchLoading = true
         this.paginationCache = {}
         this.search(query, 0, this.itemsPerPage)
     }
@@ -634,6 +637,7 @@ export class SearchController implements angular.IComponentController {
         // Set project and mounted projects filter
         //var projectList = this.getProjectMountsQuery()
         const filterTerms: { [key: string]: string[] } = {}
+        const filterQueries: QueryObject[] = []
         const queryObs: QueryObject[] = []
         this.filterList = []
 
@@ -667,7 +671,6 @@ export class SearchController implements angular.IComponentController {
             }
         }
         if (this.docsviews.selected) {
-            const queryObs: QueryObject[] = []
             const stereoIds = [
                 this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
                 this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
@@ -686,20 +689,20 @@ export class SearchController implements angular.IComponentController {
         }
 
         if (Object.entries(filterTerms).length > 0) {
-            const filterQueries: QueryObject[] = []
             for (const queryOb of queryObs) {
                 for (const [term, list] of Object.entries(filterTerms)) {
-                    for (const sid of list) {
-                        const newOb = _.cloneDeep(queryOb)
-                        newOb.params[term] = sid
-                        filterQueries.push(newOb)
+                    if (list.length > 0) {
+                        for (const sid of list) {
+                            const newOb = _.cloneDeep(queryOb)
+                            newOb.params[term] = sid
+                            filterQueries.push(newOb)
+                        }
                     }
                 }
             }
-            return filterQueries
         }
-
-        return queryObs
+        if (filterQueries.length > 0) return filterQueries
+        else return queryObs
     }
 
     private combineRelatedViews = (): void => {
@@ -891,11 +894,11 @@ const SearchComponent: VeComponentOptions = {
                 <input type="checkbox" ng-model="$ctrl.docsviews.selected"> <span ng-click="$ctrl.toggleDocs">Search for Views and Documents</span>
             </div>
         </div>
-<!--        <span class="close-button-container">-->
-<!--            <a class="close-button" ng-if="$ctrl.mmsOptions.closeable" ui-sref="main.project.ref.portal({search: undefined, field: undefined})" ui-sref-opts="{ inherit: true }">-->
-<!--                <i tooltip-placement="left" uib-tooltip="Close Search"  class="fa fa-times"></i>-->
-<!--            </a>-->
-<!--        </span>-->
+        <span class="close-button-container" ng-if="$ctrl.mmsOptions.closeable">
+            <a class="close-button"  ng-click="$ctrl.closeSearch()">
+                <i tooltip-placement="left" uib-tooltip="Close Search"  class="fa fa-times"></i>
+            </a>
+        </span>
 
         <!-- <div ng-show="advancedSearchResults" class="mms-search-input"> -->
             <!-- advanced search query input disabled -->
@@ -937,7 +940,6 @@ const SearchComponent: VeComponentOptions = {
             <mms-search-results mms-element="elem"></mms-search-results>
         </div>    
     </div>
-    <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="$ctrl.searchLoading"></i>
     <div class="container-no-results container-fluid" ng-show="(!$ctrl.searchResults || $ctrl.searchResults.length === 0) && !$ctrl.searchLoading && !ctrl.firstSearch">
         <h3>No Results Found.</h3>
     </div>

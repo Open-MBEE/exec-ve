@@ -2,8 +2,8 @@ import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
 import angular from 'angular'
 import _ from 'lodash'
 
-import { AutosaveService } from '@ve-utils/core'
-import { ApiService, AuthService, CacheService } from '@ve-utils/mms-api-client'
+import { EditService, CacheService } from '@ve-utils/core'
+import { ApiService, AuthService } from '@ve-utils/mms-api-client'
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
 import { veApp } from '@ve-app'
@@ -20,15 +20,7 @@ export interface LoginModalResolve extends VeModalResolve {
 }
 
 class LoginModalController extends VeModalControllerImpl<boolean, LoginModalResolve> implements VeModalController {
-    static $inject = [
-        '$state',
-        '$uiRouterGlobals',
-        'growl',
-        'AuthService',
-        'AutosaveService',
-        'ApiService',
-        'CacheService',
-    ]
+    static $inject = ['$state', '$uiRouterGlobals', 'growl', 'AuthService']
 
     public credentials = {
         username: '',
@@ -40,10 +32,7 @@ class LoginModalController extends VeModalControllerImpl<boolean, LoginModalReso
         private $state: StateService,
         private $uiRouterGlobals: UIRouterGlobals,
         private growl: angular.growl.IGrowlService,
-        private authSvc: AuthService,
-        private autosaveSvc: AutosaveService,
-        private apiSvc: ApiService,
-        private cacheSvc: CacheService
+        private authSvc: AuthService
     ) {
         super()
     }
@@ -55,12 +44,12 @@ class LoginModalController extends VeModalControllerImpl<boolean, LoginModalReso
                 this.growl.success('Logged in')
                 // Check if user had changes queued before refreshing page data
                 // add edits to cache
-                const edits = this.autosaveSvc.getAll()
-                _.map(edits, (element, key) => {
-                    const reqOb = this.apiSvc.makeRequestObject(element)
-                    const cacheKey = this.apiSvc.makeCacheKey(reqOb, element.id, true)
-                    this.cacheSvc.put(cacheKey, element)
-                })
+                // const edits = this.autosaveSvc.getAll()
+                // _.map(edits, (element, key) => {
+                //     const reqOb = this.apiSvc.makeRequestObject(element)
+                //     const cacheKey = this.apiSvc.makeCacheKey(reqOb, element.id, true)
+                //     this.cacheSvc.put(cacheKey, element)
+                // })
                 if (this.resolve.continue) {
                     this.$state.go(this.$uiRouterGlobals.current, {}, { reload: true }).then(
                         () => {

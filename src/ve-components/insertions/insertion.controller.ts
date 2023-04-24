@@ -2,12 +2,15 @@ import _ from 'lodash'
 
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
+import { EditObject } from '@ve-utils/core'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { InsertApi, InsertData } from '@ve-types/components'
+import { EditingApi } from '@ve-types/core/editor'
 import { BasicResponse, ElementObject, MmsObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings, veSearchCallback, VeSearchOptions } from '@ve-types/view-editor'
 
@@ -38,6 +41,7 @@ export class Insertion<
     public name: string
     public ownerId: string
     public searchOptions: VeSearchOptions<U> = null
+    public editorApi: EditingApi = {}
     type: string
     createForm: boolean = true
     oking: boolean = false
@@ -46,7 +50,8 @@ export class Insertion<
     refId: string
     orgId: string
     insertType: string
-    newItem: U
+    createItem: U
+    editItem: EditObject
 
     static $inject = [
         '$scope',
@@ -62,7 +67,8 @@ export class Insertion<
         'ApplicationService',
         'UtilsService',
         'ApiService',
-        'InsertService',
+        'InsertionService',
+        'EditorService',
     ]
 
     protected schema = 'cameo'
@@ -85,7 +91,8 @@ export class Insertion<
         protected applicationSvc: ApplicationService,
         protected utilsSvc: UtilsService,
         protected apiSvc: ApiService,
-        protected utils: InsertionService
+        protected insertionSvc: InsertionService,
+        protected editorSvc: EditorService
     ) {}
 
     public parentData: ElementObject = {} as ElementObject
@@ -99,10 +106,12 @@ export class Insertion<
 
         this.searchOptions = {
             callback: this.callback,
+            searchField: 'name',
             itemsPerPage: 200,
             filterQueryList: [this.queryFilter],
             hideFilterOptions: true,
-            closeable: false,
+            closeable: true,
+            closeCallback: this.cancel,
         }
     }
 
@@ -114,19 +123,27 @@ export class Insertion<
         this.oking = true
 
         this.ownerId = this.parentData && this.parentData.id ? this.parentData.id : 'holding_bin_' + this.projectId
-
-        this.create()
-            .then((data) => {
-                this.addResolve(data, 'created')
-            }, this.addReject)
-            .finally(this.addFinally)
+        let ready = this.$q.resolve(null)
+        if (this.editItem) {
+            ready = this.editorSvc.updateAllData(this.editItem.key, true)
+        }
+        ready.then(
+            () => {
+                this.create()
+                    .then((data) => {
+                        this.insertResolve(data, 'created')
+                    }, this.insertReject)
+                    .finally(this.insertFinally)
+            },
+            (reason) => this.insertReject(reason)
+        )
     }
 
     public loginCb = (result?: boolean): void => {
         if (result) {
             this.ok()
         } else {
-            this.addReject({
+            this.insertReject({
                 status: 666,
                 message: 'User not Authenticated',
             })
@@ -146,20 +163,20 @@ export class Insertion<
         }
         const instance = this.$uibModal.open<LoginModalResolveFn, boolean>(settings)
         instance.result.then(this.loginCb, () => {
-            this.addReject({
+            this.insertReject({
                 status: 666,
                 message: 'User Cancelled Authentication',
             })
         })
     }
 
-    public addResolve = (data: U, type: string): void => {
+    public insertResolve = (data: U, type: string): void => {
         this.growl.success(this.type + ' is being ' + type)
         this.success(data)
         this.insertApi.resolve(data)
     }
 
-    protected addReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(reason: V): void => {
+    protected insertReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(reason: V): void => {
         this.fail(reason)
         if (!this.continue) {
             this.insertApi.reject(reason)
@@ -183,7 +200,7 @@ export class Insertion<
         /* Put custom finally logic here*/
     }
 
-    public addFinally = (): void => {
+    public insertFinally = (): void => {
         this.last()
         this.oking = false
     }
@@ -201,9 +218,18 @@ export class Insertion<
         this.oking = true
         this.addExisting(data, property)
             .then((finalData) => {
-                this.addResolve(finalData, 'added')
-            }, this.addReject)
-            .finally(this.addFinally)
+                this.insertResolve(finalData, 'added')
+            }, this.insertReject)
+            .finally(this.insertFinally)
+    }
+
+    public cancel = (): void => {
+        if (this.insertData.selected) {
+            this.insertionSvc.cancelAction(this.insertData.selected)
+        }
+        if (this.insertApi.reject) {
+            this.insertApi.reject({ status: 444, message: 'User cancelled request' })
+        }
     }
     /**
      *

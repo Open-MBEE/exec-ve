@@ -6,7 +6,7 @@ import { right_default_toolbar, right_dynamic_toolbar } from '@ve-app/pane-right
 import { ExtensionService } from '@ve-components/services'
 import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { PermissionsService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
@@ -20,7 +20,7 @@ class RightToolbarController implements IComponentController {
         '$state',
         'ExtensionService',
         'PermissionsService',
-        'AutosaveService',
+        'EditService',
         'EventService',
         'ToolbarService',
         'RootScopeService',
@@ -44,7 +44,7 @@ class RightToolbarController implements IComponentController {
         public $state: StateService,
         public extensionSvc: ExtensionService,
         private permissionsSvc: PermissionsService,
-        private autosaveSvc: AutosaveService,
+        private autosaveSvc: EditService,
         private eventSvc: EventService,
         private toolbarSvc: ToolbarService,
         private rootScopeSvc: RootScopeService

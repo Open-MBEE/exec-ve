@@ -4,16 +4,17 @@ import { ExtensionService, ComponentService } from '@ve-components/services'
 import { SpecTool } from '@ve-components/spec-tools'
 import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
+import { EditorService, editor_buttons } from '@ve-core/editor'
 import { MathService, UtilsService, ImageService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
+import { ValueService } from '@ve-utils/mms-api-client/Value.service'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { PropertySpec, veComponents } from '@ve-components'
 
 import { VeQService } from '@ve-types/angular'
-import {SlotObject, TaggedValueObject, ValueObject} from '@ve-types/mms'
-import {presentations_buttons} from "@ve-components/presentations/presentations-buttons.config";
+import { ValueObject } from '@ve-types/mms'
 
 /**
  * @ngdoc component
@@ -52,6 +53,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
     mmsSpecEditorCtrl: SpecTool
 
     //Locals
+    addValueType: string = 'LiteralString'
     values: ValueObject[] = []
     editValues: ValueObject[] = []
     propertySpec: PropertySpec
@@ -97,59 +99,59 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         <h2 class="prop-title spec-view-value-heading">Property Value</h2>
         <div ng-if="!$ctrl.propertySpec.isEnumeration">
             <div ng-if="$ctrl.editValues.length == 0">
-                <select ng-model="addValueType" ng-options="key for (key, value) in $ctrl.addValueTypes"></select>
-                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue(addValueType)">Add</button>
+                <select ng-model="$ctrl.addValueType" ng-options="key for (key, value) in $ctrl.valueSvc.addValueTypes"></select>
+                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue($event, addValueType)">Add</button>
             </div>
             <div ng-repeat="value in $ctrl.editValues" ng-switch on="value.type" ng-form="valForm">
                 <div ng-switch-when="LiteralInteger" ng-class="{'has-error': valForm.$error.pattern}">
                     <div class="form-inline">
                     <input class="form-control ve-plain-input" type="number" ng-model="value.value" ng-pattern="/^-?\\d+$/" ng-blur="$ctrl.cleanupVal(value)">&nbsp;
-                    <a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+                    <a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
                     </div>
                     <label class="control-label ve-error-icon" ng-show="valForm.$error.pattern">Not a valid integer</label>
                 </div>
                 <div ng-switch-when="LiteralUnlimitedNatural" ng-class="{'has-error': valForm.$error.pattern}">
                     <div class="form-inline">
                     <input class="form-control ve-plain-input" type="number" name="natVal" ng-model="value.value" ng-pattern="/^\\d+$/" ng-blur="$ctrl.cleanupVal(value)">&nbsp;
-                    <a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+                    <a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
                     </div>
                     <label class="control-label ve-error-icon" ng-show="valForm.$error.pattern">Not a valid natural number</label>
                 </div>
-                <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value">&nbsp;{{value.value}}&nbsp;<a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a></div>
+                <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value">&nbsp;{{value.value}}&nbsp;<a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a></div>
                 <div ng-switch-when="LiteralReal">
                     <div class="form-inline">
-                        <input class="form-control ve-plain-input" type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="$ctrl.removeVal($index)">&nbsp;<i class="fa fa-close"></i></a>
+                        <input class="form-control ve-plain-input" type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)">&nbsp;<i class="fa fa-close"></i></a>
                     </div>
                 </div>
                 <div ng-switch-when="LiteralString">
                     <div ng-if="$ctrl.hasHtml(value.value)">
-                        <editor ng-model="value.value" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-element-id="{{$ctrl.element.id}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id + 'index:' + $index}}"></editor>
+                        <editor ng-model="value.value" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-element-id="{{$ctrl.element.id}}" edit-field="value" edit-index="{{ $index }}"></editor>
                     </div>
                     <div ng-if="!$ctrl.hasHtml(value.value)">
                         <textarea ng-model="value.value"></textarea>
-                        <a ng-click="$ctrl.addHtml(value)"><i class="fa fa-html5"></i></a>
+                        <a ng-click="$ctrl.addHtml($event, value)"><i class="fa fa-html5"></i></a>
                     </div>
-                    <a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+                    <a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
                 </div>
                 <div ng-switch-when="OpaqueExpression">
-                    <textarea ng-model="value.body[0]"></textarea><a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+                    <textarea ng-model="value.body[0]"></textarea><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
                 </div>
                 <div ng-switch-default>Editing not supported for now</div>
             </div>
             <div ng-if="$ctrl.editValues.length != 0 && ($ctrl.propertySpec.isSlot || $ctrl.propertySpec.isTaggedValue)">
-                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue(editValues[0].type)">Add</button>
+                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue($event, editValues[0].type)">Add</button>
             </div>
         </div>
         <div ng-if="$ctrl.propertySpec.isEnumeration && $ctrl.propertySpec.isSlot" ng-repeat="val in $ctrl.editValues">
             <select ng-model="val.instanceId" ng-options="el.id as el.name for el in $ctrl.propertySpec.options">
-            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="$ctrl.propertySpec.isEnumeration && $ctrl.propertySpec.isTaggedValue" ng-repeat="val in $ctrl.editValues">
             <select ng-model="val.elementId" ng-options="el.id as el.name for el in $ctrl.propertySpec.options">
-            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="($ctrl.propertySpec.isSlot || $ctrl.propertySpec.isTaggedValue || $ctrl.editValues.length == 0) && $ctrl.propertySpec.isEnumeration">
-            <button class="btn btn-sm btn-default" ng-click="$ctrl.addEnumerationValue()">Add</button>
+            <button class="btn btn-sm btn-default" ng-click="$ctrl.addEnumerationValue($event)">Add</button>
         </div>
     </div>
 
@@ -172,7 +174,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
 </div>
 `
 
-    static $inject = Transclusion.$inject
+    static $inject = [...Transclusion.$inject, 'ValueService']
 
     constructor(
         $q: VeQService,
@@ -181,6 +183,8 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
+        editorSvc: EditorService,
+        editSvc: EditService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
@@ -188,7 +192,8 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
-        imageSvc: ImageService
+        imageSvc: ImageService,
+        private valueSvc: ValueService
     ) {
         super(
             $q,
@@ -197,6 +202,8 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             $element,
             growl,
             componentSvc,
+            editorSvc,
+            editSvc,
             elementSvc,
             utilsSvc,
             schemaSvc,
@@ -207,20 +214,22 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             imageSvc
         )
         this.cfType = 'val'
-        this.cfTitle = 'values'
+        this.cfTitle = 'Value'
         this.cfKind = 'Value'
+        this.cfField = 'value'
         this.checkCircular = false
     }
 
     $onInit(): void {
         super.$onInit()
         this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_${this.cfType}`)
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, presentations_buttons)
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons)
 
         this.$element.on('click', (e) => {
+            e.stopPropagation()
             if (this.noClick) return
 
-            if (this.startEdit && !this.nonEditable) {
+            if (!this.nonEditable && !this.isEditing) {
                 this.startEdit()
             }
             if (this.mmsViewCtrl) {
@@ -229,29 +238,20 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
                 this.growl.warning('Cross Reference is not editable.')
             }
-            e.stopPropagation()
         })
-        this.componentSvc.setupValEditFunctions(this)
-        //Custom Start Edit functions
-        this.startEdit = (): void => {
-            this._startEdit(this.editable())
-        }
     }
 
     public getContent = (preview?): angular.IPromise<string | HTMLElement[]> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
-
         this.isEditing = false
         this.elementSaving = false
         const toCompileList: any[] = []
         let areStrings = false
-        this.values = this.componentSvc.setupValCf(this.element)
+        this.values = this.valueSvc.getValues(this.element)
         let values = this.values
         let result = ''
         if (preview) {
             values = this.editValues
-        } else {
-            this.isEditing = false
         }
         for (let i = 0; i < values.length; i++) {
             if (values[i].type === 'LiteralString') {
@@ -309,25 +309,45 @@ export class TranscludeValController extends Transclusion implements ITransclusi
     }
 
     protected recompile = (preview?: boolean): void => {
+        if (!this.valueSvc.isValue(this.element)) {
+            this.$element.empty()
+            //TODO: Add reason/errorMessage handling here.
+            this.$transcludeEl = $(
+                '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type" mms-field="::field"></annotation>'
+            )
+            this.$element.append(this.$transcludeEl)
+            this.$compile(this.$transcludeEl)(
+                Object.assign(this.$scope.$new(), {
+                    elementId: this.element.id,
+                    recentElement: this.element,
+                    type: 'transclusion',
+                    field: this.cfField,
+                })
+            )
+            return
+        }
         if (!this.nonEditable && this.mmsSpecEditorCtrl && !this.edit) {
-            this._startEdit(this.editable())
+            this.startEdit()
         } else {
             this.defaultRecompile(preview)
         }
     }
 
-    private _startEdit = (isEditable: boolean): void => {
+    protected startEdit(): void {
         if (this.propertySpec) {
-            this.componentSvc.startEdit(this, isEditable, this.$element, this.editTemplate, false)
+            super.startEdit(() => {
+                this.editValues = this.valueSvc.getValues(this.edit.element)
+            })
             return
         }
-        this.componentSvc.getPropertySpec(this.element).then(
+        this.valueSvc.getPropertySpec(this.element).then(
             (value) => {
                 this.propertySpec = value
-                this.componentSvc.startEdit(this, isEditable, this.$element, this.editTemplate, false)
+                super.startEdit(() => {
+                    this.editValues = this.valueSvc.getValues(this.edit.element)
+                })
             },
             (reason) => {
-                this.componentSvc.startEdit(this, isEditable, this.$element, this.editTemplate, false)
                 this.growl.error('Failed to get property spec: ' + reason.message)
             }
         )
@@ -335,16 +355,39 @@ export class TranscludeValController extends Transclusion implements ITransclusi
 
     public save = (e: JQuery.ClickEvent): void => {
         e.stopPropagation()
-        this.componentSvc.saveAction(this, this.$element, false)
+        this.saveAction(false)
     }
 
-    public saveC = (): void => {
-        this.componentSvc.saveAction(this, this.$element, true)
+    public saveC = (e: JQuery.ClickEvent): void => {
+        e.stopPropagation()
+        this.saveAction(true)
     }
 
     public cancel = (e: JQuery.ClickEvent): void => {
         e.stopPropagation()
-        this.componentSvc.cancelAction(this, this.recompile, this.$element)
+        this.cancelAction()
+    }
+
+    public addValue(e: JQueryEventObject): void {
+        e.stopPropagation()
+        const newVal = this.valueSvc.addValue(this.edit, this.addValueType)
+        if (this.editValues.length == 0) {
+            this.editValues.push(newVal)
+        }
+    }
+
+    public addEnumerationValue(e: JQueryEventObject): void {
+        e.stopPropagation()
+        const enumValue = this.valueSvc.addEnumerationValue(this.propertySpec, this.edit)
+        this.editValues.push(enumValue)
+        if (this.element.type == 'Property' || this.element.type == 'Port') {
+            this.edit.element.defaultValue = enumValue
+        }
+    }
+
+    public removeVal = (e: JQueryEventObject, i: number): void => {
+        e.stopPropagation()
+        this.editValues.splice(i, 1)
     }
 }
 

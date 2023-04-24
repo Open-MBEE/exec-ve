@@ -1,4 +1,3 @@
-import {ElementObject, ElementsRequest} from '@ve-types/mms'
 import { TreeBranch } from '@ve-types/tree'
 
 export namespace veAppEvents {
@@ -12,17 +11,5 @@ export namespace veAppEvents {
         parentBranch: TreeBranch
         prevBranch: TreeBranch
         branch: TreeBranch
-    }
-
-    interface elementSelectedData extends ElementsRequest<string> {
-        rootId?: string
-        refType?: string
-        displayOldSpec?: boolean
-        refresh?: boolean
-    }
-
-    interface elementUpdatedData {
-        element: ElementObject
-        continueEdit?: boolean
     }
 }

@@ -1,6 +1,7 @@
 import $ from 'jquery'
 
-import { IPresentation, Presentation, PresentationService, ViewHtmlService } from '@ve-components/presentations'
+import { Presentation, PresentationService, ViewHtmlService } from '@ve-components/presentations'
+import { Table2CSVService } from '@ve-components/presentations/services/Table2CSV.service'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { ImageService } from '@ve-utils/application'
@@ -12,14 +13,13 @@ import { veComponents } from '@ve-components'
 import { VePromise, VeQService } from '@ve-types/angular'
 import { IPresentationComponentOptions, ITableConfig } from '@ve-types/components/presentation'
 import { PresentTableObject, TableEntryObject } from '@ve-types/mms'
-import { Table2CSVService } from "@ve-components/presentations/services/Table2CSV.service";
 
 interface TableEvent {
     newInputVal: string
     oldInputVal: string
 }
 
-class PresentTableController extends Presentation implements IPresentation {
+class PresentTableController extends Presentation {
     public $searchEl: JQuery<HTMLElement>
     public $tHeadEl: JQuery<HTMLElement>
     public $captionEl: JQuery<HTMLTableCaptionElement>
@@ -58,7 +58,7 @@ class PresentTableController extends Presentation implements IPresentation {
     private _filterTermForColumns: {
         [filterTermForColumn: string]: { filterTerm: string; columns: number[] }
     } = {}
-    private filterTermForColumn: {[cols: string]: string} = {}
+    private filterTermForColumn: { [cols: string]: string } = {}
 
     /** Variables for Sorting Functions **/
     private _rowSortOrderAttrName = 'data-original-row-num'
@@ -101,8 +101,6 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     recompile = (): void => {
-        this.isEditing = false
-        this.inPreviewMode = false
         this.$element.on('click', (e) => {
             const tag = (e.target as unknown as Element).tagName
             if (tag === 'INPUT' || tag === 'LABEL' || tag === 'BUTTON') {
@@ -140,7 +138,7 @@ class PresentTableController extends Presentation implements IPresentation {
             },
             (reason) => {
                 const reqOb = {
-                    elementId: this.element.id,
+                    elementId: this.instanceSpec.id,
                     projectId: this.projectId,
                     refId: this.refId,
                     commitId: this.commitId,
@@ -149,14 +147,14 @@ class PresentTableController extends Presentation implements IPresentation {
                 this.$element.empty()
                 //TODO: Add reason/errorMessage handling here.
                 this.$transcludeEl = $(
-                    '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                    '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
                 )
                 this.$element.append(this.$transcludeEl)
                 this.$compile(this.$transcludeEl)(
                     Object.assign(this.$scope.$new(), {
-                        reqOb: reqOb,
+                        elementId: reqOb.elementId,
                         recentElement: reason.recentVersionOfElement,
-                        type: this.extensionSvc.AnnotationType,
+                        type: 'presentation',
                     })
                 )
             }
@@ -180,7 +178,7 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     getContent = (): VePromise<string, string> => {
-        const html = this.viewHtmlSvc.makeHtmlTable(this.table, true, true, this.element)
+        const html = this.viewHtmlSvc.makeHtmlTable(this.table, true, true, this.instanceSpec)
         return this.$q.resolve(`<div class="table-wrapper">${html}</div>`)
     }
 
@@ -216,7 +214,7 @@ class PresentTableController extends Presentation implements IPresentation {
     /** Add column(s)-wise filter ability **/
     private filterByColumn = (startColNum: number, endColNum: number): void => {
         this.searchTerm = ''
-        const filterTerm =  this.filterTermForColumn[`filter${startColNum}${endColNum}`]
+        const filterTerm = this.filterTermForColumn[`filter${startColNum}${endColNum}`]
         const filterInputBinding = `columnFilter${startColNum}${endColNum}`
         this._storeColumnWiseFilterTerm(filterInputBinding, startColNum, endColNum, filterTerm)
         this.numFiltered = 0
@@ -332,8 +330,8 @@ class PresentTableController extends Presentation implements IPresentation {
         this.showSortReset = true
     }
     /** Used to restore the sort order of table's rows **/
-    private resetSort = () => {
-        let sortedRows = this.trs.toArray().sort(this._comparatorForSortReset())
+    private resetSort = (): void => {
+        const sortedRows = this.trs.toArray().sort(this._comparatorForSortReset())
         this._displaySortedRows(sortedRows, this.tbody)
         this.showSortReset = false
         this.sortColumnNum = -1
@@ -442,10 +440,8 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     makeCsv = (): void => {
-         let el = this.$element
-            .find('.table-wrapper')
-            .children('table')
-        const csvString: string | boolean = Table2CSVService.export(el, {delivery: 'value'})
+        const el = this.$element.find('.table-wrapper').children('table')
+        const csvString: string | boolean = Table2CSVService.export(el, { delivery: 'value' })
         // var bom = "\xEF\xBB\xBF"; //just for excel
         if (typeof csvString === 'string') {
             const bom2 = '\uFEFF' //just for excel
@@ -472,7 +468,7 @@ class PresentTableController extends Presentation implements IPresentation {
     public scroll = (): void => {
         if (this._fixedColumnsElem) {
             const scroll = this.$element.find('.table-fix-column').scrollLeft()
-            this._fixedColumnsElem.css('transform',`translateX(${scroll}px)`)
+            this._fixedColumnsElem.css('transform', `translateX(${scroll}px)`)
         }
         if (this._fixedHeadersElem) {
             const scroll = this.$element.find('.table-fix-head').scrollTop()
@@ -489,7 +485,7 @@ class PresentTableController extends Presentation implements IPresentation {
             this.$element.find('.table-wrapper').removeClass('table-fix-head').css('height', '')
             this._fixedHeadersElem.css('transform', '').css('will-change', '')
             this._fixedHeadersElem = null
-            window.localStorage.setItem('ve-table-header-' + this.element.id, 'false')
+            window.localStorage.setItem('ve-table-header-' + this.instanceSpec.id, 'false')
             return
         }
         this.$element
@@ -500,7 +496,7 @@ class PresentTableController extends Presentation implements IPresentation {
         this._fixedHeadersElem = this.$element.find('thead, caption')
         this._fixedHeadersElem.css('will-change', 'transform') //browser optimization
         this.$element.find('.table-fix-head').on('scroll', this.scroll)
-        window.localStorage.setItem('ve-table-header-' + this.element.id, 'true')
+        window.localStorage.setItem('ve-table-header-' + this.instanceSpec.id, 'true')
     }
 
     public makeFixedColumn = (): void => {
@@ -508,7 +504,7 @@ class PresentTableController extends Presentation implements IPresentation {
             this.$element.find('.table-wrapper').removeClass('table-fix-column').css('width', '')
             this._fixedColumnsElem.css('transform', '').css('will-change', '').removeClass('table-fixed-cell')
             this._fixedColumnsElem = null
-            window.localStorage.setItem('ve-table-column-' + this.element.id, 'false')
+            window.localStorage.setItem('ve-table-column-' + this.instanceSpec.id, 'false')
             return
         }
         this.$element
@@ -521,7 +517,7 @@ class PresentTableController extends Presentation implements IPresentation {
         this._fixedColumnsElem.css('will-change', 'transform') //browser optimization
         this._fixedColumnsElem.addClass('table-fixed-cell')
         this.$element.find('.table-fix-column').on('scroll', this.scroll)
-        window.localStorage.setItem('ve-table-column-' + this.element.id, this.numFixedColumns.toString())
+        window.localStorage.setItem('ve-table-column-' + this.instanceSpec.id, this.numFixedColumns.toString())
     }
 
     public updateFixedColumns = (): void => {
@@ -535,50 +531,55 @@ class PresentTableController extends Presentation implements IPresentation {
         const spanData: boolean[][] = [] //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
         let curRow = 0
         let data = $()
-        $(this.$element).find('.table-fix-column table').children(bodyTag).children('tr')
+        $(this.$element)
+            .find('.table-fix-column table')
+            .children(bodyTag)
+            .children('tr')
             .each((index, element) => {
                 let curCol = 0
-                $(element).children(cellTag).each((index, element) => {
-                    while (spanData[curRow] && spanData[curRow][curCol]) {
-                        curCol++
-                    }
-                    if (curCol >= n) {
-                        return
-                    }
-                    data = data.add($(element))
-                    const rowstring = $(element).attr('rowspan')
-                    let rowspan = 0
-                    if (rowstring) {
-                        rowspan = parseInt(rowstring)
-                        if (rowspan > 1) {
-                            for (let i = 1; i < rowspan; i++) {
-                                if (!spanData[curRow + i]) {
-                                    spanData[curRow + i] = []
+                $(element)
+                    .children(cellTag)
+                    .each((index, element) => {
+                        while (spanData[curRow] && spanData[curRow][curCol]) {
+                            curCol++
+                        }
+                        if (curCol >= n) {
+                            return
+                        }
+                        data = data.add($(element))
+                        const rowstring = $(element).attr('rowspan')
+                        let rowspan = 0
+                        if (rowstring) {
+                            rowspan = parseInt(rowstring)
+                            if (rowspan > 1) {
+                                for (let i = 1; i < rowspan; i++) {
+                                    if (!spanData[curRow + i]) {
+                                        spanData[curRow + i] = []
+                                    }
+                                    spanData[curRow + i][curCol] = true
                                 }
-                                spanData[curRow + i][curCol] = true
                             }
                         }
-                    }
-                    const colstring = $(element).attr('colspan')
-                    if (!colstring) {
-                        curCol++
-                        return
-                    }
-                    let colspan = parseInt(colstring)
-                    while (colspan > 1) {
-                        curCol++
-                        colspan--
-                        if (rowspan > 1) {
-                            for (let j = 1; j < rowspan; j++) {
-                                spanData[curRow + j][curCol] = true
+                        const colstring = $(element).attr('colspan')
+                        if (!colstring) {
+                            curCol++
+                            return
+                        }
+                        let colspan = parseInt(colstring)
+                        while (colspan > 1) {
+                            curCol++
+                            colspan--
+                            if (rowspan > 1) {
+                                for (let j = 1; j < rowspan; j++) {
+                                    spanData[curRow + j][curCol] = true
+                                }
                             }
                         }
-                    }
-                    curCol++
-                })
+                        curCol++
+                    })
                 curRow++
             })
-            return data
+        return data
     }
 
     private compileTable(): void {
@@ -591,11 +592,11 @@ class PresentTableController extends Presentation implements IPresentation {
                 this.nextIndex = first + 300
                 if (this.nextIndex < this.lastIndex) this.compileTable()
                 else {
-                    if (window.localStorage.getItem('ve-table-header-' + this.element.id) == 'true') {
+                    if (window.localStorage.getItem('ve-table-header-' + this.instanceSpec.id) == 'true') {
                         this.fixedHeaders = true
                         this.makeFixedHeader()
                     }
-                    const columnFix = window.localStorage.getItem('ve-table-column-' + this.element.id)
+                    const columnFix = window.localStorage.getItem('ve-table-column-' + this.instanceSpec.id)
                     if (columnFix != 'false' && columnFix != null && columnFix != 'null') {
                         this.fixedColumns = true
                         this.numFixedColumns = Number.parseInt(columnFix)
@@ -628,7 +629,7 @@ const PresentTableComponent: IPresentationComponentOptions = {
 `,
     bindings: {
         peObject: '<',
-        element: '<',
+        instanceSpec: '<',
         peNumber: '<',
     },
     controller: PresentTableController,

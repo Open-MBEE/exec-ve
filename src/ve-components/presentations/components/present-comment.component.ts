@@ -9,7 +9,7 @@ const PresentCommentComponent: IPresentationComponentOptions = {
     template: `<view-cf mms-cf-type="com" mms-element-id="{{$ctrl.peObject.source}}"></view-cf>`,
     bindings: {
         peObject: '<',
-        element: '<',
+        instanceSpec: '<',
         peNumber: '<',
     },
     controller: PresentationLite,

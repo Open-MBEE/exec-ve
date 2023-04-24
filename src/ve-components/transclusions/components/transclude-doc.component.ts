@@ -1,16 +1,15 @@
-import { presentations_buttons } from '@ve-components/presentations/presentations-buttons.config'
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { Transclusion, ITransclusion } from '@ve-components/transclusions'
+import { ITransclusion, DeletableTransclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { EditorService, editor_buttons } from '@ve-core/editor'
 import { UtilsService, MathService, ImageService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
+import { EditService, EventService } from '@ve-utils/core'
+import { ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import {PresentTextObject} from "@ve-types/mms";
 
 /**
  * @ngdoc component
@@ -46,7 +45,7 @@ import {PresentTextObject} from "@ve-types/mms";
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeDocController extends Transclusion implements ITransclusion {
+export class TranscludeDocController extends DeletableTransclusion implements ITransclusion {
     protected editTemplate: string = `
     <div class="panel panel-default no-print">
     <div class="panel-heading clearfix">
@@ -54,8 +53,8 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             <form class="form-inline">
             <div class="form-group">
                 <span class="pe-type-{{$ctrl.panelType}}">{{$ctrl.panelType}} :</span>
-                <span ng-if="!$ctrl.isDirectChildOfPresentationElement">{{$ctrl.panelTitle}}</span>
-                <span ng-if="$ctrl.isDirectChildOfPresentationElement"><input type="text" class="form-control" ng-model="$ctrl.edit.name"/></span>
+                <span ng-if="!$ctrl.isDeletable">{{$ctrl.panelTitle}}</span>
+                <span ng-if="$ctrl.isDeletable"><input type="text" class="form-control" ng-model="$ctrl.edit.element.name"/></span>
             </div></form>
         </h3>
         <div class="btn-group pull-right" ng-hide="$ctrl.editLoading">
@@ -63,12 +62,12 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         </div>
     </div>
     <div class="panel-body no-padding-panel">
-        <editor ng-model="$ctrl.edit.documentation" mms-editor-type="{{$ctrl.editorType}}" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></editor>
+        <editor ng-model="$ctrl.edit.element.documentation" editor-type="{{$ctrl.editorType}}" edit-field="documentation" mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></editor>
     </div>
 </div>
 `
 
-    static $inject = Transclusion.$inject
+    static $inject = DeletableTransclusion.$inject
 
     constructor(
         $q: VeQService,
@@ -77,6 +76,8 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
+        editorSvc: EditorService,
+        editSvc: EditService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
@@ -84,7 +85,8 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
-        imageSvc: ImageService
+        imageSvc: ImageService,
+        viewSvc: ViewService,
     ) {
         super(
             $q,
@@ -93,6 +95,8 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             $element,
             growl,
             componentSvc,
+            editorSvc,
+            editSvc,
             elementSvc,
             utilsSvc,
             schemaSvc,
@@ -100,7 +104,8 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             mathSvc,
             extensionSvc,
             buttonBarSvc,
-            imageSvc
+            imageSvc,
+            viewSvc
         )
         this.cfType = 'doc'
         this.cfTitle = 'Documentation'
@@ -112,7 +117,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         super.$onInit()
 
         this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_${this.cfType}`)
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, presentations_buttons)
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons)
 
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) this.startEdit()
@@ -125,16 +130,18 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         })
 
         if (this.mmsViewPresentationElemCtrl) {
-            if (this.isDirectChildOfPresentationElement) {
-                this.panelTitle = this.instanceSpec.name
-                this.panelType = this.presentationElem.type //this is hack for fake table/list/equation until we get actual editors
+            const instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
+            const presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
+            if (this.isDeletable) {
+                this.panelTitle = instanceSpec ? instanceSpec.name : ''
+                this.panelType = presentationElem ? presentationElem.type : '' //this is hack for fake table/list/equation until we get actual editors
                 if (this.panelType.charAt(this.panelType.length - 1) === 'T')
                     this.panelType = this.panelType.substring(0, this.panelType.length - 1)
                 if (this.panelType === 'Paragraph') this.panelType = 'Text'
                 if (this.panelType === 'Figure' || this.panelType === 'ImageT') this.panelType = 'Image'
             }
-            if (this.presentationElem) {
-                this.editorType = this.presentationElem.type
+            if (presentationElem) {
+                this.editorType = presentationElem.type
             }
         }
     }
@@ -147,7 +154,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
     public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
 
-        let doc = preview ? this.edit.documentation : this.element.documentation
+        let doc = preview ? this.edit.element.documentation : this.element.documentation
         if (!doc || this.emptyRegex.test(doc)) {
             doc = '<p class="no-print placeholder">(no ' + this.panelType + ')</p>'
         }

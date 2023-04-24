@@ -55,7 +55,7 @@ const PresentListComponent: IPresentationComponentOptions = {
     template: ``,
     bindings: {
         peObject: '<',
-        element: '<',
+        instanceSpec: '<',
         peNumber: '<',
     },
     controller: PresentListController,

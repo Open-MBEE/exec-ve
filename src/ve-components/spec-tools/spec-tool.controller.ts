@@ -1,10 +1,10 @@
 import { IPaneScope } from '@openmbee/pane-layout'
 
-import { veAppEvents } from '@ve-app/events'
 import { ComponentService } from '@ve-components/services'
+import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService, ToolbarApi } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { EditObject, EventService } from '@ve-utils/core'
 import {
     ApiService,
     ElementService,
@@ -16,24 +16,21 @@ import {
 
 import { SpecApi, SpecService } from './services/Spec.service'
 
-import { VePromise, VeQService } from '@ve-types/angular'
-import { ComponentController } from '@ve-types/components'
+import { VeQService } from '@ve-types/angular'
 import { EditingApi } from '@ve-types/core/editor'
 import { ElementObject, RefObject, ValueObject, ViewObject } from '@ve-types/mms'
 
-export interface ISpecTool extends angular.IComponentController, ComponentController {
+export interface ISpecTool extends angular.IComponentController {
     $scope: ISpecToolScope
     commitId: string
     specType: string
-    edit: ElementObject
+    edit: EditObject
     element: ElementObject
     isEditing: boolean
     inPreviewMode: boolean
     skipBroadcast: boolean
-    editValues: ValueObject[]
-    values?: any[]
-    addValueTypes?: object
-    addValueType?: string
+    editValues?: ValueObject[]
+    values?: ValueObject[]
     //Functions
     editorApi?: EditingApi
     addValue?(type: string): void
@@ -102,28 +99,18 @@ export class SpecTool implements ISpecTool {
     public elementSaving: boolean
     public skipBroadcast: boolean
 
-    protected noEdit
-    protected mmsDisplayOldSpec
-
-    protected ran = false
-    protected lastid = null //race condition check
     protected gettingSpec = true
-    protected isSlot: boolean = false
     public element: ElementObject
     public document: ViewObject
     public ref: RefObject
     public values: any[]
-    public edit: ElementObject
+    public edit: EditObject
     protected modifier
-    protected relatedDocuments: null
-    protected elementTypeClass: string
     protected options: any
     protected elementDataLink: string
     protected qualifiedName: string
 
     public editValues: any[]
-
-    protected $transcludeEl: JQuery<HTMLElement>
 
     protected template: string | angular.Injectable<(...args: any[]) => string>
 
@@ -187,7 +174,6 @@ export class SpecTool implements ISpecTool {
 
         this.subs.push(
             this.eventSvc.$on('element.selected', () => {
-                this.gettingSpec = true
                 if (this.edit && this.editorApi.save) {
                     void this.editorApi.save()
                 }
@@ -237,6 +223,7 @@ export class SpecTool implements ISpecTool {
 
     public changeElement = (ready?: boolean): void => {
         if (!ready) return
+        this.gettingSpec = true
         this.specApi = this.specSvc.specApi
         this.refId = this.specApi.refId
         this.projectId = this.specApi.projectId
@@ -276,7 +263,7 @@ export class SpecTool implements ISpecTool {
             refId: this.element._refId,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
     }
 
     public addHtml(value: { value: string }): void {
@@ -293,9 +280,9 @@ export class SpecTool implements ISpecTool {
      *      or force save. If the user decides to discord or merge, type will be info even though
      *      the original save failed. Error means an actual error occured.
      */
-    public save(): VePromise<ElementObject> {
-        return this.componentSvc.save(this.edit, this.editorApi, this, false)
-    }
+    // public save(): VePromise<ElementObject> {
+    //     return this.componentSvc.save(this.edit, this.editorApi, this, false)
+    // }
 
     public hasHtml = (s: string): boolean => {
         return this.componentSvc.hasHtml(s)

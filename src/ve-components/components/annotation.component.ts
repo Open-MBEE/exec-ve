@@ -1,13 +1,14 @@
-import { veAppEvents } from '@ve-app/events'
 import { ExtensionService } from '@ve-components/services'
+import { veCoreEvents } from '@ve-core/events'
 import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
+import { ValueService } from '@ve-utils/mms-api-client/Value.service'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veUtils } from '@ve-utils'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { ElementObject, ElementsRequest, InstanceSpecObject, LiteralObject } from '@ve-types/mms'
+import { ElementObject, InstanceSpecObject, LiteralObject } from '@ve-types/mms'
 
 export interface AnnotationObject {
     toolTipTitle: string
@@ -17,13 +18,21 @@ export interface AnnotationObject {
 }
 
 class AnnotationController implements angular.IComponentController {
-    static $inject = ['$element', 'growl', 'ExtensionService', 'SchemaService', 'ApplicationService', 'EventService']
+    static $inject = [
+        '$element',
+        'growl',
+        'ExtensionService',
+        'SchemaService',
+        'ApplicationService',
+        'EventService',
+        'ValueService',
+    ]
 
     //Bindings
-    private mmsReqOb: ElementsRequest<string>
+    private mmsElementId: string
     mmsRecentElement: ElementObject
-    mmsType: number
-    mmsCfLabel: string
+    mmsType: 'presentation' | 'transclusion' | 'link'
+    mmsField: 'name' | 'documentation' | 'value'
 
     //Local
     public displayContent
@@ -35,7 +44,8 @@ class AnnotationController implements angular.IComponentController {
         private extensionSvc: ExtensionService,
         private schemaSvc: SchemaService,
         private applicationSvc: ApplicationService,
-        private eventSvc: EventService
+        private eventSvc: EventService,
+        private valueSvc: ValueService
     ) {}
 
     $onInit(): void {
@@ -48,15 +58,15 @@ class AnnotationController implements angular.IComponentController {
                     commitId: this.mmsRecentElement._commitId,
                     displayOldSpec: true,
                 }
-                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
             }
         })
 
         let displayContent: AnnotationObject
         if (this.mmsRecentElement) {
-            displayContent = this._getContentIfElementFound(this.mmsType, this.mmsRecentElement)
+            displayContent = this._getContentIfElementFound()
         } else {
-            displayContent = this._getContentIfElementNotFound(this.mmsType, this.mmsReqOb)
+            displayContent = this._getContentIfElementNotFound()
         }
         this.displayContent = displayContent
     }
@@ -72,92 +82,71 @@ class AnnotationController implements angular.IComponentController {
         )
     }
 
-    private _getContentIfElementFound(type: number, element: ElementObject): AnnotationObject {
-        const AT = this.extensionSvc.AnnotationType
+    private _getContentIfElementFound(): AnnotationObject {
         let inlineContent = ''
         let toolTipTitle: string
         let toolTipContent: string
-        let classifierType = this.schemaSvc.getKeyByValue(
-            'TYPE_TO_CLASSIFIER_ID',
-            (element as InstanceSpecObject).classifierIds[0],
-            this.schema
-        )
 
-        if (classifierType.endsWith('T')) {
-            classifierType = classifierType.substring(0, classifierType.length - 1)
-        }
+        if (this.mmsType === 'transclusion') {
+            if (this.mmsField !== 'value') {
+                inlineContent = this.mmsRecentElement[this.mmsField] || '<span>(no text)</span>'
+                toolTipTitle = 'Referenced element not found'
+                toolTipContent = `Displaying last found ${this.mmsField} as placeholder.`
+            } else {
+                if (!this.valueSvc.isValue(this.mmsRecentElement)) {
+                    inlineContent = '<span>(no text)</span>'
+                    toolTipTitle = 'Referenced element is not a value'
+                    toolTipContent = `Cannot display value of non-value type element`
+                } else {
+                    inlineContent = this._getValueForTranscludeVal(this.mmsRecentElement)
+                    toolTipTitle = 'Referenced element not found'
+                    toolTipContent = `Displaying last found ${this.mmsField} as placeholder.`
+                }
+            }
+        } else if (this.mmsType === 'presentation') {
+            let classifierType = this.schemaSvc.getKeyByValue(
+                'TYPE_TO_CLASSIFIER_ID',
+                (this.mmsRecentElement as InstanceSpecObject).classifierIds[0],
+                this.schema
+            )
 
-        switch (type) {
-            case AT.mmsTranscludeName:
-                inlineContent = element.name
-                toolTipTitle = 'Referenced element not found'
-                toolTipContent = 'Displaying last found name as placeholder.'
-                break
-            case AT.mmsTranscludeDoc:
-                inlineContent = element.documentation
-                toolTipTitle = 'Referenced element not found'
-                toolTipContent = 'Displaying last found documentation as placeholder.'
-                break
-            case AT.mmsTranscludeCom:
-                inlineContent = element.documentation
-                toolTipTitle = 'Referenced comment not found.'
-                toolTipContent = 'Displaying last found comment content as a placeholder.'
-                break
-            case AT.mmsViewLink:
-                inlineContent = element.name
-                toolTipTitle = 'Referenced view link not found'
-                toolTipContent = 'Displaying last found view link as placeholder.'
-                break
-            case AT.mmsTranscludeVal:
-                inlineContent = this._getValueForTranscludeVal(element)
-                toolTipTitle = 'Referenced element not found'
-                toolTipContent = 'Displaying last found value as placeholder.'
-                break
-            case AT.mmsPresentationElement:
-                inlineContent = element.documentation || '<span>(no text)</span>'
-                toolTipTitle = 'Referenced ' + classifierType + ' not found.'
-                toolTipContent = 'Displaying last found content as placeholder.'
-                break
+            if (classifierType.endsWith('T')) {
+                classifierType = classifierType.substring(0, classifierType.length - 1)
+            }
+            inlineContent = this.mmsRecentElement.documentation || '<span>(no text)</span>'
+            toolTipTitle = 'Referenced ' + classifierType + ' not found.'
+            toolTipContent = 'Displaying last found content as placeholder.'
+        } else if (this.mmsType === 'link') {
+            inlineContent = this.mmsRecentElement.name
+            toolTipTitle = 'Referenced view link not found'
+            toolTipContent = 'Displaying last found view link as placeholder.'
         }
 
         return {
             inlineContent: inlineContent,
             toolTipTitle: toolTipTitle,
             toolTipContent: toolTipContent,
-            id: element.id,
+            id: this.mmsElementId,
         }
     }
 
-    private _getContentIfElementNotFound(type: number, reqOb: ElementsRequest<string>): AnnotationObject {
+    private _getContentIfElementNotFound(): AnnotationObject {
         const AT = this.extensionSvc.AnnotationType
         let inlineContent = ''
-        const label = reqOb.elementId ? '(' + reqOb.elementId + ')' : ''
-        switch (type) {
-            case AT.mmsTranscludeName:
-                inlineContent = 'cf name' + label + ' does not exist'
-                break
-            case AT.mmsTranscludeDoc:
-                inlineContent = 'cf documentation' + label + ' does not exist'
-                break
-            case AT.mmsTranscludeCom:
-                inlineContent = 'cf com' + label + ' does not exist'
-                break
-            case AT.mmsTranscludeVal:
-                inlineContent = 'cf value' + label + ' does not exist'
-                break
-            case AT.mmsViewLink:
-                inlineContent = 'view link does not exist'
-                break
-            case AT.mmsPresentationElement:
-                inlineContent = 'presentation element does not exist'
-                break
+        const label = this.mmsElementId ? `(${this.mmsElementId})` : ''
+        if (this.mmsType === 'transclusion') {
+            inlineContent = 'cf element ' + label + ' does not exist'
+        } else if (this.mmsType === 'link') {
+            inlineContent = 'view link does not exist'
+        } else if (this.mmsType === 'presentation') {
+            inlineContent = 'presentation element does not exist'
         }
 
         return {
             inlineContent: inlineContent,
             toolTipTitle: 'Element not found',
             toolTipContent: '',
-            id: reqOb.elementId,
+            id: this.mmsElementId,
         }
     }
 
@@ -194,9 +183,10 @@ const AnnotationComponent: VeComponentOptions = {
 </script>
 `,
     bindings: {
-        mmsReqOb: '<',
+        mmsElementId: '<',
         mmsRecentElement: '<',
         mmsType: '<',
+        mmsField: '<',
     },
     controller: AnnotationController,
 }

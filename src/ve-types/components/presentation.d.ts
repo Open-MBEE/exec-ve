@@ -5,7 +5,7 @@ export interface IPresentationComponentOptions extends VeComponentOptions {
     style?: string[]
     bindings: {
         peObject: string
-        element: string
+        instanceSpec: string
         peNumber: string
         mmsProjectId?: '@'
         mmsRefId?: '@'

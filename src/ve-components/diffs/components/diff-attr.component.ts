@@ -7,7 +7,7 @@ import { handleChange } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
-import {VeComponentOptions, VePromise, VePromiseReason, VeQService} from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { ElementObject, ElementsRequest, RequestObject } from '@ve-types/mms'
 
 /**
@@ -62,7 +62,16 @@ class DiffAttrController {
     comparedElementHtml: string
     message: string
 
-    static $inject = ['$scope', '$timeout', 'growl', 'ElementService', 'ExtensionService', '$compile', '$q', '$interval']
+    static $inject = [
+        '$scope',
+        '$timeout',
+        'growl',
+        'ElementService',
+        'ExtensionService',
+        '$compile',
+        '$q',
+        '$interval',
+    ]
 
     constructor(
         private $scope: angular.IScope,
@@ -73,8 +82,7 @@ class DiffAttrController {
         private $compile: angular.ICompileService,
         private $q: VeQService,
         private $interval: angular.IIntervalService
-    ) {
-    }
+    ) {}
 
     $onInit(): void {
         this.viewOrigin = this.mmsViewCtrl ? this.mmsViewCtrl.getElementOrigin() : null
@@ -93,7 +101,7 @@ class DiffAttrController {
         this.diffLoading = false
     }
 
-    protected changeAction = (newVal, oldVal, firstChange): void  => {
+    protected changeAction = (newVal, oldVal, firstChange): void => {
         if (!newVal || firstChange) {
             return
         }
@@ -199,10 +207,7 @@ class DiffAttrController {
         return this.$q.allSettled([baseElementPromise, comparedElementPromise])
     }
 
-    protected _createElement = (
-        type: string,
-        reqOb: ElementsRequest<string>,
-    ): JQuery<HTMLElement> => {
+    protected _createElement = (type: string, reqOb: ElementsRequest<string>): JQuery<HTMLElement> => {
         const ignoreMathjaxAutoFormatting = type === 'doc' || type === 'val' || type === 'com'
         const html =
             '<view-cf ' +
@@ -221,15 +226,12 @@ class DiffAttrController {
 
     protected _fullyRender = (data: ElementObject): VePromise<string> => {
         const deferred = this.$q.defer<string>()
-        const element = this._createElement(
-            this.attr,
-            {
-                elementId: data.id,
-                projectId: data._projectId,
-                refId: data._refId,
-                commitId: data._commitId,
-            }
-        )
+        const element = this._createElement(this.attr, {
+            elementId: data.id,
+            projectId: data._projectId,
+            refId: data._refId,
+            commitId: data._commitId,
+        })
         const handler = this.$interval(() => {
             const baseHtml = element.html()
             if (!baseHtml.includes('(loading...)')) {
@@ -262,7 +264,7 @@ class DiffAttrController {
 }
 
 const DiffAttrComponent: VeComponentOptions = {
-    selector: 'mmsDiffAttr',
+    selector: 'diffAttr',
     bindings: {
         elementId: '@mmsBaseElementId',
         comparedElementId: '@mmsCompareElementId',
@@ -288,5 +290,5 @@ const DiffAttrComponent: VeComponentOptions = {
         mmsViewCtrl: '?^^view',
     },
 }
-
+veComponents.component('mmsDiffAttr', DiffAttrComponent)
 veComponents.component(DiffAttrComponent.selector, DiffAttrComponent)

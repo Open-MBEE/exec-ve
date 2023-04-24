@@ -2,8 +2,9 @@ import { ExtensionService, ComponentService } from '@ve-components/services'
 import { SpecTool } from '@ve-components/spec-tools'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { EditorService } from '@ve-core/editor'
 import { MathService, UtilsService, ImageService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -44,7 +45,7 @@ export class TranscludeNameController extends Transclusion implements ITransclus
     protected editTemplate: string = `
     <div>
     <form class="input-group" ng-submit="$ctrl.save($event)">
-        <input type="text" class="form-control" ng-model="$ctrl.edit.name" aria-describedby="basic-addon2">
+        <input type="text" class="form-control" ng-model="$ctrl.edit.element.name" aria-describedby="basic-addon2">
         <span class="input-group-addon transclude-name-label">Name</span>
         <span class="input-group-addon" ng-click="$ctrl.save($event)" title="Save">
             <i ng-if="!$ctrl.elementSaving" class="fa fa-save"></i>
@@ -68,6 +69,8 @@ export class TranscludeNameController extends Transclusion implements ITransclus
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
+        editorSvc: EditorService,
+        editSvc: EditService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
@@ -84,6 +87,8 @@ export class TranscludeNameController extends Transclusion implements ITransclus
             $element,
             growl,
             componentSvc,
+            editorSvc,
+            editSvc,
             elementSvc,
             utilsSvc,
             schemaSvc,
@@ -125,7 +130,7 @@ export class TranscludeNameController extends Transclusion implements ITransclus
         const defaultTemplate =
             '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
         const editTemplate =
-            '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
+            '<span ng-if="$ctrl.edit.element.name">{{$ctrl.edit.element.name}}</span><span ng-if="!$ctrl.edit.element.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
         if (preview) {
             deferred.resolve('<div class="panel panel-info">' + editTemplate + '</div>')
         } else {

@@ -1,3 +1,4 @@
+import { ElementObject } from '@ve-types/mms'
 import { VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 export interface InsertResolveFn<T extends InsertData> extends VeModalResolveFn {
@@ -21,7 +22,9 @@ export interface InsertData {
     type: string
     insertType: string
     noPublish?: boolean
+    isNew?: boolean
     parentTitle?: string
+    selected?: ElementObject
 }
 
 export interface InsertApi<T, U> {

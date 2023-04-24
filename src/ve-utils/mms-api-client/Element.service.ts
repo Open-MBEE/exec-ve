@@ -1,6 +1,7 @@
 import _ from 'lodash'
 
-import { ApiService, CacheService, httpCallback, HttpService, URLService } from '@ve-utils/mms-api-client'
+import { CacheService, EditObject, EditService } from '@ve-utils/core'
+import { ApiService, httpCallback, HttpService, URLService } from '@ve-utils/mms-api-client'
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
 
 import { veUtils } from '@ve-utils'
@@ -34,14 +35,15 @@ import {
  * * An element CRUD service with additional convenience methods for managing edits.
  */
 export class ElementService extends BaseApiService {
-    static $inject = ['$q', '$http', 'URLService', 'ApiService', 'CacheService', 'HttpService']
+    static $inject = ['$q', '$http', 'CacheService', 'EditService', 'URLService', 'ApiService', 'HttpService']
 
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
+        private cacheSvc: CacheService,
+        private editSvc: EditService,
         private uRLSvc: URLService,
         private apiSvc: ApiService,
-        private cacheSvc: CacheService,
         private httpSvc: HttpService
     ) {
         super()
@@ -104,7 +106,7 @@ export class ElementService extends BaseApiService {
         allowEmpty?: boolean
     ): VePromise<T> {
         this.apiSvc.normalize(reqOb)
-        const requestCacheKey = this.getElementKey(reqOb, reqOb.elementId)
+        const requestCacheKey = this.getRequestKey(reqOb, reqOb.elementId)
         if (!reqOb.projectId) {
             console.log('foo')
         }
@@ -116,7 +118,7 @@ export class ElementService extends BaseApiService {
             this.httpSvc.ping(url, weight)
             return this._getInProgress(url) as VePromise<T>
         }
-        const deletedRequestCacheKey = this.getElementKey(reqOb, reqOb.elementId)
+        const deletedRequestCacheKey = this.getRequestKey(reqOb, reqOb.elementId)
         deletedRequestCacheKey.push('deleted')
         const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey)
         if (deleted && !refresh) {
@@ -193,7 +195,7 @@ export class ElementService extends BaseApiService {
             this.apiSvc.normalize(reqOb)
             for (let i = 0; i < reqOb.elementId.length; i++) {
                 const id = reqOb.elementId[i]
-                const requestCacheKey = this.getElementKey(reqOb, id)
+                const requestCacheKey = this.getRequestKey(reqOb, id)
                 const exist = this.cacheSvc.get<T>(requestCacheKey)
                 if (exist && !refresh) {
                     existing.push(exist)
@@ -239,20 +241,18 @@ export class ElementService extends BaseApiService {
      * @param {boolean} [edit=false] whether object to cache is for editor
      * @returns {object} cached object
      */
-    cacheElement<T extends ElementObject>(reqOb: RequestObject, elementOb: T, edit?: boolean): T {
-        let result: T = this.apiSvc.cleanElement(elementOb, edit)
-        const requestCacheKey = this.getElementKey(reqOb, result.id, edit)
+    cacheElement<T extends ElementObject>(reqOb: RequestObject, elementOb: T): T {
+        let result: T = this.apiSvc.cleanElement(elementOb)
+        const requestCacheKey = this.getRequestKey(reqOb, result.id)
         const origResultCommit = result._commitId
         if (reqOb.commitId === 'latest') {
             const resultCommitCopy: T = _.cloneDeep<T>(result)
             result._commitId = 'latest' //so realCacheKey is right later
             const commitCacheKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(resultCommitCopy), result.id) //save historic element
-            if (!edit) {
-                this.cacheSvc.put(commitCacheKey, resultCommitCopy, true)
-            }
+            this.cacheSvc.put(commitCacheKey, resultCommitCopy, true)
         }
-        const resultReqOb = this.apiSvc.makeRequestObject(result)
-        const realCacheKey = this.apiSvc.makeCacheKey(resultReqOb, result.id, edit)
+
+        const realCacheKey = this.getElementKey(result)
         result._commitId = origResultCommit //restore actual commitId
         if (!_.isEqual(realCacheKey, requestCacheKey)) {
             this.cacheSvc.link(requestCacheKey, realCacheKey)
@@ -261,8 +261,16 @@ export class ElementService extends BaseApiService {
         return result
     }
 
+    openEdit<T extends ElementObject>(elementOb: T): EditObject<T> {
+        const result: T = this.apiSvc.cleanElement(elementOb, true)
+        result._commitId = 'latest'
+        const editKey = this.getEditElementKey(elementOb)
+
+        return this.editSvc.addOrUpdate(editKey, result) as EditObject<T>
+    }
+
     cacheDeletedElement = (reqOb: RequestObject, deletedOb: ElementObject): void => {
-        const requestCacheKey = this.getElementKey(reqOb, deletedOb.id)
+        const requestCacheKey = this.getRequestKey(reqOb, deletedOb.id)
         requestCacheKey.push('deleted')
         const deletedReqOb: RequestObject = {
             projectId: deletedOb._projectId,
@@ -312,29 +320,26 @@ export class ElementService extends BaseApiService {
     getElementForEdit<T extends ElementObject>(
         reqOb: ElementsRequest<string>,
         weight?: number,
-        refresh?: boolean
-    ): VePromise<T> {
+        overwrite?: boolean
+    ): VePromise<EditObject<T>, ElementsResponse<T>> {
         this.apiSvc.normalize(reqOb)
-        const requestCacheKey = this.getElementKey(reqOb, reqOb.elementId, true)
+        const requestCacheKey = this.getEditKey(reqOb)
         const url = this.uRLSvc.getElementURL(reqOb) + 'edit'
-        if (this._isInProgress(url)) {
-            return this._getInProgress(url) as VePromise<T>
-        }
-        const cached = this.cacheSvc.get<T>(requestCacheKey)
-        if (cached && !refresh) {
-            return new this.$q<T>((resolve, reject) => {
-                return resolve(cached)
-            })
-        }
         if (!this._isInProgress(url)) {
+            const openEdit = this.editSvc.get<T>(requestCacheKey)
+            if (openEdit && !overwrite) {
+                return new this.$q<EditObject<T>, ElementsResponse<T>>((resolve, reject) => {
+                    return resolve(openEdit)
+                })
+            }
             this._addInProgress(
                 url,
-                new this.$q<T>((resolve, reject) => {
-                    this.getElement<T>(reqOb, weight, refresh)
+                new this.$q<EditObject<T>, ElementsResponse<T>>((resolve, reject) => {
+                    this.getElement<T>(reqOb, weight)
                         .then(
                             (result) => {
                                 const copy = _.cloneDeep(result)
-                                resolve(this.cacheElement(reqOb, copy, true))
+                                resolve(this.editSvc.addOrUpdate(requestCacheKey, copy, overwrite) as EditObject<T>)
                             },
                             (reason) => {
                                 reject(reason)
@@ -346,7 +351,7 @@ export class ElementService extends BaseApiService {
                 })
             )
         }
-        return this._getInProgress<T>(url) as VePromise<T>
+        return this._getInProgress(url) as VePromise<EditObject<T>, ElementsResponse<T>>
     }
 
     /**
@@ -391,7 +396,7 @@ export class ElementService extends BaseApiService {
         refresh?: boolean
     ): VePromise<T[], GenericResponse<T>> {
         this.apiSvc.normalize(reqOb)
-        const requestCacheKey = this.getElementKey(reqOb, jsonKey)
+        const requestCacheKey = this.getRequestKey(reqOb, jsonKey)
         if (this._isInProgress(url)) {
             this.httpSvc.ping(url, weight)
             return this._getInProgress(url) as VePromise<T[], GenericResponse<T>>
@@ -448,14 +453,12 @@ export class ElementService extends BaseApiService {
         */
         const ob = _.cloneDeep(elementOb) //make a copy
         ob._commitId = 'latest'
-        const editOb = this.cacheSvc.get<ElementObject>(
-            this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(ob), ob.id, true)
-        )
-        if (editOb) {
-            Object.keys(editOb).forEach((key) => {
+        const editOb = this.editSvc.get(this.getEditElementKey(elementOb))
+        if (editOb && editOb.element) {
+            Object.keys(editOb.element).forEach((key) => {
                 if (!elementOb.hasOwnProperty(key)) {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    ob[key] = editOb[key]
+                    ob[key] = editOb.element[key]
                 }
             })
         }
@@ -534,8 +537,8 @@ export class ElementService extends BaseApiService {
                     elementId: e.id,
                 }
                 const resp: T = this.cacheElement(metaOb, e)
-                const editCopy = _.cloneDeep(e)
-                this.cacheElement(metaOb, editCopy, true)
+                // const editCopy = _.cloneDeep(e)
+                // this.cacheElement(metaOb, editCopy, true)
                 const history = this.cacheSvc.get<CommitObject[]>(
                     this.apiSvc.makeCacheKey(metaOb, metaOb.elementId, false, 'history')
                 )
@@ -790,8 +793,8 @@ export class ElementService extends BaseApiService {
                         const results: T[] = []
                         for (let i = 0; i < response.data.elements.length; i++) {
                             results.push(this.cacheElement(reqOb, response.data.elements[i]))
-                            const editCopy = _.cloneDeep(response.data.elements[i])
-                            this.cacheElement(reqOb, editCopy, true)
+                            // const editCopy = _.cloneDeep(response.data.elements[i])
+                            // this.cacheElement(reqOb, editCopy, true)
                         }
                         resolve(results)
                     },
@@ -950,8 +953,67 @@ export class ElementService extends BaseApiService {
         return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>
     }
 
-    public getElementKey(reqOb: RequestObject, id: string, edit?: boolean): string[] {
+    public deleteTemp(elementOb: ElementObject): void {
+        //Handle cleanup of temporary elements
+        if (elementOb.id.endsWith('_temp')) {
+            this.cacheSvc.remove(this.getElementKey(elementOb))
+        }
+    }
+
+    public createFromTemp<T extends ElementObject>(elementOb: T): VePromise<T> {
+        return new this.$q((resolve, reject) => {
+            const toCreate = _.cloneDeep(elementOb)
+
+            if (toCreate.id.endsWith('_temp')) {
+                toCreate.id.replace('_temp', '')
+            }
+
+            const reqOb: ElementCreationRequest<T> = {
+                elements: [toCreate],
+                elementId: toCreate.id,
+                projectId: elementOb._projectId,
+                refId: elementOb._refId,
+            }
+            this.createElement(reqOb).then((result) => {
+                this.deleteTemp(elementOb)
+                resolve(result)
+            }, reject)
+        })
+    }
+
+    public cacheTemp<T extends ElementObject>(elementOb: T): T {
+        if (!elementOb.id.endsWith('_temp')) {
+            elementOb.id = elementOb.id + '_temp'
+        }
+        return this.cacheElement(this.apiSvc.makeRequestObject(elementOb), elementOb)
+    }
+
+    public getRequestKey(reqOb: RequestObject, id: string, edit?: boolean): string[] {
         return this.apiSvc.makeCacheKey(reqOb, id, edit)
+    }
+
+    public getElementRequest(elementOb: ElementObject): ElementsRequest<string> {
+        const req = this.apiSvc.makeRequestObject(elementOb)
+        ;(req as ElementsRequest<string>).elementId = elementOb.id
+        return req as ElementsRequest<string>
+    }
+
+    public getElementKey(elementOb: ElementObject, edit?: boolean): string[] {
+        return this.getRequestKey(this.getElementRequest(elementOb), elementOb.id, edit)
+    }
+
+    public getEditKey(reqOb: ElementsRequest<string>): string[] {
+        const key: string[] = []
+        if (reqOb !== null) {
+            if (reqOb.projectId) key.push(reqOb.projectId)
+            if (reqOb.refId !== null) key.push(!reqOb.refId ? 'master' : reqOb.refId)
+        }
+        key.push(reqOb.elementId)
+        return key
+    }
+
+    public getEditElementKey(e: ElementObject): string[] {
+        return [e._projectId, e._refId, e.id]
     }
 
     public getElementQualifiedName(reqOb: ElementsRequest<string>): VePromise<string, SearchResponse<ElementObject>> {
@@ -1056,10 +1118,10 @@ export class ElementService extends BaseApiService {
         if (elements && elements.length > 0) {
             elements.forEach((e) => {
                 const metaOb = this._createMetaOb(e)
-                const editCopy = _.cloneDeep(e)
+                //const editCopy = _.cloneDeep(e)
                 results.push(this.cacheElement(metaOb, e))
 
-                this.cacheElement(metaOb, editCopy, true)
+                //this.cacheElement(metaOb, editCopy, true)
 
                 const history = this.cacheSvc.get<CommitObject[]>(
                     this.apiSvc.makeCacheKey(metaOb, metaOb.elementId, false, 'history')

@@ -1,4 +1,5 @@
 import { Insertion, InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
 import { SearchFilter } from '@ve-core/search/mms-search.component'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
@@ -37,7 +38,8 @@ class InsertPeController extends Insertion<InsertPresentationData> {
         applicationSvc: ApplicationService,
         utilsSvc: UtilsService,
         apiSvc: ApiService,
-        utils: InsertionService
+        utils: InsertionService,
+        editorSvc: EditorService
     ) {
         super(
             $scope,
@@ -53,7 +55,8 @@ class InsertPeController extends Insertion<InsertPresentationData> {
             applicationSvc,
             utilsSvc,
             apiSvc,
-            utils
+            utils,
+            editorSvc
         )
     }
 
@@ -99,11 +102,11 @@ class InsertPeController extends Insertion<InsertPresentationData> {
 
     public success = (): void => {
         const elemType = this.type
-        this.utils.successUpdates(elemType, this.insertData.viewOrSectionOb.id)
+        this.insertionSvc.successUpdates(elemType, this.insertData.viewOrSectionOb.id)
         this.growl.success(this.type + ' is being created')
     }
 
-    public addExisting = (elementOb: ViewInstanceSpec): VePromise<ViewInstanceSpec> => {
+    public insert = (elementOb: ViewInstanceSpec): VePromise<ViewInstanceSpec> => {
         const instanceVal: InstanceValueObject = {
             id: this.apiSvc.createUniqueId(),
             instanceId: elementOb.id,

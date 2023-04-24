@@ -1,4 +1,5 @@
 import { Insertion, InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
 import { SearchFilter } from '@ve-core/search/mms-search.component'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
@@ -37,7 +38,8 @@ class InsertViewController extends Insertion<InsertViewData> {
         applicationSvc: ApplicationService,
         utilsSvc: UtilsService,
         apiSvc: ApiService,
-        utils: InsertionService
+        utils: InsertionService,
+        editorSvc: EditorService
     ) {
         super(
             $scope,
@@ -53,7 +55,8 @@ class InsertViewController extends Insertion<InsertViewData> {
             applicationSvc,
             utilsSvc,
             apiSvc,
-            utils
+            utils,
+            editorSvc
         )
     }
 
@@ -67,7 +70,7 @@ class InsertViewController extends Insertion<InsertViewData> {
         }
     }
 
-    public addExisting = (data: ViewObject): VePromise<ViewObject> => {
+    public insert = (data: ViewObject): VePromise<ViewObject> => {
         const deferred = this.$q.defer<ViewObject>()
         const view = data
         const viewId = view.id
@@ -141,7 +144,7 @@ class InsertViewController extends Insertion<InsertViewData> {
                     id: this.ownerId,
                 },
                 {
-                    name: this.newItem.name,
+                    name: this.createItem.name,
                     id: this.apiSvc.createUniqueId(),
                     isDoc: true,
                     _projectId: this.projectId,
@@ -152,13 +155,13 @@ class InsertViewController extends Insertion<InsertViewData> {
         } else if (this.type === 'View') {
             return this.viewSvc.createView(this.parentData, {
                 id: this.apiSvc.createUniqueId(),
-                name: this.newItem.name,
+                name: this.createItem.name,
                 _projectId: this.projectId,
                 _refId: this.refId,
                 type: 'Class',
             })
         } else if (this.type === 'Group') {
-            return this.viewSvc.createGroup(this.newItem.name, {
+            return this.viewSvc.createGroup(this.createItem.name, {
                 _projectId: this.projectId,
                 _refId: this.refId,
                 id: this.ownerId,
@@ -195,12 +198,12 @@ const InsertViewComponent: VeComponentOptions = {
             <div class="comment-modal-input" ng-show="$ctrl.createForm">
                 <div class="form-group">
                     <label>Name:</label>
-                    <input class="form-control" ng-model="$ctrl.newItem.name" type="text"
+                    <input class="form-control" ng-model="$ctrl.createItem.name" type="text"
                         ng-keyup="$event.keyCode == 13 ? $ctrl.ok() : null" placeholder="Type a name for your {{$ctrl.type | lowercase}} here" autofocus>
                 </div>
                 <div class="form-group">
                     <label class="label-documentation">Documentation (optional):</label>
-                    <editor ng-model="$ctrl.newItem.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
+                    <editor ng-model="$ctrl.createItem.documentation" edit-field="documentation" mms-element-id="$ctrl.createItem.id" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
                 </div>
             </div>
         </div>

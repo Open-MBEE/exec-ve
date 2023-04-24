@@ -7,6 +7,7 @@ import { AppUtilsService } from '@ve-app/main/services'
 import { TreeService } from '@ve-components/trees'
 import { ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
+import { ConfirmDeleteModalResolveFn } from '@ve-core/modals'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { ApiService, ElementService, PermissionsService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
@@ -16,7 +17,7 @@ import { veApp } from '@ve-app'
 
 import { left_default_buttons } from './left-buttons.config'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
@@ -148,7 +149,7 @@ class LeftPaneController implements angular.IComponentController {
 
         // Start listening to change events
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>('view.selected', this.changeData),
+            this.eventSvc.$on<veCoreEvents.elementSelectedData>('view.selected', this.changeData),
             this.eventSvc.$on<veAppEvents.viewDeletedData>('view.deleted', (data) => {
                 let goto = '^.currentState'
                 let documentId = this.treeApi.rootId
@@ -219,6 +220,10 @@ class LeftPaneController implements angular.IComponentController {
                                 this.reloadData()
                                 break
                             }
+                            case 'tree-delete': {
+                                this.deleteItem()
+                                break
+                            }
                             case 'tree-show-pe': {
                                 this.bbApi.toggleButton('tree-show-pe')
                             }
@@ -271,7 +276,7 @@ class LeftPaneController implements angular.IComponentController {
         })
     }
 
-    changeData = (data: veAppEvents.elementSelectedData): void => {
+    changeData = (data: veCoreEvents.elementSelectedData): void => {
         //If the transitioning state detects a refresh, it will let us know to regenerate the tree
         if (data.refresh) this.treeSvc.processedRoot = ''
         const rootId = !data.rootId && data.elementId.endsWith('_cover') ? data.projectId + '_pm' : data.rootId
@@ -413,7 +418,7 @@ class LeftPaneController implements angular.IComponentController {
                     refId: branch.data._refId,
                     commitId: 'latest',
                 }
-                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
             }
 
             void this.$state.go(
@@ -468,7 +473,7 @@ class LeftPaneController implements angular.IComponentController {
     reloadData = (): void => {
         this.bbApi.toggleButtonSpinner('tree-refresh')
         this.treeSvc.processedRoot = ''
-        const data: veAppEvents.elementSelectedData = {
+        const data: veCoreEvents.elementSelectedData = {
             rootId: this.treeApi.rootId,
             elementId: this.treeApi.elementId,
             projectId: this.treeApi.projectId,
@@ -476,11 +481,136 @@ class LeftPaneController implements angular.IComponentController {
             refType: this.treeApi.refType,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('view.selected', data)
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data)
         const finished = this.eventSvc.$on('tree.ready', () => {
             this.bbApi.toggleButtonSpinner('tree-refresh')
             finished.dispose()
         })
+    }
+
+    deleteItem = (): void => {
+        const branch = this.treeSvc.getSelectedBranch()
+        if (!branch) {
+            this.growl.warning('Select item to remove.')
+            return
+        }
+        this.treeSvc.getPrevBranch(branch).then(
+            (prevBranch) => {
+                const type = this.viewSvc.getElementType(branch.data)
+                if (this.$state.includes('**.present.**')) {
+                    if (type == 'Document') {
+                        this.growl.warning(
+                            'Cannot remove a document from this view. To remove this item, go to project home.'
+                        )
+                        return
+                    }
+                    if (branch.type !== 'view' || !this.apiSvc.isView(branch.data)) {
+                        this.growl.warning(
+                            'Cannot remove non-view item. To remove this item, open it in the center pane.'
+                        )
+                        return
+                    }
+                } else {
+                    if (
+                        branch.type !== 'view' &&
+                        !this.apiSvc.isDocument(branch.data) &&
+                        (branch.type !== 'group' || branch.children.length > 0)
+                    ) {
+                        this.growl.warning('Cannot remove group with contents. Empty contents and try again.')
+                        return
+                    }
+                }
+                const instance = this.$uibModal.open<ConfirmDeleteModalResolveFn, void>({
+                    component: 'confirmDeleteModal',
+                    resolve: {
+                        getType: () => {
+                            let type = branch.type
+                            if (this.apiSvc.isDocument(branch.data)) {
+                                type = 'Document'
+                            }
+                            return type
+                        },
+                        getName: () => {
+                            return branch.data.name
+                        },
+                        finalize: () => {
+                            return (): VePromise<void, RefsResponse> => {
+                                return new this.$q<void, RefsResponse>((resolve, reject) => {
+                                    if (branch.type === 'view') {
+                                        this.treeSvc.getParent(branch).then((parentBranch) => {
+                                            if (!this.$state.includes('**.present.**')) {
+                                                this.viewSvc.downgradeDocument(branch.data).then(resolve, reject)
+                                            } else {
+                                                this.viewSvc
+                                                    .removeViewFromParentView({
+                                                        projectId: parentBranch.data._projectId,
+                                                        refId: parentBranch.data._refId,
+                                                        parentViewId: parentBranch.data.id,
+                                                        viewId: branch.data.id,
+                                                    })
+                                                    .then(resolve, reject)
+                                            }
+                                        }, reject)
+                                    } else if (branch.type === 'group') {
+                                        this.viewSvc.removeGroup(branch.data).then(resolve, reject)
+                                    } else {
+                                        resolve()
+                                    }
+                                })
+                            }
+                        },
+                    },
+                })
+                instance.result.then(
+                    () => {
+                        this.treeSvc.removeBranch(branch).then(
+                            () => {
+                                this.treeSvc.getParent(branch).then(
+                                    (parentBranch) => {
+                                        const data = {
+                                            parentBranch,
+                                            prevBranch,
+                                            branch,
+                                        }
+                                        this.eventSvc.$broadcast<veAppEvents.viewDeletedData>('view.deleted', data)
+                                        if (this.$state.includes('**.present.**') && branch.type === 'view') {
+                                            this.treeSvc.processDeletedViewBranch(branch)
+                                        }
+                                        let selectBranch: TreeBranch = null
+                                        if (prevBranch) {
+                                            selectBranch = prevBranch
+                                        } else if (parentBranch) {
+                                            selectBranch = parentBranch
+                                        }
+                                        this.treeSvc.selectBranch(selectBranch).then(
+                                            () => {
+                                                this.eventSvc.$broadcast(TreeService.events.RELOAD)
+                                            },
+                                            (reason) => {
+                                                this.growl.error(TreeService.treeError(reason))
+                                            }
+                                        )
+                                    },
+                                    (reason) => {
+                                        this.growl.error(TreeService.treeError(reason))
+                                    }
+                                )
+                            },
+
+                            (reason) => {
+                                this.growl.error(TreeService.treeError(reason))
+                            }
+                        )
+                    },
+                    (reason) => {
+                        this.growl.error(reason.message)
+                    }
+                )
+            },
+            (reason) => {
+                this.growl.error(reason.message)
+            }
+        )
     }
 }
 

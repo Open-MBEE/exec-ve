@@ -130,7 +130,7 @@ class SpecInspectorController extends SpecTool implements ISpecTool {
 
     protected initCallback = (): void => {
         this.specSvc.setEditing(false)
-        this.specSvc.cleanUpSaveAll(this.toolbarId)
+        this.specSvc.toggleSave(this.toolbarId)
     }
 }
 

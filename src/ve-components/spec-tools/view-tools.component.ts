@@ -1,10 +1,12 @@
 import _ from 'lodash'
 
 import { ComponentService, ExtensionService } from '@ve-components/services'
+import { EditorService } from '@ve-core/editor'
+import { EditDialogService } from '@ve-core/editor/services/EditDialog.service'
 import { veCoreEvents } from '@ve-core/events'
 import { IToolBarButton, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditObject, EditService, EventService } from '@ve-utils/core'
 import { ElementService, ProjectService, PermissionsService } from '@ve-utils/mms-api-client'
 
 import { veComponents } from '@ve-components'
@@ -83,7 +85,7 @@ import { VeModalService } from '@ve-types/view-editor'
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 
-class ToolsController implements angular.IComponentController {
+class ToolsController {
     //Bindings
     toolsCategory: string
 
@@ -92,11 +94,16 @@ class ToolsController implements angular.IComponentController {
     projectId: string
     refId: string
     commitId: string
+    edit: EditObject
+    element: ElementObject
+    inPreviewMode: boolean
+    isEditing: boolean
+    skipBroadcast: boolean
 
     subs: Rx.IDisposable[]
     currentTool: string
     currentTitle: string
-    private specApi: SpecApi
+    specApi: SpecApi
     show: {
         [key: string]: boolean
     } = {}
@@ -125,7 +132,9 @@ class ToolsController implements angular.IComponentController {
         'PermissionsService',
         'RootScopeService',
         'EventService',
-        'AutosaveService',
+        'EditService',
+        'EditorService',
+        'EditDialogService',
         'ToolbarService',
         'SpecService',
         'ExtensionService',
@@ -135,7 +144,7 @@ class ToolsController implements angular.IComponentController {
         private $q: VeQService,
         private $timeout: angular.ITimeoutService,
         private $compile: angular.ICompileService,
-        private $scope: angular.IScope,
+        public $scope: angular.IScope,
         private $element: JQuery,
         private $uibModal: VeModalService,
         private hotkeys: angular.hotkeys.HotkeysProvider,
@@ -146,7 +155,9 @@ class ToolsController implements angular.IComponentController {
         private permissionsSvc: PermissionsService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
-        private autosaveSvc: AutosaveService,
+        private autosaveSvc: EditService,
+        private editorSvc: EditorService,
+        private editdialogSvc: EditDialogService,
         private toolbarSvc: ToolbarService,
         private specSvc: SpecService,
         private extensionSvc: ExtensionService
@@ -164,22 +175,20 @@ class ToolsController implements angular.IComponentController {
         this.subs.push(this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, this.changeTool))
 
         this.subs.push(
-            this.eventSvc.$on('presentationElem.edit', (editOb: ElementObject) => {
-                const key = `${editOb.id}|${editOb._projectId}|${editOb._refId}`
-                this.autosaveSvc.addOrUpdate(key, editOb)
-                this.specSvc.cleanUpSaveAll(this.toolbarId)
+            this.eventSvc.$on('editor.edit', (editOb: ElementObject) => {
+                this.specSvc.toggleSave(this.toolbarId)
             })
         )
 
         this.subs.push(
-            this.eventSvc.$on('presentationElem.save', (editOb: ElementObject) => {
-                this.cleanUpEdit(editOb, true)
+            this.eventSvc.$on('editor.save', (editOb: ElementObject) => {
+                this.specSvc.toggleSave(this.toolbarId)
             })
         )
 
         this.subs.push(
-            this.eventSvc.$on('presentationElem.cancel', (editOb: ElementObject) => {
-                this.cleanUpEdit(editOb)
+            this.eventSvc.$on('editor.cancel', () => {
+                this.cleanUpEdit()
             })
         )
 
@@ -189,7 +198,7 @@ class ToolsController implements angular.IComponentController {
             })
         )
         this.subs.push(
-            this.eventSvc.$on('spec-editor.saveC', () => {
+            this.eventSvc.$on('spec-editor.save-continue', () => {
                 this.save(true)
             })
         )
@@ -207,96 +216,41 @@ class ToolsController implements angular.IComponentController {
                 this.eventSvc.$broadcast('spec-editor.saveall')
             },
         })
-        let savingAll = false
+        const savingAll = false
         this.subs.push(
             this.eventSvc.$on('spec-editor.saveall', () => {
-                if (savingAll) {
-                    this.growl.info('Please wait...')
-                    return
-                }
-                if (this.autosaveSvc.openEdits() === 0) {
-                    this.growl.info('Nothing to save')
-                    return
-                }
-
-                Object.values(this.autosaveSvc.getAll()).forEach((ve_edit: ElementObject) => {
-                    this.componentSvc.clearAutosave(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type)
-                })
-
-                this.specSvc.editorSave().then(
-                    () => {
-                        savingAll = true
-                        this.toolbarSvc.waitForApi(this.toolbarId).then(
-                            (api) => {
-                                api.toggleButtonSpinner('spec-editor.saveall')
-                            },
-                            (reason) => {
-                                this.growl.error(ToolbarService.error(reason))
-                            }
-                        )
-                        this.elementSvc
-                            .updateElements(Object.values(this.autosaveSvc.getAll()))
-                            .then(
-                                (responses) => {
-                                    responses.forEach((elementOb) => {
-                                        this.autosaveSvc.remove(
-                                            elementOb.id + '|' + elementOb._projectId + '|' + elementOb._refId
-                                        )
-                                        const data = {
-                                            element: elementOb,
-                                            continueEdit: false,
-                                        }
-                                        this.eventSvc.$broadcast('element.updated', data)
-                                        this.eventSvc.resolve('right-toolbar', {
-                                            id: 'spec-inspector',
-                                        })
-                                        this.specSvc.setEditing(false)
-                                    })
-                                    this.growl.success('Save All Successful')
-                                },
-                                (responses) => {
-                                    // reset the last edit elementOb to one of the existing element
-                                    const elementToSelect = Object.values(this.autosaveSvc.getAll())[0]
-                                    this.specSvc.tracker.etrackerSelected =
-                                        elementToSelect.id +
-                                        '|' +
-                                        elementToSelect._projectId +
-                                        '|' +
-                                        elementToSelect._refId
-                                    this.specSvc.keepMode()
-                                    this.specApi.elementId = elementToSelect.id
-                                    this.specApi.projectId = elementToSelect._projectId
-                                    this.specApi.refId = elementToSelect._refId
-                                    this.specApi.commitId = 'latest'
-                                    this.growl.error('Some elements failed to save, resolve individually in edit pane')
-                                }
-                            )
+                this.toolbarSvc.waitForApi(this.toolbarId).then(
+                    (api) => {
+                        api.toggleButtonSpinner('spec-editor.saveall')
+                        this.editorSvc
+                            .saveAll()
+                            .catch(() => {
+                                // reset the last edit elementOb to one of the existing element
+                                const firstEdit = Object.values(this.autosaveSvc.getAll())[0]
+                                this.specSvc.tracker.etrackerSelected = firstEdit.key
+                                this.specSvc.keepMode()
+                                this.specApi.elementId = firstEdit.element.id
+                                this.specApi.projectId = firstEdit.element._projectId
+                                this.specApi.refId = firstEdit.element._refId
+                                this.specApi.commitId = 'latest'
+                                this.growl.error('Some elements failed to save, resolve individually in edit pane')
+                            })
                             .finally(() => {
                                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                                     (api) => {
                                         api.toggleButtonSpinner('spec-editor.saveall')
+                                        this.specSvc.toggleSave(this.toolbarId)
                                     },
                                     (reason) => {
                                         this.growl.error(ToolbarService.error(reason))
                                     }
                                 )
-                                savingAll = false
-                                this.specSvc.cleanUpSaveAll(this.toolbarId)
-                                if (this.autosaveSvc.openEdits() === 0) {
-                                    this.toolbarSvc.waitForApi(this.toolbarId).then(
-                                        (api) => {
-                                            api.setIcon('spec-editor', 'fa-edit')
-                                            api.setPermission('spec-editor.saveall', false)
-                                        },
-                                        (reason) => {
-                                            this.growl.error(ToolbarService.error(reason))
-                                        }
-                                    )
-                                }
                             })
+
+                        this.specSvc.setEditing(false)
                     },
                     (reason) => {
-                        this.growl.error(reason.message)
+                        this.growl.error(ToolbarService.error(reason))
                     }
                 )
             })
@@ -304,9 +258,6 @@ class ToolsController implements angular.IComponentController {
         this.subs.push(
             this.eventSvc.$on('spec-editor.cancel', () => {
                 const go = (): void => {
-                    const rmEdit = this.specSvc.getEdits()
-                    this.autosaveSvc.remove(rmEdit.id + '|' + rmEdit._projectId + '|' + rmEdit._refId)
-                    this.specSvc.revertEdits()
                     if (this.autosaveSvc.openEdits() > 0) {
                         const next = Object.keys(this.autosaveSvc.getAll())[0]
                         const id = next.split('|')
@@ -327,25 +278,26 @@ class ToolsController implements angular.IComponentController {
                                 this.growl.error(ToolbarService.error(reason))
                             }
                         )
-                        this.specSvc.cleanUpSaveAll(this.toolbarId)
+                        this.specSvc.toggleSave(this.toolbarId)
                     }
                 }
-                if (this.specSvc.hasEdits()) {
-                    const ve_edit: ElementObject = this.specSvc.getEdits()
-                    const deleteOb = {
-                        type: ve_edit.type,
-                        element: ve_edit,
+                this.editorSvc.hasEdits(this.edit).then(
+                    (hasEdits) => {
+                        if (hasEdits) {
+                            this.editorSvc.deleteEditModal(this.edit).result.then(
+                                () => {
+                                    go()
+                                },
+                                () => {
+                                    /* Do Nothing */
+                                }
+                            )
+                        } else go()
+                    },
+                    () => {
+                        go()
                     }
-
-                    this.componentSvc.deleteEditModal(deleteOb).result.then(
-                        () => {
-                            go()
-                        },
-                        () => {
-                            /* Do Nothing */
-                        }
-                    )
-                } else go()
+                )
             })
         )
     }
@@ -408,12 +360,8 @@ class ToolsController implements angular.IComponentController {
     //     this.specApi.commitId = this.mmsRefId;
     // }
 
-    public cleanUpEdit = (editOb: ElementObject, cleanAll?: boolean): void => {
-        if (!this.componentSvc.hasEdits(editOb) || cleanAll) {
-            const key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId
-            this.autosaveSvc.remove(key)
-            this.specSvc.cleanUpSaveAll(this.toolbarId)
-        }
+    public cleanUpEdit = (): void => {
+        this.specSvc.toggleSave(this.toolbarId)
     }
 
     public save = (continueEdit: boolean): void => {
@@ -426,15 +374,28 @@ class ToolsController implements angular.IComponentController {
                 if (!continueEdit) {
                     api.toggleButtonSpinner('spec-editor.save')
                 } else {
-                    api.toggleButtonSpinner('spec-editor.saveC')
+                    api.toggleButtonSpinner('spec-editor.save-continue')
                 }
-                this.specSvc
-                    .save(this.toolbarId, continueEdit)
+                this.editorSvc
+                    .save(this.specSvc.getEdits().key, continueEdit)
                     .then(
                         () => {
-                            this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
-                                id: 'spec-inspector',
-                            })
+                            if (this.autosaveSvc.openEdits() > 0) {
+                                const next = Object.keys(this.autosaveSvc.getAll())[0]
+                                const id = next.split('|')
+                                this.specSvc.tracker.etrackerSelected = next
+                                this.specSvc.keepMode()
+                                this.specApi.elementId = id[2]
+                                this.specApi.projectId = id[0]
+                                this.specApi.refId = id[1]
+                                this.specApi.commitId = 'latest'
+                            } else {
+                                this.specSvc.setEditing(false)
+                                this.specSvc.toggleSave(this.toolbarId)
+                                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
+                                    id: 'spec-inspector',
+                                })
+                            }
                         },
                         (reason) => {
                             if (reason.type === 'info') this.growl.info(reason.message)
@@ -446,28 +407,9 @@ class ToolsController implements angular.IComponentController {
                         if (!continueEdit) {
                             api.toggleButtonSpinner('spec-editor.save')
                         } else {
-                            api.toggleButtonSpinner('spec-editor.saveC')
+                            api.toggleButtonSpinner('spec-editor.save-continue')
                         }
                     })
-            },
-            (reason) => {
-                this.growl.error(ToolbarService.error(reason))
-            }
-        )
-    }
-
-    public etrackerChange = (): void => {
-        this.specSvc.keepMode()
-        const id = this.specSvc.tracker.etrackerSelected
-        if (!id) return
-        const info = id.split('|')
-        this.specApi.elementId = info[0]
-        this.specApi.projectId = info[1]
-        this.specApi.refId = info[2]
-        this.specApi.commitId = 'latest'
-        this.toolbarSvc.waitForApi(this.toolbarId).then(
-            (api) => {
-                api.setPermission('spec-editor', true)
             },
             (reason) => {
                 this.growl.error(ToolbarService.error(reason))

@@ -1,51 +1,36 @@
 import { IPaneScope } from '@openmbee/pane-layout'
 import $ from 'jquery'
 
-import { ViewPresentationElemController } from '@ve-components/presentations/view-pe.component'
+import { ViewPresentationElemController } from '@ve-components/presentations'
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { SpecTool } from '@ve-components/spec-tools'
 import { ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar'
+import { EditorService } from '@ve-core/editor'
+import { veCoreEvents } from '@ve-core/events'
 import { ImageService, MathService, UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { EditObject, EditService, EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { ComponentController } from '@ve-types/components'
-import { EditingToolbar, EditingApi } from '@ve-types/core/editor'
-import {
-    ElementObject,
-    InstanceSpecObject,
-    InstanceValueObject,
-    PresentationInstanceObject, PresentTextObject,
-    ValueObject,
-    ViewObject,
-} from '@ve-types/mms'
+import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
+import { EditingToolbar } from '@ve-types/core/editor'
+import { ElementObject, ElementsResponse, ViewObject } from '@ve-types/mms'
 
-export interface ITransclusion extends angular.IComponentController, ComponentController {
+export interface ITransclusion extends angular.IComponentController {
     $scope: TranscludeScope
     mmsElementId: string
     mmsProjectId: string
     mmsRefId: string
     commitId: string
     cfType: string
-    edit: ElementObject
+    edit: EditObject
     element: ElementObject
     isEditing: boolean
     inPreviewMode: boolean
     skipBroadcast: boolean
-    addValueTypes?: object
-    addValueType?: string
     recompileScope?: TranscludeScope
-    values?: ValueObject[]
-    //Functions
-    editorApi?: EditingApi
-    editValues?: ValueObject[]
-    addValue?(type: string): void
-    removeVal?(i: number): void
-    addEnumerationValue?(): void
 }
 
 export interface ITransclusionComponentOptions extends VeComponentOptions {
@@ -133,11 +118,12 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     //Customizers
     public cfType: string
     protected cfTitle: string
+    protected cfField: 'name' | 'value' | 'documentation'
     protected cfKind: string
     protected checkCircular: boolean
 
     //Locals
-    protected isDirectChildOfPresentationElement: boolean
+    protected isDeletable: boolean
     protected editable: () => boolean = () => false
 
     public subs: Rx.IDisposable[]
@@ -146,25 +132,22 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     protected projectId: string
     protected refId: string
 
-    public editorApi: EditingApi = {}
     public isEditing: boolean = false
-    public inPreviewMode: boolean
+    public inPreviewMode: boolean = false
     public elementSaving: boolean = false
     public editLoading: boolean = false
     public skipBroadcast: boolean
-    protected clearWatch: boolean = false
 
-    public edit: ElementObject
-    public editValues: ValueObject[]
+    public editKey: string | string[]
+    public edit: EditObject
     public element: ElementObject
     protected type: string = ''
     protected editorType: string
 
     public view: ViewObject
-    public instanceSpec: InstanceSpecObject
-    public instanceVal: InstanceValueObject
-
-    protected presentationElem: PresentationInstanceObject | ElementObject
+    // public instanceSpec: InstanceSpecObject
+    // public instanceVal: InstanceValueObject
+    // protected presentationElem: PresentationInstanceObject | ElementObject
 
     protected panelTitle: string
     protected panelType: string
@@ -172,9 +155,9 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     protected $transcludeEl: JQuery<HTMLElement>
 
     // Possible templates to manage api functions
-    protected template: string | angular.Injectable<(...args: unknown[]) => string>
-    protected editTemplate: string | angular.Injectable<(...args: unknown[]) => string>
-    protected previewTemplate: string | angular.Injectable<(...args: unknown[]) => string>
+    protected template: string
+    protected editTemplate: string
+    protected previewTemplate: string
 
     public bbApi: ButtonBarApi
     public bbId: string
@@ -190,7 +173,6 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     preview(e?): void {}
     save(e?): void {}
     saveC(e?): void {}
-    startEdit(e?): void {}
     /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
 
     static $inject: string[] = [
@@ -200,6 +182,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         '$element',
         'growl',
         'ComponentService',
+        'EditorService',
+        'EditService',
         'ElementService',
         'UtilsService',
         'SchemaService',
@@ -217,6 +201,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         protected $element: JQuery<HTMLElement>,
         protected growl: angular.growl.IGrowlService,
         protected componentSvc: ComponentService,
+        protected editorSvc: EditorService,
+        protected editSvc: EditService,
         protected elementSvc: ElementService,
         protected utilsSvc: UtilsService,
         protected schemaSvc: SchemaService,
@@ -243,45 +229,25 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         if (this.mmsSpecEditorCtrl && this.mmsSpecEditorCtrl.specApi.elementId === this.mmsElementId) {
             this.editable = (): boolean => this.mmsSpecEditorCtrl.specSvc.editable
         }
-        if (this.mmsViewPresentationElemCtrl) {
-            this.delete = (): void => {
-                this.componentSvc.deleteAction(this, this.bbApi, this.mmsViewPresentationElemCtrl.getParentSection())
-            }
-            this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
-            this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
-            this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
-            const isOpaque = this.instanceSpec.classifierIds &&
-                this.instanceSpec.classifierIds.length > 0 &&
-                this.schemaSvc
-                    .getMap<string[]>('OPAQUE_CLASSIFIERS', this.schema)
-                    .indexOf(this.instanceSpec.classifierIds[0]) >= 0
-            if (!isOpaque && this.mmsElementId === (this.presentationElem as PresentTextObject).source && this.mmsElementId === this.instanceSpec.id) {
-                this.isDirectChildOfPresentationElement = true
-            }
+        //if (this.editTemplate) {
+        this.save = (e: JQuery.ClickEvent): void => {
+            if (e) e.stopPropagation()
+            this.saveAction(false)
         }
-        if (this.editTemplate) {
-            this.save = (e: JQuery.ClickEvent): void => {
-                if (e) e.stopPropagation()
-                this.componentSvc.saveAction(this, this.$element, false)
-            }
 
-            this.saveC = (): void => {
-                this.componentSvc.saveAction(this, this.$element, true)
-            }
-
-            this.cancel = (e?: JQuery.ClickEvent): void => {
-                if (e) e.stopPropagation()
-                this.componentSvc.cancelAction(this, this.recompile, this.$element)
-            }
-
-            this.startEdit = (): void => {
-                this.componentSvc.startEdit(this, this.editable(), this.$element, this.editTemplate, false)
-            }
-
-            this.preview = (): void => {
-                this.componentSvc.previewAction(this, this.recompile, this.$element)
-            }
+        this.saveC = (): void => {
+            this.saveAction(true)
         }
+
+        this.cancel = (e?: JQuery.ClickEvent): void => {
+            if (e) e.stopPropagation()
+            this.cancelAction()
+        }
+
+        this.preview = (): void => {
+            this.previewAction()
+        }
+        //}
     }
 
     $onDestroy(): void {
@@ -381,12 +347,9 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                         this.panelTitle = this.element.name + ' ' + this.cfTitle
                         this.panelType = this.cfKind
                     }
-                    this.recompile()
-                    this.componentSvc.reopenUnsavedElts(this, this.cfTitle.toLowerCase())
-
                     if (this.commitId === 'latest') {
                         this.subs.push(
-                            this.eventSvc.$on(
+                            this.eventSvc.$on<veCoreEvents.elementUpdatedData>(
                                 'element.updated',
                                 (data: { element: ElementObject; continueEdit: boolean }) => {
                                     const elementOb = data.element
@@ -404,19 +367,33 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                             )
                         )
                     }
+                    if (this.editTemplate) {
+                        this._reopenUnsaved().then(
+                            (data) => {
+                                if (data) this.startEdit()
+                                else this.recompile()
+                            },
+                            () => {
+                                this.recompile()
+                            }
+                        )
+                    } else {
+                        this.recompile()
+                    }
                 },
                 (reason) => {
                     this.$element.empty()
                     //TODO: Add reason/errorMessage handling here.
                     this.$transcludeEl = $(
-                        '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                        '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type" mms-field="::field"></annotation>'
                     )
                     this.$element.append(this.$transcludeEl)
                     this.$compile(this.$transcludeEl)(
                         Object.assign(this.$scope.$new(), {
-                            reqOb: reqOb,
+                            elementId: reqOb,
                             recentElement: reason.recentVersionOfElement,
-                            type: this.extensionSvc.AnnotationType,
+                            type: 'transclusion',
+                            field: this.cfField,
                         })
                     )
                 }
@@ -428,12 +405,249 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     }
 
     protected bbInit = (api: ButtonBarApi): void => {
-        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-preview', this))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-save', this))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-saveC', this))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-cancel', this))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-delete', this))
-        api.setPermission('presentation-element-delete', this.isDirectChildOfPresentationElement)
+        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-preview', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save-continue', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-cancel', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-delete', this))
+        api.setPermission('editor-delete', this.isDeletable)
+    }
+
+    /**
+     * @name Utils#reopenUnsavedElts     * called by transcludes when users have unsaved edits, leaves that view, and comes back to that view.
+     * the editor will reopen if there are unsaved edits.
+     * assumes no reload.
+     * uses these in the scope:
+     *   element - element object for the element to edit (for sections it's the instance spec)
+     *   ve_edits - unsaved edits object
+     *   startEdit - pop open the editor window
+     * @param {ITransclusion} ctrl scope of the transclude directives or view section directive
+     * @param {String} transcludeType name, documentation, or value
+     */
+    private _reopenUnsaved = (): VePromise<boolean> => {
+        return new this.$q((resolve, reject) => {
+            const key = this.elementSvc.getEditElementKey(this.element)
+            const editOb = this.editSvc.get(key)
+            if (!editOb || this.commitId !== 'latest') {
+                resolve(false)
+            } else {
+                this.editorSvc.hasEdits(editOb, this.cfField).then(resolve, reject)
+            }
+        })
+    }
+
+    /**
+     * @name Transclusion#startEdit     * called by transcludes to add the editor frame
+     * uses these in the scope:
+     *   element - element object for the element to edit (for sections it's the instance spec)
+     *   isEditing - boolean
+     *   commitId - calculated commit id
+     *   isEnumeration - boolean
+     *   recompileScope - child scope of directive scope
+     *   skipBroadcast - boolean (whether to broadcast presentationElem.edit for keeping track of open edits)
+     * sets these in the scope:
+     *   edit - editable element object
+     *   isEditing - true
+     *   inPreviewMode - false
+     *   editValues - array of editable values (for element that are of type Property, Slot, Port, Constraint)
+     *
+     */
+    protected startEdit(cb?: () => void): void {
+        if (this.editable() && !this.isEditing) {
+            this.editLoading = true
+            const reqOb = {
+                elementId: this.element.id,
+                projectId: this.element._projectId,
+                refId: this.element._refId,
+            }
+            this.elementSvc
+                .getElementForEdit(reqOb)
+                .then(
+                    (data) => {
+                        this.isEditing = true
+                        this.inPreviewMode = false
+                        this.edit = data
+                        this.editKey = data.key
+
+                        if (cb) {
+                            cb()
+                        }
+                        if (this.editTemplate) {
+                            this.$element.empty()
+                            this.$transcludeEl = $(this.editTemplate)
+
+                            this.$element.append(this.$transcludeEl)
+                            this.$compile(this.$transcludeEl)(this.$scope.$new())
+                        }
+
+                        if (!this.skipBroadcast) {
+                            // Broadcast message for the toolCtrl:
+                            this.eventSvc.$broadcast('editor.edit', this.edit)
+                        } else {
+                            this.skipBroadcast = false
+                        }
+                        this.editorSvc.scrollToElement(this.$element)
+                    },
+                    (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
+                        this.growl.error(reason.message)
+                    }
+                )
+                .finally(() => {
+                    this.editLoading = false
+                })
+
+            this.elementSvc.isCacheOutdated(this.element).then(
+                (data) => {
+                    if (data.status && data.server._modified > data.cache._modified) {
+                        this.growl.warning('This element has been updated on the server')
+                    }
+                },
+                (reason) => {
+                    this.growl.error(reason.message)
+                }
+            )
+        }
+    }
+
+    protected saveAction(continueEdit?: boolean): void {
+        if (this.elementSaving) {
+            this.growl.info('Please Wait...')
+            return
+        }
+        // this.editSvc.clearAutosave(ctrl.element._projectId + ctrl.element._refId + ctrl.element.id, ctrl.edit.type)
+        if (this.bbApi) {
+            if (!continueEdit) {
+                this.bbApi.toggleButtonSpinner('editor-save')
+            } else {
+                this.bbApi.toggleButtonSpinner('editor-save-continue')
+            }
+        }
+
+        this.elementSaving = true
+
+        this.editorSvc
+            .save(this.editKey, continueEdit)
+            .then(
+                (data) => {
+                    this.elementSaving = false
+                    if (!continueEdit) {
+                        this.isEditing = false
+                        this.eventSvc.$broadcast('editor.save', this.edit)
+                    }
+                    //scrollToElement(domElement);
+                },
+                (reason) => {
+                    this.elementSaving = false
+                    this.editorSvc.handleError(reason)
+                }
+            )
+            .finally(() => {
+                if (this.bbApi) {
+                    if (!continueEdit) {
+                        this.bbApi.toggleButtonSpinner('editor-save')
+                    } else {
+                        this.bbApi.toggleButtonSpinner('editor-save-continue')
+                    }
+                }
+            })
+    }
+
+    protected cancelAction(): void {
+        if (this.elementSaving) {
+            this.growl.info('Please Wait...')
+            return
+        }
+        const cancelCleanUp = (): void => {
+            this.isEditing = false
+            this.editorSvc.removeEdit(this.edit.key)
+            // Broadcast message for the ToolCtrl:
+            this.eventSvc.$broadcast('editor.cancel', this.edit)
+            this.recompile()
+            // scrollToElement(domElement);
+        }
+        if (this.bbApi) {
+            this.bbApi.toggleButtonSpinner('editor-cancel')
+        }
+        // const cancelFn: () => VePromise<boolean> = (): VePromise<boolean> => {
+        //     if (ctrl.editorApi && ctrl.editorApi.cancel) {
+        //         return ctrl.editorApi.cancel()
+        //     }
+        //     return this.$q.resolve<boolean>(true)
+        // }
+        this.editorSvc.updateEditor(this.edit.key, this.cfField).then(
+            (success) => {
+                // Only need to confirm the cancellation if edits have been made:
+                if (!success) {
+                    this.editorSvc.handleError({
+                        message: 'Problem Saving from Editor',
+                        type: 'warning',
+                    })
+                }
+                this.editorSvc
+                    .hasEdits(this.edit, this.cfField)
+                    .then(
+                        (hasEdits) => {
+                            if (hasEdits) {
+                                this.editorSvc.deleteEditModal(this.edit).result.then(
+                                    (result) => {
+                                        if (result) cancelCleanUp()
+                                    },
+                                    () => {
+                                        //Do Nothing if user wants to keep working
+                                    }
+                                )
+                            } else {
+                                cancelCleanUp()
+                            }
+                        },
+                        () => {
+                            cancelCleanUp()
+                        }
+                    )
+                    .finally(() => {
+                        if (this.bbApi) {
+                            this.bbApi.toggleButtonSpinner('editor-cancel')
+                        }
+                    })
+            },
+            () => {
+                this.editorSvc.handleError({
+                    message: 'Error Saving from Editor; Please Retry',
+                    type: 'error',
+                })
+            }
+        )
+    }
+
+    public previewAction(): void {
+        if (this.elementSaving) {
+            this.growl.info('Please Wait...')
+            return
+        }
+        if (this.edit && this.isEditing) {
+            this.editorSvc
+                .hasEdits(this.edit)
+                .then((hasEdits) => {
+                    if (hasEdits && !this.inPreviewMode) {
+                        this.skipBroadcast = true //preview next click to go into edit mode from broadcasting
+                        this.inPreviewMode = true
+                        this.recompile()
+                    } else {
+                        //nothing has changed, cancel instead of preview
+
+                        // Broadcast message for the ToolCtrl to clear out the tracker window:
+                        this.eventSvc.$broadcast('editor.cancel', this.edit)
+                        if (this.element) {
+                            this.recompile()
+                        }
+                    }
+                })
+                .finally(() => {
+                    this.isEditing = false
+                    this.elementSaving = false
+                    this.editorSvc.scrollToElement(this.$element)
+                })
+        }
     }
 
     //Transclusion API
@@ -446,7 +660,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         obj.value = parseInt(obj.value as string)
     }
 
-    protected addHtml(value: { value: string | number }): void {
+    protected addHtml(e: JQueryEventObject, value: { value: string | number }): void {
+        e.stopPropagation()
         value.value = `<p>${value.value}</p>`
     }
 }

@@ -9,30 +9,22 @@ import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import { ComponentController } from '@ve-types/components'
-import { EditingApi, EditingToolbar } from '@ve-types/core/editor'
 import {
     ElementObject,
     InstanceSpecObject,
     InstanceValueObject,
     PresentationInstanceObject,
-    ValueObject,
     ViewObject,
 } from '@ve-types/mms'
-
-export interface IPresentation extends ComponentController {
-    number: string
-    level: number
-}
 
 export class PresentationLite {
     //Bindings
     public peObject: PresentationInstanceObject
-    public element: InstanceSpecObject
+    public instanceSpec: InstanceSpecObject
     public peNumber: string
 }
 
-export class Presentation extends PresentationLite implements IPresentation, EditingToolbar {
+export class Presentation extends PresentationLite {
     //Bindings
     protected mmsProjectId: string
     protected mmsRefId: string
@@ -46,8 +38,6 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
 
     //Common
     //public element: ElementObject;
-    public edit: InstanceSpecObject
-    public editValues: ValueObject[]
     protected $transcludeEl: JQuery<HTMLElement>
     public view: ViewObject
     public projectId: string
@@ -59,21 +49,6 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
 
     public number: string
     public level: number
-    public isEditing: boolean
-    public skipBroadcast: boolean
-    public inPreviewMode: boolean
-    public cleanUp
-    public elementSaving: boolean
-
-    //Default Toolbar Api
-    /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-    cancel(e?): void {}
-    delete(e?): void {}
-    preview(e?): void {}
-    save(e?): void {}
-    saveC(e?): void {}
-    startEdit(e?): void {}
-    /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
 
     private schema = 'cameo'
 
@@ -110,10 +85,6 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
         super()
     }
 
-    instanceSpec?: ElementObject
-    editorApi?: EditingApi
-    values?: unknown[]
-
     /**
      * @listens element.updated
      */
@@ -137,15 +108,12 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
         this.commitId = commitId ? commitId : 'latest'
 
         if (this.mmsViewCtrl && this.mmsViewPresentationElemCtrl) {
-            this.isEditing = false
-            this.inPreviewMode = false
-            this.elementSaving = false
-            this.cleanUp = false
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
             this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
-            this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
+            //this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
             this.view = this.mmsViewCtrl.getView()
-            const isOpaque = this.instanceSpec.classifierIds &&
+            const isOpaque =
+                this.instanceSpec.classifierIds &&
                 this.instanceSpec.classifierIds.length > 0 &&
                 this.schemaSvc
                     .getMap<string[]>('OPAQUE_CLASSIFIERS', this.schema)
@@ -159,11 +127,12 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
                     const elementOb = data.element
                     const continueEdit = data.continueEdit
                     if (
-                        elementOb.id === this.element.id &&
-                        elementOb._projectId === this.element._projectId &&
-                        elementOb._refId === this.element._refId &&
+                        elementOb.id === this.instanceSpec.id &&
+                        elementOb._projectId === this.instanceSpec._projectId &&
+                        elementOb._refId === this.instanceSpec._refId &&
                         !continueEdit
                     ) {
+                        this.instanceSpec = elementOb
                         this.recompile()
                     }
                 })
@@ -205,9 +174,6 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
      * This function is automatically triggered by the "element.updated" event.
      */
     protected recompile = (): void => {
-        this.isEditing = false
-        this.inPreviewMode = false
-
         this.setNumber()
         this.getContent().then(
             (result) => {
@@ -221,7 +187,7 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
             },
             (reason) => {
                 const reqOb = {
-                    elementId: this.element.id,
+                    elementId: this.instanceSpec.id,
                     projectId: this.projectId,
                     refId: this.refId,
                     commitId: this.commitId,
@@ -230,14 +196,14 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
                 this.$element.empty()
                 //TODO: Add reason/errorMessage handling here.
                 this.$transcludeEl = $(
-                    '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                    '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
                 )
                 this.$element.append(this.$transcludeEl)
                 this.$compile(this.$transcludeEl)(
                     Object.assign(this.$scope.$new(), {
-                        reqOb: reqOb,
+                        elementId: reqOb.elementId,
                         recentElement: reason.recentVersionOfElement,
-                        type: this.extensionSvc.AnnotationType,
+                        type: 'presentation',
                     })
                 )
             }

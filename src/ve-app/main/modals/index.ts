@@ -1,6 +1,5 @@
 //Modals
 import './about-modal.component'
-import './confirm-delete-modal.component'
 import './login-modal.component'
 import './print-confirm-modal.component'
 import './select-modal.component'

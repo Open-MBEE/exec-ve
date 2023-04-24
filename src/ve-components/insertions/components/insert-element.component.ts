@@ -1,16 +1,16 @@
 import _ from 'lodash'
 
 import { Insertion, InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import { Class } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { InsertData } from '@ve-types/components'
-import { ElementCreationRequest, ElementObject, MmsObject } from '@ve-types/mms'
+import { ElementObject, MmsObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 class InsertElementController extends Insertion<InsertData> {
@@ -38,7 +38,8 @@ class InsertElementController extends Insertion<InsertData> {
         applicationSvc: ApplicationService,
         utilsSvc: UtilsService,
         apiSvc: ApiService,
-        utils: InsertionService
+        insertionSvc: InsertionService,
+        editorSvc: EditorService
     ) {
         super(
             $scope,
@@ -54,12 +55,32 @@ class InsertElementController extends Insertion<InsertData> {
             applicationSvc,
             utilsSvc,
             apiSvc,
-            utils
+            insertionSvc,
+            editorSvc
         )
     }
 
     public $onInit(): void {
         super.$onInit()
+
+        if (this.insertData.selected) {
+            this.createItem = this.insertData.selected
+            if (this.insertData.isNew) {
+                this.searchExisting = false
+            }
+        } else {
+            this.createItem = {
+                id: `${this.apiSvc.createUniqueId()}_temp`,
+                _projectId: this.mmsProjectId,
+                _refId: this.mmsRefId,
+                ownerId: 'holding_bin_' + this.mmsProjectId,
+                name: '',
+                documentation: '',
+                type: 'Class',
+                _appliedStereotypeIds: [],
+            }
+        }
+        this.editItem = this.elementSvc.openEdit(this.createItem)
         this.description = 'Search for an existing element before you ' + this.parentAction
 
         this.searchOptions.getProperties = true
@@ -67,33 +88,8 @@ class InsertElementController extends Insertion<InsertData> {
     }
 
     public create = (): VePromise<ElementObject> => {
-        if (!this.newItem.name) {
-            this.growl.error('Error: A name for your new element is required.')
-            return this.$q.reject({ status: 422 })
-        }
-        const createObj: ElementObject = {
-            id: this.apiSvc.createUniqueId(),
-            _projectId: this.mmsProjectId,
-            _refId: this.mmsRefId,
-            ownerId: 'holding_bin_' + this.mmsProjectId,
-            name: this.newItem.name,
-            documentation: this.newItem.documentation,
-            type: 'Class',
-            _appliedStereotypeIds: [],
-        }
-        const toCreate: ElementObject = new Class(createObj)
-        const reqOb: ElementCreationRequest<ElementObject> = {
-            elements: [toCreate],
-            elementId: toCreate.id,
-            projectId: this.mmsProjectId,
-            refId: this.mmsRefId,
-        }
-
-        if (!this.insertData.noPublish) {
-            return this.elementSvc.createElement(reqOb)
-        } else {
-            return this.$q.resolve(createObj)
-        }
+        this.insertData.isNew = true
+        return this.insertionSvc.createAction(this.createItem, this.insertData.noPublish)
     }
 
     public fail = <V extends VePromiseReason<MmsObject>>(reason: V): void => {
@@ -115,6 +111,11 @@ const InsertComponent: VeComponentOptions = {
     template: `
 <div class="modal-body">
     <div class="ve-light-tabs modal-top-tabs" ng-show="!$ctrl.viewLink">
+        <span class="close-button-container">
+            <a class="close-button"  ng-click="$ctrl.cancel()">
+                <i tooltip-placement="left" uib-tooltip="Close Insert Dialog"  class="fa fa-times"></i>
+            </a>
+        </span>
         <ul class="nav nav-tabs">
             <li class="uib-tab nav-item tab-item" ng-class="{'active': !$ctrl.searchExisting}">
                 <a class="nav-link" ng-click="$ctrl.searchExisting = false"><i class="fa fa-plus"></i>Create New</a>
@@ -131,7 +132,7 @@ const InsertComponent: VeComponentOptions = {
             {{$ctrl.description}}
         </div>
 
-        <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-search>
+        <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" embedded="true"></mms-search>
     </div>
 
     <!-- Create New Panel -->
@@ -139,11 +140,11 @@ const InsertComponent: VeComponentOptions = {
         <form>
             <div class="form-group">
                 <label>Name </label><span class="star-mandatory">*</span>
-                <input class="form-control" type="text" ng-model="$ctrl.newItem.name" placeholder="Name your new element" autofocus/>
+                <input class="form-control" type="text" ng-model="$ctrl.createItem.name" placeholder="Name your new element" autofocus/>
             </div>
             <div class="form-group">
                 <label class="label-documentation">Documentation</label>
-                <editor ng-model="$ctrl.newItem.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
+                <editor ng-model="$ctrl.createItem.documentation" edit-field="documentation" mms-element-id="{{$ctrl.createItem.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
             </div>
             <div class="form-group" ng-show="$ctrl.createType === 2">
                 <label>Value</label>
@@ -162,7 +163,7 @@ const InsertComponent: VeComponentOptions = {
     </div>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" ng-show="!$ctrl.searchExisting" type="button" ng-click="$ctrl.create()">Create or Select<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
+    <button class="btn btn-primary" ng-show="!$ctrl.searchExisting" type="button" ng-click="$ctrl.ok()">Create<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
     <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
 </div>
 `,

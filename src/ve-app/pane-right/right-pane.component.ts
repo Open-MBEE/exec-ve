@@ -3,11 +3,11 @@ import { StateService } from '@uirouter/angularjs'
 import angular, { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
-import { veAppEvents } from '@ve-app/events'
 import { SpecApi, SpecService } from '@ve-components/spec-tools'
+import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditObject, EditService, EventService } from '@ve-utils/core'
 import { ElementService, PermissionsService, ProjectService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
@@ -15,6 +15,7 @@ import { veApp } from '@ve-app'
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject, RefObject, RefsResponse } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
+import _ from "lodash";
 
 class RightPaneController implements IComponentController {
     //Bindings
@@ -30,7 +31,7 @@ class RightPaneController implements IComponentController {
 
     private specApi: SpecApi
     private openEdits: number
-    private edits: { [id: string]: ElementObject }
+    private edits: { [id: string]: EditObject }
 
     private $pane: IPane
     private $tools: JQuery<HTMLElement>
@@ -52,7 +53,7 @@ class RightPaneController implements IComponentController {
         'PermissionsService',
         'RootScopeService',
         'EventService',
-        'AutosaveService',
+        'EditService',
         'ToolbarService',
         'SpecService',
     ]
@@ -72,7 +73,7 @@ class RightPaneController implements IComponentController {
         private permissionsSvc: PermissionsService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
-        private autosaveSvc: AutosaveService,
+        private autosaveSvc: EditService,
         private toolbarSvc: ToolbarService,
         private specSvc: SpecService
     ) {}
@@ -106,13 +107,13 @@ class RightPaneController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>('element.selected', (data) => {
+            this.eventSvc.$on<veCoreEvents.elementSelectedData>('element.selected', (data) => {
                 this.changeAction(data)
             })
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementUpdatedData>('element.updated', (data) => {
+            this.eventSvc.$on<veCoreEvents.elementUpdatedData>('element.updated', (data) => {
                 if (
                     data.element.id === this.specApi.elementId &&
                     data.element._projectId === this.specApi.projectId &&
@@ -126,7 +127,7 @@ class RightPaneController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>('view.selected', (data) => {
+            this.eventSvc.$on<veCoreEvents.elementSelectedData>('view.selected', (data) => {
                 this.changeAction(data)
             })
         )
@@ -137,11 +138,6 @@ class RightPaneController implements IComponentController {
             })
         )
 
-        this.subs.push(
-            this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
-                this.openEdits = this.autosaveSvc.openEdits()
-            })
-        )
         this.edits = this.autosaveSvc.getAll()
     }
 
@@ -149,7 +145,7 @@ class RightPaneController implements IComponentController {
         this.eventSvc.$destroy(this.subs)
     }
 
-    changeAction = (data: veAppEvents.elementSelectedData): void => {
+    changeAction = (data: veCoreEvents.elementSelectedData): void => {
         this.eventSvc.resolve<boolean>('spec.ready', false)
         const elementId = data.elementId
         const refId = data.refId
@@ -173,7 +169,7 @@ class RightPaneController implements IComponentController {
 
         promise.then(
             (refType) => {
-                this.specApi = {
+                const specApi = {
                     elementId,
                     projectId,
                     refType,
@@ -181,8 +177,20 @@ class RightPaneController implements IComponentController {
                     commitId,
                     displayOldSpec,
                 }
-
-                this.specSvc.specApi = this.specApi
+                if (this.specSvc.specApi) {
+                    const current = {
+                        elementId: this.specSvc.specApi.elementId,
+                        projectId: this.specSvc.specApi.projectId,
+                        refId: this.specSvc.specApi.refId,
+                        refType: this.specSvc.specApi.refType,
+                        commitId: this.specSvc.specApi.commitId,
+                        displayOldSpec: this.specSvc.specApi.displayOldSpec
+                    }
+                    if (_.isEqual(specApi, current)) {
+                        return //don't do unnecessary updates
+                    }
+                }
+                this.specSvc.specApi = this.specApi = specApi
 
                 if (this.specSvc.setEditing) {
                     this.specSvc.setEditing(false)
@@ -207,6 +215,25 @@ class RightPaneController implements IComponentController {
             }
         )
     }
+
+    public etrackerChange = (): void => {
+        this.specSvc.keepMode()
+        const id = this.specSvc.tracker.etrackerSelected
+        if (!id) return
+        const info = id.split('|')
+        this.specApi.elementId = info[2]
+        this.specApi.projectId = info[0]
+        this.specApi.refId = info[1]
+        this.specApi.commitId = 'latest'
+        this.toolbarSvc.waitForApi(this.toolbarId).then(
+            (api) => {
+                api.setPermission('spec-editor', true)
+            },
+            (reason) => {
+                this.growl.error(ToolbarService.error(reason))
+            }
+        )
+    }
 }
 
 const RightPaneComponent: VeComponentOptions = {
@@ -219,7 +246,7 @@ const RightPaneComponent: VeComponentOptions = {
                 <label class="col-sm-3 control-label">Edits ({{$ctrl.openEdits}}):</label>
                 <div class="col-sm-9">
                     <select class="form-control"
-                        ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in $ctrl.edits"
+                        ng-options="eid as edit.element.type + ': ' + edit.element.name for (eid, edit) in $ctrl.edits"
                         ng-model="$ctrl.specSvc.tracker.etrackerSelected" ng-change="$ctrl.etrackerChange()">
                     </select>
                 </div>

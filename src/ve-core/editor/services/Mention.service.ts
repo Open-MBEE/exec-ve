@@ -3,11 +3,12 @@ import moment from 'moment'
 
 import { MMSMentionController } from '@ve-core/editor/components/mention.component'
 import { UtilsService } from '@ve-utils/application'
-import { ApiService, CacheService, ViewService } from '@ve-utils/mms-api-client'
+import { ApiService, ViewService } from '@ve-utils/mms-api-client'
 
 import { veCore } from '@ve-core'
 
 import { ElementObject } from '@ve-types/mms'
+import { CacheService } from '@ve-utils/core'
 
 export interface MentionScope extends angular.IScope {
     mmsEditor?: CKEDITOR.editor

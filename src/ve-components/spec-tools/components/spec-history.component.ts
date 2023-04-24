@@ -4,6 +4,7 @@ import _ from 'lodash'
 import { Commit, CompareData, DiffMergeService } from '@ve-components/diffs'
 import { ComponentService } from '@ve-components/services'
 import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools'
+import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -20,7 +21,6 @@ import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { CommitObject, ElementsRequest, RefObject } from '@ve-types/mms'
-import {veAppEvents} from "@ve-app/events";
 
 /**
  * @ngdoc component
@@ -173,7 +173,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
             commitId: this.historyVer,
         }
         this.keepCommitSelected = true
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
     }
 
     getElementHistoryByRef = (ref?: RefObject): void => {

@@ -350,7 +350,7 @@ veUtils.service('ButtonBarService', ButtonBarService)
 // }
 // if (typeof ctrl !== 'undefined') {
 //     switch (button) {
-//         case 'presentation-element-delete':
+//         case 'editor-delete':
 //             return {
 //                 id: button,
 //                 icon: 'fa-solid fa-trash',
@@ -361,7 +361,7 @@ veUtils.service('ButtonBarService', ButtonBarService)
 //                 toggleable: false,
 //                 api: 'delete'
 //             }
-//         case 'presentation-element-save':
+//         case 'editor-save':
 //             return {
 //                 id: button,
 //                 icon: 'fa-solid fa-save',
@@ -375,7 +375,7 @@ veUtils.service('ButtonBarService', ButtonBarService)
 //                     ctrl.save()
 //                 },
 //             }
-//         case 'presentation-element-saveC':
+//         case 'editor-save-continue':
 //             return {
 //                 id: button,
 //                 icon: 'fa-regular fa-paper-plane',
@@ -389,7 +389,7 @@ veUtils.service('ButtonBarService', ButtonBarService)
 //                     ctrl.saveC()
 //                 },
 //             }
-//         case 'presentation-element-cancel':
+//         case 'editor-cancel':
 //             return {
 //                 id: button,
 //                 icon: 'fa-solid fa-times',
@@ -403,7 +403,7 @@ veUtils.service('ButtonBarService', ButtonBarService)
 //                     ctrl.cancel()
 //                 },
 //             }
-//         case 'presentation-element-preview':
+//         case 'editor-preview':
 //             return {
 //                 id: button,
 //                 icon: 'fa-regular fa-file-powerpoint',

@@ -22,7 +22,6 @@ export interface TOCHtmlObject {
  * @name veUtils/UtilsService
  * @requires $q
  * @requires $http
- * @requires CacheService
  * @requires URLService
  * @requires ApiService
  * * Utilities
@@ -403,7 +402,7 @@ export class UtilsService {
      * @returns {void} nothing
      */
     public convertViewLinks(printElement: JQuery<HTMLElement>): void {
-        printElement.find('view-link').each((index) => {
+        printElement.find('view-link, mms-view-link').each((index) => {
             const $this = $(this)
             let elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id')
             if (!elementId) {
@@ -547,18 +546,19 @@ caption::before {content: "Table " counter(table-counter) ". "; }
 `
         }
         if (meta) {
-        Object.keys(meta).forEach((key) => {
-            if (meta[key]) {
-                let content: string
-                if (meta[key] === 'counter(page)') {
-                    content = meta[key] as string
-                } else {
-                    content = `"${(meta[key] as string | number).toString()}"`
-                }
-                ret += `@page {@${key} {font-size: 9px; content: ${content};}}
+            Object.keys(meta).forEach((key) => {
+                if (meta[key]) {
+                    let content: string
+                    if (meta[key] === 'counter(page)') {
+                        content = meta[key] as string
+                    } else {
+                        content = `"${(meta[key] as string | number).toString()}"`
+                    }
+                    ret += `@page {@${key} {font-size: 9px; content: ${content};}}
 `
-            }
-        })}
+                }
+            })
+        }
         if (landscape) {
             ret += '@page {size: 11in 8.5in;}'
         }
@@ -596,22 +596,26 @@ caption::before {content: "Table " counter(table-counter) ". "; }
         }
         const deferred = this.$q.defer<string>()
         this.$http
-            .post(this.uRLSvc.getExportHtmlUrl(), {
-                html: data.htmlString,
-                css: data.css,
-                format: exportType == 2 ? 'docx' : 'pdf'
-            }, {
-                responseType: 'blob'
-            })
+            .post(
+                this.uRLSvc.getExportHtmlUrl(),
+                {
+                    html: data.htmlString,
+                    css: data.css,
+                    format: exportType == 2 ? 'docx' : 'pdf',
+                },
+                {
+                    responseType: 'blob',
+                }
+            )
             .then(
                 (data2) => {
-                    const blob = new Blob([data2.data as BlobPart], {type: accept});
-                    const a = window.document.createElement('a');
-                    const url = window.URL.createObjectURL(blob);
-                    a.href = url;
-                    a.download = data.name + (exportType == 2 ? '.docx' : '.pdf');
-                    a.click();
-                    window.URL.revokeObjectURL(url);
+                    const blob = new Blob([data2.data as BlobPart], { type: accept })
+                    const a = window.document.createElement('a')
+                    const url = window.URL.createObjectURL(blob)
+                    a.href = url
+                    a.download = data.name + (exportType == 2 ? '.docx' : '.pdf')
+                    a.click()
+                    window.URL.revokeObjectURL(url)
                     deferred.resolve('ok')
                 },
                 (error: angular.IHttpResponse<string>) => {

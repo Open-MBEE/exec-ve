@@ -1,4 +1,5 @@
-import { ApiService, CacheService, ElementService, URLService } from '@ve-utils/mms-api-client'
+import { CacheService } from '@ve-utils/core'
+import { ApiService, ElementService, URLService } from '@ve-utils/mms-api-client'
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
 
 import { veUtils } from '@ve-utils'
@@ -417,17 +418,20 @@ export class ProjectService extends BaseApiService {
                         this._removeInProgress(url)
                         resolve(cached)
                     } else {
-                        this.$http.get<RefsResponse>(url).then(
-                            (response) => {
-                                this.cacheSvc.put<RefObject>(cacheKey, response.data.refs[0])
-                                resolve(this.cacheSvc.get<RefObject>(cacheKey))
-                            },
-                            (response: angular.IHttpResponse<RefsResponse>) => {
-                                this.apiSvc.handleErrorCallback(response, reject)
-                            }
-                        ).finally(() => {
-                            this._removeInProgress(url)
-                        })
+                        this.$http
+                            .get<RefsResponse>(url)
+                            .then(
+                                (response) => {
+                                    this.cacheSvc.put<RefObject>(cacheKey, response.data.refs[0])
+                                    resolve(this.cacheSvc.get<RefObject>(cacheKey))
+                                },
+                                (response: angular.IHttpResponse<RefsResponse>) => {
+                                    this.apiSvc.handleErrorCallback(response, reject)
+                                }
+                            )
+                            .finally(() => {
+                                this._removeInProgress(url)
+                            })
                     }
                 })
             )
@@ -651,7 +655,7 @@ export class ProjectService extends BaseApiService {
                                     for (let i = 0; i < response.data.groups.length; i++) {
                                         let group: GroupObject = response.data.groups[i]
                                         reqOb.elementId = group.id
-                                        group = this.elementSvc.cacheElement(reqOb, group, false)
+                                        group = this.elementSvc.cacheElement(reqOb, group)
                                         this.cacheSvc.put(['group', projectId, refId, group.id], group, true)
                                         groups.push(
                                             this.cacheSvc.get<GroupObject>(['group', projectId, refId, group.id])

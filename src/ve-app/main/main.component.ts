@@ -7,21 +7,14 @@ import Rx from 'rx-lite'
 
 import { WorkingTimeModalResolveFn, WorkingTimeObject } from '@ve-app/main/modals/working-modal.component'
 import { ApplicationService, RootScopeService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
-import {
-    ApiService,
-    AuthService,
-    CacheService,
-    ElementService,
-    HttpService,
-    URLService,
-} from '@ve-utils/mms-api-client'
+import { EditService, EventService } from '@ve-utils/core'
+import { ApiService, AuthService, ElementService, HttpService, URLService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
-import { ElementObject, ParamsObject } from '@ve-types/mms'
+import { ParamsObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 class MainController implements IComponentController {
@@ -44,10 +37,9 @@ class MainController implements IComponentController {
         'HttpService',
         'AuthService',
         'ElementService',
-        'CacheService',
         'ApplicationService',
         'RootScopeService',
-        'AutosaveService',
+        'EditService',
         'EventService',
     ]
 
@@ -90,10 +82,9 @@ class MainController implements IComponentController {
         private httpSvc: HttpService,
         private authSvc: AuthService,
         private elementSvc: ElementService,
-        private cacheSvc: CacheService,
         private applicationSvc: ApplicationService,
         private rootScopeSvc: RootScopeService,
-        private autosaveSvc: AutosaveService,
+        private editSvc: EditService,
         private eventSvc: EventService
     ) {
         this.veConfig = window.__env
@@ -139,14 +130,8 @@ class MainController implements IComponentController {
             })
         )
 
-        this.subs.push(
-            this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
-                this.openEdits = this.autosaveSvc.getAll()
-            })
-        )
-
         this.$window.addEventListener('beforeunload', (event) => {
-            if (Object.keys(this.openEdits).length > 0) {
+            if (this.editSvc.openEdits() > 0) {
                 const message = 'You may have unsaved changes, are you sure you want to leave?'
                 event.returnValue = message
                 return message
@@ -195,27 +180,27 @@ class MainController implements IComponentController {
             })
         )
 
-        this.subs.push(
-            this.eventSvc.$on('element.updated', (data: { element: ElementObject; continueEdit: boolean }) => {
-                const element = data.element
-                //if element is not being edited and there's a cached edit object, update the edit object also
-                //so next time edit forms will show updated data (mainly for stomp updates)
-                const editKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(element), element.id, true)
-                const veEditsKey = element.id + '|' + element._projectId + '|' + element._refId
-                if (this.autosaveSvc.getAll() && !this.autosaveSvc.get(veEditsKey) && this.cacheSvc.exists(editKey)) {
-                    this.elementSvc.cacheElement(
-                        {
-                            projectId: element._projectId,
-                            refId: element._refId,
-                            elementId: element.id,
-                            commitId: 'latest',
-                        },
-                        _.cloneDeep(element),
-                        true
-                    )
-                }
-            })
-        )
+        // this.subs.push(
+        //     this.eventSvc.$on('element.updated', (data: { element: ElementObject; continueEdit: boolean }) => {
+        //         const element = data.element
+        //         //if element is not being edited and there's a cached edit object, update the edit object also
+        //         //so next time edit forms will show updated data (mainly for stomp updates)
+        //         const editKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(element), element.id, true)
+        //         const veEditsKey = element.id + '|' + element._projectId + '|' + element._refId
+        //         if (this.autosaveSvc.getAll() && !this.autosaveSvc.get(veEditsKey) && this.cacheSvc.exists(editKey)) {
+        //             this.elementSvc.cacheElement(
+        //                 {
+        //                     projectId: element._projectId,
+        //                     refId: element._refId,
+        //                     elementId: element.id,
+        //                     commitId: 'latest',
+        //                 },
+        //                 _.cloneDeep(element),
+        //                 true
+        //             )
+        //         }
+        //     })
+        // )
 
         this.$transitions.onStart({}, (trans) => {
             this.rootScopeSvc.veViewContentLoading(true)

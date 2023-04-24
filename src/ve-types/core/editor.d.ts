@@ -24,6 +24,4 @@ export interface EditingToolbar {
     save(e?): void
 
     saveC(e?): void
-
-    startEdit(e?): void
 }

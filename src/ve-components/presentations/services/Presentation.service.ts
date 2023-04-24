@@ -92,14 +92,20 @@ export class PresentationService {
                         //auto open editor for newly added pe
                         $('#' + data.id)
                             .find('transclude-doc,transclude-com')
-                            .click()
+                            .trigger('click')
                     },
                     0,
                     false
                 )
             },
             (reason) => {
-                this.growl.warning(`Error adding PE: ${reason.message}`)
+                if (reason && reason.status !== 444) {
+                    this.growl.warning(`Error adding PE: ${reason.message}`)
+                } else {
+                    this.growl.info('PE Insert Cancelled', {
+                        ttl: 1000,
+                    })
+                }
             }
         )
     }

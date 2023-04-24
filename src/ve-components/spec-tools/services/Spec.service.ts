@@ -1,7 +1,8 @@
 import { ComponentService } from '@ve-components/services'
+import { EditorService } from '@ve-core/editor'
 import { ToolbarService } from '@ve-core/toolbar'
 import { UtilsService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditObject, EditService, EventService } from '@ve-utils/core'
 import {
     ApiService,
     AuthService,
@@ -11,6 +12,7 @@ import {
     URLService,
     UserService,
     ViewService,
+    ValueService
 } from '@ve-utils/mms-api-client'
 
 import { PropertySpec, veComponents } from '@ve-components'
@@ -21,7 +23,6 @@ import {
     DocumentObject,
     ElementObject,
     ElementsRequest,
-    ElementsResponse,
     RefObject,
     UserObject,
     ValueObject,
@@ -47,7 +48,7 @@ export class SpecService implements angular.Injectable<any> {
     private modifier: UserObject
     private ref: RefObject
     private values: ValueObject[]
-    private edit: ElementObject
+    private edit: EditObject
     private editing: boolean = false
     public editable: boolean
     private keeping: boolean = false
@@ -69,14 +70,16 @@ export class SpecService implements angular.Injectable<any> {
         'ViewService',
         'EventService',
         'ToolbarService',
-        'AutosaveService',
+        'EditService',
         'ComponentService',
         'URLService',
         'AuthService',
         'UserService',
         'PermissionsService',
         'UtilsService',
-        'ApiService'
+        'ApiService',
+        'ValueService',
+        'EditorService',
     ]
     private ran: boolean
     private lastid: string
@@ -90,14 +93,16 @@ export class SpecService implements angular.Injectable<any> {
         private viewSvc: ViewService,
         private eventSvc: EventService,
         private toolbarSvc: ToolbarService,
-        private autosaveSvc: AutosaveService,
+        private autosaveSvc: EditService,
         private componentSvc: ComponentService,
         private uRLSvc: URLService,
         private authSvc: AuthService,
         private userSvc: UserService,
         private permissionsSvc: PermissionsService,
         private utilsSvc: UtilsService,
-        private apiSvc: ApiService
+        private apiSvc: ApiService,
+        private valueSvc: ValueService,
+        private editorSvc: EditorService
     ) {}
 
     /**
@@ -145,12 +150,15 @@ export class SpecService implements angular.Injectable<any> {
      * @return {Object} may be null or undefined, if not, is
      *  current element object that can be edited (may include changes)
      */
-    public getEdits = (): ElementObject => {
+    public getEdits = (): EditObject => {
         return this.edit
     }
 
-    public setEdits = (edit: ElementObject): void => {
-        this.edit = edit
+    public setEdits = (editOb: EditObject): void => {
+        if (this.valueSvc.isValue(editOb.element)) {
+            editOb.values = this.valueSvc.getValues(editOb.element)
+        }
+        this.edit = editOb
     }
 
     public getElement = (): ElementObject => {
@@ -184,7 +192,7 @@ export class SpecService implements angular.Injectable<any> {
 
     public getQualifiedName(element: ElementObject): VePromise<boolean> {
         const deferred = this.$q.defer<boolean>()
-        if (this.edit) element = this.edit
+        if (this.edit) element = this.edit.element
         const reqOb: ElementsRequest<string> = {
             commitId: element._commitId ? element._commitId : 'latest',
             projectId: element._projectId,
@@ -229,7 +237,7 @@ export class SpecService implements angular.Injectable<any> {
                     if (this.apiSvc.isView(data) || this.viewSvc.isSection(data)) {
                         this.view = data
                     }
-                    this.values = this.componentSvc.setupValCf(data)
+                    this.values = this.valueSvc.getValues(data)
                     promises.push(
                         this.userSvc.getUserData(data._modifier).then((result) => {
                             this.modifier = result
@@ -287,9 +295,9 @@ export class SpecService implements angular.Injectable<any> {
                         this.setEditing(false)
                     } else {
                         promises.push(
-                            this.elementSvc.getElementForEdit(reqOb).then((data) => {
-                                if (data.id !== this.lastid) return
-                                this.edit = data
+                            this.elementSvc.getElementForEdit(reqOb).then((editOb) => {
+                                if (editOb.element.id !== this.lastid) return
+                                this.setEdits(editOb)
                                 this.editable = true
                                 if (!this.getKeepMode()) this.setEditing(false)
                                 this.setKeepMode(false)
@@ -365,23 +373,6 @@ export class SpecService implements angular.Injectable<any> {
             })
     }
 
-    /**
-     * @name Spec.service:SpecApi#hasEdits
-     * whether editor object has changes compared to base element,
-     * currently compares name, doc, property values, if element is not
-     * editable, returns false
-     *
-     * @return {boolean} has changes or not
-     */
-    public hasEdits = (): boolean => {
-        return this.componentSvc.hasEdits(this.edit)
-    }
-
-    public setEditValues<T extends ValueObject>(values: T[]): void {
-        this.editValues.length = 0
-        this.editValues.push(...values)
-    }
-
     public setKeepMode = (value?: boolean): void => {
         if (value === undefined) {
             this.keepMode()
@@ -404,58 +395,8 @@ export class SpecService implements angular.Injectable<any> {
         return this.$q.resolve(false)
     }
 
-    revertEdits = (): void => {
-        this.editValues = this.componentSvc.revertEdits(this.editValues, this.edit)
-    }
-
-    public save = (toolbarId: string, continueEdit: boolean): VePromise<void, ElementsResponse<ElementObject>> => {
-        const deferred = this.$q.defer<void>()
-        this.eventSvc.$broadcast('element-saving', true)
-        const saveEdit = this.edit
-        this.componentSvc.clearAutosave(saveEdit._projectId + saveEdit._refId + saveEdit.id, saveEdit.type)
-        return new this.$q((resolve, reject) => {
-            this._save().then(
-                (data) => {
-                    this.eventSvc.$broadcast('element-saving', false)
-                    if (!data) {
-                        this.growl.info('Save Skipped (No Changes)')
-                    } else {
-                        this.growl.success('Save Successful')
-                    }
-                    if (continueEdit) return
-                    const saveEdit = this.getEdits()
-                    const key = saveEdit.id + '|' + saveEdit._projectId + '|' + saveEdit._refId
-                    this.autosaveSvc.remove(key)
-                    if (this.autosaveSvc.openEdits() > 0) {
-                        const next = Object.keys(this.autosaveSvc.getAll())[0]
-                        const id = next.split('|')
-                        this.tracker.etrackerSelected = next
-                        this.keepMode()
-                        this.specApi.elementId = id[0]
-                        this.specApi.projectId = id[1]
-                        this.specApi.refId = id[2]
-                        this.specApi.commitId = 'latest'
-                    } else {
-                        this.setEditing(false)
-                        this.cleanUpSaveAll(toolbarId)
-                    }
-                    resolve()
-                },
-                (reason) => {
-                    this.eventSvc.$broadcast('element-saving', false)
-                    reject(reason)
-                }
-            )
-        })
-    }
-
-    private _save(): VePromise<ElementObject> {
-        //TODO value edits don't save because they're handled by transclude val
-        return this.componentSvc.save(this.edit, this.editorApi, { element: this.element }, false)
-    }
-
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
-    public cleanUpSaveAll = (toolbarId: string): void => {
+    public toggleSave = (toolbarId: string): void => {
         this.toolbarSvc.waitForApi(toolbarId).then(
             (api) => {
                 if (this.autosaveSvc.openEdits() > 0) {
@@ -471,6 +412,25 @@ export class SpecService implements angular.Injectable<any> {
             }
         )
     }
+    //
+
+    // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
+    // public cleanUpSaveAll = (toolbarId: string): void => {
+    //     this.toolbarSvc.waitForApi(toolbarId).then(
+    //         (api) => {
+    //             if (this.autosaveSvc.openEdits() > 0) {
+    //                 api.setPermission('spec-editor.saveall', true)
+    //                 api.setIcon('spec-editor', 'fa-edit-asterisk')
+    //             } else {
+    //                 api.setPermission('spec-editor.saveall', false)
+    //                 api.setIcon('spec-editor', 'fa-edit')
+    //             }
+    //         },
+    //         (reason) => {
+    //             this.growl.error(ToolbarService.error(reason))
+    //         }
+    //     )
+    // }
 }
 
 veComponents.service('SpecService', SpecService)

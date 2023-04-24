@@ -1,4 +1,17 @@
+import { ElementObject, ElementsRequest } from '@ve-types/mms'
+
 export namespace veCoreEvents {
+    interface elementSelectedData extends ElementsRequest<string> {
+        rootId?: string
+        refType?: string
+        displayOldSpec?: boolean
+        refresh?: boolean
+    }
+
+    interface elementUpdatedData {
+        element: ElementObject
+        continueEdit?: boolean
+    }
     interface buttonClicked {
         $event?: JQuery.ClickEvent
         clicked: string
