@@ -1,14 +1,23 @@
+import { EditorService } from '@ve-core/editor'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
+import { ElementService } from '@ve-utils/mms-api-client'
+import { Class } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
+import { VePromise, VeQService } from '@ve-types/angular'
+import { ElementObject } from '@ve-types/mms'
+
 export class InsertionService {
-    static $inject = ['$timeout', 'growl', 'RootScopeService', 'EventService']
+    static $inject = ['$q', '$timeout', 'growl', 'ElementService', 'EditorService', 'RootScopeService', 'EventService']
 
     constructor(
+        private $q: VeQService,
         private $timeout: angular.ITimeoutService,
         private growl: angular.growl.IGrowlService,
+        private elementSvc: ElementService,
+        private editorSvc: EditorService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService
     ) {}
@@ -21,13 +30,41 @@ export class InsertionService {
         if (elemType === 'Comment' && !this.rootScopeSvc.veCommentsOn()) {
             void this.$timeout(
                 () => {
-                    $('.show-comments').click()
+                    $('.show-comments').trigger('click')
                 },
                 0,
                 false
             )
         }
     }
+
+    public createAction = (createItem: ElementObject, noPublish: boolean): VePromise<ElementObject> => {
+        if (!createItem.name) {
+            this.growl.error('Error: A name for your new element is required.')
+            return this.$q.reject({ status: 422 })
+        }
+        const editKey = this.elementSvc.getEditElementKey(createItem)
+
+        const toCreate: ElementObject = new Class(createItem)
+
+        let promise: VePromise<ElementObject>
+        if (!noPublish) {
+            promise = this.elementSvc.createFromTemp(toCreate)
+        } else {
+            promise = this.$q.resolve(this.elementSvc.cacheTemp(toCreate))
+        }
+
+        promise.finally(() => {
+            this.editorSvc.removeEdit(editKey)
+        })
+
+        return promise
+    }
+
+    public cancelAction = (cancelledItem: ElementObject): void => {
+        this.editorSvc.removeEdit(this.elementSvc.getEditElementKey(cancelledItem))
+        this.elementSvc.deleteTemp(cancelledItem)
+    }
 }
 
-veComponents.service('InsertService', InsertionService)
+veComponents.service('InsertionService', InsertionService)

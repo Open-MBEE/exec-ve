@@ -67,7 +67,7 @@ export class Insertion<
         'ApplicationService',
         'UtilsService',
         'ApiService',
-        'InsertService',
+        'InsertionService',
         'EditorService',
     ]
 
@@ -91,7 +91,7 @@ export class Insertion<
         protected applicationSvc: ApplicationService,
         protected utilsSvc: UtilsService,
         protected apiSvc: ApiService,
-        protected utils: InsertionService,
+        protected insertionSvc: InsertionService,
         protected editorSvc: EditorService
     ) {}
 
@@ -124,26 +124,23 @@ export class Insertion<
 
         this.ownerId = this.parentData && this.parentData.id ? this.parentData.id : 'holding_bin_' + this.projectId
 
-        let promise: VePromise<unknown>
-        if (this.editorApi && this.editorApi.save) {
-            promise = this.editorApi.save()
-        } else {
-            promise = this.$q.resolve()
-        }
-        promise.then(() => {
-            this.create()
-                .then((data) => {
-                    this.addResolve(data, 'created')
-                }, this.addReject)
-                .finally(this.addFinally)
-        }, this.addReject)
+        this.editorSvc.updateAllData(this.editItem.key, true).then(
+            () => {
+                this.create()
+                    .then((data) => {
+                        this.insertResolve(data, 'created')
+                    }, this.insertReject)
+                    .finally(this.insertFinally)
+            },
+            (reason) => this.insertReject(reason)
+        )
     }
 
     public loginCb = (result?: boolean): void => {
         if (result) {
             this.ok()
         } else {
-            this.addReject({
+            this.insertReject({
                 status: 666,
                 message: 'User not Authenticated',
             })
@@ -163,20 +160,20 @@ export class Insertion<
         }
         const instance = this.$uibModal.open<LoginModalResolveFn, boolean>(settings)
         instance.result.then(this.loginCb, () => {
-            this.addReject({
+            this.insertReject({
                 status: 666,
                 message: 'User Cancelled Authentication',
             })
         })
     }
 
-    public addResolve = (data: U, type: string): void => {
+    public insertResolve = (data: U, type: string): void => {
         this.growl.success(this.type + ' is being ' + type)
         this.success(data)
         this.insertApi.resolve(data)
     }
 
-    protected addReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(reason: V): void => {
+    protected insertReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(reason: V): void => {
         this.fail(reason)
         if (!this.continue) {
             this.insertApi.reject(reason)
@@ -200,7 +197,7 @@ export class Insertion<
         /* Put custom finally logic here*/
     }
 
-    public addFinally = (): void => {
+    public insertFinally = (): void => {
         this.last()
         this.oking = false
     }
@@ -218,12 +215,15 @@ export class Insertion<
         this.oking = true
         this.addExisting(data, property)
             .then((finalData) => {
-                this.addResolve(finalData, 'added')
-            }, this.addReject)
-            .finally(this.addFinally)
+                this.insertResolve(finalData, 'added')
+            }, this.insertReject)
+            .finally(this.insertFinally)
     }
 
     public cancel = (): void => {
+        if (this.insertData.selected) {
+            this.insertionSvc.cancelAction(this.insertData.selected)
+        }
         if (this.insertApi.reject) {
             this.insertApi.reject({ status: 444, message: 'User cancelled request' })
         }

@@ -1,4 +1,4 @@
-import {PresentationLite} from '@ve-components/presentations'
+import { PresentationLite } from '@ve-components/presentations'
 
 import { veComponents } from '@ve-components'
 

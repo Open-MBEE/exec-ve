@@ -109,7 +109,7 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             this.projectSvc.getCommits(refObj.parentRefId, this.projectId, ts).then((commits: CommitObject[]) => {
                 refObj.parentCommitId = commits[0].id
                 deferred.resolve(this.projectSvc.createRef(refObj, this.projectId))
-            }, this.addReject)
+            }, this.insertReject)
         } else {
         */
         return this.projectSvc.createRef(refObj, this.projectId)

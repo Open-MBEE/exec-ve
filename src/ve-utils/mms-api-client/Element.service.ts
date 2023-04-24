@@ -953,6 +953,41 @@ export class ElementService extends BaseApiService {
         return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>
     }
 
+    public deleteTemp(elementOb: ElementObject): void {
+        //Handle cleanup of temporary elements
+        if (elementOb.id.endsWith('_temp')) {
+            this.cacheSvc.remove(this.getElementKey(elementOb))
+        }
+    }
+
+    public createFromTemp<T extends ElementObject>(elementOb: T): VePromise<T> {
+        return new this.$q((resolve, reject) => {
+            const toCreate = _.cloneDeep(elementOb)
+
+            if (toCreate.id.endsWith('_temp')) {
+                toCreate.id.replace('_temp', '')
+            }
+
+            const reqOb: ElementCreationRequest<T> = {
+                elements: [toCreate],
+                elementId: toCreate.id,
+                projectId: elementOb._projectId,
+                refId: elementOb._refId,
+            }
+            this.createElement(reqOb).then((result) => {
+                this.deleteTemp(elementOb)
+                resolve(result)
+            }, reject)
+        })
+    }
+
+    public cacheTemp<T extends ElementObject>(elementOb: T): T {
+        if (!elementOb.id.endsWith('_temp')) {
+            elementOb.id = elementOb.id + '_temp'
+        }
+        return this.cacheElement(this.apiSvc.makeRequestObject(elementOb), elementOb)
+    }
+
     public getRequestKey(reqOb: RequestObject, id: string, edit?: boolean): string[] {
         return this.apiSvc.makeCacheKey(reqOb, id, edit)
     }
@@ -967,7 +1002,7 @@ export class ElementService extends BaseApiService {
         return this.getRequestKey(this.getElementRequest(elementOb), elementOb.id, edit)
     }
 
-    public getEditKey(reqOb: RequestObject): string[] {
+    public getEditKey(reqOb: ElementsRequest<string>): string[] {
         const key: string[] = []
         if (reqOb !== null) {
             if (reqOb.projectId) key.push(reqOb.projectId)

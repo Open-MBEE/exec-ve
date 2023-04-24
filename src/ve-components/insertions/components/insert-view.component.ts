@@ -70,7 +70,7 @@ class InsertViewController extends Insertion<InsertViewData> {
         }
     }
 
-    public addExisting = (data: ViewObject): VePromise<ViewObject> => {
+    public insert = (data: ViewObject): VePromise<ViewObject> => {
         const deferred = this.$q.defer<ViewObject>()
         const view = data
         const viewId = view.id

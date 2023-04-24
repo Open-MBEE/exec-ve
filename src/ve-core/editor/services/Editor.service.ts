@@ -10,7 +10,7 @@ import { ApiService, ElementService, PermissionsService, ViewService, ValueServi
 import { veCore } from '@ve-core'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
-import { ElementObject, ElementsResponse } from '@ve-types/mms'
+import { BasicResponse, ElementObject, ElementsResponse, MmsObject } from '@ve-types/mms'
 import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 export class EditorService {
@@ -56,9 +56,9 @@ export class EditorService {
         return this.edit2editor[editKey]
     }
 
-    public updateAllData(editKey: string | string[], allowNone?: boolean): VePromise<void, string> {
+    public updateAllData(editKey: string | string[], allowNone?: boolean): VePromise<void, BasicResponse<MmsObject>> {
         const key: string = this.editSvc.makeKey(editKey)
-        return new this.$q<void, string>((resolve, reject) => {
+        return new this.$q<void, BasicResponse<MmsObject>>((resolve, reject) => {
             if (this.edit2editor[key]) {
                 const promises: VePromise<void, string>[] = []
                 for (const id of Object.keys(this.edit2editor[key])) {
@@ -146,7 +146,7 @@ export class EditorService {
                 .then((responses) => {
                     responses.forEach((elementOb) => {
                         const edit = this.editSvc.get(this.elementSvc.getEditElementKey(elementOb))
-                        this.removeEdit(edit)
+                        this.removeEdit(edit.key)
                         const data = {
                             element: elementOb,
                             continueEdit: false,
@@ -339,7 +339,7 @@ export class EditorService {
                     projectId: editOb.element._projectId,
                     refId: editOb.element._refId,
                 }
-                this.removeEdit(editOb, true)
+                this.removeEdit(editOb.key)
                 this.elementSvc.getElementForEdit(reqOb).then(
                     (edit) => {
                         if (this.valueSvc.isValue(edit.element)) {
@@ -352,18 +352,15 @@ export class EditorService {
                     }
                 )
             } else {
-                this.removeEdit(editOb)
+                this.removeEdit(editOb.key)
                 resolve()
             }
         })
     }
 
-    public removeEdit(editOb: EditObject, silent?: boolean): void {
-        this.clearAutosave(editOb.key)
-        this.editSvc.remove(editOb.key)
-        if (!silent) {
-            this.eventSvc.$broadcast('editor.cancel')
-        }
+    public removeEdit(editKey: string | string[]): void {
+        this.clearAutosave(editKey)
+        this.editSvc.remove(editKey)
     }
 
     public clearAutosave = (key: string | string[]): void => {
@@ -480,7 +477,7 @@ export class EditorService {
                 },
                 finalize: () => {
                     return () => {
-                        this.removeEdit(edit)
+                        this.removeEdit(edit.key)
                         return this.$q.resolve()
                     }
                 },

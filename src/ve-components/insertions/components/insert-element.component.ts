@@ -5,13 +5,12 @@ import { EditorService } from '@ve-core/editor'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import { Class } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { InsertData } from '@ve-types/components'
-import { ElementCreationRequest, ElementObject, MmsObject } from '@ve-types/mms'
+import { ElementObject, MmsObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 class InsertElementController extends Insertion<InsertData> {
@@ -39,7 +38,7 @@ class InsertElementController extends Insertion<InsertData> {
         applicationSvc: ApplicationService,
         utilsSvc: UtilsService,
         apiSvc: ApiService,
-        utils: InsertionService,
+        insertionSvc: InsertionService,
         editorSvc: EditorService
     ) {
         super(
@@ -56,22 +55,30 @@ class InsertElementController extends Insertion<InsertData> {
             applicationSvc,
             utilsSvc,
             apiSvc,
-            utils,
+            insertionSvc,
             editorSvc
         )
     }
 
     public $onInit(): void {
         super.$onInit()
-        this.createItem = {
-            id: `${this.apiSvc.createUniqueId()}_temp`,
-            _projectId: this.mmsProjectId,
-            _refId: this.mmsRefId,
-            ownerId: 'holding_bin_' + this.mmsProjectId,
-            name: '',
-            documentation: '',
-            type: 'Class',
-            _appliedStereotypeIds: [],
+
+        if (this.insertData.selected) {
+            this.createItem = this.insertData.selected
+            if (this.insertData.isNew) {
+                this.searchExisting = false
+            }
+        } else {
+            this.createItem = {
+                id: `${this.apiSvc.createUniqueId()}_temp`,
+                _projectId: this.mmsProjectId,
+                _refId: this.mmsRefId,
+                ownerId: 'holding_bin_' + this.mmsProjectId,
+                name: '',
+                documentation: '',
+                type: 'Class',
+                _appliedStereotypeIds: [],
+            }
         }
         this.editItem = this.elementSvc.openEdit(this.createItem)
         this.description = 'Search for an existing element before you ' + this.parentAction
@@ -81,32 +88,8 @@ class InsertElementController extends Insertion<InsertData> {
     }
 
     public create = (): VePromise<ElementObject> => {
-        if (!this.createItem.name) {
-            this.growl.error('Error: A name for your new element is required.')
-            return this.$q.reject({ status: 422 })
-        }
-
-        this.createItem.id = this.createItem.id.replace('_temp', '')
-
-        const toCreate: ElementObject = new Class(this.createItem)
-        const reqOb: ElementCreationRequest<ElementObject> = {
-            elements: [toCreate],
-            elementId: toCreate.id,
-            projectId: this.mmsProjectId,
-            refId: this.mmsRefId,
-        }
-        let promise: VePromise<ElementObject>
-        if (!this.insertData.noPublish) {
-            promise = this.elementSvc.createElement(reqOb)
-        } else {
-            promise = this.$q.resolve(this.createItem)
-        }
-
-        promise.finally(() => {
-            this.editorSvc.removeEdit(this.editItem)
-        })
-
-        return promise
+        this.insertData.isNew = true
+        return this.insertionSvc.createAction(this.createItem, this.insertData.noPublish)
     }
 
     public fail = <V extends VePromiseReason<MmsObject>>(reason: V): void => {

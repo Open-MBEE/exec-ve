@@ -102,11 +102,11 @@ class InsertPeController extends Insertion<InsertPresentationData> {
 
     public success = (): void => {
         const elemType = this.type
-        this.utils.successUpdates(elemType, this.insertData.viewOrSectionOb.id)
+        this.insertionSvc.successUpdates(elemType, this.insertData.viewOrSectionOb.id)
         this.growl.success(this.type + ' is being created')
     }
 
-    public addExisting = (elementOb: ViewInstanceSpec): VePromise<ViewInstanceSpec> => {
+    public insert = (elementOb: ViewInstanceSpec): VePromise<ViewInstanceSpec> => {
         const instanceVal: InstanceValueObject = {
             id: this.apiSvc.createUniqueId(),
             instanceId: elementOb.id,

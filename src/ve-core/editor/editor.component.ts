@@ -177,18 +177,24 @@ export class EditorController implements angular.IComponentController {
             this.init = true
 
             this.id = this.editorSvc.createId()
-            this.editKey = this.elementSvc.getEditKey(
-                { refId: this.mmsRefId, projectId: this.mmsProjectId, elementId: this.mmsElementId },
-            )
+            this.editKey = this.elementSvc.getEditKey({
+                refId: this.mmsRefId,
+                projectId: this.mmsProjectId,
+                elementId: this.mmsElementId,
+            })
             if (this.editKey) {
-                this.editorSvc.add(this.editKey, `${this.editField}${this.editIndex}`, this.update)
+                this.editorSvc.add(
+                    this.editKey,
+                    `${this.editField}${this.editIndex ? this.editIndex : ''}`,
+                    this.update
+                )
             }
             this.startEditor()
         }
     }
 
     $onDestroy(): void {
-        this.editorSvc.remove(this.editKey, `${this.editField}${this.editIndex}`)
+        this.editorSvc.remove(this.editKey, `${this.editField}${this.editIndex ? this.editIndex : ''}`)
     }
 
     public startEditor(): void {
@@ -213,7 +219,7 @@ export class EditorController implements angular.IComponentController {
             // Configuration for autosave plugin
             this.instance.config.autosave = {
                 SaveKey: `${Array.isArray(this.editKey) ? this.editKey.join('|') : this.editKey}${this.editField}${
-                    this.editIndex
+                    this.editIndex ? this.editIndex : ''
                 }`,
                 delay: 5,
                 NotOlderThen: 7200, // 5 days in minutes

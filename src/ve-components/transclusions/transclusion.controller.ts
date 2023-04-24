@@ -210,7 +210,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         protected mathSvc: MathService,
         protected extensionSvc: ExtensionService,
         protected buttonBarSvc: ButtonBarService,
-        protected imageSvc: ImageService,
+        protected imageSvc: ImageService
     ) {}
 
     $onInit(): void {
@@ -230,23 +230,23 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             this.editable = (): boolean => this.mmsSpecEditorCtrl.specSvc.editable
         }
         //if (this.editTemplate) {
-            this.save = (e: JQuery.ClickEvent): void => {
-                if (e) e.stopPropagation()
-                this.saveAction(false)
-            }
+        this.save = (e: JQuery.ClickEvent): void => {
+            if (e) e.stopPropagation()
+            this.saveAction(false)
+        }
 
-            this.saveC = (): void => {
-                this.saveAction(true)
-            }
+        this.saveC = (): void => {
+            this.saveAction(true)
+        }
 
-            this.cancel = (e?: JQuery.ClickEvent): void => {
-                if (e) e.stopPropagation()
-                this.cancelAction()
-            }
+        this.cancel = (e?: JQuery.ClickEvent): void => {
+            if (e) e.stopPropagation()
+            this.cancelAction()
+        }
 
-            this.preview = (): void => {
-                this.previewAction()
-            }
+        this.preview = (): void => {
+            this.previewAction()
+        }
         //}
     }
 
@@ -559,9 +559,9 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         }
         const cancelCleanUp = (): void => {
             this.isEditing = false
-            this.editorSvc.removeEdit(this.edit)
+            this.editorSvc.removeEdit(this.edit.key)
             // Broadcast message for the ToolCtrl:
-
+            this.eventSvc.$broadcast('editor.cancel', this.edit)
             this.recompile()
             // scrollToElement(domElement);
         }

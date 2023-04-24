@@ -49,8 +49,10 @@ export class EditService {
 
     remove = (key: string | string[]): void => {
         key = this.makeKey(key)
-        delete this.edits[key]
-        this.trigger()
+        if (this.edits[key]) {
+            delete this.edits[key]
+            this.trigger()
+        }
     }
 
     // getKey<T extends ElementObject>(): string {}
