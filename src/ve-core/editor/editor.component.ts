@@ -63,7 +63,8 @@ export class EditorController implements angular.IComponentController {
     }
     private basicStylesToolbar = {
         name: 'basicstyles',
-        items: ['Bold', 'Italic', 'Underline', 'mmsExtraFormat'],
+        //items: ['Bold', 'Italic', 'Underline', 'mmsExtraFormat'],
+        items: ['Bold', 'Italic', 'Underline'],
     }
     private clipboardToolbar = { name: 'clipboard', items: ['Undo', 'Redo'] }
     private justifyToolbar = {
@@ -96,7 +97,7 @@ export class EditorController implements angular.IComponentController {
             'Mathjax',
             'SpecialChar',
             'Mmscomment',
-            'mmsExtraFeature',
+            //'mmsExtraFeature',
         ],
     }
     private tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-'] }
