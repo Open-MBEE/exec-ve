@@ -113,10 +113,6 @@ export class ViewPresentationElemController implements angular.IComponentControl
                         this.instanceSpec = instanceSpec
                         this.presentationElem = this.viewSvc.getPresentationInstanceObject(instanceSpec)
                         this.presentationElemLoading = false
-                        //Init PeNumber
-                        if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
-                            this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
-                        }
                         if (this.viewCtrl) {
                             this.viewCtrl.elementTranscluded(instanceSpec, this.presentationElem.type)
                         }
@@ -139,14 +135,6 @@ export class ViewPresentationElemController implements angular.IComponentControl
                         )
                         $(this.$element).append(newPe)
                         this.$compile(newPe)(this.$scope)
-                        this.subs.push(
-                            this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
-                                if (!data) return
-                                if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
-                                    this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
-                                }
-                            })
-                        )
                     })
                 },
                 (reason) => {
