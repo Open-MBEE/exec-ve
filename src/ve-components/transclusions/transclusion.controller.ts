@@ -415,7 +415,7 @@ export class Transclusion implements ITransclusion, EditorActions {
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save', this))
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save-continue', this))
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-cancel', this))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-refresh', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-reset', this))
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-delete', this))
         api.setPermission('editor-delete', this.isDeletable)
     }
@@ -583,6 +583,18 @@ export class Transclusion implements ITransclusion, EditorActions {
                         type: 'warning',
                     })
                 }
+                const cancelCleanUp = (): void => {
+                    if (continueEdit)
+                        this.editorSvc.resetEdit(this.edit, continueEdit).then(
+                            (edit) => {
+                                this.edit = edit
+                            },
+                            (reason) => {
+                                this.growl.error(reason.message)
+                            }
+                        )
+                    else this.cleanUpAction()
+                }
                 this.editorSvc
                     .hasEdits(this.edit, this.cfField)
                     .then(
@@ -590,28 +602,20 @@ export class Transclusion implements ITransclusion, EditorActions {
                             if (hasEdits) {
                                 this.editorSvc.deleteEditModal(this.edit).result.then(
                                     (result) => {
-                                        if (result) this.cleanUpAction()
+                                        if (result) {
+                                            cancelCleanUp()
+                                        }
                                     },
                                     () => {
                                         //Do Nothing if user wants to keep working
                                     }
                                 )
                             } else {
-                                if (continueEdit)
-                                    this.editorSvc.resetEdit(this.edit, continueEdit).then(
-                                        (edit) => {
-                                            this.edit = edit
-                                            this.recompile()
-                                        },
-                                        (reason) => {
-                                            this.growl.error(reason.message)
-                                        }
-                                    )
-                                else this.cleanUpAction()
+                                cancelCleanUp()
                             }
                         },
                         () => {
-                            this.cleanUpAction()
+                            cancelCleanUp()
                         }
                     )
                     .finally(() => {

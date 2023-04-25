@@ -15,7 +15,7 @@ import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-typ
 
 export class EditorService {
     public generatedIds: number = 0
-    private edit2editor: { [editKey: string]: { [field: string]: () => VePromise<void, string> } } = {}
+    private edit2editor: { [editKey: string]: { [field: string]: () => VePromise<boolean, string> } } = {}
     public savingAll: boolean = false
 
     static $inject = [
@@ -52,7 +52,7 @@ export class EditorService {
         private editSvc: EditService
     ) {}
 
-    public get(editKey: string): { [field: string]: () => VePromise<void, string> } {
+    public get(editKey: string): { [field: string]: () => VePromise<boolean, string> } {
         return this.edit2editor[editKey]
     }
 
@@ -60,7 +60,7 @@ export class EditorService {
         const key: string = this.editSvc.makeKey(editKey)
         return new this.$q<void, BasicResponse<MmsObject>>((resolve, reject) => {
             if (this.edit2editor[key]) {
-                const promises: VePromise<void, string>[] = []
+                const promises: VePromise<boolean, string>[] = []
                 for (const id of Object.keys(this.edit2editor[key])) {
                     promises.push(this.edit2editor[key][id]())
                 }
@@ -73,7 +73,7 @@ export class EditorService {
         })
     }
 
-    public add(editKey: string | string[], field: string, updateFn: () => VePromise<void, string>): void {
+    public add(editKey: string | string[], field: string, updateFn: () => VePromise<boolean, string>): void {
         editKey = this.editSvc.makeKey(editKey)
         if (!this.edit2editor[editKey]) this.edit2editor[editKey] = {}
         this.edit2editor[editKey][field] = updateFn
@@ -372,7 +372,7 @@ export class EditorService {
             if (this.edit2editor[editKey] && this.edit2editor[editKey][field]) {
                 this.edit2editor[editKey][field]().then(resolve, reject)
             } else {
-                resolve() // continue for non ckeditor transcludes
+                resolve(true) // continue for non ckeditor transcludes
             }
         })
     }

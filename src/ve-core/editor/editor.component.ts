@@ -686,7 +686,7 @@ export class EditorController implements angular.IComponentController {
         )
     }
 
-    public update = (): VePromise<void, string> => {
+    public update = (): VePromise<boolean, string> => {
         // getData() returns CKEditor's processed/clean HTML content.
         return new this.$q((resolve, reject) => {
             if (this.instance) {
@@ -700,7 +700,7 @@ export class EditorController implements angular.IComponentController {
                     })
                 }
             }
-            resolve()
+            resolve(true)
         })
     }
 
