@@ -224,7 +224,7 @@ class ViewTreesController implements IComponentController {
                 this.treeSvc.getBranch(data).then(
                     (branch) => {
                         if (branch) {
-                            this.treeSvc.removeSingleBranch(branch).catch((reason) => {
+                            this.treeSvc.removeBranch(branch).catch((reason) => {
                                 this.growl.error(TreeService.treeError(reason))
                             })
                         }

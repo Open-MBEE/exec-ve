@@ -482,7 +482,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
 
                         if (!this.skipBroadcast) {
                             // Broadcast message for the toolCtrl:
-                            this.eventSvc.$broadcast('editor.edit', this.edit)
+                            this.eventSvc.$broadcast('editor.open', this.edit)
                         } else {
                             this.skipBroadcast = false
                         }
@@ -529,19 +529,19 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             .save(this.editKey, continueEdit)
             .then(
                 (data) => {
-                    this.elementSaving = false
+                    this.inPreviewMode = false
                     if (!continueEdit) {
                         this.isEditing = false
-                        this.eventSvc.$broadcast('editor.save', this.edit)
+                        this.eventSvc.$broadcast('editor.close', this.edit)
                     }
                     //scrollToElement(domElement);
                 },
                 (reason) => {
-                    this.elementSaving = false
                     this.editorSvc.handleError(reason)
                 }
             )
             .finally(() => {
+                this.elementSaving = false
                 if (this.bbApi) {
                     if (!continueEdit) {
                         this.bbApi.toggleButtonSpinner('editor-save')
@@ -552,19 +552,12 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             })
     }
 
-    protected cancelAction(): void {
+    protected cancelAction(continueEdit?: boolean): void {
         if (this.elementSaving) {
             this.growl.info('Please Wait...')
             return
         }
-        const cancelCleanUp = (): void => {
-            this.isEditing = false
-            this.editorSvc.removeEdit(this.edit.key)
-            // Broadcast message for the ToolCtrl:
-            this.eventSvc.$broadcast('editor.cancel', this.edit)
-            this.recompile()
-            // scrollToElement(domElement);
-        }
+
         if (this.bbApi) {
             this.bbApi.toggleButtonSpinner('editor-cancel')
         }
@@ -590,18 +583,28 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                             if (hasEdits) {
                                 this.editorSvc.deleteEditModal(this.edit).result.then(
                                     (result) => {
-                                        if (result) cancelCleanUp()
+                                        if (result) this.cleanUpAction()
                                     },
                                     () => {
                                         //Do Nothing if user wants to keep working
                                     }
                                 )
                             } else {
-                                cancelCleanUp()
+                                if (continueEdit)
+                                    this.editorSvc.resetEdit(this.edit, continueEdit).then(
+                                        (edit) => {
+                                            this.edit = edit
+                                            this.recompile()
+                                        },
+                                        (reason) => {
+                                            this.growl.error(reason.message)
+                                        }
+                                    )
+                                else this.cleanUpAction()
                             }
                         },
                         () => {
-                            cancelCleanUp()
+                            this.cleanUpAction()
                         }
                     )
                     .finally(() => {
@@ -631,15 +634,10 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                     if (hasEdits && !this.inPreviewMode) {
                         this.skipBroadcast = true //preview next click to go into edit mode from broadcasting
                         this.inPreviewMode = true
-                        this.recompile()
+                        this.recompile(true)
                     } else {
                         //nothing has changed, cancel instead of preview
-
-                        // Broadcast message for the ToolCtrl to clear out the tracker window:
-                        this.eventSvc.$broadcast('editor.cancel', this.edit)
-                        if (this.element) {
-                            this.recompile()
-                        }
+                        this.cleanUpAction()
                     }
                 })
                 .finally(() => {
@@ -648,6 +646,13 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                     this.editorSvc.scrollToElement(this.$element)
                 })
         }
+    }
+
+    public cleanUpAction = (): void => {
+        this.editorSvc.cleanUpEdit(this.editKey)
+        this.isEditing = false
+        this.recompile()
+        // scrollToElement(domElement);
     }
 
     //Transclusion API

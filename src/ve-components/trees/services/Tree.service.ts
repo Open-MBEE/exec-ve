@@ -49,7 +49,7 @@ export class TreeService {
     static events = {
         UPDATED: 'tree.updated',
         RELOAD: 'tree.reload',
-        FILTER: 'tree.filter'
+        FILTER: 'tree.filter',
     }
 
     static MetaTypes = [
@@ -338,11 +338,6 @@ export class TreeService {
         return this.$q.resolve()
     }
 
-    public removeSingleBranch = (branch: TreeBranch): VePromise<void, unknown> => {
-        this._removeBranch(branch, true)
-        return this.$q.resolve()
-    }
-
     /**
      * @name TreeApi#expandBranch
      * self explanatory
@@ -468,10 +463,8 @@ export class TreeService {
             if (branch) {
                 const next = this.getFirstChild(branch)
                 if (next) {
-                    if (types && types.includes(next.type))
-                        resolve(next)
-                    else
-                        this.getNextBranch(next, types).then(resolve, reject)
+                    if (types && types.includes(next.type)) resolve(next)
+                    else this.getNextBranch(next, types).then(resolve, reject)
                 } else {
                     this.getClosestAncestorNextSibling(branch).then((nextSib) => {
                         if (types && !types.includes(nextSib.type)) {

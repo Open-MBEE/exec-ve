@@ -5,7 +5,7 @@ import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angu
 import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService } from '@ve-app/main/services'
 import { TreeService } from '@ve-components/trees'
-import { ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar'
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
 import { ConfirmDeleteModalResolveFn } from '@ve-core/modals'
 import { RootScopeService } from '@ve-utils/application'
@@ -19,10 +19,10 @@ import { left_default_buttons } from './left-buttons.config'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import {
-    DocumentObject,
     ElementObject,
     ElementsRequest,
     ElementsResponse,
+    InstanceSpecObject,
     ParamsObject,
     ProjectObject,
     RefObject,
@@ -173,9 +173,21 @@ class LeftPaneController implements angular.IComponentController {
                     viewId,
                     search: undefined,
                 })
+            }),
+            this.eventSvc.$on<InstanceSpecObject>('presentation.deleted', (data) => {
+                this.treeSvc.getBranch(data).then(
+                    (branch) => {
+                        this.treeSvc.removeBranch(branch).catch((reason) => {
+                            this.growl.error(TreeService.treeError(reason))
+                        })
+                    },
+                    () => {
+                        this.growl.error('Deleted branch not found')
+                    }
+                )
             })
         )
-/*
+        /*
         this.subs.push(
             this.eventSvc.$on('tree.ready', () => {
                 if (!this.bbApi) {
@@ -356,10 +368,10 @@ class LeftPaneController implements angular.IComponentController {
                                             resolve(root)
                                         }, reject)
                                 } else {*/
-                                    this.treeApi.numberingDepth = 0
-                                    this.treeApi.numberingSeparator = '.'
-                                    this.treeApi.startChapter = 1
-                                    resolve(root)
+                                this.treeApi.numberingDepth = 0
+                                this.treeApi.numberingSeparator = '.'
+                                this.treeApi.startChapter = 1
+                                resolve(root)
                                 //}
                             }, reject)
                         } else {

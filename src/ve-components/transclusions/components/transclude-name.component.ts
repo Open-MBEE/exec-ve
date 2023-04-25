@@ -134,7 +134,6 @@ export class TranscludeNameController extends Transclusion implements ITransclus
         if (preview) {
             deferred.resolve('<div class="panel panel-info">' + editTemplate + '</div>')
         } else {
-            this.isEditing = false
             deferred.resolve(defaultTemplate)
         }
         return deferred.promise

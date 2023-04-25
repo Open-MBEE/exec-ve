@@ -55,14 +55,14 @@ export class InsertionService {
         }
 
         promise.finally(() => {
-            this.editorSvc.removeEdit(editKey)
+            this.editorSvc.cleanUpEdit(editKey)
         })
 
         return promise
     }
 
     public cancelAction = (cancelledItem: ElementObject): void => {
-        this.editorSvc.removeEdit(this.elementSvc.getEditElementKey(cancelledItem))
+        this.editorSvc.cleanUpEdit(this.elementSvc.getEditElementKey(cancelledItem))
         this.elementSvc.deleteTemp(cancelledItem)
     }
 }

@@ -1,6 +1,7 @@
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions'
+import { ITransclusion, ITransclusionComponentOptions } from '@ve-components/transclusions'
 import { TranscludeDocController } from '@ve-components/transclusions/components/transclude-doc.component'
+import { DeletableTransclusion } from '@ve-components/transclusions/deletable-transclusion.controller'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { EditorService } from '@ve-core/editor'
 import { ImageService, MathService, UtilsService } from '@ve-utils/application'
@@ -11,7 +12,6 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import { DeletableTransclusion } from "@ve-components/transclusions/deletable-transclusion.controller";
 
 /**
  * @ngdoc directive
@@ -105,7 +105,6 @@ export class TranscludeComController extends TranscludeDocController implements 
         if (preview) {
             result = '<div class="panel panel-info">' + doc + '</div>'
         } else {
-            this.isEditing = false
             result = doc
         }
         if (!this.mmsGenerateForDiff) {

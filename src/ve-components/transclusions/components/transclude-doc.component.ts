@@ -86,7 +86,7 @@ export class TranscludeDocController extends DeletableTransclusion implements IT
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService,
-        viewSvc: ViewService,
+        viewSvc: ViewService
     ) {
         super(
             $q,
@@ -167,7 +167,6 @@ export class TranscludeDocController extends DeletableTransclusion implements IT
         if (preview) {
             result = '<div class="panel panel-info">' + doc + '</div>'
         } else {
-            this.isEditing = false
             result = doc
         }
         if (this.mmsViewPresentationElemCtrl) {

@@ -175,20 +175,14 @@ class ToolsController {
         this.subs.push(this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, this.changeTool))
 
         this.subs.push(
-            this.eventSvc.$on('editor.edit', (editOb: ElementObject) => {
-                this.specSvc.toggleSave(this.toolbarId)
+            this.eventSvc.$on('editor.open', (editOb: ElementObject) => {
+                this.openEdit()
             })
         )
 
         this.subs.push(
-            this.eventSvc.$on('editor.save', (editOb: ElementObject) => {
-                this.specSvc.toggleSave(this.toolbarId)
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('editor.cancel', () => {
-                this.cleanUpEdit()
+            this.eventSvc.$on('editor.close', (editOb: ElementObject) => {
+                this.closeEdit()
             })
         )
 
@@ -360,7 +354,11 @@ class ToolsController {
     //     this.specApi.commitId = this.mmsRefId;
     // }
 
-    public cleanUpEdit = (): void => {
+    public closeEdit = (): void => {
+        this.specSvc.toggleSave(this.toolbarId)
+    }
+
+    public openEdit = (): void => {
         this.specSvc.toggleSave(this.toolbarId)
     }
 

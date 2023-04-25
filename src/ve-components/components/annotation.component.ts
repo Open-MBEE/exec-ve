@@ -2,7 +2,7 @@ import { ExtensionService } from '@ve-components/services'
 import { veCoreEvents } from '@ve-core/events'
 import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
-import { ValueService } from '@ve-utils/mms-api-client/Value.service'
+import { ValueService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veUtils } from '@ve-utils'
