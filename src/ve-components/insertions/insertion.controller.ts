@@ -10,7 +10,6 @@ import { SchemaService } from '@ve-utils/model-schema'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { InsertApi, InsertData } from '@ve-types/components'
-import { EditingApi } from '@ve-types/core/editor'
 import { BasicResponse, ElementObject, MmsObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings, veSearchCallback, VeSearchOptions } from '@ve-types/view-editor'
 
@@ -41,7 +40,6 @@ export class Insertion<
     public name: string
     public ownerId: string
     public searchOptions: VeSearchOptions<U> = null
-    public editorApi: EditingApi = {}
     type: string
     createForm: boolean = true
     oking: boolean = false

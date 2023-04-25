@@ -259,7 +259,7 @@ export class ViewController implements angular.IComponentController {
             commitId: this.mmsCommitId,
         }
         this.elementSvc
-            .getElement<ElementObject>(this.reqOb, 1)
+            .getElement<ViewObject | ViewInstanceSpec>(this.reqOb, 1)
             .then(
                 (data) => {
                     //view accepts a section element

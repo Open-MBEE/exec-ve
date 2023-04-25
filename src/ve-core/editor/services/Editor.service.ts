@@ -146,7 +146,7 @@ export class EditorService {
                 .then((responses) => {
                     responses.forEach((elementOb) => {
                         const edit = this.editSvc.get(this.elementSvc.getEditElementKey(elementOb))
-                        this.removeEdit(edit.key)
+                        this.cleanUpEdit(edit.key)
                         const data = {
                             element: elementOb,
                             continueEdit: false,
@@ -175,7 +175,6 @@ export class EditorService {
         return new this.$q<T>((resolve, reject) => {
             this.updateAllData(editKey, true).then(
                 () => {
-                    this.clearAutosave(editKey)
                     const edit = this.editSvc.get<T>(editKey).element
                     this.elementSvc.updateElement(edit, false, true).then(
                         (element: T) => {
@@ -186,7 +185,7 @@ export class EditorService {
                             }
                             this.eventSvc.$broadcast('element.updated', data)
                             if (continueEdit) return
-                            this.editSvc.remove(editKey)
+                            this.cleanUpEdit(editKey)
                         },
                         (reason: VePromiseReason<ElementsResponse<T>>) => {
                             if (reason.status === 409) {
@@ -280,27 +279,6 @@ export class EditorService {
                                     !this.valueSvc.isEqual(edit, elementOb)
                                 ) {
                                     resolve(true)
-                                    // if (
-                                    //     (edit.type === 'Property' || edit.type === 'Port') &&
-                                    //     !_.isEqual(edit.defaultValue, elementOb.defaultValue)
-                                    // ) {
-                                    //     resolve(true)
-                                    // } else if (
-                                    //     edit.type === 'Slot' &&
-                                    //     !_.isEqual((edit as SlotObject).value, elementOb.value)
-                                    // ) {
-                                    //     resolve(true)
-                                    // } else if (
-                                    //     edit.type.endsWith('TaggedValue') &&
-                                    //     !_.isEqual((edit as TaggedValueObject).value, elementOb.value)
-                                    // ) {
-                                    //     resolve(true)
-                                    // } else if (
-                                    //     edit.type === 'Constraint' &&
-                                    //     !_.isEqual((edit as ConstraintObject).specification, elementOb.specification)
-                                    // ) {
-                                    //     resolve(true)
-                                    // }
                                 }
                                 resolve(false)
                             } else if (
@@ -331,7 +309,10 @@ export class EditorService {
      * @param {object} editOb scope with common properties
      * @param {boolean} continueEdit boolean to re-check out a clean copy
      */
-    public resetEdit(editOb: EditObject, continueEdit?: boolean): VePromise<void, ElementsResponse<ElementObject>> {
+    public resetEdit(
+        editOb: EditObject,
+        continueEdit?: boolean
+    ): VePromise<EditObject, ElementsResponse<ElementObject>> {
         return new this.$q((resolve, reject) => {
             if (continueEdit) {
                 const reqOb = {
@@ -339,28 +320,30 @@ export class EditorService {
                     projectId: editOb.element._projectId,
                     refId: editOb.element._refId,
                 }
-                this.removeEdit(editOb.key)
+                this.cleanUpEdit(editOb.key)
                 this.elementSvc.getElementForEdit(reqOb).then(
                     (edit) => {
                         if (this.valueSvc.isValue(edit.element)) {
                             edit.values = this.valueSvc.getValues(edit.element)
                         }
-                        resolve()
+                        resolve(edit)
                     },
                     (reason) => {
                         reject(reason)
                     }
                 )
             } else {
-                this.removeEdit(editOb.key)
+                this.cleanUpEdit(editOb.key)
                 resolve()
             }
         })
     }
 
-    public removeEdit(editKey: string | string[]): void {
+    public cleanUpEdit(editKey: string | string[]): void {
         this.clearAutosave(editKey)
         this.editSvc.remove(editKey)
+        // Broadcast message for the ToolCtrl:
+        this.eventSvc.$broadcast('editor.close')
     }
 
     public clearAutosave = (key: string | string[]): void => {
@@ -477,7 +460,7 @@ export class EditorService {
                 },
                 finalize: () => {
                     return () => {
-                        this.removeEdit(edit.key)
+                        this.cleanUpEdit(edit.key)
                         return this.$q.resolve()
                     }
                 },

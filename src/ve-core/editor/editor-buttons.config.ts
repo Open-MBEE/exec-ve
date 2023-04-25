@@ -30,6 +30,13 @@ export const editor_buttons: IButtonBarButton[] = [
         api: 'cancel',
     },
     {
+        id: 'editor-reset',
+        icon: 'fa-solid fa-rotate-left',
+        selectable: false,
+        tooltip: 'Reset Editor and Continue',
+        api: 'reset',
+    },
+    {
         id: 'editor-preview',
         icon: 'fa-regular fa-file-powerpoint',
         selectable: false,

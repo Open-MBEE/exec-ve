@@ -7,8 +7,7 @@ import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { EditorService, editor_buttons } from '@ve-core/editor'
 import { MathService, UtilsService, ImageService } from '@ve-utils/application'
 import { EditService, EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
-import { ValueService } from '@ve-utils/mms-api-client/Value.service'
+import { ElementService, ValueService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { PropertySpec, veComponents } from '@ve-components'
@@ -243,8 +242,6 @@ export class TranscludeValController extends Transclusion implements ITransclusi
 
     public getContent = (preview?): angular.IPromise<string | HTMLElement[]> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
-        this.isEditing = false
-        this.elementSaving = false
         const toCompileList: any[] = []
         let areStrings = false
         this.values = this.valueSvc.getValues(this.element)
