@@ -18,7 +18,7 @@ class InsertElementController extends Insertion<InsertData> {
     protected parentAction: string
 
     //Locals
-    protected createType: number = 1
+    //protected createType: number = 1
     protected description: string
     protected searchExisting: boolean = true
 
@@ -111,11 +111,13 @@ const InsertComponent: VeComponentOptions = {
     template: `
 <div class="modal-body">
     <div class="ve-light-tabs modal-top-tabs" ng-show="!$ctrl.viewLink">
+        <!-- only have 1 cancel at botton
         <span class="close-button-container">
             <a class="close-button"  ng-click="$ctrl.cancel()">
                 <i tooltip-placement="left" uib-tooltip="Close Insert Dialog"  class="fa fa-times"></i>
             </a>
         </span>
+        -->
         <ul class="nav nav-tabs">
             <li class="uib-tab nav-item tab-item" ng-class="{'active': !$ctrl.searchExisting}">
                 <a class="nav-link" ng-click="$ctrl.searchExisting = false"><i class="fa fa-plus"></i>Create New</a>
@@ -146,6 +148,7 @@ const InsertComponent: VeComponentOptions = {
                 <label class="label-documentation">Documentation</label>
                 <editor ng-model="$ctrl.createItem.documentation" edit-field="documentation" mms-element-id="{{$ctrl.createItem.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
             </div>
+            <!-- create non class not supported
             <div class="form-group" ng-show="$ctrl.createType === 2">
                 <label>Value</label>
             </div>
@@ -153,10 +156,10 @@ const InsertComponent: VeComponentOptions = {
                 <label>Source</label>
                 <label>Target</label>
             </div>
-            
             <label><input type="radio" ng-model="$ctrl.createType" ng-value="1" checked>&nbsp;Class</label><br></label>
             <label><input type="radio" ng-model="$ctrl.createType" ng-value="2">&nbsp;Property</label><br>
             <label><input type="radio" ng-model="$ctrl.createType" ng-value="3">&nbsp;Relationship</label><br>
+            -->
         </form>
 
         <p class="help-block pull-left"><i>Fields marked with <span class="star-mandatory">*</span> are required</i></p>

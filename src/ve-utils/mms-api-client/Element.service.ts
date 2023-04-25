@@ -338,7 +338,7 @@ export class ElementService extends BaseApiService {
                     this.getElement<T>(reqOb, weight)
                         .then(
                             (result) => {
-                                const copy = _.cloneDeep(result)
+                                const copy = this.apiSvc.cleanElement(_.cloneDeep(result), true)
                                 resolve(this.editSvc.addOrUpdate(requestCacheKey, copy, overwrite) as EditObject<T>)
                             },
                             (reason) => {

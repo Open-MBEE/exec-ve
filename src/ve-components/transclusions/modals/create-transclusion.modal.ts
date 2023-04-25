@@ -20,15 +20,13 @@ class CreateTransclusionModalController
     implements VeModalController
 {
     protected linkTemplate: string = `
-    <div class="transclude-modal-instructions">
-    {{$ctrl.description}}
-</div>
+
 <div class="form-group" ng-show="$ctrl.viewLink"><br>
     <label>Link Text:</label>
     <div class="radio radio-with-label">
         <label><input type="radio" ng-model="$ctrl.linkType" ng-value="1">&nbsp;Auto-Numbering
             <a uib-tooltip="For links within current document, otherwise defaults to name" tooltip-trigger="mouseenter" tooltip-popup-delay="100"><i class="fa fa-info-circle"></i></a></label><br>
-        <label><input type="radio" ng-model="$ctrl.linkType" ng-value="4">&nbsp;Auto-Numbering w/ Name</label><br>
+        <label><input type="radio" ng-model="$ctrl.linkType" ng-value="4">&nbsp;Auto-Numbering w/ Name
             <a uib-tooltip="For links within current document, otherwise defaults to name" tooltip-trigger="mouseenter" tooltip-popup-delay="100"><i class="fa fa-info-circle"></i></a></label><br>
         <label><input type="radio" ng-model="$ctrl.linkType" ng-value="2">&nbsp;Name</label><br>
         <label><input type="radio" ng-model="$ctrl.linkType" ng-value="3">&nbsp;Custom&nbsp;
@@ -42,7 +40,7 @@ class CreateTransclusionModalController
     <label>Property to Transclude</label><span class="star-mandatory">*</span>
     <div class="radio radio-with-label">
         <label><input type="radio" name="optradio" value="true" ng-click="$ctrl.toggleRadio('name')">Name</label><br>
-        <label><input type="radio" name="optradio" value="true" ng-click="$ctrl.toggleRadio('doc')">Documentation</label>
+        <label><input type="radio" name="optradio" value="true" ng-click="$ctrl.toggleRadio('doc')">Documentation</label><br>
         <label><input type="radio" name="optradio" value="true" ng-click="$ctrl.toggleRadio('val')">Value</label>
         
     </div>
@@ -56,10 +54,11 @@ class CreateTransclusionModalController
     <div>
     <label>Target Element</label><span class="star-mandatory">*</span><i class="fa fa-question-circle" uib-tooltip="{{$ctrl.description}}" tooltip-placement="bottom"></i>
     <div class="transclude-target block">
-        <span ng-show="$ctrl.element" uib-popover-template="'insertTemplate'" popover-popup-close-delay="500" popover-placement="right" popover-title="Select Target" class="outline">
+        <span ng-show="$ctrl.element" class="outline">
             {{$ctrl.element.name}}: <span class="placeholder">({{$ctrl.element.id}})</span>
+            <span><button class="btn btn-xs btn-primary" ng-click="$ctrl.insert()">{{'Modify'}} Target</button></span>
         </span>
-        <span ng-hide="$ctrl.element" ng-hide="$ctrl.element" uib-popover-template="'insertTemplate'" popover-popup-close-delay="500" popover-placement="right" popover-title="Select Target" class="outline placeholder">
+        <span ng-hide="$ctrl.element" class="outline placeholder">
             (No Target)
         </span>
     </div>
@@ -128,13 +127,15 @@ class CreateTransclusionModalController
                 this.element = result
                 this.insertData.selected = result
                 this.selectOptions()
+                //TODO need to clean up any previously created element
             },
             reject: (reason): void => {
                 if (reason.status !== 444) {
                     this.growl.error(reason.message)
                 }
                 this.element = null
-                this.insert()
+                this.cancel()
+                //TODO need to clean up any previously created element
             },
         }
         this.insertData = this.resolve.getInsertData
@@ -248,17 +249,14 @@ const CreateTransclusionModal: VeModalComponent = {
         
     </div>
     <div class="modal-footer" ng-if="!$ctrl.inserting">
-        <div uib-tooltip="{{ !$ctrl.element ? 'Select all required fields to insert a' : 'Create'}}{{ $ctrl.viewLink ? ' Link': ' Transclusion' }}" popup-placement="top-left">
+        <div>
+            <p class="help-block pull-left"><i>Fields marked with <span class="star-mandatory">*</span> are required</i> </p>
+        </div>
+        <div >
           <button class="btn btn-primary" ng-disabled="!$ctrl.element" type="button" ng-click="$ctrl.choose()">Create {{$ctrl.viewLink ? 'Link': 'Transclusion'}}<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
         </div>
         <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
-        <div>
-            <p class="help-block pull-left"><i>Fields marked with <span class="star-mandatory">*</span> are required</i></p>
-        </div>
     </div>
-    <script type="text/ng-template" id="insertTemplate">
-        <button class="btn btn-xs btn-primary" ng-click="$ctrl.insert()">{{ $ctrl.element ? 'Select or Create' : 'Modify'}} Target</button>
-    </script>
 </div>
 `,
     bindings: {
