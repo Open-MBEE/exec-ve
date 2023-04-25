@@ -32,9 +32,9 @@ export const pane_center_buttons: IButtonBarButton[] = [
         id: 'show-numbering',
         icon: 'fa-solid fa-list-ol',
         selectable: false,
-        tooltip: 'Hide Numbering',
+        tooltip: 'Show Numbering',
         toggle: {
-            tooltip: 'Show Numbering',
+            tooltip: 'Hide Numbering',
         },
     },
     {

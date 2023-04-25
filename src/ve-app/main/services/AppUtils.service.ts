@@ -13,6 +13,7 @@ import { veApp } from '@ve-app'
 import { VePromise, VeQService } from '@ve-types/angular'
 import { RefObject, ViewObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
+import {Table2CSVService} from "@ve-components/presentations/services/Table2CSV.service";
 
 export interface DocumentStructure {
     cover: string
@@ -63,7 +64,7 @@ export class AppUtilsService implements angular.Injectable<any> {
     public tableToCsv = (tables: JQLite, isDoc: boolean): void => {
         //Export to CSV button Pop-up Generated Here
         const modalInstance = this.$uibModal.open<TableExportModalResolveFn, string>({
-            component: 'tableExportModal',
+            component: 'tableExport',
             resolve: {
                 type: () => {
                     return isDoc ? 'DOCUMENT' : 'VIEW'
@@ -109,7 +110,7 @@ if (window.navigator.msSaveOrOpenBlob) {
                 tables.find('table').each((index: number, elt: HTMLTableElement) => {
                     const tableObj = {
                         caption: 'no caption',
-                        val: angular.element(elt).table2CSV({ delivery: 'value' }),
+                        val: Table2CSVService.export(angular.element(elt),{ delivery: 'value' }),
                     }
                     if (elt.caption) {
                         tableObj.caption = elt.caption.innerHTML
@@ -130,10 +131,10 @@ if (window.navigator.msSaveOrOpenBlob) {
                     //return true
                 }
                 // generate text area content for popup
-                let genTextArea = ''
+                let genTextArea = string
                 let num = 0
                 tableCSV.forEach((element: { caption: string; val: string }) => {
-                    genTextArea = `
+                    genTextArea += `
     <h2>${element.caption}</h2>
 <div><button class="btn btn-sm btn-primary" onclick="doClick('textArea${num}')">
 Save CSV</button></div>
@@ -141,7 +142,6 @@ Save CSV</button></div>
 `
                     num++
                 })
-                genTextArea += string
                 exportPopup(genTextArea)
             }
         })

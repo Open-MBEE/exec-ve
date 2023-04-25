@@ -90,7 +90,7 @@ export class ViewController implements angular.IComponentController {
         'RootScopeService',
     ]
     private showEdits: boolean
-    private modified: Date
+    private modified: string
     private modifier: UserObject
     private view: ViewObject
     private reqOb: ElementsRequest<string> = {
@@ -386,7 +386,7 @@ export const ViewComponent: VeComponentOptions = {
     <div ng-if="!$ctrl.noTitle">
         <div ng-if="!$ctrl.mmsLink" >
             <h1 class="view-title h{{$ctrl.level}}">
-            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> 
+            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.view._veNumber}}</span> 
             <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}" mms-watch-id="true"></transclude-name>
             </h1>
         </div>

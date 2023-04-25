@@ -19,10 +19,10 @@ export interface ElementObject extends MmsObject {
     _projectId: string
     _refId: string
     _commitId?: string
-    _modified?: Date
+    _modified?: string
     _modifier?: string
     _creator?: string
-    _created?: Date
+    _created?: string
     _inRefIds?: string[]
     _artifacts?: ArtifactObject[]
     appliedStereotypeInstanceId?: string

@@ -8,6 +8,7 @@ import { TreeBranch } from '@ve-types/tree'
 
 export class FullDocumentApi {
     public viewsBuffer: ViewData[] = []
+    public views: ViewData[] = []
 
     private _isLoadingRemaingViews: boolean = false
     _isFullDocFullyLoaded: boolean = false
@@ -52,11 +53,11 @@ export class FullDocumentApi {
                 this._isLoadingRemaingViews = true
                 handler = this.$interval(() => {
                     let nextIndex = this.viewsBuffer.length + 9
-                    if (nextIndex >= this.viewsBuffer.length) {
-                        nextIndex = this.viewsBuffer.length - 1
+                    if (nextIndex >= this.views.length) {
+                        nextIndex = this.views.length - 1
                     }
                     this._pushNewViewsToBuffer(this.viewsBuffer.length, nextIndex)
-                    if (nextIndex === this.viewsBuffer.length - 1) {
+                    if (nextIndex === this.views.length - 1) {
                         this.$interval.cancel(handler)
                         this._waitTillAfterDigestCycle(() => {
                             callback()
@@ -87,7 +88,7 @@ export class FullDocumentApi {
     public handleViewAdd = (view: ViewData, prevSiblingViewId: string): void => {
         // load the new view into the original views right after its sibling
         const siblingIndex = this._findViewFromOriginalViews(prevSiblingViewId)
-        this.viewsBuffer.splice(siblingIndex + 1, 0, view)
+        this.views.splice(siblingIndex + 1, 0, view)
 
         // load the new view into the viewsBuffer
         const siblingIndexFromLoadedViews = this._findViewFromLoadedViews(prevSiblingViewId)
@@ -103,7 +104,7 @@ export class FullDocumentApi {
     public handleViewDelete = (deletedBranch: TreeBranch): void => {
         const viewIdsToDelete: string[] = []
         this._getAllViewsStartingAt(deletedBranch, viewIdsToDelete)
-        this._deleteViewsFrom(this.viewsBuffer, viewIdsToDelete)
+        this._deleteViewsFrom(this.views, viewIdsToDelete)
         this._deleteViewsFrom(this.viewsBuffer, viewIdsToDelete)
     }
 
@@ -113,10 +114,10 @@ export class FullDocumentApi {
 
     private _pushNewViewsToBuffer = (startIndex: number, endIndex: number): boolean => {
         let isLoadedBefore = true
-        if (startIndex < this.viewsBuffer.length && endIndex < this.viewsBuffer.length) {
-            Array.prototype.push.apply(this.viewsBuffer, this.viewsBuffer.slice(startIndex, endIndex + 1))
+        if (startIndex < this.views.length && endIndex < this.views.length) {
+            Array.prototype.push.apply(this.viewsBuffer, this.views.slice(startIndex, endIndex + 1))
             isLoadedBefore = false
-            if (endIndex === this.viewsBuffer.length - 1) {
+            if (endIndex === this.views.length - 1) {
                 this._waitTillAfterDigestCycle(() => {
                     this._isFullDocFullyLoaded = true
                 })
@@ -141,7 +142,9 @@ export class FullDocumentApi {
     private _incrementallyAddViewTillScroll = (callback: () => void, isScrollbarVisible: () => boolean): void => {
         const isNoMoreToLoad = this._pushNewViewsToBuffer(this.viewsBuffer.length, this.viewsBuffer.length)
         this._waitTillAfterDigestCycle(() => {
-            const isScrollBarVisible = isScrollbarVisible()
+            //const isScrollBarVisible = isScrollbarVisible()
+            // the scrollbar logic no longer work, error in pane, just load a view and stop
+            const isScrollBarVisible = true
             if (isScrollBarVisible || isNoMoreToLoad) {
                 callback()
             } else {
@@ -170,7 +173,7 @@ export class FullDocumentApi {
     }
 
     private _findViewFromOriginalViews = (viewId: string): number => {
-        return _.findIndex(this.viewsBuffer, { id: viewId })
+        return _.findIndex(this.views, { id: viewId })
     }
 
     private _waitTillAfterDigestCycle = (callback: () => void): void => {

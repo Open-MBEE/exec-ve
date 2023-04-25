@@ -40,9 +40,10 @@ class FullDocumentController implements IComponentController, Ng1Controller {
     fullDocumentApi: FullDocumentApi
     viewContentLoading: boolean
     buttons: IButtonBarButton[] = []
-    latestElement: Date
+    latestElement: string = ''
     scrollApi: IPaneScrollApi
     views: ViewData[] = []
+    viewsBuffer: ViewData[] = []
     view2Children: { [key: string]: string[] } = {}
     view2Node: View2NodeMap = {}
     num = 1
@@ -150,7 +151,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
             })
         )
 
-        // api to communicate with borderlayout library
+        // api to communicate with borderlayout library, no longer works
         this.scrollApi = {
             notifyOnScroll: this.notifyOnScroll,
             isScrollVisible: (): boolean => {
@@ -209,6 +210,12 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                             this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode())
                         }
                         break
+                    case 'show-numbering':
+                        this.bbApi.toggleButton(
+                            'show-numbering',
+                            this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
+                        )
+                        break
                     case 'convert-pdf':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             void this.appUtilsSvc.printModal(
@@ -250,30 +257,12 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                         break
 
                     case 'refresh-numbering':
-                        this.fullDocumentApi.loadRemainingViews(() => {
-                            this.views.forEach((view) => {
-                                if (this.treeSvc.branch2viewNumber[view.id]) {
-                                    view.number = this.treeSvc.branch2viewNumber[view.id]
-                                }
-                            })
-                        })
+                        //TODO
                         break
                 }
             })
         )
-
-        this.subs.push(
-            this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
-                if (!data) return
-                this.fullDocumentApi.loadRemainingViews(() => {
-                    this.views.forEach((view) => {
-                        if (this.treeSvc.branch2viewNumber[view.id]) {
-                            view.number = this.treeSvc.branch2viewNumber[view.id]
-                        }
-                    })
-                })
-            })
-        )
+        this.initViews()
     }
 
     $onDestroy(): void {
@@ -281,7 +270,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         this.buttonBarSvc.destroy(this.bbId)
     }
 
-    $postLink(): void {
+    initViews(): void {
         // Send view to kick off tree compilation
         const data: veCoreEvents.elementSelectedData = {
             rootId: this.mmsDocument.id,
@@ -295,14 +284,21 @@ class FullDocumentController implements IComponentController, Ng1Controller {
 
         this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data)
         this.fullDocumentApi = this.fullDocumentSvc.get()
-        this.views = this.fullDocumentApi.viewsBuffer
-        this._createViews()
+        this.views = this.fullDocumentApi.views
+        this.viewsBuffer = this.fullDocumentApi.viewsBuffer
+        this._createViews().then(() => {
+            this.fullDocumentApi.addInitialViews(scrollVisible)
+            if (this.mmsView && this.mmsView.id !== this.mmsDocument.id) {
+                this.fullDocumentApi.handleClickOnBranch(this.mmsView.id, ()=> {
+                    this._scroll(this.mmsView.id)
+                    this.fullDocumentApi.loadRemainingViews(()=>{}) //remove if scroll works
+                })
+            } else {
+                this.fullDocumentApi.loadRemainingViews(()=>{}) //remove if scroll works
+            }
+        })
         const scrollVisible = (): boolean => {
             return this.scrollApi.isScrollVisible()
-        }
-        this.fullDocumentApi.addInitialViews(scrollVisible)
-        if (this.mmsView && this.mmsView.id !== this.mmsDocument.id) {
-            this._scroll(this.mmsView.id)
         }
     }
 
@@ -337,7 +333,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
         api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
-        api.toggleButton('show-numbering', !this.rootScopeSvc.veNumberingOn())
+        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
@@ -384,7 +380,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         }
     }
 
-    private _createViews = (): void => {
+    private _createViews = () => {
         const message = this._loadingViewsFromServer()
         this.views.push({
             id: this.mmsDocument.id,
@@ -396,7 +392,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         if (!this.mmsDocument._childViews) {
             this.mmsDocument._childViews = []
         }
-        this.viewSvc
+        return this.viewSvc
             .handleChildViews(
                 this.mmsDocument,
                 'composite',
@@ -505,7 +501,7 @@ const DocumentComponent: VeComponentOptions = {
     selector: 'document',
     template: `
     <div>
-    <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="36px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
+    <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="46px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
         <div class="pane-center-toolbar">
             <div class="share-link">
                 <button type="button" class="btn btn-tools btn-sm share-url" uib-tooltip="Share Page" tooltip-placement="bottom" tooltip-popup-delay="100"
@@ -524,7 +520,7 @@ const DocumentComponent: VeComponentOptions = {
         </div>
         <div class="container-fluid ve-secondary-text"> Document Last Modified: {{ $ctrl.latestElement | date:'M/d/yy h:mm a' }}</div>
         <div class="pane-center container-fluid" id="print-div">
-            <div ng-repeat="view in $ctrl.views track by view.id" ng-class="{chapter: view.topLevel, 'first-chapter': view.first}">
+            <div ng-repeat="view in $ctrl.viewsBuffer track by view.id" ng-class="{chapter: view.topLevel, 'first-chapter': view.first}">
                 <view mms-element-id="{{view.id}}" mms-commit-id="latest" mms-project-id="{{$ctrl.mmsProject.id}}" mms-ref-id="{{$ctrl.mmsRef.id}}" mms-number="{{view.number}}" mms-view-api="view.api"></view>
             </div>
         </div>

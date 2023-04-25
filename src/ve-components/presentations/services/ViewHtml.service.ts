@@ -64,7 +64,7 @@ export class ViewHtmlService {
             result.push('</thead>')
         }
         if (this.applicationSvc.getState().inDoc && !table.excludeFromList) {
-            result.push('<caption>Table {{$ctrl.peNumber}}. {{$ctrl.table.title || $ctrl.element.name}}</caption>')
+            result.push('<caption>Table {{$ctrl.instanceSpec._veNumber}}. {{$ctrl.table.title || $ctrl.instanceSpec.name}}</caption>')
         } else if (table.title) {
             result.push('<caption>' + table.title + '</caption>')
         } //same for caption to control stacking context

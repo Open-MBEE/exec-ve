@@ -48,7 +48,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
     bars: string[] = []
     comments: {
         count: number
-        lastCommented: Date
+        lastCommented: string
         lastCommentedBy: string
         map: object
     } = {
@@ -134,16 +134,6 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
 
         this.initView()
 
-        //Subscribe to Tree Updated Subject
-        this.subs.push(
-            this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
-                if (!data) return
-                if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
-                    this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
-                }
-            })
-        )
-
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 if (data.clicked === 'show-comments') {
@@ -155,7 +145,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                 } else if (data.clicked === 'show-numbering') {
                     this.bbApi.toggleButton(
                         'show-numbering',
-                        !this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
+                        this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
                     )
                     return
                 } else if (data.clicked === 'show-elements') {
@@ -222,10 +212,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                     this.appUtilsSvc.tableToCsv(angular.element('#print-div'), false)
                     return
                 } else if (data.clicked === 'refresh-numbering') {
-                    if (this.isPageLoading()) return
-                    if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
-                        this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
-                    }
+                    // TODO
                     return
                 }
             })
@@ -286,7 +273,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
 
         this.contentWindowSvc.toggleLeftPane(false)
 
-        this.rootScopeSvc.veNumberingOn(false)
+        this.rootScopeSvc.veNumberingOn(true)
 
         // Share URL button settings
         this.dynamicPopover = this.shortUrlSvc.dynamicPopover
@@ -294,9 +281,6 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         this.viewApi = {
             elementClicked: this.elementClicked,
             elementTranscluded: this.elementTranscluded,
-        }
-        if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
-            this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
         }
     }
 
@@ -328,7 +312,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
         api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
-        api.toggleButton('show-numbering', !this.rootScopeSvc.veNumberingOn())
+        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn())
 
         // Set hotkeys for toolbar
         this.hotkeys
@@ -431,7 +415,7 @@ const SlideshowComponent: VeComponentOptions = {
     selector: 'slideshow',
     template: `
     <div ng-show="$ctrl.viewId">
-    <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="36px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
+    <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="46px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
         <div class="pane-center-toolbar">
             <div class="share-link">
                 <button type="button" class="btn btn-tools btn-sm share-url" uib-tooltip="Share Page" tooltip-placement="bottom" tooltip-popup-delay="100"

@@ -41,7 +41,7 @@ class LeftPaneController implements angular.IComponentController {
     public bbApi: ButtonBarApi
     public bbSize: string
     public bars: string[]
-    private headerSize: string = '93px'
+    private headerSize: string = '83px'
     protected squishSize: number = 250
 
     //Bindings
@@ -175,7 +175,7 @@ class LeftPaneController implements angular.IComponentController {
                 })
             })
         )
-
+/*
         this.subs.push(
             this.eventSvc.$on('tree.ready', () => {
                 if (!this.bbApi) {
@@ -194,7 +194,8 @@ class LeftPaneController implements angular.IComponentController {
                 }
             })
         )
-
+*/
+        this.bbApi = this.buttonBarSvc.initApi(this.buttonId, this.bbInit, left_default_buttons)
         this.buttonBarSvc.waitForApi(this.buttonId).then(
             (api) => {
                 this.bbApi = api
@@ -246,7 +247,7 @@ class LeftPaneController implements angular.IComponentController {
         api.buttons.length = 0
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-expand'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-collapse'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-add'))
+        /*api.addButton(this.buttonBarSvc.getButtonBarButton('tree-add'))
         api.setPermission('tree-add', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-delete'))
         api.setPermission('tree-delete', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
@@ -263,10 +264,10 @@ class LeftPaneController implements angular.IComponentController {
         )
         api.setPermission('tree-add.view', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
 
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-view'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-view'))*/
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-full-document'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-show-pe'))
-        api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
+        //api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
         if (this.rootScopeSvc.veFullDocMode()) {
             api.toggleButton('tree-full-document', true)
         }
@@ -334,7 +335,9 @@ class LeftPaneController implements angular.IComponentController {
                                 projectId: this.treeApi.projectId,
                             }
                             this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
-                                if (this.apiSvc.isDocument(root) && this.$state.includes('**.present.**')) {
+                                // TODO this call is taking a long time that keeps the tree from being visible, need
+                                // to see if it can be moved to a resolve or faster
+                                /*if (this.apiSvc.isDocument(root) && this.$state.includes('**.present.**')) {
                                     this.viewSvc
                                         .getDocumentMetadata({
                                             elementId: root.id,
@@ -352,9 +355,12 @@ class LeftPaneController implements angular.IComponentController {
                                                 (root as DocumentObject)._childViews = []
                                             resolve(root)
                                         }, reject)
-                                } else {
+                                } else {*/
+                                    this.treeApi.numberingDepth = 0
+                                    this.treeApi.numberingSeparator = '.'
+                                    this.treeApi.startChapter = 1
                                     resolve(root)
-                                }
+                                //}
                             }, reject)
                         } else {
                             resolve(null)

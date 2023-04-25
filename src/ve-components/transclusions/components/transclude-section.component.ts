@@ -2,7 +2,7 @@ import { ExtensionService, ComponentService } from '@ve-components/services'
 import { DeletableTransclusion, ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import {editor_buttons, EditorService} from '@ve-core/editor'
-import { MathService, UtilsService, ImageService } from '@ve-utils/application'
+import { MathService, UtilsService, ImageService, RootScopeService } from '@ve-utils/application'
 import { EditService, EventService } from '@ve-utils/core'
 import {ElementService, ViewService} from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
@@ -43,11 +43,12 @@ import {PresentationService} from "@ve-components/presentations";
  * @param {boolean=false} nonEditable can edit inline or not
  */
 export class TranscludeSectionController extends DeletableTransclusion implements ITransclusion {
+    showNumbering: boolean
     defaultTemplate = `
  <div ng-if="$ctrl.element.specification">
     <div ng-show="!$ctrl.isEditing">
         <h1 class="section-title h{{$ctrl.level}}">
-            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> {{$ctrl.element.name}}
+            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.element._veNumber}}</span> {{$ctrl.element.name}}
         </h1>
     </div>
     <div ng-class="{'panel panel-default' : $ctrl.isEditing}">
@@ -71,7 +72,7 @@ export class TranscludeSectionController extends DeletableTransclusion implement
 `
     //Locals
 
-    static $inject = [...DeletableTransclusion.$inject, 'PresentationService']
+    static $inject = [...DeletableTransclusion.$inject, 'PresentationService', 'RootScopeService']
 
     constructor(
         $q: VeQService,
@@ -92,6 +93,7 @@ export class TranscludeSectionController extends DeletableTransclusion implement
         imageSvc: ImageService,
         viewSvc: ViewService,
         private presentationSvc: PresentationService,
+        private rootScopeSvc: RootScopeService,
     ) {
         super(
             $q,
@@ -120,6 +122,7 @@ export class TranscludeSectionController extends DeletableTransclusion implement
 
     $onInit(): void {
         super.$onInit()
+        this.showNumbering = this.rootScopeSvc.veNumberingOn()
         this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_section`)
         this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons)
         this.bbApi.setPermission('editor-preview', false)
@@ -129,6 +132,9 @@ export class TranscludeSectionController extends DeletableTransclusion implement
             if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element)
             e.stopPropagation()
         })
+        this.subs.push(this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VENUMBERINGON, (data) => {
+            this.showNumbering = data
+        }))
     }
 
     $onDestroy(): void {
