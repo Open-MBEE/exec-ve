@@ -15,7 +15,7 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
-import { EditingToolbar } from '@ve-types/core/editor'
+import { EditorActions } from '@ve-types/core/editor'
 import { ElementObject, ElementsResponse, ViewObject } from '@ve-types/mms'
 
 export interface ITransclusion extends angular.IComponentController {
@@ -89,7 +89,7 @@ export interface TranscludeScope extends IPaneScope {
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class Transclusion implements ITransclusion, EditingToolbar {
+export class Transclusion implements ITransclusion, EditorActions {
     //Regex
     fixPreSpanRegex: RegExp = /<\/span>\s*<view-cf/g
     fixPostSpanRegex: RegExp = /<\/view-cf>\s*<span[^>]*>/g
@@ -169,6 +169,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     //Default Toolbar Api
     /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
     cancel(e?): void {}
+    reset(e?): void {}
     delete(e?): void {}
     preview(e?): void {}
     save(e?): void {}
@@ -242,6 +243,11 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         this.cancel = (e?: JQuery.ClickEvent): void => {
             if (e) e.stopPropagation()
             this.cancelAction()
+        }
+
+        this.reset = (e?: JQuery.ClickEvent): void => {
+            if (e) e.stopPropagation()
+            this.cancelAction(true)
         }
 
         this.preview = (): void => {

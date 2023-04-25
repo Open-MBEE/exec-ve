@@ -17,7 +17,6 @@ import {
 import { SpecApi, SpecService } from './services/Spec.service'
 
 import { VeQService } from '@ve-types/angular'
-import { EditingApi } from '@ve-types/core/editor'
 import { ElementObject, RefObject, ValueObject, ViewObject } from '@ve-types/mms'
 
 export interface ISpecTool extends angular.IComponentController {
@@ -32,7 +31,6 @@ export interface ISpecTool extends angular.IComponentController {
     editValues?: ValueObject[]
     values?: ValueObject[]
     //Functions
-    editorApi?: EditingApi
     addValue?(type: string): void
     removeVal?(i: number): void
 }
@@ -92,7 +90,6 @@ export class SpecTool implements ISpecTool {
     protected projectId: string
     protected refId: string
 
-    public editorApi: EditingApi = {}
     public isEditing: boolean
     public isEnumeration: boolean
     public inPreviewMode: boolean
@@ -172,13 +169,6 @@ export class SpecTool implements ISpecTool {
 
         this.changeElement()
 
-        this.subs.push(
-            this.eventSvc.$on('element.selected', () => {
-                if (this.edit && this.editorApi.save) {
-                    void this.editorApi.save()
-                }
-            })
-        )
         this.subs.push(this.eventSvc.binding<boolean>('spec.ready', this.changeElement))
         //this.subs.push(this.eventSvc.$on(this.specType, this.initCallback))
     }

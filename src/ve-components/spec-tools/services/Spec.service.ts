@@ -12,13 +12,12 @@ import {
     URLService,
     UserService,
     ViewService,
-    ValueService
+    ValueService,
 } from '@ve-utils/mms-api-client'
 
 import { PropertySpec, veComponents } from '@ve-components'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
-import { EditingApi } from '@ve-types/core/editor'
 import {
     DocumentObject,
     ElementObject,
@@ -52,7 +51,6 @@ export class SpecService implements angular.Injectable<any> {
     private editing: boolean = false
     public editable: boolean
     private keeping: boolean = false
-    private editorApi: EditingApi
 
     public specApi: SpecApi
     public tracker: {
@@ -386,13 +384,6 @@ export class SpecService implements angular.Injectable<any> {
 
     public keepMode = (): void => {
         this.keeping = true
-    }
-
-    public editorSave(): VePromise<boolean> {
-        if (this.edit && this.editorApi.save) {
-            return this.editorApi.save()
-        }
-        return this.$q.resolve(false)
     }
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons

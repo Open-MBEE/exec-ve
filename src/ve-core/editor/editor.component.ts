@@ -195,7 +195,14 @@ export class EditorController implements angular.IComponentController {
     }
 
     $onDestroy(): void {
-        this.editorSvc.remove(this.editKey, `${this.editField}${this.editIndex ? this.editIndex : ''}`)
+        this.update().then(
+            () => {
+                this.editorSvc.remove(this.editKey, `${this.editField}${this.editIndex ? this.editIndex : ''}`)
+            },
+            () => {
+                console.log('Error updating destroyed editor')
+            }
+        )
     }
 
     public startEditor(): void {

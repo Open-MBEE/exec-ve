@@ -5,7 +5,7 @@ import { veUtils } from '@ve-utils'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
-import { EditingToolbar } from '@ve-types/core/editor'
+import { EditorActions } from '@ve-types/core/editor'
 import { VeApiObject } from '@ve-types/view-editor'
 
 const default_buttons: IButtonBarButton[] = [
@@ -114,7 +114,7 @@ export class ButtonBarService {
         })
     }
 
-    getButtonBarButton = (buttonId: string, ctrl?: EditingToolbar): BarButton => {
+    getButtonBarButton = (buttonId: string, ctrl?: EditorActions): BarButton => {
         if (this.buttons.hasOwnProperty(buttonId)) {
             const newButton = new BarButton(buttonId, this.buttons[buttonId])
             if (this.buttons[buttonId].dropdown) {
