@@ -58,7 +58,7 @@ export class InsertionService {
         } else {
             promise = this.$q.resolve(this.elementSvc.cacheElement({
                 refId: toCreate._refId,
-                projectId: toCreate._projectI,
+                projectId: toCreate._projectId,
             }, _.cloneDeep(toCreate)))
         }
 
