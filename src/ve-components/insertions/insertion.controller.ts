@@ -108,7 +108,7 @@ export class Insertion<
             itemsPerPage: 200,
             filterQueryList: [this.queryFilter],
             hideFilterOptions: true,
-            closeable: true,
+            closeable: false,
             closeCallback: this.cancel,
         }
     }
