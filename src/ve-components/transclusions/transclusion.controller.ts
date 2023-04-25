@@ -242,7 +242,7 @@ export class Transclusion implements ITransclusion, EditorActions {
 
         this.cancel = (e?: JQuery.ClickEvent): void => {
             if (e) e.stopPropagation()
-            this.cancelAction()
+            this.cancelAction(false)
         }
 
         this.reset = (e?: JQuery.ClickEvent): void => {
@@ -415,6 +415,7 @@ export class Transclusion implements ITransclusion, EditorActions {
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save', this))
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save-continue', this))
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-cancel', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-refresh', this))
         api.addButton(this.buttonBarSvc.getButtonBarButton('editor-delete', this))
         api.setPermission('editor-delete', this.isDeletable)
     }
