@@ -200,8 +200,8 @@ export class EditorService {
                                                 refId: latest._refId,
                                                 commitId: 'latest',
                                             }
-                                            this.elementSvc.openEdit(latest)
                                             this.elementSvc.cacheElement(reqOb, latest)
+                                            this.resetEdit(this.editSvc.get<T>(editKey), true)
                                         } else if (choice === 'force') {
                                             edit._modified = latest._modified
                                             this._save<T>(editKey, continueEdit).then(
