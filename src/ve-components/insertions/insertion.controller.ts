@@ -216,6 +216,10 @@ export class Insertion<
         this.oking = true
         this.addExisting(data, property)
             .then((finalData) => {
+                if (this.editItem) {
+                    this.editorSvc.cleanUpEdit(this.editItem.key)
+                }
+                this.insertData.isNew = false
                 this.insertResolve(finalData, 'added')
             }, this.insertReject)
             .finally(this.insertFinally)

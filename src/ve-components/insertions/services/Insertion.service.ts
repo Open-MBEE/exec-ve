@@ -8,6 +8,7 @@ import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
+import _ from "lodash";
 
 export class InsertionService {
     static $inject = ['$q', '$timeout', 'growl', 'ElementService', 'EditorService', 'RootScopeService', 'EventService']
@@ -49,9 +50,16 @@ export class InsertionService {
 
         let promise: VePromise<ElementObject>
         if (!noPublish) {
-            promise = this.elementSvc.createFromTemp(toCreate)
+            promise = this.elementSvc.createElement({
+                elements: [toCreate],
+                refId: toCreate._refId,
+                projectId: toCreate._projectId
+            })
         } else {
-            promise = this.$q.resolve(this.elementSvc.cacheTemp(toCreate))
+            promise = this.$q.resolve(this.elementSvc.cacheElement({
+                refId: toCreate._refId,
+                projectId: toCreate._projectId,
+            }, _.cloneDeep(toCreate)))
         }
 
         promise.finally(() => {
@@ -63,7 +71,6 @@ export class InsertionService {
 
     public cancelAction = (cancelledItem: ElementObject): void => {
         this.editorSvc.cleanUpEdit(this.elementSvc.getEditElementKey(cancelledItem))
-        this.elementSvc.deleteTemp(cancelledItem)
     }
 }
 

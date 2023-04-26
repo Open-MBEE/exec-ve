@@ -70,7 +70,7 @@ class CreateTransclusionModalController
 `
 
     protected title: string = 'Insert Cross Reference'
-    protected description: string = 'Begin by searching for or creating an element, then click a field to Transclude.'
+    protected description: string
     protected searchExisting: boolean = true
     protected cf: TransclusionObject
     protected element: ElementObject
@@ -85,7 +85,7 @@ class CreateTransclusionModalController
     protected linkText: string
 
     protected insertApi: InsertApi<ElementObject, VePromiseReason<ElementsResponse<ElementObject>>>
-    protected insertData: InsertData
+    protected insertData: InsertTransclusionData
     protected inserting: boolean = false
     protected insertNew: boolean
 
@@ -122,6 +122,7 @@ class CreateTransclusionModalController
         this.$modalBody = this.$element.find('.modal-body')
         this.$target = $(this.targetTemplate)
         this.viewLink = this.resolve.getInsertData.viewLink
+
         this.insertApi = {
             resolve: (result): void => {
                 this.element = result
@@ -139,7 +140,10 @@ class CreateTransclusionModalController
             },
         }
         this.insertData = this.resolve.getInsertData
-
+        this.description = 'Begin by searching for or creating an element, then click on a result.'
+        if (this.insertData.viewLink) {
+            this.description = 'Begin by searching for a view or presentation, then click on a result.'
+        }
         //Unless Explicitly overridden, don't save a new element until transclusion is created
         if (typeof this.insertData.noPublish === 'undefined') this.insertData.noPublish = true
         this.cf = {
