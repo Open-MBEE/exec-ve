@@ -461,14 +461,8 @@ export class Transclusion implements ITransclusion, EditorActions {
      */
     protected startEdit(cb?: () => void): void {
         if (this.editable() && !this.isEditing) {
-            this.editLoading = true
-            const reqOb = {
-                elementId: this.element.id,
-                projectId: this.element._projectId,
-                refId: this.element._refId,
-            }
-            this.elementSvc
-                .getElementForEdit(reqOb)
+            this.editorSvc
+                .openEdit(this.element)
                 .then(
                     (data) => {
                         this.isEditing = true
@@ -574,63 +568,70 @@ export class Transclusion implements ITransclusion, EditorActions {
         //     }
         //     return this.$q.resolve<boolean>(true)
         // }
-        this.editorSvc.updateEditor(this.edit.key, this.cfField).then(
-            (success) => {
-                // Only need to confirm the cancellation if edits have been made:
-                if (!success) {
-                    this.editorSvc.handleError({
-                        message: 'Problem Saving from Editor',
-                        type: 'warning',
-                    })
-                }
-                const cancelCleanUp = (): void => {
-                    if (continueEdit)
-                        this.editorSvc.resetEdit(this.edit, continueEdit).then(
-                            (edit) => {
-                                this.edit = edit
+        if (continueEdit) {
+            this.cleanUpAction()
+            this.editorSvc
+                .openEdit(this.element)
+                .then(
+                    (edit) => {
+                        this.edit = edit
+                    },
+                    (reason) => {
+                        this.growl.error(reason.message)
+                    }
+                )
+                .finally(() => {
+                    if (this.bbApi) {
+                        this.bbApi.toggleButtonSpinner('editor-cancel')
+                    }
+                })
+        } else {
+            this.editorSvc
+                .updateEditor(this.edit.key, this.cfField)
+                .then(
+                    (success) => {
+                        // Only need to confirm the cancellation if edits have been made:
+                        if (!success) {
+                            this.editorSvc.handleError({
+                                message: 'Problem Saving from Editor',
+                                type: 'warning',
+                            })
+                        }
+                        this.editorSvc.hasEdits(this.edit, this.cfField).then(
+                            (hasEdits) => {
+                                if (hasEdits) {
+                                    this.editorSvc.deleteEditModal(this.edit).result.then(
+                                        (result) => {
+                                            if (result) {
+                                                this.cleanUpAction()
+                                            }
+                                        },
+                                        () => {
+                                            //Do Nothing if user wants to keep working
+                                        }
+                                    )
+                                } else {
+                                    this.cleanUpAction()
+                                }
                             },
-                            (reason) => {
-                                this.growl.error(reason.message)
+                            () => {
+                                this.cleanUpAction()
                             }
                         )
-                    else this.cleanUpAction()
-                }
-                this.editorSvc
-                    .hasEdits(this.edit, this.cfField)
-                    .then(
-                        (hasEdits) => {
-                            if (hasEdits) {
-                                this.editorSvc.deleteEditModal(this.edit).result.then(
-                                    (result) => {
-                                        if (result) {
-                                            cancelCleanUp()
-                                        }
-                                    },
-                                    () => {
-                                        //Do Nothing if user wants to keep working
-                                    }
-                                )
-                            } else {
-                                cancelCleanUp()
-                            }
-                        },
-                        () => {
-                            cancelCleanUp()
-                        }
-                    )
-                    .finally(() => {
-                        if (this.bbApi) {
-                            this.bbApi.toggleButtonSpinner('editor-cancel')
-                        }
-                    })
-            },
-            () => {
-                this.editorSvc.handleError({
-                    message: 'Error Saving from Editor; Please Retry',
-                    type: 'error',
+                    },
+                    () => {
+                        this.editorSvc.handleError({
+                            message: 'Error Saving from Editor; Please Retry',
+                            type: 'error',
+                        })
+                    }
+                )
+                .finally(() => {
+                    if (this.bbApi) {
+                        this.bbApi.toggleButtonSpinner('editor-cancel')
+                    }
                 })
-            }
-        )
+        }
     }
 
     public previewAction(): void {

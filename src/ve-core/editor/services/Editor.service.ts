@@ -303,39 +303,29 @@ export class EditorService {
     }
 
     /**
-     * @name Utils#revertEdits
+     * @name Utils#openEdit
      * reset back to base element or remove editor object
      *
-     * @param {object} editOb scope with common properties
-     * @param {boolean} continueEdit boolean to re-check out a clean copy
+     * @param {object} elementOb scope with common properties
      */
-    public resetEdit(
-        editOb: EditObject,
-        continueEdit?: boolean
-    ): VePromise<EditObject, ElementsResponse<ElementObject>> {
+    public openEdit(elementOb: ElementObject): VePromise<EditObject, ElementsResponse<ElementObject>> {
         return new this.$q((resolve, reject) => {
-            if (continueEdit) {
-                const reqOb = {
-                    elementId: editOb.element.id,
-                    projectId: editOb.element._projectId,
-                    refId: editOb.element._refId,
-                }
-                this.cleanUpEdit(editOb.key)
-                this.elementSvc.getElementForEdit(reqOb).then(
-                    (edit) => {
-                        if (this.valueSvc.isValue(edit.element)) {
-                            edit.values = this.valueSvc.getValues(edit.element)
-                        }
-                        resolve(edit)
-                    },
-                    (reason) => {
-                        reject(reason)
-                    }
-                )
-            } else {
-                this.cleanUpEdit(editOb.key)
-                resolve()
+            const reqOb = {
+                elementId: elementOb.id,
+                projectId: elementOb._projectId,
+                refId: elementOb._refId,
             }
+            this.elementSvc.getElementForEdit(reqOb).then(
+                (edit) => {
+                    if (this.valueSvc.isValue(edit.element)) {
+                        edit.values = this.valueSvc.getValues(edit.element)
+                    }
+                    resolve(edit)
+                },
+                (reason) => {
+                    reject(reason)
+                }
+            )
         })
     }
 
