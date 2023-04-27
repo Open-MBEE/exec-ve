@@ -226,8 +226,8 @@ export class EditorController implements angular.IComponentController {
         if (this.editKey) {
             // Configuration for autosave plugin
             this.instance.config.autosave = {
-                SaveKey: `${Array.isArray(this.editKey) ? this.editKey.join('|') : this.editKey}${this.editField}${
-                    this.editIndex ? this.editIndex : ''
+                SaveKey: `${Array.isArray(this.editKey) ? this.editKey.join('|') : this.editKey}|${this.editField}${
+                    this.editIndex ? '|' + this.editIndex : ''
                 }`,
                 delay: 5,
                 NotOlderThen: 7200, // 5 days in minutes

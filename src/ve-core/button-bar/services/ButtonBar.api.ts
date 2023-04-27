@@ -76,6 +76,7 @@ export class ButtonBarApi {
     public toggleButtonSpinner = (id: string): void => {
         this.buttons.forEach((button) => {
             if (button.id === id) button.toggleSpin()
+            else button.toggleLock()
         })
     }
 

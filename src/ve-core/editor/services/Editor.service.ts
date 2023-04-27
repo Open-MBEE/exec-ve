@@ -99,10 +99,7 @@ export class EditorService {
         editor.focusManager.focus(element)
     }
 
-    public save = (
-        editKey: string | string[],
-        continueEdit: boolean
-    ): VePromise<void, ElementsResponse<ElementObject>> => {
+    public save = (editKey: string | string[], continueEdit: boolean): VePromise<ElementObject> => {
         this.eventSvc.$broadcast('element-saving', true)
 
         return new this.$q((resolve, reject) => {
@@ -115,7 +112,7 @@ export class EditorService {
                         this.growl.success('Save Successful')
                     }
 
-                    resolve()
+                    resolve(data)
                 },
                 (reason) => {
                     this.eventSvc.$broadcast('element-saving', false)
@@ -178,14 +175,13 @@ export class EditorService {
                     const edit = this.editSvc.get<T>(editKey).element
                     this.elementSvc.updateElement(edit, false, true).then(
                         (element: T) => {
-                            resolve(element)
                             const data = {
                                 element: element,
                                 continueEdit: continueEdit ? continueEdit : false,
                             }
                             this.eventSvc.$broadcast('element.updated', data)
-                            if (continueEdit) return
                             this.cleanUpEdit(editKey)
+                            resolve(element)
                         },
                         (reason: VePromiseReason<ElementsResponse<T>>) => {
                             if (reason.status === 409) {
@@ -200,8 +196,8 @@ export class EditorService {
                                                 refId: latest._refId,
                                                 commitId: 'latest',
                                             }
-                                            this.elementSvc.cacheElement(reqOb, latest)
-                                            this.resetEdit(this.editSvc.get<T>(editKey), true)
+                                            this.cleanUpEdit(editKey)
+                                            resolve(this.elementSvc.cacheElement(reqOb, latest))
                                         } else if (choice === 'force') {
                                             edit._modified = latest._modified
                                             this._save<T>(editKey, continueEdit).then(
@@ -336,9 +332,9 @@ export class EditorService {
         this.eventSvc.$broadcast('editor.close')
     }
 
-    public clearAutosave = (key: string | string[]): void => {
+    public clearAutosave = (key: string | string[], field?: string): void => {
         key = this.editSvc.makeKey(key)
-
+        if (field) key = key + '_' + field
         Object.keys(window.localStorage).forEach((akey) => {
             if (akey.indexOf(key as string) !== -1) {
                 window.localStorage.removeItem(akey)

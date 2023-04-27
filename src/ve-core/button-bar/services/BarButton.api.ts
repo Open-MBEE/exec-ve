@@ -42,6 +42,7 @@ export class BarButton {
     toggled: boolean = false
     dropdown_toggled: boolean = false
     spinner: boolean = false
+    locked: boolean = false
 
     //Toggle Configuration
 
@@ -114,5 +115,9 @@ export class BarButton {
             this.icon = 'fa fa-spinner fa-spin'
         }
         this.spinner = !this.spinner
+    }
+
+    public toggleLock = (): void => {
+        this.locked = !this.locked
     }
 }
