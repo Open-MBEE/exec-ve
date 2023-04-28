@@ -95,7 +95,6 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         </div>
     </div>
     <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.includes('TaggedValue')">
-        <h2 class="prop-title spec-view-value-heading">Property Value</h2>
         <div ng-if="!$ctrl.propertySpec.isEnumeration">
             <div ng-if="$ctrl.editValues.length == 0">
                 <select ng-model="$ctrl.addValueType" ng-options="key for (key, value) in $ctrl.valueSvc.addValueTypes"></select>

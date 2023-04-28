@@ -275,7 +275,7 @@ class ToolsController {
                         this.specSvc.toggleSave(this.toolbarId)
                     }
                 }
-                this.editorSvc.hasEdits(this.edit).then(
+                this.editorSvc.hasEdits(this.specSvc.getEdits()).then(
                     (hasEdits) => {
                         if (hasEdits) {
                             this.editorSvc.deleteEditModal(this.edit).result.then(

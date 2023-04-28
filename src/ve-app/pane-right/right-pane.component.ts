@@ -240,7 +240,7 @@ const RightPaneComponent: VeComponentOptions = {
     selector: 'rightPane',
     template: `
     <div class="pane-right">
-    <div ng-if="$ctrl.specSvc.getEditing()" class="container-fluid">        
+    <div ng-if="$ctrl.specSvc.getEditing()" style="padding-top: 10px" >        
         <form class="form-horizontal">
             <div class="form-group">
                 <label class="col-sm-3 control-label">Edits ({{$ctrl.openEdits}}):</label>
