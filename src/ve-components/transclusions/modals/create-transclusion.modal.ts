@@ -128,7 +128,6 @@ class CreateTransclusionModalController
                 this.element = result
                 this.insertData.selected = result
                 this.selectOptions()
-                //TODO need to clean up any previously created element
             },
             reject: (reason): void => {
                 if (reason.status !== 444) {
@@ -136,7 +135,6 @@ class CreateTransclusionModalController
                 }
                 this.element = null
                 this.cancel()
-                //TODO need to clean up any previously created element
             },
         }
         this.insertData = this.resolve.getInsertData

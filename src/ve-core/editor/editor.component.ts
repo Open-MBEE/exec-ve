@@ -407,7 +407,7 @@ export class EditorController implements angular.IComponentController {
                     this.uRLSvc.getPutArtifactsURL({
                         projectId: this.mmsProjectId,
                         refId: this.mmsRefId,
-                        elementId: this.apiSvc.createUniqueId().replace('MMS', 'VE'),
+                        elementId: this.apiSvc.createUniqueId().replace('MMS', '_hidden_image'),
                     }),
                     true
                 )
@@ -625,11 +625,11 @@ export class EditorController implements angular.IComponentController {
         cInstance.result.then(
             (data) => {
                 const tag =
-                    '<view-cf mms-cf-type="com" mms-element-id="' +
+                    '<mms-cf mms-cf-type="com" mms-element-id="' +
                     data.id +
                     '">comment:' +
                     data._creator +
-                    '</view-cf>'
+                    '</mms-cf>'
                 this._addWidgetTag(tag, editor)
             },
             (reason) => {

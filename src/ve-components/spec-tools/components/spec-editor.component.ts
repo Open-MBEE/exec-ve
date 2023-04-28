@@ -17,8 +17,9 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import {ElementObject} from "@ve-types/mms";
+import { VeComponentOptions, VePromiseReason, VeQService } from '@ve-types/angular'
+import { ElementObject, ElementsResponse } from "@ve-types/mms";
+import { EditorService } from "@ve-core/editor";
 
 /**
  * @ngdoc directive
@@ -88,9 +89,10 @@ import {ElementObject} from "@ve-types/mms";
  */
 
 class SpecEditorController extends SpecTool implements ISpecTool {
-    static $inject = [...SpecTool.$inject, 'EditService', 'ValueService']
+    static $inject = [...SpecTool.$inject, 'EditService', 'ValueService', 'EditorService']
 
     private isValue: boolean
+
     constructor(
         $q: VeQService,
         $scope: angular.IScope,
@@ -108,7 +110,8 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         specSvc: SpecService,
         toolbarSvc: ToolbarService,
         private autosaveSvc: EditService,
-        private valueSvc: ValueService
+        private valueSvc: ValueService,
+        private editorSvc: EditorService
     ) {
         super(
             $q,
@@ -141,8 +144,8 @@ class SpecEditorController extends SpecTool implements ISpecTool {
 
     initCallback = (): void => {
         this.specSvc.setEditing(true)
-        const editOb = this.specSvc.getEdits()
-        if (editOb) {
+        const e = this.specSvc.getElement()
+        this.editorSvc.openEdit(e).then((editOb) => {
             this.specSvc.tracker.etrackerSelected = editOb.key
             this.specSvc.toggleSave(this.toolbarId)
             this.elementSvc.isCacheOutdated(editOb.element).then(
@@ -159,11 +162,13 @@ class SpecEditorController extends SpecTool implements ISpecTool {
                 }
             )
             this.edit = editOb
+            this.specSvc.setEdits(editOb)
             this.isValue = this.valueSvc.isValue(editOb.element)
-        }
+        }, (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
+            this.growl.error(reason.message)
+        })
     }
 }
-
 const SpecEditorComponent: VeComponentOptions = {
     selector: 'specEditor',
     template: `

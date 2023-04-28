@@ -18,11 +18,11 @@ export class TransclusionService {
         nonEditable?: boolean,
         addProjectandRef?: boolean
     ): string => {
-        return `<view-cf mms-cf-type="${cfType}" mms-element-id="${element.id}"
+        return `<mms-cf mms-cf-type="${cfType}" mms-element-id="${element.id}"
                   ${addProjectandRef ? ` mms-project-id="${element._projectId}"` : ''}
                   ${addProjectandRef ? ` mms-ref-id="${element._refId}"` : ''}
                   ${addProjectandRef && element._commitId ? ` mms-commit-id="${element._commitId}"` : ''}
-                  ${nonEditable ? ' non-editable="true"' : ''}>[cf:${element.name}.${cfType}]</view-cf>`
+                  ${nonEditable ? ' non-editable="true"' : ''}>[cf:${element.name}.${cfType}]</mms-cf>`
     }
 
     public createViewLink = (elem: ViewObject, linkType: number, linkText?: string): string => {
@@ -66,7 +66,7 @@ export class TransclusionService {
         linkType: number,
         linkText?: string
     ): string => {
-        let tag = '<view-link'
+        let tag = '<mms-view-link'
         if (did) {
             tag += ' mms-doc-id="' + did + '"'
         }
@@ -91,7 +91,7 @@ export class TransclusionService {
             tag += ' suppress-numbering="false"'
             tag += ' show-name="true"'
         }
-        tag += '>[cf:' + elem.name + '.vlink]</view-link>'
+        tag += '>[cf:' + elem.name + '.vlink]</mms-view-link>'
         return tag
     }
 }
