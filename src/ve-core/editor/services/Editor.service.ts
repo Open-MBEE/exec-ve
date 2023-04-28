@@ -334,7 +334,7 @@ export class EditorService {
 
     public clearAutosave = (key: string | string[], field?: string): void => {
         key = this.editSvc.makeKey(key)
-        if (field) key = key + '_' + field
+        if (field) key = key + '|' + field
         Object.keys(window.localStorage).forEach((akey) => {
             if (akey.indexOf(key as string) !== -1) {
                 window.localStorage.removeItem(akey)

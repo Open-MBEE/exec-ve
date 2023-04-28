@@ -396,41 +396,41 @@ export class EditorController implements angular.IComponentController {
             31
         ) //priority is after indent list plugin's event handler
 
-        this.instance.on('fileUploadRequest', (e: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) =>
-            this._waitForEditor((evt) => {
-                const fileLoader = evt.data.fileLoader
-                const formData = new FormData()
-                const xhr = fileLoader.xhr
+        this.instance.on('fileUploadRequest', (e: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) => {
+            //this._waitForEditor((evt) => {
+            const fileLoader = e.data.fileLoader
+            const formData = new FormData()
+            const xhr = fileLoader.xhr
 
-                xhr.open(
-                    'POST',
-                    this.uRLSvc.getPutArtifactsURL({
-                        projectId: this.mmsProjectId,
-                        refId: this.mmsRefId,
-                        elementId: this.apiSvc.createUniqueId().replace('MMS', '_hidden_image'),
-                    }),
-                    true
-                )
-                //xhr.withCredentials = true;
-                xhr.setRequestHeader('Authorization', this.uRLSvc.getAuthorizationHeaderValue())
-                formData.append('file', fileLoader.file, fileLoader.fileName)
-                if (fileLoader.fileName) {
-                    formData.append('name', fileLoader.fileName)
-                }
+            xhr.open(
+                'POST',
+                this.uRLSvc.getPutArtifactsURL({
+                    projectId: this.mmsProjectId,
+                    refId: this.mmsRefId,
+                    elementId: this.apiSvc.createUniqueId().replace('MMS', '_hidden_image'),
+                }),
+                true
+            )
+            //xhr.withCredentials = true;
+            xhr.setRequestHeader('Authorization', this.uRLSvc.getAuthorizationHeaderValue())
+            formData.append('file', fileLoader.file, fileLoader.fileName)
+            if (fileLoader.fileName) {
+                formData.append('name', fileLoader.fileName)
+            }
 
-                fileLoader.xhr.send(formData)
+            fileLoader.xhr.send(formData)
 
-                // Prevented the default behavior.
-                evt.stop()
-            }, e)
-        )
+            // Prevented the default behavior.
+            e.stop()
+            //}, e)
+        })
         this.instance.on('fileUploadResponse', (e: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) => {
-            this._waitForEditor((evt) => {
+            //this._waitForEditor((evt) => {
                 // Prevent the default response handler.
-                evt.stop()
+                e.stop()
 
                 // Get XHR and response.
-                const data = evt.data
+                const data = e.data
                 const xhr = data.fileLoader.xhr
                 const response: ElementsResponse<ElementObject> = JSON.parse(
                     xhr.response as string
@@ -444,7 +444,7 @@ export class EditorController implements angular.IComponentController {
                 ) {
                     // An error occurred during upload.
                     //data.message = response[ 1 ];
-                    evt.cancel()
+                    e.cancel()
                 } else {
                     //TODO does this need to be smarter?
                     const element = response.elements[0]
@@ -455,7 +455,7 @@ export class EditorController implements angular.IComponentController {
                         artifactExtension: element._artifacts[0].extension,
                     })
                 }
-            }, e)
+            //}, e)
         })
     }
 
