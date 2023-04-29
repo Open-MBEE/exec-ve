@@ -1,9 +1,6 @@
 /* VE base styles */
 @use "src/styles/globals";
 
-/* Bootstrap */
-@use "src/styles/third-party/bootstrap/mixins/buttons";
-
 // /*************************
 //   Button variables that make Bootstrap
 //   conform to the MMS app design guide
@@ -21,12 +18,12 @@
 }
 
 .btn-secondary {
-  @include buttons.button-variant(globals.$brand-base, globals.$white, globals.$white);
+  @include button-variant(globals.$brand-base, globals.$white, globals.$white);
 }
 
 // Toolbar button style
 .btn-tools {
-  @include buttons.button-variant(globals.$base-grey, globals.$white, globals.$white);
+  @include button-variant(globals.$base-grey, globals.$white, globals.$white);
 
   .fa,
   .fa-solid,

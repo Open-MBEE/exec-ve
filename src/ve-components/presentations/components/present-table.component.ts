@@ -613,7 +613,7 @@ class PresentTableController extends Presentation {
 const PresentTableComponent: IPresentationComponentOptions = {
     selector: 'presentTable',
     template: `
-    <div class="tableSearch ve-table-filter">
+    <div class="table-search ve-table-filter">
     <button class="btn btn-sm export-csv-button btn-default" ng-click="$ctrl.makeCsv()">Export CSV</button> 
     <button class="btn btn-sm filter-table-button btn-default" ng-click="$ctrl.showFilter = !$ctrl.showFilter">Filter table</button> 
     <label class="btn btn-sm btn-default table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="$ctrl.fixedHeaders" ng-change="$ctrl.makeFixedHeader()" /> Freeze Headers</label> 

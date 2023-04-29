@@ -1,8 +1,7 @@
 /* VE base styles */
 @use "src/styles/globals";
 
-/* Bootstrap */
-@use "src/styles/third-party/bootstrap";
+/* SASS Libraries */
 @use "sass:color";
 
 /* Stylesheet for transclusion-related elements */
@@ -270,7 +269,7 @@ transclude-img img {
 // Transclude edit panel buttons
 .transclude-panel-toolbar {
   .btn-tools {
-    @include bootstrap.button-variant(globals.$base-grey, globals.$quaternary-grey, globals.$quaternary-grey);
+    @include button-variant(globals.$base-grey, globals.$quaternary-grey, globals.$quaternary-grey);
 
     &:not(.dropdown-toggle) .fa .fa-solid .fa-regular {
       padding-right: 0;

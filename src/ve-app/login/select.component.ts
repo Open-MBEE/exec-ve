@@ -229,7 +229,7 @@ const SelectComponent: VeComponentOptions = {
                             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                                 aria-labelledby="org-btn-keyboard-nav">
                                 <li ng-repeat="org in $ctrl.orgs | orderBy: 'name'" ng-click="$ctrl.selectOrg(org)"
-                                    ng-class="{'checked-list-item': org.name === $ctrl.selectedOrg}">{{ org.name }}
+                                    ng-class="{'checked-list-item': org.name === $ctrl.selectedOrg, 'dropdown-item': true}">{{ org.name }}
                                 </li>
                             </ul>
                         </div>

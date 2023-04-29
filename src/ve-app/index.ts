@@ -6,7 +6,7 @@
 
 import 'angular'
 import 'lodash'
-import 'angular-ui-bootstrap'
+import 'ui-bootstrap4'
 import 'rx-lite'
 import 'flatpickr'
 

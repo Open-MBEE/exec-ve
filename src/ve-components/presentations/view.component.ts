@@ -391,7 +391,7 @@ export const ViewComponent: VeComponentOptions = {
             </h1>
         </div>
         <div ng-if="$ctrl.mmsLink" class="view-title">
-          <view-link ng-class="{'docTitle-underlined': $ctrl.isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
+          <view-link ng-class="{'doc-title-underlined': $ctrl.isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
           <view-link class="open-document" ng-mouseover="$ctrl.hoverIn()" ng-mouseleave="$ctrl.hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
             link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
         </div>

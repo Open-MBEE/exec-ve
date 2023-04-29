@@ -1,3 +1,6 @@
+/* Important VE Variables */
+@use "globals";
+
 /* Import Third-Party CSS/SASS */
 @import "~angular-hotkeys/src/hotkeys.css";
 @import "~angular-growl-v2/src/growl.css";
@@ -5,10 +8,17 @@
 @import "~@openmbee/pane-layout/styles/styles.css";
 
 /* Local Bootstrap */
-@import "third-party/bootstrap-main";
+$enable-gradients: true;
+$theme-colors: (
+  "primary": globals.$brand-base,
+  "warning": globals.$ve-warning
+);
+$enable-caret: false;
+
+@import "~bootstrap/scss/bootstrap";
 
 /* Import VE Directive Styles */
-@import "ve-components/ve-components-main";
+@import "ve-components";
 
 /* Import VE APP Styles */
-@import "ve-app/ve-app-main";
+@import "ve-app";

@@ -1,9 +1,6 @@
 /* VE base styles */
 @use "src/styles/globals";
 
-/* Third-party */
-@use "../../third-party/bootstrap";
-
 /* ------------------------------------------------------------------
 [Table of contents]
 
@@ -69,7 +66,7 @@
     &,
     &:hover,
     &:focus {
-      color: bootstrap.$dropdown-link-disabled-color;
+      color: $dropdown-link-disabled-color;
     }
 
     // Nuke hover/focus effects
@@ -78,10 +75,7 @@
       text-decoration: none;
       background-color: transparent;
       background-image: none; // Remove CSS gradient
-
-      @include bootstrap.reset-filter;
-
-      cursor: bootstrap.$cursor-disabled;
+      cursor: not-allowed;
     }
   }
 
@@ -147,7 +141,8 @@
     overflow-x: hidden;
     overflow-y: auto;
 
-    & li {
+    li.dropdown-item {
+      color: white;
       padding: 6px 8px;
       word-wrap: normal;
       width: 100%;
@@ -158,6 +153,7 @@
 
       &:hover {
         background-color: globals.$ve-slate-lighter-2;
+        color: globals.$ve-slate-darker-2;
       }
 
       &.divider {
@@ -199,7 +195,7 @@
   }
 
   .dropdown-menu.list-with-selected-item {
-    li {
+    li.dropdown-item {
       /* When a list item is selected, include a check mark before it. Add additional padding to these lists */
       padding-left: 30px;
 

@@ -2,7 +2,6 @@
 @use "src/styles/globals";
 
 /* Dependencies */
-@use "src/styles/third-party/bootstrap";
 @use "sass:color";
 
 .mms-search {
@@ -289,7 +288,7 @@
   }
 
   .ve-btn-group-default {
-    @include bootstrap.button-variant(globals.$ve-light-text, globals.$white, globals.$ve-silver-darker-2);
+    @include button-variant(globals.$ve-light-text, globals.$white, globals.$ve-silver-darker-2);
 
     text-transform: initial;
     letter-spacing: normal;

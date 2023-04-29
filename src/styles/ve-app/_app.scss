@@ -1,28 +1,4 @@
-/*************************
-  Main combinator file for
-  View Editor stylesheets
-*************************/
-
-/* VE base styles */
 @use "../globals";
-
-/* Overall page design */
-@use "layout/pane-left";
-@use "layout/pane-center";
-@use "layout/pane-right";
-@use "layout/panes";
-@use "layout/login-select";
-
-/* Layout directive customizations */
-@use "layout/ve-nav";
-@use "layout/ve-footer";
-@use "layout/ve-no-panes";
-@use "layout/ve-table-filter";
-@use "layout/ve-tabs";
-@use "layout/ve-dropdowns";
-
-/* Third party customizations */
-@use "thirdparty/autosave-plugin";
 
 .ng-hide {
   display: none !important;
@@ -327,7 +303,7 @@ i.section-icon {
 3. Table Filtering & Sorting
 ------------------------------------------------------------------- */
 
-.tableSearch > span {
+.table-search > span {
   display: block;
 }
 
@@ -581,7 +557,7 @@ table caption {
   padding-right: 6px;
 }
 
-.docTitle-underlined {
+.doc-title-underlined {
   text-decoration: underline;
   text-decoration-color: rgb(72 133 189);
 }
@@ -666,7 +642,7 @@ span.inline-btn-label {
 10. Custom grids
 ------------------------------------------------------------------- */
 
-//Grid with narrower gutter so input can be wider
+// Grid with narrower gutter so input can be wider
 .row.narrow-gutter-row {
   margin-left: -3px;
   margin-right: -3px;
