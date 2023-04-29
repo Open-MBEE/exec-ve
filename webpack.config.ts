@@ -185,7 +185,7 @@ const config = (env: any, argv: ArgV): Configuration => ({
         path: path.resolve(__dirname, 'dist'),
         filename: 'js/[name].bundle.js',
         assetModuleFilename: '[name][ext]',
-        publicPath: '/',
+        publicPath: '',
     },
     watch: true,
     resolve: {
