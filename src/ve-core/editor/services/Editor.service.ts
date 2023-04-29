@@ -15,7 +15,7 @@ import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-typ
 
 export class EditorService {
     public generatedIds: number = 0
-    private edit2editor: { [editKey: string]: { [field: string]: () => VePromise<void, string> } } = {}
+    private edit2editor: { [editKey: string]: { [field: string]: () => VePromise<boolean, string> } } = {}
     public savingAll: boolean = false
 
     static $inject = [
@@ -52,7 +52,7 @@ export class EditorService {
         private editSvc: EditService
     ) {}
 
-    public get(editKey: string): { [field: string]: () => VePromise<void, string> } {
+    public get(editKey: string): { [field: string]: () => VePromise<boolean, string> } {
         return this.edit2editor[editKey]
     }
 
@@ -60,7 +60,7 @@ export class EditorService {
         const key: string = this.editSvc.makeKey(editKey)
         return new this.$q<void, BasicResponse<MmsObject>>((resolve, reject) => {
             if (this.edit2editor[key]) {
-                const promises: VePromise<void, string>[] = []
+                const promises: VePromise<boolean, string>[] = []
                 for (const id of Object.keys(this.edit2editor[key])) {
                     promises.push(this.edit2editor[key][id]())
                 }
@@ -73,7 +73,7 @@ export class EditorService {
         })
     }
 
-    public add(editKey: string | string[], field: string, updateFn: () => VePromise<void, string>): void {
+    public add(editKey: string | string[], field: string, updateFn: () => VePromise<boolean, string>): void {
         editKey = this.editSvc.makeKey(editKey)
         if (!this.edit2editor[editKey]) this.edit2editor[editKey] = {}
         this.edit2editor[editKey][field] = updateFn
@@ -99,10 +99,7 @@ export class EditorService {
         editor.focusManager.focus(element)
     }
 
-    public save = (
-        editKey: string | string[],
-        continueEdit: boolean
-    ): VePromise<void, ElementsResponse<ElementObject>> => {
+    public save = (editKey: string | string[], continueEdit: boolean): VePromise<ElementObject> => {
         this.eventSvc.$broadcast('element-saving', true)
 
         return new this.$q((resolve, reject) => {
@@ -115,7 +112,7 @@ export class EditorService {
                         this.growl.success('Save Successful')
                     }
 
-                    resolve()
+                    resolve(data)
                 },
                 (reason) => {
                     this.eventSvc.$broadcast('element-saving', false)
@@ -178,14 +175,13 @@ export class EditorService {
                     const edit = this.editSvc.get<T>(editKey).element
                     this.elementSvc.updateElement(edit, false, true).then(
                         (element: T) => {
-                            resolve(element)
                             const data = {
                                 element: element,
                                 continueEdit: continueEdit ? continueEdit : false,
                             }
                             this.eventSvc.$broadcast('element.updated', data)
-                            if (continueEdit) return
                             this.cleanUpEdit(editKey)
+                            resolve(element)
                         },
                         (reason: VePromiseReason<ElementsResponse<T>>) => {
                             if (reason.status === 409) {
@@ -200,8 +196,8 @@ export class EditorService {
                                                 refId: latest._refId,
                                                 commitId: 'latest',
                                             }
-                                            this.elementSvc.openEdit(latest)
-                                            this.elementSvc.cacheElement(reqOb, latest)
+                                            this.cleanUpEdit(editKey)
+                                            resolve(this.elementSvc.cacheElement(reqOb, latest))
                                         } else if (choice === 'force') {
                                             edit._modified = latest._modified
                                             this._save<T>(editKey, continueEdit).then(
@@ -303,39 +299,29 @@ export class EditorService {
     }
 
     /**
-     * @name Utils#revertEdits
+     * @name Utils#openEdit
      * reset back to base element or remove editor object
      *
-     * @param {object} editOb scope with common properties
-     * @param {boolean} continueEdit boolean to re-check out a clean copy
+     * @param {object} elementOb scope with common properties
      */
-    public resetEdit(
-        editOb: EditObject,
-        continueEdit?: boolean
-    ): VePromise<EditObject, ElementsResponse<ElementObject>> {
+    public openEdit(elementOb: ElementObject): VePromise<EditObject, ElementsResponse<ElementObject>> {
         return new this.$q((resolve, reject) => {
-            if (continueEdit) {
-                const reqOb = {
-                    elementId: editOb.element.id,
-                    projectId: editOb.element._projectId,
-                    refId: editOb.element._refId,
-                }
-                this.cleanUpEdit(editOb.key)
-                this.elementSvc.getElementForEdit(reqOb).then(
-                    (edit) => {
-                        if (this.valueSvc.isValue(edit.element)) {
-                            edit.values = this.valueSvc.getValues(edit.element)
-                        }
-                        resolve(edit)
-                    },
-                    (reason) => {
-                        reject(reason)
-                    }
-                )
-            } else {
-                this.cleanUpEdit(editOb.key)
-                resolve()
+            const reqOb = {
+                elementId: elementOb.id,
+                projectId: elementOb._projectId,
+                refId: elementOb._refId,
             }
+            this.elementSvc.getElementForEdit(reqOb).then(
+                (edit) => {
+                    if (this.valueSvc.isValue(edit.element)) {
+                        edit.values = this.valueSvc.getValues(edit.element)
+                    }
+                    resolve(edit)
+                },
+                (reason) => {
+                    reject(reason)
+                }
+            )
         })
     }
 
@@ -346,9 +332,9 @@ export class EditorService {
         this.eventSvc.$broadcast('editor.close')
     }
 
-    public clearAutosave = (key: string | string[]): void => {
+    public clearAutosave = (key: string | string[], field?: string): void => {
         key = this.editSvc.makeKey(key)
-
+        if (field) key = key + '|' + field
         Object.keys(window.localStorage).forEach((akey) => {
             if (akey.indexOf(key as string) !== -1) {
                 window.localStorage.removeItem(akey)
@@ -372,7 +358,7 @@ export class EditorService {
             if (this.edit2editor[editKey] && this.edit2editor[editKey][field]) {
                 this.edit2editor[editKey][field]().then(resolve, reject)
             } else {
-                resolve() // continue for non ckeditor transcludes
+                resolve(true) // continue for non ckeditor transcludes
             }
         })
     }

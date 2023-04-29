@@ -62,16 +62,8 @@ export class CrossReferenceController implements IComponentController {
         private extensionSvc: ExtensionService
     ) {}
 
-    $onChanges(onChangesObj: angular.IOnChangesObject): void {
-        if (!this.clearWatch) {
-            handleChange(onChangesObj, 'mmsElementId', this.changeAction)
-            handleChange(onChangesObj, 'mmsCommitId', this.changeAction)
-        }
-    }
-
-    $postLink(): void {
-        //this.$transcludeEl = $(this.$element.children()[0]);
-        this.changeAction(this.mmsElementId, '', false)
+    $onInit(): void {
+        this.changeAction()
     }
 
     //INFO this was this.getWsAndVersion
@@ -83,14 +75,7 @@ export class CrossReferenceController implements IComponentController {
         }
     }
 
-    private changeAction = (newVal, oldVal, firstChange): void => {
-        if (this.clearWatch || !newVal || firstChange) {
-            return
-        }
-        if (!this.mmsWatchId && newVal) {
-            this.clearWatch = true
-        }
-
+    private changeAction = (): void => {
         let projectId = this.mmsProjectId
         let refId = this.mmsRefId
         let commitId = this.mmsCommitId
@@ -155,7 +140,7 @@ const ViewCfComponent: VeComponentOptions = {
         mmsCfLabel: '@',
     },
     require: {
-        transclusionCtrl: '?^^transclusion',
+        transclusionCtrl: '?^^transclusion', //TODO this will never have anything?
         mmsViewCtrl: '?^^view',
     },
     controller: CrossReferenceController,

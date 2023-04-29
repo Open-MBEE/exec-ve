@@ -1,6 +1,6 @@
 (function () {
 
-    $.ajax("/config/config.json", {
+    $.ajax("config/config.json", {
         async: false,
         global: false,
         dataType: "json",

@@ -44,32 +44,7 @@ import {PresentationService} from "@ve-components/presentations";
  */
 export class TranscludeSectionController extends DeletableTransclusion implements ITransclusion {
     showNumbering: boolean
-    defaultTemplate = `
- <div ng-if="$ctrl.element.specification">
-    <div ng-show="!$ctrl.isEditing">
-        <h1 class="section-title h{{$ctrl.level}}">
-            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.element._veNumber}}</span> {{$ctrl.element.name}}
-        </h1>
-    </div>
-    <div ng-class="{'panel panel-default' : $ctrl.isEditing}">
-        <div ng-show="$ctrl.isEditing" class="panel-heading clearfix no-print">
-            <h3 class="panel-title pull-left">
-                <div ng-class="{prop: $ctrl.isEditing}"><input class="form-control" type="text" ng-model="$ctrl.edit.element.name"/></div>
-            </h3>
-            <div class="btn-group pull-right" ng-hide="$ctrl.editLoading">
-                <button-bar class="transclude-panel-toolbar" button-id="$ctrl.bbId"></button-bar>
-            </div>
-        </div>
-        <div ng-class="{'panel-body' : $ctrl.isEditing}">
-            <add-pe-menu mms-view="$ctrl.section" index="-1" class="add-pe-button-container no-print"></add-pe-menu>
-            <div ng-repeat="instanceVal in $ctrl.element.specification.operand track by instanceVal.instanceId">
-                <view-pe mms-instance-val="instanceVal" mms-parent-section="$ctrl.element"></view-pe>
-                <add-pe-menu mms-view="$ctrl.element" index="$index" class="add-pe-button-container no-print"></add-pe-menu>
-            </div>
-        </div>
-    </div>
-</div>
-`
+    noCompile: boolean = true
     //Locals
 
     static $inject = [...DeletableTransclusion.$inject, 'PresentationService', 'RootScopeService']
@@ -127,6 +102,7 @@ export class TranscludeSectionController extends DeletableTransclusion implement
         this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons)
         this.bbApi.setPermission('editor-preview', false)
         this.bbApi.setPermission('editor-save-continue', false)
+        this.bbApi.setPermission('editor-reset', false)
         this.$element.on('click', (e) => {
             if (this.startEdit) this.startEdit()
             if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element)
@@ -152,14 +128,38 @@ export class TranscludeSectionController extends DeletableTransclusion implement
             }
         }
         const deferred = this.$q.defer<string>()
-        deferred.resolve(this.defaultTemplate)
+        deferred.reject({status: 200}); //don't recompile
         return deferred.promise
     }
 }
 
 export const TranscludeSectionComponent: VeComponentOptions = {
     selector: 'transcludeSection',
-    template: `<div></div>`,
+    template: `
+ <div ng-if="$ctrl.element.specification">
+    <div ng-show="!$ctrl.isEditing">
+        <h1 class="section-title h{{$ctrl.level}}">
+            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.element._veNumber}}</span> {{$ctrl.element.name}}
+        </h1>
+    </div>
+    <div ng-class="{'panel panel-default' : $ctrl.isEditing}">
+        <div ng-show="$ctrl.isEditing" class="panel-heading clearfix no-print">
+            <h3 class="panel-title pull-left">
+                <div ng-class="{prop: $ctrl.isEditing}"><input class="form-control" type="text" ng-model="$ctrl.edit.element.name"/></div>
+            </h3>
+            <div class="btn-group pull-right" ng-hide="$ctrl.editLoading">
+                <button-bar class="transclude-panel-toolbar" button-id="$ctrl.bbId"></button-bar>
+            </div>
+        </div>
+        <div ng-class="{'panel-body' : $ctrl.isEditing}">
+            <add-pe-menu mms-view="$ctrl.section" index="-1" class="add-pe-button-container no-print"></add-pe-menu>
+            <div ng-repeat="instanceVal in $ctrl.element.specification.operand track by instanceVal.instanceId">
+                <view-pe mms-instance-val="instanceVal" mms-parent-section="$ctrl.element"></view-pe>
+                <add-pe-menu mms-view="$ctrl.element" index="$index" class="add-pe-button-container no-print"></add-pe-menu>
+            </div>
+        </div>
+    </div>
+</div>`,
     bindings: {
         mmsElementId: '@',
         mmsProjectId: '@',

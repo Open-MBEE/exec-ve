@@ -38,7 +38,7 @@ export const editor_buttons: IButtonBarButton[] = [
     },
     {
         id: 'editor-preview',
-        icon: 'fa-regular fa-file-powerpoint',
+        icon: 'fa-solid fa-magnifying-glass',
         selectable: false,
         tooltip: 'Preview Changes',
         api: 'preview',

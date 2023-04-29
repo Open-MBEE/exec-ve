@@ -9,18 +9,19 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
-import { InsertData } from '@ve-types/components'
 import { ElementObject, MmsObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
+import { InsertTransclusionData } from "@ve-components/transclusions";
 
-class InsertElementController extends Insertion<InsertData> {
+class InsertElementController extends Insertion<InsertTransclusionData> {
     //Bindings
     protected parentAction: string
 
     //Locals
-    protected createType: number = 1
+    //protected createType: number = 1
     protected description: string
     protected searchExisting: boolean = true
+    protected disableCreateNew: boolean = false
 
     static $inject = Insertion.$inject
 
@@ -63,14 +64,12 @@ class InsertElementController extends Insertion<InsertData> {
     public $onInit(): void {
         super.$onInit()
 
-        if (this.insertData.selected) {
+        if (this.insertData.selected && this.insertData.isNew) {
             this.createItem = this.insertData.selected
-            if (this.insertData.isNew) {
-                this.searchExisting = false
-            }
+            this.searchExisting = false
         } else {
             this.createItem = {
-                id: `${this.apiSvc.createUniqueId()}_temp`,
+                id: `${this.apiSvc.createUniqueId()}`,
                 _projectId: this.mmsProjectId,
                 _refId: this.mmsRefId,
                 ownerId: 'holding_bin_' + this.mmsProjectId,
@@ -80,7 +79,10 @@ class InsertElementController extends Insertion<InsertData> {
                 _appliedStereotypeIds: [],
             }
         }
-        this.editItem = this.elementSvc.openEdit(this.createItem)
+        this.disableCreateNew = this.insertData.viewLink
+        if (!this.disableCreateNew) {
+            this.editItem = this.elementSvc.openEdit(this.createItem, false)
+        }
         this.description = 'Search for an existing element before you ' + this.parentAction
 
         this.searchOptions.getProperties = true
@@ -111,13 +113,15 @@ const InsertComponent: VeComponentOptions = {
     template: `
 <div class="modal-body">
     <div class="ve-light-tabs modal-top-tabs" ng-show="!$ctrl.viewLink">
+        <!-- only have 1 cancel at botton
         <span class="close-button-container">
             <a class="close-button"  ng-click="$ctrl.cancel()">
                 <i tooltip-placement="left" uib-tooltip="Close Insert Dialog"  class="fa fa-times"></i>
             </a>
         </span>
+        -->
         <ul class="nav nav-tabs">
-            <li class="uib-tab nav-item tab-item" ng-class="{'active': !$ctrl.searchExisting}">
+            <li ng-hide="$ctrl.disableCreateNew" class="uib-tab nav-item tab-item" ng-class="{'active': !$ctrl.searchExisting}">
                 <a class="nav-link" ng-click="$ctrl.searchExisting = false"><i class="fa fa-plus"></i>Create New</a>
             </li>
             <li class="uib-tab nav-item tab-item" ng-class="{'active': $ctrl.searchExisting}">
@@ -128,10 +132,6 @@ const InsertComponent: VeComponentOptions = {
 
     <!-- Search for existing panel -->
     <div ng-show="$ctrl.searchExisting">
-        <div class="transclude-modal-instructions">
-            {{$ctrl.description}}
-        </div>
-
         <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" embedded="true"></mms-search>
     </div>
 
@@ -146,6 +146,7 @@ const InsertComponent: VeComponentOptions = {
                 <label class="label-documentation">Documentation</label>
                 <editor ng-model="$ctrl.createItem.documentation" edit-field="documentation" mms-element-id="{{$ctrl.createItem.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
             </div>
+            <!-- create non class not supported
             <div class="form-group" ng-show="$ctrl.createType === 2">
                 <label>Value</label>
             </div>
@@ -153,10 +154,10 @@ const InsertComponent: VeComponentOptions = {
                 <label>Source</label>
                 <label>Target</label>
             </div>
-            
             <label><input type="radio" ng-model="$ctrl.createType" ng-value="1" checked>&nbsp;Class</label><br></label>
             <label><input type="radio" ng-model="$ctrl.createType" ng-value="2">&nbsp;Property</label><br>
             <label><input type="radio" ng-model="$ctrl.createType" ng-value="3">&nbsp;Relationship</label><br>
+            -->
         </form>
 
         <p class="help-block pull-left"><i>Fields marked with <span class="star-mandatory">*</span> are required</i></p>

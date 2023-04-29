@@ -252,6 +252,7 @@ class ToolsController {
         this.subs.push(
             this.eventSvc.$on('spec-editor.cancel', () => {
                 const go = (): void => {
+                    this.editorSvc.cleanUpEdit(this.specSvc.getEdits().key)
                     if (this.autosaveSvc.openEdits() > 0) {
                         const next = Object.keys(this.autosaveSvc.getAll())[0]
                         const id = next.split('|')
@@ -275,10 +276,10 @@ class ToolsController {
                         this.specSvc.toggleSave(this.toolbarId)
                     }
                 }
-                this.editorSvc.hasEdits(this.edit).then(
+                this.editorSvc.hasEdits(this.specSvc.getEdits()).then(
                     (hasEdits) => {
                         if (hasEdits) {
-                            this.editorSvc.deleteEditModal(this.edit).result.then(
+                            this.editorSvc.deleteEditModal(this.specSvc.getEdits()).result.then(
                                 () => {
                                     go()
                                 },

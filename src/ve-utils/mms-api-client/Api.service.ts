@@ -28,6 +28,7 @@ export class ApiService {
         'documentation',
         'defaultValue',
         'value',
+        'valueIds',
         'specification',
         'id',
         '_projectId',

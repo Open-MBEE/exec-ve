@@ -14,11 +14,6 @@ import { VePromise, VeQService } from '@ve-types/angular'
 import { IPresentationComponentOptions, ITableConfig } from '@ve-types/components/presentation'
 import { PresentTableObject, TableEntryObject } from '@ve-types/mms'
 
-interface TableEvent {
-    newInputVal: string
-    oldInputVal: string
-}
-
 class PresentTableController extends Presentation {
     public $searchEl: JQuery<HTMLElement>
     public $tHeadEl: JQuery<HTMLElement>

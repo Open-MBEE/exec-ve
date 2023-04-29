@@ -52,7 +52,7 @@ export class SpecService implements angular.Injectable<any> {
     public editable: boolean
     private keeping: boolean = false
 
-    public specApi: SpecApi
+    public specApi: SpecApi = {refType: '', refId: '', elementId: '', projectId: ''}
     public tracker: {
         etrackerSelected?: string
     } = {}
@@ -285,55 +285,15 @@ export class SpecService implements angular.Injectable<any> {
                     }
                     if (
                         (this.specApi.commitId && this.specApi.commitId !== 'latest') ||
-                        !this.permissionsSvc.hasBranchEditPermission(this.specApi.projectId, this.specApi.refId) ||
+                        !this.permissionsSvc.hasBranchEditPermission(data._projectId, data._refId) ||
                         this.specApi.refType === 'Tag'
                     ) {
                         this.editable = false
                         this.edit = null
                         this.setEditing(false)
                     } else {
-                        promises.push(
-                            this.elementSvc.getElementForEdit(reqOb).then((editOb) => {
-                                if (editOb.element.id !== this.lastid) return
-                                this.setEdits(editOb)
-                                this.editable = true
-                                if (!this.getKeepMode()) this.setEditing(false)
-                                this.setKeepMode(false)
-                                /* not needed because of transclude val?
-                                if (
-                                    this.edit.type === 'Property' ||
-                                    this.edit.type === 'Port' ||
-                                    this.edit.type === 'Slot'
-                                ) {
-                                    // Array.isArray(this.specSvc.edit.value)) {
-                                    if (this.edit.defaultValue) {
-                                        this.setEditValues([this.edit.defaultValue])
-                                    } else if (this.edit.value) {
-                                        let values: ValueObject | ValueObject[] = (
-                                            this.edit as LiteralObject<ValueObject>
-                                        ).value
-                                        if (!Array.isArray(values)) {
-                                            values = [values]
-                                        }
-                                        this.setEditValues(values)
-                                    } else this.setEditValues([])
-                                    this.componentSvc.getPropertySpec(this.element).then(
-                                        (value) => {
-                                            this.specApi.propSpec.isEnumeration = value.isEnumeration
-                                            this.specApi.propSpec.isSlot = value.isSlot
-                                            this.specApi.propSpec.options = value.options
-                                        },
-                                        (reason) => {
-                                            this.growl.error('Failed to get property spec: ' + reason.message)
-                                        }
-                                    )
-                                }
-                                if (this.edit.type === 'Constraint' && this.edit.specification) {
-                                    this.setEditValues([this.edit.specification])
-                                }
-                                */
-                            })
-                        )
+                        this.editable = true
+                        // only get edit object if in spec edit
                     }
                     promises.push(
                         this.projectSvc.getRef(this.specApi.refId, this.specApi.projectId).then((result) => {
