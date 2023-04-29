@@ -1,3 +1,4 @@
+import angular from 'angular'
 import $ from 'jquery'
 
 import { SaveConflictResolveFn } from '@ve-components/diffs'
@@ -15,7 +16,8 @@ import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-typ
 
 export class EditorService {
     public generatedIds: number = 0
-    private edit2editor: { [editKey: string]: { [field: string]: () => VePromise<boolean, string> } } = {}
+    private edit2editor: { [editKey: string]: { [field: string]: (destroy?: boolean) => VePromise<boolean, string> } } =
+        {}
     public savingAll: boolean = false
 
     static $inject = [
@@ -56,13 +58,17 @@ export class EditorService {
         return this.edit2editor[editKey]
     }
 
-    public updateAllData(editKey: string | string[], allowNone?: boolean): VePromise<void, BasicResponse<MmsObject>> {
+    public updateAllData(
+        editKey: string | string[],
+        allowNone?: boolean,
+        destroy?: boolean
+    ): VePromise<void, BasicResponse<MmsObject>> {
         const key: string = this.editSvc.makeKey(editKey)
         return new this.$q<void, BasicResponse<MmsObject>>((resolve, reject) => {
             if (this.edit2editor[key]) {
                 const promises: VePromise<boolean, string>[] = []
                 for (const id of Object.keys(this.edit2editor[key])) {
-                    promises.push(this.edit2editor[key][id]())
+                    promises.push(this.edit2editor[key][id](destroy))
                 }
                 this.$q.all(promises).then(resolve, reject)
             } else if (allowNone) {
@@ -73,7 +79,11 @@ export class EditorService {
         })
     }
 
-    public add(editKey: string | string[], field: string, updateFn: () => VePromise<boolean, string>): void {
+    public add(
+        editKey: string | string[],
+        field: string,
+        updateFn: (destroy?: boolean) => VePromise<boolean, string>
+    ): void {
         editKey = this.editSvc.makeKey(editKey)
         if (!this.edit2editor[editKey]) this.edit2editor[editKey] = {}
         this.edit2editor[editKey][field] = updateFn
@@ -170,7 +180,7 @@ export class EditorService {
      */
     private _save<T extends ElementObject>(editKey: string | string[], continueEdit?: boolean): VePromise<T> {
         return new this.$q<T>((resolve, reject) => {
-            this.updateAllData(editKey, true).then(
+            this.updateAllData(editKey, true, true).then(
                 () => {
                     const edit = this.editSvc.get<T>(editKey).element
                     this.elementSvc.updateElement(edit, false, true).then(
@@ -255,7 +265,7 @@ export class EditorService {
         const edit = editOb.element
         edit._commitId = 'latest'
         return new this.$q<boolean, ElementsResponse<ElementObject>>((resolve) => {
-            this.updateAllData(editOb.key, true).then(
+            this.updateAllData(editOb.key, true, false).then(
                 () => {
                     this.elementSvc.getElement<ElementObject>(this.elementSvc.getElementRequest(edit)).then(
                         (elementOb) => {

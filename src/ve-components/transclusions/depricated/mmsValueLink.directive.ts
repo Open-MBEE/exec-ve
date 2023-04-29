@@ -9,7 +9,7 @@
 //  * @requires veUtils/ElementService
 //  *
 //  * @restrict E
-//  * * Given an element id, generates a hyperlink with a view-cf value
+//  * * Given an element id, generates a hyperlink with a mms-cf value
 //  *
 //  * @param {string} mmsElementId The id of the view
 //  * @param {string} mmsProjectId The project id for the view

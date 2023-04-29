@@ -1,6 +1,7 @@
 import { IQResolveReject } from 'angular'
 import _ from 'lodash'
 
+import { CacheService } from '@ve-utils/core'
 import { ElementService, URLService, ApiService } from '@ve-utils/mms-api-client'
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
 import { SchemaService } from '@ve-utils/model-schema'
@@ -36,7 +37,6 @@ import {
     BasicResponse,
 } from '@ve-types/mms'
 import { TreeBranch, View2NodeMap } from '@ve-types/tree'
-import { CacheService } from '@ve-utils/core'
 
 export interface ViewData {
     id: string

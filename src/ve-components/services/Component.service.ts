@@ -1,8 +1,5 @@
 import { ViewController } from '@ve-components/presentations'
 import { ITransclusion } from '@ve-components/transclusions'
-import { RootScopeService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
-import { ApiService, ElementService, PermissionsService, URLService, ViewService } from '@ve-utils/mms-api-client'
 
 import { veComponents } from '@ve-components'
 

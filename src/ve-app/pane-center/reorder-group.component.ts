@@ -3,6 +3,7 @@ import { IComponentController } from 'angular'
 import _ from 'lodash'
 
 import { TreeService } from '@ve-components/trees'
+import { CacheService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
@@ -10,7 +11,6 @@ import { veApp } from '@ve-app'
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import { DocumentObject, ElementObject, GroupObject, ParamsObject, ProjectObject, RefObject } from '@ve-types/mms'
 import { AngularUITree, VeTreeNodeScope } from '@ve-types/tree'
-import { CacheService } from '@ve-utils/core'
 
 interface ReorderGroupNode {
     data: GroupObject | DocumentObject

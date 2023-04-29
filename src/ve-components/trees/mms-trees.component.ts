@@ -88,7 +88,7 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 
-class ViewTreesController implements IComponentController {
+class TreesController implements IComponentController {
     //Bindings
     toolbarId: string = 'toolbar'
     buttonId: string
@@ -549,8 +549,8 @@ class ViewTreesController implements IComponentController {
     }
 }
 
-const ViewTreesComponent: VeComponentOptions = {
-    selector: 'viewTrees',
+const TreesComponent: VeComponentOptions = {
+    selector: 'mmsTrees',
     template: `
 
 <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
@@ -569,7 +569,7 @@ const ViewTreesComponent: VeComponentOptions = {
         toolbarId: '@',
         buttonId: '@',
     },
-    controller: ViewTreesController,
+    controller: TreesController,
 }
 
-veComponents.component(ViewTreesComponent.selector, ViewTreesComponent)
+veComponents.component(TreesComponent.selector, TreesComponent)

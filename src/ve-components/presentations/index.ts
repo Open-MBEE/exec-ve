@@ -15,7 +15,7 @@ export * from './view.component'
 import './view-pe.component'
 
 export * from './view-pe.component'
-import './view-link.component'
+import './mms-view-link.component'
 
 //Presentations
 import './components/present-equation.component'
@@ -28,6 +28,3 @@ import './components/present-table.component'
 import './components/present-table-t.component'
 import './components/present-section.component'
 import './components/present-comment.component'
-
-//Compatibility
-import './mms-view-compatibility.component'

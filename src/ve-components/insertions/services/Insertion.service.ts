@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import { EditorService } from '@ve-core/editor'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -8,7 +10,6 @@ import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
-import _ from "lodash";
 
 export class InsertionService {
     static $inject = ['$q', '$timeout', 'growl', 'ElementService', 'EditorService', 'RootScopeService', 'EventService']
@@ -53,13 +54,18 @@ export class InsertionService {
             promise = this.elementSvc.createElement({
                 elements: [toCreate],
                 refId: toCreate._refId,
-                projectId: toCreate._projectId
+                projectId: toCreate._projectId,
             })
         } else {
-            promise = this.$q.resolve(this.elementSvc.cacheElement({
-                refId: toCreate._refId,
-                projectId: toCreate._projectId,
-            }, _.cloneDeep(toCreate)))
+            promise = this.$q.resolve(
+                this.elementSvc.cacheElement(
+                    {
+                        refId: toCreate._refId,
+                        projectId: toCreate._projectId,
+                    },
+                    _.cloneDeep(toCreate)
+                )
+            )
         }
 
         promise.finally(() => {

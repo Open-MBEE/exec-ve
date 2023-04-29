@@ -1,9 +1,10 @@
 import { IPane } from '@openmbee/pane-layout'
 import { StateService } from '@uirouter/angularjs'
 import angular, { IComponentController } from 'angular'
+import _ from 'lodash'
 import Rx from 'rx-lite'
 
-import { SpecApi, SpecService } from '@ve-components/spec-tools'
+import { SpecService } from '@ve-components/spec-tools'
 import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
@@ -15,7 +16,8 @@ import { veApp } from '@ve-app'
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject, RefObject, RefsResponse } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
-import _ from "lodash";
+
+import elementSelectedData = veCoreEvents.elementSelectedData
 
 class RightPaneController implements IComponentController {
     //Bindings
@@ -84,7 +86,7 @@ class RightPaneController implements IComponentController {
         this.rootScopeSvc.rightPaneClosed(this.$pane.closed)
 
         //Init spec ready binding
-        this.eventSvc.resolve<boolean>('spec.ready', false)
+        this.eventSvc.resolve<boolean>('spec.ready', true)
 
         this.subs.push(
             this.$pane.$toggled.subscribe(() => {
@@ -182,7 +184,7 @@ class RightPaneController implements IComponentController {
                         refId: this.specSvc.specApi.refId,
                         refType: this.specSvc.specApi.refType,
                         commitId: this.specSvc.specApi.commitId,
-                        displayOldSpec: this.specSvc.specApi.displayOldSpec
+                        displayOldSpec: this.specSvc.specApi.displayOldSpec,
                     }
                     if (_.isEqual(specApi, current)) {
                         return //don't do unnecessary updates
@@ -190,9 +192,9 @@ class RightPaneController implements IComponentController {
                 }
                 Object.assign(this.specSvc.specApi, specApi)
 
-                if (this.specSvc.setEditing) {
-                    this.specSvc.setEditing(false)
-                }
+                // if (this.specSvc.setEditing) {
+                //     this.specSvc.setEditing(false)
+                // }
 
                 this.specSvc.specApi.rootId = data.rootId ? data.rootId : ''
 
@@ -219,18 +221,14 @@ class RightPaneController implements IComponentController {
         const id = this.specSvc.tracker.etrackerSelected
         if (!id) return
         const info = id.split('|')
-        this.specSvc.specApi.elementId = info[2]
-        this.specSvc.specApi.projectId = info[0]
-        this.specSvc.specApi.refId = info[1]
-        this.specSvc.specApi.commitId = 'latest'
-        this.toolbarSvc.waitForApi(this.toolbarId).then(
-            (api) => {
-                api.setPermission('spec-editor', true)
-            },
-            (reason) => {
-                this.growl.error(ToolbarService.error(reason))
-            }
-        )
+        const data: veCoreEvents.elementSelectedData = {
+            elementId: info[2],
+            projectId: info[0],
+            refId: info[1],
+            commitId: 'latest',
+        }
+
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
     }
 }
 
@@ -252,7 +250,7 @@ const RightPaneComponent: VeComponentOptions = {
         </form>
         <hr class="right-title-divider">
     </div>
-    <view-tools toolbar-id="{{$ctrl.toolbarId}}"></view-tools>
+    <mms-tools toolbar-id="{{$ctrl.toolbarId}}"></mms-tools>
 </div>
     `,
     require: {

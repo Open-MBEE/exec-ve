@@ -42,11 +42,7 @@ export class ValueService {
     private taggedValue: string = 'value'
     static $inject = ['$q', 'ApiService', 'ElementService']
 
-    constructor(
-        private $q: VeQService,
-        private apiSvc: ApiService,
-        private elementSvc: ElementService
-    ) {}
+    constructor(private $q: VeQService, private apiSvc: ApiService, private elementSvc: ElementService) {}
     public addValue = (editOb: EditObject, type: string): LiteralObject<unknown> => {
         const edit = editOb.element
         let newValueSpec: ValueSpec

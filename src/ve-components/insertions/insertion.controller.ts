@@ -123,7 +123,7 @@ export class Insertion<
         this.ownerId = this.parentData && this.parentData.id ? this.parentData.id : 'holding_bin_' + this.projectId
         let ready = this.$q.resolve(null)
         if (this.editItem) {
-            ready = this.editorSvc.updateAllData(this.editItem.key, true)
+            ready = this.editorSvc.updateAllData(this.editItem.key, true, true)
         }
         ready.then(
             () => {

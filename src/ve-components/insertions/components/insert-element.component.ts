@@ -1,6 +1,7 @@
 import _ from 'lodash'
 
 import { Insertion, InsertionService } from '@ve-components/insertions'
+import { InsertTransclusionData } from '@ve-components/transclusions'
 import { EditorService } from '@ve-core/editor'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
@@ -11,7 +12,6 @@ import { veComponents } from '@ve-components'
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { ElementObject, MmsObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
-import { InsertTransclusionData } from "@ve-components/transclusions";
 
 class InsertElementController extends Insertion<InsertTransclusionData> {
     //Bindings
@@ -86,7 +86,7 @@ class InsertElementController extends Insertion<InsertTransclusionData> {
         this.description = 'Search for an existing element before you ' + this.parentAction
 
         this.searchOptions.getProperties = true
-        this.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to view-cf a placeholder.'
+        this.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to mms-cf a placeholder.'
     }
 
     public create = (): VePromise<ElementObject> => {

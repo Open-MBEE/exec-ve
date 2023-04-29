@@ -17,7 +17,7 @@ import { PermissionsService, ViewData, ViewService, URLService } from '@ve-utils
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { DocumentObject, ElementObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms'
 import { TreeBranch, View2NodeMap } from '@ve-types/tree'
 
@@ -286,17 +286,22 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         this.fullDocumentApi = this.fullDocumentSvc.get()
         this.views = this.fullDocumentApi.views
         this.viewsBuffer = this.fullDocumentApi.viewsBuffer
-        this._createViews().then(() => {
-            this.fullDocumentApi.addInitialViews(scrollVisible)
-            if (this.mmsView && this.mmsView.id !== this.mmsDocument.id) {
-                this.fullDocumentApi.handleClickOnBranch(this.mmsView.id, ()=> {
-                    this._scroll(this.mmsView.id)
-                    this.fullDocumentApi.loadRemainingViews(()=>{}) //remove if scroll works
-                })
-            } else {
-                this.fullDocumentApi.loadRemainingViews(()=>{}) //remove if scroll works
+        this._createViews().then(
+            () => {
+                this.fullDocumentApi.addInitialViews(scrollVisible)
+                if (this.mmsView && this.mmsView.id !== this.mmsDocument.id) {
+                    this.fullDocumentApi.handleClickOnBranch(this.mmsView.id, () => {
+                        this._scroll(this.mmsView.id)
+                        this.fullDocumentApi.loadRemainingViews() //remove if scroll works
+                    })
+                } else {
+                    this.fullDocumentApi.loadRemainingViews() //remove if scroll works
+                }
+            },
+            (reason) => {
+                this.growl.error(reason.message)
             }
-        })
+        )
         const scrollVisible = (): boolean => {
             return this.scrollApi.isScrollVisible()
         }
@@ -380,37 +385,40 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         }
     }
 
-    private _createViews = () => {
+    private _createViews = (): VePromise<void, void> => {
         const message = this._loadingViewsFromServer()
-        this.views.push({
-            id: this.mmsDocument.id,
-            api: {
-                elementTranscluded: this._elementTranscluded,
-                elementClicked: this._elementClicked,
-            },
+        return new this.$q((resolve, reject) => {
+            this.views.push({
+                id: this.mmsDocument.id,
+                api: {
+                    elementTranscluded: this._elementTranscluded,
+                    elementClicked: this._elementClicked,
+                },
+            })
+            if (!this.mmsDocument._childViews) {
+                this.mmsDocument._childViews = []
+            }
+            this.viewSvc
+                .handleChildViews(
+                    this.mmsDocument,
+                    'composite',
+                    undefined,
+                    this.mmsProject.id,
+                    this.mmsRef.id,
+                    this.view2Node,
+                    this._handleSingleView
+                )
+                .then((childIds: string[]) => {
+                    for (let i = 0; i < childIds.length; i++) {
+                        this._constructViews(childIds[i], this.num.toString(10))
+                        this.num = this.num + 1
+                    }
+                    resolve()
+                }, reject)
+                .finally(() => {
+                    message.destroy()
+                })
         })
-        if (!this.mmsDocument._childViews) {
-            this.mmsDocument._childViews = []
-        }
-        return this.viewSvc
-            .handleChildViews(
-                this.mmsDocument,
-                'composite',
-                undefined,
-                this.mmsProject.id,
-                this.mmsRef.id,
-                this.view2Node,
-                this._handleSingleView
-            )
-            .then((childIds: string[]) => {
-                for (let i = 0; i < childIds.length; i++) {
-                    this._constructViews(childIds[i], this.num.toString(10))
-                    this.num = this.num + 1
-                }
-            })
-            .finally(() => {
-                message.destroy()
-            })
     }
 
     private _loadingViewsFromServer = (): angular.growl.IGrowlMessage => {

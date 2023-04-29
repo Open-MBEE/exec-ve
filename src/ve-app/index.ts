@@ -18,6 +18,7 @@ import '@uirouter/angularjs'
 import 'angular-sanitize'
 import 'angular-ui-tree'
 import '@openmbee/pane-layout'
+import '@openmbee/angularjs-dropdown-multiselect'
 
 import 'ui-router-visualizer'
 
@@ -30,7 +31,6 @@ import 'ngstorage'
 import '../lib/angular-promise-extras/angular-promise-extras'
 import '../lib/angular-flatpickr/ngFlatpickr.main'
 import '../lib/html-rendered-diff/index'
-import '../lib/angularjs-dropdown-multiselect/angularjs-dropdown-multiselect.main'
 import '../lib/angular-ui-tree-filter/angular-ui-tree-filter'
 
 //VE Modules

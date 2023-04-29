@@ -1,4 +1,4 @@
-import {veComponents} from "@ve-components";
+import { veComponents } from '@ve-components'
 
 export class Table2CSVService {
     public static export(el: JQuery, inputOptions: JQuery.table2CSV.inputOptions): string {

@@ -7,7 +7,7 @@ import { ElementService } from '@ve-utils/mms-api-client'
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import {ConstraintObject, ElementObject, ElementsRequest, ElementTaggedValueObject, SlotObject} from '@ve-types/mms'
+import { ConstraintObject, ElementObject, ElementsRequest, ElementTaggedValueObject, SlotObject } from '@ve-types/mms'
 import { VeModalController, VeModalInstanceService } from '@ve-types/view-editor'
 
 export interface RevertConfirmResolve {
@@ -78,7 +78,9 @@ class RevertConfirmController implements VeModalController {
                     if (revertOb.type === 'Property' || revertOb.type === 'Port') {
                         revertOb.defaultValue = _.cloneDeep(targetOb.defaultValue)
                     } else if (revertOb.type === 'ElementTaggedValue') {
-                        (revertOb as ElementTaggedValueObject).valueIds = _.cloneDeep((targetOb as ElementTaggedValueObject).valueIds)
+                        ;(revertOb as ElementTaggedValueObject).valueIds = _.cloneDeep(
+                            (targetOb as ElementTaggedValueObject).valueIds
+                        )
                     } else if (revertOb.type === 'Slot' || revertOb.type.endsWith('TaggedValue')) {
                         ;(revertOb as SlotObject).value = _.cloneDeep((targetOb as SlotObject).value)
                     } else if (revertOb.type === 'Constraint' && revertOb.specification) {
@@ -133,16 +135,16 @@ const RevertConfirmComponent: VeComponentOptions = {
     <h3>Preview Element</h3>
     <div class="element-preview-box">
         <h1 class="prop element-title">
-            <view-cf mms-cf-type="name" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
+            <mms-cf mms-cf-type="name" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></mms-cf>
         </h1>
         <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
         <p class="doc-text">
-            <view-cf mms-cf-type="doc" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
+            <mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></mms-cf>
         </p>
         <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.endsWith('TaggedValue')">
         <h2 class="prop-title">Property Value</h2>
         <span class="prop">
-            <view-cf mms-cf-type="val" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
+            <mms-cf mms-cf-type="val" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></mms-cf>
         </span></div>
     </div>
 </div>

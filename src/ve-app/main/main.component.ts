@@ -2,7 +2,6 @@ import 'angular-growl-v2'
 
 import { StateService, Transition, TransitionService, UIRouter, UIRouterGlobals } from '@uirouter/angularjs'
 import angular, { IComponentController, IHttpResponse } from 'angular'
-import _ from 'lodash'
 import Rx from 'rx-lite'
 
 import { WorkingTimeModalResolveFn, WorkingTimeObject } from '@ve-app/main/modals/working-modal.component'

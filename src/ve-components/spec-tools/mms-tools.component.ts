@@ -111,6 +111,7 @@ class ToolsController {
     editable: boolean
     viewId: string
     elementSaving: boolean
+    elementLoading: boolean
 
     protected errorType: string
 
@@ -200,6 +201,12 @@ class ToolsController {
         this.subs.push(
             this.eventSvc.$on('element-saving', (data: boolean) => {
                 this.elementSaving = data
+            })
+        )
+
+        this.subs.push(
+            this.eventSvc.binding<boolean>('spec.ready', (data) => {
+                this.elementLoading = !data
             })
         )
 
@@ -329,7 +336,11 @@ class ToolsController {
         const tag = this.extensionSvc.getTagByType('spec', id)
         const toolId: string = _.camelCase(id)
         const newTool: JQuery = $(
-            '<div id="' + toolId + '" class="container-fluid" ng-if="$ctrl.show.' + toolId + '"></div>'
+            '<div id="' +
+                toolId +
+                '" class="container-fluid" ng-if="!$ctrl.elementLoading && $ctrl.show.' +
+                toolId +
+                '"></div>'
         )
         if (tag === 'extensionError') {
             this.errorType = this.currentTool.replace('spec-', '')
@@ -417,13 +428,16 @@ class ToolsController {
     }
 }
 
-const ViewToolsComponent: VeComponentOptions = {
-    selector: 'viewTools',
+const MmsToolsComponent: VeComponentOptions = {
+    selector: 'mmsTools',
     template: `
     <div class="container-fluid">
     <h4 class="right-pane-title">{{$ctrl.currentTitle}}</h4>
     <hr class="right-title-divider">
-    <div id="tools"></div>
+    <div ng-if="$ctrl.elementLoading" class="tool-spinner" >
+        <i class="fa fa-spin fa-spinner"></i>
+    </div>
+    <div ng-hide="$ctrl.elementLoading" id="tools"></div>
 </div>
     `,
     bindings: {
@@ -433,4 +447,4 @@ const ViewToolsComponent: VeComponentOptions = {
     controller: ToolsController,
 }
 
-veComponents.component(ViewToolsComponent.selector, ViewToolsComponent)
+veComponents.component(MmsToolsComponent.selector, MmsToolsComponent)

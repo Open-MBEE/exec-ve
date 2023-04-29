@@ -14,7 +14,7 @@ const PresentSectionComponent: IPresentationComponentOptions = {
         mmsRefId: '@',
         mmsCommitId: '@',
     },
-    template: `<view-cf mms-cf-type="section" mms-element-id="{{$ctrl.instanceSpec.id}}"></view-cf>`,
+    template: `<mms-cf mms-cf-type="section" mms-element-id="{{$ctrl.instanceSpec.id}}"></mms-cf>`,
     controller: PresentationLite,
     require: {
         mmsViewCtrl: '?^^view',

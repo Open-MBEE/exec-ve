@@ -210,9 +210,9 @@ class DiffAttrController {
     protected _createElement = (type: string, reqOb: ElementsRequest<string>): JQuery<HTMLElement> => {
         const ignoreMathjaxAutoFormatting = type === 'doc' || type === 'val' || type === 'com'
         const html =
-            '<view-cf ' +
+            '<mms-cf ' +
             (ignoreMathjaxAutoFormatting ? 'mms-generate-for-diff="mmsGenerateForDiff" ' : '') +
-            'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{commitId}}"></view-cf>'
+            'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{commitId}}"></mms-cf>'
         const newScope = Object.assign(this.$scope.$new(), {
             type: type,
             mmsElementId: reqOb.elementId,
@@ -264,7 +264,7 @@ class DiffAttrController {
 }
 
 const DiffAttrComponent: VeComponentOptions = {
-    selector: 'diffAttr',
+    selector: 'mmsDiffAttr',
     bindings: {
         elementId: '@mmsBaseElementId',
         comparedElementId: '@mmsCompareElementId',
