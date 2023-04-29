@@ -29,7 +29,6 @@ class RightPaneController implements IComponentController {
 
     public subs: Rx.IDisposable[]
 
-    private specApi: SpecApi
     private openEdits: number
     private edits: { [id: string]: EditObject }
 
@@ -115,9 +114,9 @@ class RightPaneController implements IComponentController {
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.elementUpdatedData>('element.updated', (data) => {
                 if (
-                    data.element.id === this.specApi.elementId &&
-                    data.element._projectId === this.specApi.projectId &&
-                    data.element._refId === this.specApi.refId &&
+                    data.element.id === this.specSvc.specApi.elementId &&
+                    data.element._projectId === this.specSvc.specApi.projectId &&
+                    data.element._refId === this.specSvc.specApi.refId &&
                     !data.continueEdit
                 ) {
                     this.eventSvc.resolve<boolean>('spec.ready', false)
@@ -154,16 +153,15 @@ class RightPaneController implements IComponentController {
         const displayOldSpec = data.displayOldSpec ? data.displayOldSpec : null
         const promise: VePromise<string, RefsResponse> = new this.$q((resolve, reject) => {
             if (
-                !this.specApi ||
-                !this.specApi.refType ||
-                refId != this.specApi.refId ||
-                projectId != this.specApi.projectId
+                !this.specSvc.specApi.refType ||
+                refId != this.specSvc.specApi.refId ||
+                projectId != this.specSvc.specApi.projectId
             ) {
                 this.projectSvc.getRef(refId, projectId).then((ref) => {
                     resolve(ref.type)
                 }, reject)
             } else {
-                resolve(this.specApi.refType)
+                resolve(this.specSvc.specApi.refType)
             }
         })
 
@@ -190,13 +188,13 @@ class RightPaneController implements IComponentController {
                         return //don't do unnecessary updates
                     }
                 }
-                this.specSvc.specApi = this.specApi = specApi
+                Object.assign(this.specSvc.specApi, specApi)
 
                 if (this.specSvc.setEditing) {
                     this.specSvc.setEditing(false)
                 }
 
-                this.specApi.rootId = data.rootId ? data.rootId : ''
+                this.specSvc.specApi.rootId = data.rootId ? data.rootId : ''
 
                 this.specSvc.editable =
                     data.rootId &&
@@ -221,10 +219,10 @@ class RightPaneController implements IComponentController {
         const id = this.specSvc.tracker.etrackerSelected
         if (!id) return
         const info = id.split('|')
-        this.specApi.elementId = info[2]
-        this.specApi.projectId = info[0]
-        this.specApi.refId = info[1]
-        this.specApi.commitId = 'latest'
+        this.specSvc.specApi.elementId = info[2]
+        this.specSvc.specApi.projectId = info[0]
+        this.specSvc.specApi.refId = info[1]
+        this.specSvc.specApi.commitId = 'latest'
         this.toolbarSvc.waitForApi(this.toolbarId).then(
             (api) => {
                 api.setPermission('spec-editor', true)
