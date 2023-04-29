@@ -68,8 +68,7 @@ export class ButtonBarService {
         if (!root) {
             root = 'button_bar'
         }
-        if (!this.buttonBars[root]) return root
-        else if (!this.barCounter[root]) this.barCounter[root] = 0
+        if (!this.barCounter[root]) this.barCounter[root] = 1
         else this.barCounter[root]++
         return `${root}_${this.barCounter[root]}`
     }

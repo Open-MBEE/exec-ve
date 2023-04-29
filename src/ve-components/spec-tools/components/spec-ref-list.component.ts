@@ -199,9 +199,7 @@ const SpecRefListComponent: VeComponentOptions = {
         </tr>
     </tbody>
 
-    <tbody ng-show="$ctrl.mmsTags.length && !filteredTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags found</td></tr></tbody>
-
-    <tbody ng-hide="$ctrl.mmsTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags in current project.</td></tr></tbody>
+    <tbody ng-hide="filteredTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags found</td></tr></tbody>
 
     <thead>
         <tr>

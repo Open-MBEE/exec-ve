@@ -1,6 +1,6 @@
 {
   "name": "view-editor",
-  "version": "4.0.0",
+  "version": "5.0.0-alpha",
   "description": "View Editor Application",
   "repository": "https://github.com/Open-MBEE/ve.git",
   "main": "main.ts",

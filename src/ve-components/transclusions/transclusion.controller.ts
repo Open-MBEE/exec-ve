@@ -121,6 +121,7 @@ export class Transclusion implements ITransclusion, EditorActions {
     protected cfField: 'name' | 'value' | 'documentation'
     protected cfKind: string
     protected checkCircular: boolean
+    protected noCompile: boolean = false
 
     //Locals
     protected isDeletable: boolean
@@ -317,7 +318,9 @@ export class Transclusion implements ITransclusion, EditorActions {
                     })
             },
             (reason) => {
-                this.growl.error(`Transclusion Error: ${reason.message}`)
+                if (reason.status !== 200) {
+                    this.growl.error(`Transclusion Error: ${reason.message}`)
+                }
             }
         )
     }
@@ -335,7 +338,9 @@ export class Transclusion implements ITransclusion, EditorActions {
         this.projectId = this.mmsProjectId
         this.refId = this.mmsRefId ? this.mmsRefId : 'master'
         this.commitId = this.mmsCommitId ? this.mmsCommitId : 'latest'
-        this.$element.html('(loading...)')
+        if (!this.noCompile) {
+            this.$element.html('(loading...)')
+        }
         this.$element.addClass('isLoading')
         const reqOb = {
             elementId: this.mmsElementId,
@@ -534,7 +539,8 @@ export class Transclusion implements ITransclusion, EditorActions {
                 (data) => {
                     this.inPreviewMode = false
                     this.element = data
-                    this.cleanUpAction(continueEdit)
+                    // do not call here since it's called by element.updated event listener
+                    //this.cleanUpAction(continueEdit)
 
                     //scrollToElement(domElement);
                 },

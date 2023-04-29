@@ -14,8 +14,7 @@ CKEDITOR.plugins.add('mmscf', {
             button: 'Insert Cross Reference',
 
             allowedContent:
-                'mms-cf[*];mms-transclude-doc[*];mms-transclude-val[*];mms-transclude-name[*];' +
-                'view-cf[*];',
+                'mms-cf[*];view-cf[*];',
             inline: true,
             insert: () => {
                 var defaultConfig = {
@@ -35,7 +34,6 @@ CKEDITOR.plugins.add('mmscf', {
                 // Return "true" (that element needs to converted to a mmscf widget)
                 // for all <mms-transclude-doc> elements.
                 return (
-                    new RegExp(`(mms-)?transclude-[a-z]*`).test(element.name) ||
                     element.name === 'mms-cf' ||
                     element.name === 'view-cf'
                 )

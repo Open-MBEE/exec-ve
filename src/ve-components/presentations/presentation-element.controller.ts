@@ -107,37 +107,6 @@ export class Presentation extends PresentationLite {
         this.refId = refId ? refId : 'master'
         this.commitId = commitId ? commitId : 'latest'
 
-        if (this.mmsViewCtrl && this.mmsViewPresentationElemCtrl) {
-            this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
-            this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
-            //this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
-            this.view = this.mmsViewCtrl.getView()
-            const isOpaque =
-                this.instanceSpec.classifierIds &&
-                this.instanceSpec.classifierIds.length > 0 &&
-                this.schemaSvc
-                    .getMap<string[]>('OPAQUE_CLASSIFIERS', this.schema)
-                    .indexOf(this.instanceSpec.classifierIds[0]) >= 0
-            this.isDirectChildOfPresentationElement = !isOpaque
-        }
-
-        if (this.commitId === 'latest') {
-            this.subs.push(
-                this.eventSvc.$on('element.updated', (data: { element: ElementObject; continueEdit: boolean }) => {
-                    const elementOb = data.element
-                    const continueEdit = data.continueEdit
-                    if (
-                        elementOb.id === this.instanceSpec.id &&
-                        elementOb._projectId === this.instanceSpec._projectId &&
-                        elementOb._refId === this.instanceSpec._refId &&
-                        !continueEdit
-                    ) {
-                        this.instanceSpec = elementOb
-                        this.recompile()
-                    }
-                })
-            )
-        }
         this.config()
     }
 

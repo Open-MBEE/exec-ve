@@ -12,7 +12,7 @@ const ButtonBarComponent: VeComponentOptions = {
     <div class="button-bar">
     <span ng-repeat="button in $ctrl.buttons | filter: {active: true, permission: true}"  >
       <!-- Normal button -->
-      <a type="button" ng-hide="button.dropdown_buttons.length > 0" class="btn btn-tools btn-sm {{button.id}} {{ button.permission && !button.locked ? '' : 'disabled' }}"
+      <a type="button" ng-if="button.dropdown_buttons.length === 0" class="btn btn-tools btn-sm {{button.id}} {{ button.permission && !button.locked ? '' : 'disabled' }}"
           ng-click="$ctrl.buttonClicked($event, button)" uib-tooltip="{{button.tooltip}}" tooltip-append-to-body="false"
           tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
           <span class="fa-stack">

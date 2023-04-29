@@ -186,7 +186,7 @@ class ViewLinkController implements angular.IComponentController {
                         this.vid = data.id
                     } else if (this.apiSvc.isView(data) || data.type === 'InstanceSpecification') {
                         if (!docid || docid === '') {
-                            docid = data.id
+                            docid = this.applicationSvc.getState().currentDoc
                         }
                         this.docid = docid
                         this.vid = data.id
@@ -241,7 +241,7 @@ export const ViewLinkComponent: VeComponentOptions = {
 </span>        
 `,
     require: {
-        mmsCfCtrl: '?^^transclusion',
+        mmsCfCtrl: '?^^transclusion', //TODO this will never have anything
         mmsViewCtrl: '?^^view',
     },
     bindings: {
