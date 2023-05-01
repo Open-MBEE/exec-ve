@@ -261,14 +261,15 @@ class ToolsController {
                 const go = (): void => {
                     this.editorSvc.cleanUpEdit(this.specSvc.getEdits().key)
                     if (this.autosaveSvc.openEdits() > 0) {
-                        const next = Object.keys(this.autosaveSvc.getAll())[0]
-                        const id = next.split('|')
-                        this.specSvc.tracker.etrackerSelected = next
-                        this.specSvc.keepMode()
-                        this.specApi.elementId = id[0]
-                        this.specApi.projectId = id[1]
-                        this.specApi.refId = id[2]
-                        this.specApi.commitId = 'latest'
+                        const id = Object.keys(this.autosaveSvc.getAll())[0]
+                        const info = id.split('|')
+                        const data: veCoreEvents.elementSelectedData = {
+                            elementId: info[2],
+                            projectId: info[0],
+                            refId: info[1],
+                            commitId: 'latest',
+                        }
+                        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
                     } else {
                         this.specSvc.setEditing(false)
                         this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
@@ -392,13 +393,14 @@ class ToolsController {
                         () => {
                             if (this.autosaveSvc.openEdits() > 0) {
                                 const next = Object.keys(this.autosaveSvc.getAll())[0]
-                                const id = next.split('|')
-                                this.specSvc.tracker.etrackerSelected = next
-                                this.specSvc.keepMode()
-                                this.specApi.elementId = id[2]
-                                this.specApi.projectId = id[0]
-                                this.specApi.refId = id[1]
-                                this.specApi.commitId = 'latest'
+                                const info = next.split('|')
+                                const data: veCoreEvents.elementSelectedData = {
+                                    elementId: info[2],
+                                    projectId: info[0],
+                                    refId: info[1],
+                                    commitId: 'latest',
+                                }
+                                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
                             } else {
                                 this.specSvc.setEditing(false)
                                 this.specSvc.toggleSave(this.toolbarId)
