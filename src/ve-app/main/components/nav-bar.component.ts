@@ -214,7 +214,7 @@ const NavBarComponent: VeComponentOptions = {
                                 <a href="https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf" target="_blank">View Editor Help</a>
                             </li>
                             <li>
-                                <a href="https://openmbee.atlassian.net/secure/Dashboard.jspa" target="_blank">Report Issue</a>
+                                <a href="https://github.com/Open-MBEE/ve/issues" target="_blank">Report Issue</a>
                             </li>
                             <li class="divider"></li>
                             <li class="list-section-bottom">
