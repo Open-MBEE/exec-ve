@@ -147,7 +147,6 @@ class RightPaneController implements IComponentController {
     }
 
     changeAction = (data: veCoreEvents.elementSelectedData): void => {
-        this.eventSvc.resolve<boolean>('spec.ready', false)
         const elementId = data.elementId
         const refId = data.refId
         const projectId = data.projectId
@@ -190,6 +189,7 @@ class RightPaneController implements IComponentController {
                         return //don't do unnecessary updates
                     }
                 }
+                this.eventSvc.resolve<boolean>('spec.ready', false)
                 Object.assign(this.specSvc.specApi, specApi)
 
                 // if (this.specSvc.setEditing) {

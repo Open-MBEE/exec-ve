@@ -316,22 +316,35 @@ export class EditorService {
      */
     public openEdit(elementOb: ElementObject): VePromise<EditObject, ElementsResponse<ElementObject>> {
         return new this.$q((resolve, reject) => {
-            const reqOb = {
-                elementId: elementOb.id,
-                projectId: elementOb._projectId,
-                refId: elementOb._refId,
-            }
-            this.elementSvc.getElementForEdit(reqOb).then(
-                (edit) => {
-                    if (this.valueSvc.isValue(edit.element)) {
-                        edit.values = this.valueSvc.getValues(edit.element)
-                    }
-                    resolve(edit)
-                },
-                (reason) => {
-                    reject(reason)
+            this.permissionsSvc.initializePermissions({
+                    id: elementOb._projectId
+                }, {
+                    id: elementOb._refId,
+                    _projectId: elementOb._projectId,
+                    type: 'Branch'
                 }
-            )
+            ).finally(() => {
+                const reqOb = {
+                    elementId: elementOb.id,
+                    projectId: elementOb._projectId,
+                    refId: elementOb._refId,
+                }
+                if (!this.permissionsSvc.hasBranchEditPermission(elementOb._projectId, elementOb._refId)) {
+                    reject({message: 'No edit permission on branch', status: 403})
+                    return
+                }
+                this.elementSvc.getElementForEdit(reqOb).then(
+                    (edit) => {
+                        if (this.valueSvc.isValue(edit.element)) {
+                            edit.values = this.valueSvc.getValues(edit.element)
+                        }
+                        resolve(edit)
+                    },
+                    (reason) => {
+                        reject(reason)
+                    }
+                )
+            })
         })
     }
 

@@ -33,7 +33,11 @@ export class PermissionsService {
         const url = this.uRLSvc.getPermissionsLookupURL()
 
         const deferred = this.$q.defer<PermissionCache>()
-
+        if (this.permissions.project[projectOb.id] !== undefined &&
+            this.permissions.ref[projectOb.id + '/' + refOb.id] !== undefined) {
+            deferred.resolve(this.permissions)
+            return deferred.promise
+        }
         this.$http
             .put<PermissionsResponse>(url, {
                 lookups: [
