@@ -14,3 +14,5 @@ PhantomJS_*
 Chrome_*
 test-results/
 angular-mms-grunt-servers.json
+venv
+.vscode
