@@ -269,14 +269,13 @@ export class EditorController implements IComponentController {
                         if (
                             element.name.startsWith('transclude-') ||
                             element.name.startsWith('present-') ||
-                            element.name.startsWith('mms')
+                            element.name.startsWith('mms-')
                         ) {
                             if (
                                 element.name !== 'mms-view-link' &&
-                                element.name !== 'transclusion' &&
-                                element.name !== 'transclude-group-docs' &&
+                                element.name !== 'mms-cf' &&
                                 element.name !== 'mms-diff-attr' &&
-                                element.name !== 'transclude-value-link'
+                                element.name !== 'mms-group-docs'
                             ) {
                                 element.replaceWithChildren()
                                 return
@@ -325,13 +324,13 @@ export class EditorController implements IComponentController {
                         if (
                             element.name.startsWith('transclude-') ||
                             element.name.startsWith('present-') ||
-                            element.name.startsWith('view')
+                            element.name.startsWith('mms-')
                         ) {
                             if (
                                 element.name !== 'mms-view-link' &&
-                                element.name !== 'transclude-group-docs' &&
-                                element.name !== 'transclude-diff-merge-attr' &&
-                                element.name !== 'mms-value-link'
+                                element.name !== 'mms-cf' &&
+                                element.name !== 'mms-diff-attr' &&
+                                element.name !== 'mms-group-docs'
                             ) {
                                 element.replaceWithChildren()
                                 return
