@@ -1170,6 +1170,7 @@ veApp.run([
     },
 ])
 
+/*
 veApp.run([
     '$uiRouter',
     '$trace',
@@ -1180,3 +1181,4 @@ veApp.run([
         }
     },
 ])
+*/
