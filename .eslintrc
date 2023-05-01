@@ -1,0 +1,105 @@
+{
+  "settings": {
+    "import/extensions": [".js", ".ts"],
+    "import/parsers": {
+      "@typescript-eslint/parser": [
+        ".ts"
+      ]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysCheckTypes": true,
+        "project": "./tsconfig.json",
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      },
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "moduleDirectory": ["node_modules"]
+      }
+    }
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "./"
+  },
+  "plugins": ["unused-imports"],
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:prettier/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "no-multiple-empty-lines": 2,
+    "import/newline-after-import": [
+      2
+    ],
+    "@typescript-eslint/explicit-function-return-type": 2,
+    "@typescript-eslint/no-inferrable-types": [
+      2,
+      {
+        "ignoreProperties": true
+      }
+    ],
+    "import/order": ["error", {
+      "newlines-between": "always",
+      "alphabetize": {
+        "order": "asc",
+        "caseInsensitive": true
+      },
+      "pathGroups": [
+        {
+          "pattern": "@/**",
+          "group": "external",
+          "position": "after"
+        },
+        {
+          "pattern": "@ve-app",
+          "group": "internal",
+          "position": "after"
+        },
+        {
+          "pattern": "@ve-components",
+          "group": "internal",
+          "position": "after"
+        },
+        {
+          "pattern": "@ve-core",
+          "group": "internal",
+          "position": "after"
+        },
+        {
+          "pattern": "@ve-utils",
+          "group": "internal",
+          "position": "after"
+        },
+        {
+          "pattern": "@ve-types/**",
+          "group": "type",
+          "position": "after"
+        },
+        {
+          "pattern": "../../lib/**",
+          "group": "external",
+          "position": "after"
+        }
+      ],
+      "groups": [
+        "builtin",
+        "external",
+        "internal",
+        "unknown",
+        "parent",
+        "sibling",
+        "index",
+        "object",
+        "type"
+      ]
+    }]
+  }
+}

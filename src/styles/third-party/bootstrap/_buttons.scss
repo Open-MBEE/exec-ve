@@ -1,0 +1,192 @@
+@use "../bootstrap-variables" as bootstrap;
+@use "./mixins/buttons";
+@use "./mixins/tab-focus";
+@use "./mixins/vendor-prefixes" as vendor;
+@use "./mixins/opacity";
+
+// --------------------------------------------------
+// Buttons
+// --------------------------------------------------
+
+// Base styles
+// --------------------------------------------------
+
+.btn {
+  display: inline-block;
+  margin-bottom: 0; // For input.btn
+  font-weight: bootstrap.$btn-font-weight;
+  text-align: center;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+
+  // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+
+  @include buttons.button-size(bootstrap.$padding-base-vertical, bootstrap.$padding-base-horizontal,
+  bootstrap.$font-size-base, bootstrap.$line-height-base, bootstrap.$btn-border-radius-base);
+  @include vendor.user-select(none);
+
+  &,
+  &:active,
+  &.active {
+    &:focus,
+    &.focus {
+      @include tab-focus.tab-focus;
+    }
+  }
+
+  &:hover,
+  &:focus,
+  &.focus {
+    color: bootstrap.$btn-default-color;
+    text-decoration: none;
+  }
+
+  &:active,
+  &.active {
+    outline: 0;
+    background-image: none;
+
+    @include vendor.box-shadow(inset 0 3px 5px rgba(0,0,0,0.125));
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    cursor: bootstrap.$cursor-disabled;
+
+    @include opacity.opacity(0.65);
+    @include vendor.box-shadow(none);
+  }
+
+  // [converter] extracted a& to a.btn
+}
+
+a.btn {
+  &.disabled,
+  fieldset[disabled] & {
+    pointer-events: none; // Future-proof disabling of clicks on `<a>` elements
+  }
+}
+
+// Alternate buttons
+// --------------------------------------------------
+
+.btn-default {
+  @include buttons.button-variant(bootstrap.$btn-default-color, bootstrap.$btn-default-bg, bootstrap.$btn-default-border);
+}
+
+.btn-primary {
+  @include buttons.button-variant(bootstrap.$btn-primary-color, bootstrap.$btn-primary-bg, bootstrap.$btn-primary-border);
+}
+
+// Success appears as green
+.btn-success {
+  @include buttons.button-variant(bootstrap.$btn-success-color, bootstrap.$btn-success-bg, bootstrap.$btn-success-border);
+}
+
+// Info appears as blue-green
+.btn-info {
+  @include buttons.button-variant(bootstrap.$btn-info-color, bootstrap.$btn-info-bg, bootstrap.$btn-info-border);
+}
+
+// Warning appears as orange
+.btn-warning {
+  @include buttons.button-variant(bootstrap.$btn-warning-color, bootstrap.$btn-warning-bg, bootstrap.$btn-warning-border);
+}
+
+// Danger and error appear as red
+.btn-danger {
+  @include buttons.button-variant(bootstrap.$btn-danger-color, bootstrap.$btn-danger-bg, bootstrap.$btn-danger-border);
+}
+
+// Link buttons
+// -------------------------
+
+// Make a button look and behave like a link
+.btn-link {
+  color: bootstrap.$link-color;
+  font-weight: normal;
+  border-radius: 0;
+
+  &,
+  &:active,
+  &.active,
+  &[disabled],
+  fieldset[disabled] & {
+    background-color: transparent;
+
+    @include vendor.box-shadow(none);
+  }
+
+  &,
+  &:hover,
+  &:focus,
+  &:active {
+    border-color: transparent;
+  }
+
+  &:hover,
+  &:focus {
+    color: bootstrap.$link-hover-color;
+    text-decoration: bootstrap.$link-hover-decoration;
+    background-color: transparent;
+  }
+
+  &[disabled],
+  fieldset[disabled] & {
+    &:hover,
+    &:focus {
+      color: bootstrap.$btn-link-disabled-color;
+      text-decoration: none;
+    }
+  }
+}
+
+// Button Sizes
+// --------------------------------------------------
+
+.btn-lg {
+  // line-height: ensure even-numbered height of button next to large input
+  @include buttons.button-size(bootstrap.$padding-large-vertical, bootstrap.$padding-large-horizontal, bootstrap.$font-size-large, bootstrap.$line-height-large, bootstrap.$btn-border-radius-large);
+}
+
+.btn-sm {
+  // line-height: ensure proper height of button next to small input
+  @include buttons.button-size(bootstrap.$padding-small-vertical, bootstrap.$padding-small-horizontal, bootstrap.$font-size-small, bootstrap.$line-height-small, bootstrap.$btn-border-radius-small);
+}
+
+.btn-xs {
+  @include buttons.button-size(
+    bootstrap.$padding-xs-vertical,
+    bootstrap.$padding-xs-horizontal,
+    bootstrap.$font-size-small,
+    bootstrap.$line-height-small,
+    bootstrap.$btn-border-radius-small
+  );
+}
+
+// Block button
+// --------------------------------------------------
+
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+// Vertically space out multiple block buttons
+.btn-block + .btn-block {
+  margin-top: 5px;
+}
+
+// Specificity overrides
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  &.btn-block {
+    width: 100%;
+  }
+}

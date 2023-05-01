@@ -1,0 +1,59 @@
+/* VE base styles */
+@use "src/styles/globals";
+
+/* Bootstrap */
+@use "src/styles/third-party/bootstrap/mixins/buttons";
+
+// /*************************
+//   Button variables that make Bootstrap
+//   conform to the MMS app design guide
+// *************************/
+
+.btn {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+
+  .fa-inverse {
+    color: globals.$ve-silver-base;
+  }
+}
+
+.btn-secondary {
+  @include buttons.button-variant(globals.$brand-base, globals.$white, globals.$white);
+}
+
+// Toolbar button style
+.btn-tools {
+  @include buttons.button-variant(globals.$base-grey, globals.$white, globals.$white);
+
+  .fa,
+  .fa-solid,
+  .fa-regular {
+    padding-right: 4px;
+  }
+
+  &:not(.dropdown-toggle) .fa,
+  &:not(.dropdown-toggle) .fa-solid,
+  &:not(.dropdown-toggle) .fa-regular {
+    padding-right: 0;
+  }
+
+  .caret {
+    opacity: 0.4;
+  }
+
+  &.print,
+  &.refresh-numbering {
+    margin-left: 12px;
+  }
+}
+
+// Pull center button dropdowns to the right
+.pane-center button-bar {
+  .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+}

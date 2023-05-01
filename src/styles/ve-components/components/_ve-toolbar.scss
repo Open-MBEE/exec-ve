@@ -1,0 +1,142 @@
+/* VE base styles */
+@use "src/styles/globals";
+
+tool-bar {
+  .right-toolbar {
+    width: 41px;
+    height: 100%;
+    float: right;
+    background-color: globals.$ve-slate-darker-2;
+    padding-top: 24px;
+    position: fixed;
+
+    @include globals.calc(left, "100% - 41px");
+  }
+
+  .left-toolbar {
+    width: 41px;
+    height: 100%;
+    float: left;
+    background-color: globals.$ve-slate-darker-2;
+    padding-top: 24px;
+    position: fixed;
+
+    @include globals.calc(right, "100% - 41px");
+  }
+
+  .toolbox {
+    width: 100%;
+    background-color: globals.$base-grey;
+  }
+
+  .tools {
+    display: block;
+    height: 45px;
+    margin-bottom: 3px;
+    color: globals.$black;
+    background-color: globals.$tertiary-grey;
+
+    @include globals.box-shadow(inset 7px 0 9px -7px globals.$tool-inset);
+
+    text-align: center;
+    vertical-align: bottom;
+    font-size: 20px;
+    line-height: 45px;
+
+    &:active {
+      background-color: globals.$white;
+
+      @include globals.box-shadow(none);
+      @include globals.transition(all 0.2s linear);
+    }
+
+    &:hover {
+      text-decoration: none;
+      color: globals.$black !important;
+      cursor: pointer;
+    }
+
+    .fa-edit-asterisk::before {
+      content: "\f044";
+      position: relative;
+      display: inline-block;
+      width: 2em;
+      height: 2em;
+      line-height: 2em;
+      vertical-align: middle;
+    }
+
+    .fa-edit-asterisk::after {
+      content: "\2a";
+      color: globals.$red;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      text-align: right;
+      float: right;
+      margin-right: 0.4em;
+      margin-top: 0.4em;
+      font-size: 12px;
+    }
+
+    .fa-save,
+    .fa-paper-plane {
+      color: globals.$brand-base;
+    }
+
+    .fa-save-all {
+      color: globals.$brand-base;
+    }
+
+    .fa-save-all::before {
+      content: "\f0c7";
+      position: relative;
+      display: inline-block;
+      width: 2em;
+      height: 2em;
+      line-height: 2em;
+      vertical-align: middle;
+      left: -6px;
+      bottom: -5px;
+    }
+
+    .fa-save-all::after {
+      content: "\f0c7";
+      position: absolute;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      float: right;
+      margin-left: 0.3em;
+      margin-top: 0.3em;
+    }
+
+    .fa-times {
+      color: globals.$red;
+    }
+
+    .fa-plus {
+      color: globals.$green;
+    }
+
+    .fa-refresh {
+      color: globals.$brand-base;
+    }
+  }
+
+  .selected {
+    background-color: globals.$white;
+
+    @include globals.box-shadow(none);
+  }
+
+  .dynamic {
+    @include globals.box-shadow(none);
+
+    background-color: globals.$white;
+  }
+
+  .pulldown {
+    margin-top: 50px;
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "elements": [
+    {
+      "id": "{{projectId}}_pm",
+      "type": "Model",
+      "documentation": "Created Automatically by MBEE System",
+      "appliedStereotypeInstanceId": "{{projectId}}_pm_asi",
+      "ownerId": "{{projectId}}"
+    },
+    {
+      "id": "{{projectId}}_pm_asi",
+      "stereotypedElementId": "{{projectId}}_pm",
+      "appliedStereotypeInstanceId": null,
+      "type": "InstanceSpecification",
+      "ownerId": "{{projectId}}_pm",
+      "slotIds": [
+        "{{projectId}}_pm_asi-slot-_17_0_2_3_407019f_1383165366792_59388_29094"
+      ],
+      "classifierIds": [
+        "_17_0_2_3_407019f_1383165357327_898985_29071"
+      ],
+      "visibility": null,
+      "documentation": "",
+      "specification": null,
+      "name": ""
+    },
+    {
+      "appliedStereotypeInstanceId": null,
+      "type": "Slot",
+      "ownerId": "{{projectId}}_pm_asi",
+      "owningInstanceId": "{{projectId}}_pm_asi",
+      "id": "{{projectId}}_pm_asi-slot-_17_0_2_3_407019f_1383165366792_59388_29094",
+      "value": [
+        {
+          "type": "LiteralString",
+          "ownerId": "{{projectId}}_pm_asi-slot-_17_0_2_3_407019f_1383165366792_59388_29094",
+          "owningSlotId": "{{projectId}}_pm_asi-slot-_17_0_2_3_407019f_1383165366792_59388_29094",
+          "owningPackageId": null,
+          "id": "{{projectId}}_pm_asi-slot-_17_0_2_3_407019f_1383165366792_59388_29094-slotvalue-0-literalstring",
+          "supplierDependencyIds": [],
+          "value": "https://cae-mms-lb.jpl.nasa.gov"
+        },
+        {
+          "type": "LiteralString",
+          "ownerId": "{{projectId}}_pm_asi-slot-_17_0_2_3_407019f_1383165366792_59388_29094",
+          "owningSlotId": "{{projectId}}_pm_asi-slot-_17_0_2_3_407019f_1383165366792_59388_29094",
+          "id": "{{projectId}}_pm_asi-slot-_17_0_2_3_407019f_1383165366792_59388_29094-slotvalue-1-literalstring",
+          "supplierDependencyIds": [],
+          "value": "http://localhost:8080"
+        }
+      ],
+      "definingFeatureId": "_17_0_2_3_407019f_1383165366792_59388_29094"
+    },
+    {
+      "twcVersion": -1,
+      "mountedElementId": "PROJECT-4b2e0639-8830-47bd-b0fc-91b3aabb5e45_pm",
+      "mountedElementProjectId": "PROJECT-4b2e0639-8830-47bd-b0fc-91b3aabb5e45",
+      "type": "Mount",
+      "mountedRefId": "master",
+      "ownerId": "{{projectId}}_pm"
+    },
+    {
+      "twcVersion": -1,
+      "mountedElementId": "PROJECT-72379b04-6dc6-43b6-8e2b-e79a5a6de142_pm",
+      "mountedElementProjectId": "PROJECT-72379b04-6dc6-43b6-8e2b-e79a5a6de142",
+      "type": "Mount",
+      "mountedRefId": "master",
+      "ownerId": "{{projectId}}_pm"
+    },
+    {
+      "twcVersion": -1,
+      "mountedElementId": "PROJECT-275116e7-5669-4796-8d65-3c2c8c8d3f9e_pm",
+      "mountedElementProjectId": "PROJECT-275116e7-5669-4796-8d65-3c2c8c8d3f9e",
+      "type": "Mount",
+      "mountedRefId": "master",
+      "ownerId": "{{projectId}}_pm"
+    },
+    {
+      "twcVersion": -1,
+      "mountedElementId": "PROJECT-9b4d2b1641e6203934d95e7bde5fe08_pm",
+      "mountedElementProjectId": "PROJECT-9b4d2b1641e6203934d95e7bde5fe08",
+      "type": "Mount",
+      "mountedRefId": "master",
+      "ownerId": "{{projectId}}_pm"
+    },
+    {
+      "twcVersion": -1,
+      "mountedElementId": "PROJECT-ID_5_9_12_2_36_25_PM__3355cc91_137159f37b3__5c3b_sscae_cmr_137_78_160_100_pm",
+      "mountedElementProjectId": "PROJECT-ID_5_9_12_2_36_25_PM__3355cc91_137159f37b3__5c3b_sscae_cmr_137_78_160_100",
+      "type": "Mount",
+      "mountedRefId": "master",
+      "ownerId": "{{projectId}}_pm"
+    },
+    {
+      "twcVersion": -1,
+      "mountedElementId": "PROJECT-595f5a46-4bbd-4126-86a6-ec01f155cb67_pm",
+      "mountedElementProjectId": "PROJECT-595f5a46-4bbd-4126-86a6-ec01f155cb67",
+      "type": "Mount",
+      "mountedRefId": "master",
+      "ownerId": "{{projectId}}_pm"
+    },
+    {
+      "twcVersion": -1,
+      "mountedElementId": "PROJECT-b818821ad5fb9956e13d5fa929369fcb_pm",
+      "mountedElementProjectId": "PROJECT-b818821ad5fb9956e13d5fa929369fcb",
+      "type": "Mount",
+      "mountedRefId": "master",
+      "ownerId": "_12_0EAPbeta_be00301_1156851270584_552173_1"
+    },
+    {
+      "twcVersion": -1,
+      "mountedElementId": "PROJECT-877558e9224f114d50dea1f39a1c119_pm",
+      "mountedElementProjectId": "PROJECT-877558e9224f114d50dea1f39a1c119",
+      "type": "Mount",
+      "mountedRefId": "master",
+      "ownerId": "{{projectId}}_pm"
+    }
+  ]
+}

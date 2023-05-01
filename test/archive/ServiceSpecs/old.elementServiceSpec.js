@@ -8,7 +8,7 @@ describe('ElementService', function() {
 
 	var root = '/alfresco/service';
 	var forceEmpty, forceFail, modElements;
-	
+
 
 	beforeEach(inject(function($injector) {
 		ElementService = $injector.get('ElementService');
@@ -24,7 +24,7 @@ describe('ElementService', function() {
 			{ elements: [ { sysmlid:12345, specialization: { type:'Comment' }, lastModified: '01-01-2014' } ] } );
 		$httpBackend.whenGET(root + '/workspaces/master/elements/12345').respond( function(method, url, data) {
 			var elements;
-			if (forceEmpty) 
+			if (forceEmpty)
 				elements = { elements: [] };
 			else {
 				elements = {elements: [ { sysmlid:12345, specialization: { type:'Comment' },
@@ -33,12 +33,12 @@ describe('ElementService', function() {
 			return [200, elements];});
 		$httpBackend.whenGET(root + '/workspaces/master/elements/12346').respond( function(method, url, data) {
 			if (forceFail) {
-				return [500, undefined, {status: {code:500, name:'Internal Error', 
+				return [500, undefined, {status: {code:500, name:'Internal Error',
 					description:'An error inside the HTTP server which prevented it from fulfilling the request.'}}];
 			} else {
 				return [200, { elements: [ { sysmlid: 12346, specialization: { type:'Package'} } ] } ];
 			}});
-	
+
 
 		// GetElement misc responses
 		$httpBackend.whenGET(root + '/workspaces/master/elements/badId').respond( function(method, url, data) {
@@ -47,16 +47,16 @@ describe('ElementService', function() {
 		$httpBackend.whenGET(root + '/workspaces/master/elements/emptyId').respond( { elements: [] });
 		$httpBackend.whenGET(root + '/workspaces/master/elements').respond(
 			{elements:[ {sysmlid:12345, name:'commentElement', documentation:'old documentation',
-			specialization:{type:'Comment'}}, {sysmlid:12346, name:'packageElement', 
+			specialization:{type:'Comment'}}, {sysmlid:12346, name:'packageElement',
 			specialization:{type:'Package'}}]});
 
 		$httpBackend.whenGET(root + '/workspaces/master/elements/noSpecialization').respond(
 			{ elements: [ { sysmlid: 'noSpecialization', documentation: 'has no specialization' } ] } );
 		$httpBackend.whenGET(root + '/workspaces/master/elements/operationId').respond(
-			{ elements: [ { sysmlid: 'operationId', specialization: { type: 'Operation', 
+			{ elements: [ { sysmlid: 'operationId', specialization: { type: 'Operation',
 			parameters: [ 'paramId', 'paramId2' ], expresion: 'expressionId' } } ] } );
 		$httpBackend.whenGET(root + '/workspaces/master/elements/productId').respond(
-			{ elements: [ { sysmlid: 'productId', specialization: { type: 'Product', 
+			{ elements: [ { sysmlid: 'productId', specialization: { type: 'Product',
 			view2view: [ { sysmlid: 'viewId', childrenViews:[] } ], noSections: [] } } ] } );
 
 		// UpdateElement response
@@ -83,9 +83,9 @@ describe('ElementService', function() {
 		$httpBackend.whenGET(root + '/workspaces/master/elements?search=muschek').respond(function(method, url, data) {
 			if (forceFail) { return [500, 'Internal Server Error']; }
 			else {
-				var elements = { elements: [ { sysmlid: 'commentId', author: 'muschek', specialization: { type: 'muschek' } }, 
-				{ sysmlid: 'packageId', author: 'muschek', specialization: { type: 'muschek' } }, 
-				{ sysmlid: 'paramId', description: 'Chris Muschek want to use this parameter for blah, blah, blah...', specialization: 
+				var elements = { elements: [ { sysmlid: 'commentId', author: 'muschek', specialization: { type: 'muschek' } },
+				{ sysmlid: 'packageId', author: 'muschek', specialization: { type: 'muschek' } },
+				{ sysmlid: 'paramId', description: 'Chris Muschek want to use this parameter for blah, blah, blah...', specialization:
 				{ type: 'Parameter', direction: 'one', parameterType: 'band name', defaultValue: undefined } } ] };
 
 				if (modElements) {
@@ -126,7 +126,7 @@ describe('ElementService', function() {
 				expect(response.lastModified).toEqual( '01-01-2014' );
 			}); $httpBackend.flush();
 		}).toThrow();
-		
+
 		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), !(elements.hasOwnProperty(id)),
 		// $http.get - fail
 		ElementService.getElement('badId', undefined, undefined, 'latest').then(function(response) { displayError(); },
@@ -155,11 +155,11 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// elements[12345] now exists
 
-		
+
 		//	Cannot exist because the 'elements' cache does not change between the two checks.
 		// 		!(inProgress.hasOwnProperty(key)), (ver === 'latest'), !(elements.hasOwnProperty(id)),
 		//		$http.get - pass, (data.elements.length > 0), (elements.hasOwnProperty(id))
-		
+
 
 		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), (elements.hasOwnProperty(id)),
 		// !(!update), $http.get - fail
@@ -188,11 +188,11 @@ describe('ElementService', function() {
 		$httpBackend.flush();
 		forceEmpty = false;
 
-		
+
 		//	Cannot exist because the 'elements' cache does not change between the two checks.
 		//		!(inProgress.hasOwnProperty(key)), (ver === 'latest'), (elements.hasOwnProperty(id)),
 		//		!(!update), $http.get - pass, (data.elements.length > 0), !(elements.hasOwnProperty(id))
-		
+
 
 		// !(inProgress.hasOwnProperty(key)), (ver === 'latest'), (elements.hasOwnProperty(id)),
 		// (!update)
@@ -262,7 +262,7 @@ describe('ElementService', function() {
 
 		// Mixed (valid and invalid) ids
 		ids = ['12345', '12346'];
-		ElementService.getElements(ids, true, undefined, undefined).then(function(response) { displayError(); }, 
+		ElementService.getElements(ids, true, undefined, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage.status).toEqual(500);
 				expect(failMessage.data).toEqual(undefined);
@@ -276,11 +276,11 @@ describe('ElementService', function() {
 	// done - 3 expected to fail
 	it('getElementForEdit', inject(function() {
 
-		
+
 		//	!(edits.hasOwnProperty(id) && !update), getElement - fail
 		//		a. (edits.hasOwnProperty(id) && update)
 		//		b. (!edits.hasOwnProperty(id) && !update)
-		
+
 		ElementService.getElementForEdit('badId', true, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage.status).toEqual(404);
@@ -288,10 +288,10 @@ describe('ElementService', function() {
 			});
 		$httpBackend.flush();
 
-		
-		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)), 
+
+		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)),
 		//	!(edit.hasOwnProperty('specialization'))
-		
+
 		ElementService.getElementForEdit('noSpecialization', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('noSpecialization');
 			expect(response.documentation).toEqual('has no specialization');
@@ -299,10 +299,10 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// edits[noSpecialization] now exists
 
-		
-		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)), 
+
+		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)),
 		//	(edit.hasOwnProperty('specialization')), !(edit.specialization.hasOwnProperty(nonEditKeys[i]))
-		
+
 		ElementService.getElementForEdit('operationId', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('operationId');
 			expect(response.specialization.type).toEqual('Operation');
@@ -311,10 +311,10 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// edits[operationId] now exists
 
-		
-		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)), 
+
+		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, !(edits.hasOwnProperty(id)),
 		//	(edit.hasOwnProperty('specialization')), (edit.specialization.hasOwnProperty(nonEditKeys[i]))
-		
+
 		ElementService.getElementForEdit('productId', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('productId');
 			expect(response.specialization.type).toEqual('Product');
@@ -323,10 +323,10 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// edits[productId] now exists
 
-		
-		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)), 
+
+		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)),
 		//	!(edit.hasOwnProperty('specialization'))
-		
+
 		ElementService.getElementForEdit('noSpecialization', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('noSpecialization');
 			expect(response.documentation).toEqual('has no specialization');
@@ -335,7 +335,7 @@ describe('ElementService', function() {
 			// edit the response
 			response.documentation = 'this element has no specialization';
 		}); $httpBackend.flush();
-		
+
 		// After edit
 		ElementService.getElementForEdit('noSpecialization', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('noSpecialization');
@@ -343,10 +343,10 @@ describe('ElementService', function() {
 			expect(response.specialization).toEqual(undefined);
 		}); $httpBackend.flush();
 
-		
-		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)), 
+
+		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)),
 		//	(edit.hasOwnProperty('specialization')), !(edit.specialization.hasOwnProperty(nonEditKeys[i]))
-		
+
 		ElementService.getElementForEdit('operationId', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('operationId');
 			expect(response.specialization.type).toEqual('Operation');
@@ -357,11 +357,11 @@ describe('ElementService', function() {
 			response.documentation = 'operations do not have non-editable properties';
 		}); $httpBackend.flush();
 
-		 
+
 		// !-- NOTE: I'm not sure if the element for edit that has been updated from the server,
 		// ought to have the documentation property if it did not already exist, but currently,
 		// it does. -- !
-		
+
 		//After an edit has been made.
 		ElementService.getElementForEdit('operationId', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('operationId');
@@ -371,10 +371,10 @@ describe('ElementService', function() {
 			expect(response.documentation).toEqual('operations do not have non-editable properties');
 		}); $httpBackend.flush();
 
-		
-		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)), 
+
+		//	!(edits.hasOwnProperty(id) && !update), getElement - pass, (edits.hasOwnProperty(id)),
 		//	(edit.hasOwnProperty('specialization')), (edit.specialization.hasOwnProperty(nonEditKeys[i]))
-		
+
 		ElementService.getElementForEdit('productId', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('productId');
 			expect(response.specialization.type).toEqual('Product');
@@ -385,11 +385,11 @@ describe('ElementService', function() {
 			response.documentation = 'products have non-editable properties';
 		}); $httpBackend.flush();
 
-		 
+
 		// !-- NOTE: I'm not sure if the element for edit that has been updated from the server,
 		// ought to have the documentation property if it did not already exist, but currently,
 		// it does. -- !
-		
+
 		//After an edit has been made.
 		ElementService.getElementForEdit('productId', true, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('productId');
@@ -470,7 +470,7 @@ describe('ElementService', function() {
 
 		// Mixed (valid and invalid) ids
 		ids = ['12345', '12346'];
-		ElementService.getElementsForEdit(ids, true, undefined, undefined).then(function(response) { displayError(); }, 
+		ElementService.getElementsForEdit(ids, true, undefined, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage.status).toEqual(500);
 				expect(failMessage.data).toEqual(undefined);
@@ -488,9 +488,9 @@ describe('ElementService', function() {
 	// done - 2 expected to fail
 	it('updateElement', inject(function() {
 
-		
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - fail
-		
+
 		var elem = { sysmlid: 'badId', specialization: { type: 'Package' } }
 		ElementService.updateElement(elem, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
@@ -499,21 +499,21 @@ describe('ElementService', function() {
 			});
 		$httpBackend.flush();
 
-		
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - pass,
 		//	!(elements.hasOwnProperty(elem.sysmlid)), !(edits.hasOwnProperty(elem.sysmlid))
-		
+
 		elem = { sysmlid: '1', specialization: { type: 'Project', version: 'v1' } };
 		ElementService.updateElement(elem, undefined).then(function(response) {
 			expect(response).toEqual(elem);
 		}); $httpBackend.flush();
 		// elements[1] now exists
 
-		
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - pass,
 		//	!(elements.hasOwnProperty(elem.sysmlid)), (edits.hasOwnProperty(elem.sysmlid)),
 		//	!(edit.hasOwnProperty('specialization'))
-		
+
 		var elem2;
 		ElementService.getElementForEdit('noSpecialization', true, 'master').then( function(response) {
 			expect(response.sysmlid).toEqual('noSpecialization');
@@ -530,18 +530,18 @@ describe('ElementService', function() {
 			expect(response.documentation).toEqual('has no specialization');
 			expect(response.name).toEqual('noSpecialization');
 
-			// Element checked out for editing, was updated when updateElement was called.
+			// Element checked out for editor, was updated when updateElement was called.
 			expect(elem2).toEqual(response);
 			expect(elem2.name).toEqual('noSpecialization');
 		}); $httpBackend.flush();
 		// elements[noSpecialization] now exists
 
 
-		
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - pass,
 		//	!(elements.hasOwnProperty(elem.sysmlid)), (edits.hasOwnProperty(elem.sysmlid)),
 		//	(edit.hasOwnProperty('specialization')), !(edit.specialization.hasOwnProperty(nonEditKeys[i]))
-		
+
 		ElementService.getElementForEdit('operationId', true, 'master').then( function(response) {
 			expect(response.sysmlid).toEqual('operationId');
 			expect(response.specialization).not.toEqual(undefined);
@@ -552,7 +552,7 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// edits[operationId] now exists
 
-		elem = { sysmlid: 'operationId', name: 'operationElement', specialization: { type: 'Operation', 
+		elem = { sysmlid: 'operationId', name: 'operationElement', specialization: { type: 'Operation',
 			parameters: [ 'paramId', 'paramId2' ], expresion: 'expressionId' } };
 		ElementService.updateElement(elem, undefined).then( function(response) {
 			expect(response.sysmlid).toEqual('operationId');
@@ -564,13 +564,13 @@ describe('ElementService', function() {
 			expect(elem2.name).toEqual(response.name);
 		}); $httpBackend.flush();
 		// elements[operationId] now exists
-		
 
-		
+
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - pass,
 		//	!(elements.hasOwnProperty(elem.sysmlid)), (edits.hasOwnProperty(elem.sysmlid)),
 		//	(edit.hasOwnProperty('specialization')), (edit.specialization.hasOwnProperty(nonEditKeys[i]))
-		
+
 		ElementService.getElementForEdit('productId', true, 'master').then( function(response) {
 			expect(response.sysmlid).toEqual('productId');
 			expect(response.specialization).not.toEqual(undefined);
@@ -582,7 +582,7 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// edits[productId] now exists
 
-		elem = { sysmlid: 'productId', name: 'productElement', specialization: { type: 'Product', 
+		elem = { sysmlid: 'productId', name: 'productElement', specialization: { type: 'Product',
 			view2view: [ { sysmlid: 'viewId', childrenViews:[] }, { sysmlid: 'viewId2', childrenViews: [] } ],
 			noSections: [] } };
 		ElementService.updateElement(elem, undefined).then( function(response) {
@@ -596,10 +596,10 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// elements[productId] now exists
 
-		
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - pass,
 		//	(elements.hasOwnProperty(elem.sysmlid)), !(edits.hasOwnProperty(elem.sysmlid))
-		
+
 		elem = { name: '2', specialization: { type: 'Project', version: 'v2' } };
 		ElementService.createElement(elem, 'master').then( function(response) {
 			expect(response.sysmlid).toBeDefined();
@@ -625,11 +625,11 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// edits[2] now exists
 
-		
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - pass,
 		//	(elements.hasOwnProperty(elem.sysmlid)), (edits.hasOwnProperty(elem.sysmlid)),
 		//	!(edit.hasOwnProperty('specialization'))
-		
+
 		elem = { name: 'noSpec2' };
 		ElementService.createElement(elem, 'master').then(function(response) {
 			expect(elem.sysmlid).not.toBeDefined();
@@ -646,7 +646,7 @@ describe('ElementService', function() {
 		// edits[noSpec2] now exists
 
 		var elem3 = { sysmlid: 'noSpec2', name: 'noSpec2', author: 'muschek' };
-		// Edit the element checked out for editing
+		// Edit the element checked out for editor
 		elem2.documentation = 'Another element without a specialization';
 		ElementService.updateElement(elem3, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('noSpec2');
@@ -654,21 +654,21 @@ describe('ElementService', function() {
 			expect(response.author).toEqual('muschek');
 			expect(response.documentation).not.toBeDefined();
 
-			// Expect the element checked out for editing to be updated and maintain it's own properties.
+			// Expect the element checked out for editor to be updated and maintain it's own properties.
 			expect(elem2.author).toEqual('muschek');
 			expect(elem2.documentation).toEqual('Another element without a specialization');
 
-			// Expect element not checked for editing to still be updated.
+			// Expect element not checked for editor to still be updated.
 			expect(elem.author).toEqual('muschek');
 			expect(elem.documentation).not.toBeDefined();
 		}); $httpBackend.flush();
 
 
-		
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - pass,
 		//	(elements.hasOwnProperty(elem.sysmlid)), (edits.hasOwnProperty(elem.sysmlid)),
 		//	(edit.hasOwnProperty('specialization')), !(edit.specialization.hasOwnProperty(nonEditKeys[i]))
-		
+
 		elem = { name: 'package2', specialization: { type: 'Package' } };
 		ElementService.createElement(elem, 'master').then(function(response) {
 			expect(elem.sysmlid).not.toBeDefined();
@@ -686,7 +686,7 @@ describe('ElementService', function() {
 		// edits[noSpec2] now exists
 
 		elem3 = { sysmlid: 'package2', name: 'package2', author: 'muschek' };
-		// Edit the element checked out for editing
+		// Edit the element checked out for editor
 		elem2.documentation = 'Another package element';
 		ElementService.updateElement(elem3, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('package2');
@@ -694,20 +694,20 @@ describe('ElementService', function() {
 			expect(response.author).toEqual('muschek');
 			expect(response.documentation).not.toBeDefined();
 
-			// Expect the element checked out for editing to be updated and maintain it's own properties.
+			// Expect the element checked out for editor to be updated and maintain it's own properties.
 			expect(elem2.author).toEqual('muschek');
 			expect(elem2.documentation).toEqual('Another package element');
 
-			// Expect element not checked for editing to still be updated.
+			// Expect element not checked for editor to still be updated.
 			expect(elem.author).toEqual('muschek');
 			expect(elem.documentation).not.toBeDefined();
 		}); $httpBackend.flush();
 
-		
+
 		//	!(!elem.hasOwnProperty('sysmlid')), !(elem.hasOwnProperty('owner')), $http.post - pass,
 		//	(elements.hasOwnProperty(elem.sysmlid)), (edits.hasOwnProperty(elem.sysmlid)),
 		//	(edit.hasOwnProperty('specialization')), (edit.specialization.hasOwnProperty(nonEditKeys[i]))
-		
+
 		elem = { name: 'view', specialization: { type: 'View', contains: [], displayedElements: [], allowedElements: [],
 			childrenViews: [] } };
 		ElementService.createElement(elem, 'master').then(function(response) {
@@ -729,10 +729,10 @@ describe('ElementService', function() {
 		}); $rootScope.$apply();
 		// edits[noSpec2] now exists
 
-		elem3 = { sysmlid: 'view', name: 'view', author: 'muschek', 
+		elem3 = { sysmlid: 'view', name: 'view', author: 'muschek',
 			specialization: { type: 'View', contains: [ 'table', 'list' ],  displayedElements: [], allowedElements: [],
 			childrenViews: [] } };
-		// Edit the element checked out for editing
+		// Edit the element checked out for editor
 		elem2.documentation = 'View element';
 		ElementService.updateElement(elem3, undefined).then(function(response) {
 			expect(response.sysmlid).toEqual('view');
@@ -740,11 +740,11 @@ describe('ElementService', function() {
 			expect(response.author).toEqual('muschek');
 			expect(response.documentation).not.toBeDefined();
 
-			// Expect the element checked out for editing to be updated and maintain it's own properties.
+			// Expect the element checked out for editor to be updated and maintain it's own properties.
 			expect(elem2.author).toEqual('muschek');
 			expect(elem2.documentation).toEqual('View element');
 
-			// Expect element not checked for editing to still be updated.
+			// Expect element not checked for editor to still be updated.
 			expect(elem.author).toEqual('muschek');
 			expect(elem.documentation).not.toBeDefined();
 		}); $httpBackend.flush();
@@ -752,7 +752,7 @@ describe('ElementService', function() {
 		//	Only one test case is necessary for the owner property.
 		//		!(!elem.hasOwnProperty('sysmlid')), (elem.hasOwnProperty('owner')), $http.post - pass,
 		//		!(elements.hasOwnProperty(elem.sysmlid)), !(edits.hasOwnProperty(elem.sysmlid))
-		
+
 		elem = { sysmlid: 'commentElement', owner: 'anotherElement',  specialization: { type: 'Comment' } };
 
 		ElementService.updateElement(elem, undefined).then(function(response) {
@@ -762,7 +762,7 @@ describe('ElementService', function() {
 			expect(response).toEqual(elem);
 		}); $httpBackend.flush();
 
-		
+
 		//	(!elem.hasOwnProperty('sysmlid'))
 		elem = { documentation: 'element without sysmlid' };
 		ElementService.updateElement(elem, undefined).then(function(response) { displayError(); },
@@ -809,15 +809,15 @@ describe('ElementService', function() {
 
 		// Invalid id
 		elems = [ { documentation: 'invalid element', specialization: { type: 'Comment' } } ];
-		ElementService.updateElements(elems, undefined).then(function(response) { displayError(); }, 
+		ElementService.updateElements(elems, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage).toEqual('Element id not found, create element first!');
-			}); 
+			});
 		$rootScope.$apply();
 
 		// Mixed (valid and invalid) ids
 		elems.push( { sysmlid: 'valid3', specialization: { type: 'Comment' } } );
-		ElementService.updateElements(elems, undefined).then(function(response) { displayError(); }, 
+		ElementService.updateElements(elems, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage).toEqual('Element id not found, create element first!');
 			});
@@ -825,23 +825,23 @@ describe('ElementService', function() {
 
 		elems = [ { sysmlid: 'validId4', specialization: { type: 'Comment' } } ];
 		elems.push( { name: 'invalid', specialization: { type: 'Package' } } );
-		ElementService.updateElements(elems, undefined).then(function(response) { displayError(); }, 
+		ElementService.updateElements(elems, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage).toEqual('Element id not found, create element first!');
 			});
 		$httpBackend.flush();
 	}));
 
-	// !-- NOTE: I'm not sure if the createElement function ought to add an owner property if 
+	// !-- NOTE: I'm not sure if the createElement function ought to add an owner property if
 	// one does not already exist. --!
-	// !-- NOTE: When creating an element and receiving an empty array back, the promise ought to 
+	// !-- NOTE: When creating an element and receiving an empty array back, the promise ought to
 	// be rejected. --!
 	// done - expects 1-2 to fail
 	it('createElement', inject(function() {
 
-		
+
 		//	!(!elem.hasOwnProperty('owner')), !(elem.hasOwnProperty('sysmlid')), $http.post - fail
-		
+
 		var elem = { name: 'badElement', specialization: { type: 'Pop-Up' },
 			documentation: 'Element with non-existant type', owner: 'ownerId' };
 		ElementService.createElement(elem, undefined).then(function(response) { displayError(); },
@@ -852,7 +852,7 @@ describe('ElementService', function() {
 
 
 		// !-- NOTE: This ought to be rejected. --!
-		
+
 		//	!(!elem.hasOwnProperty('owner')), !(elem.hasOwnProperty('sysmlid')), $http.post - pass,
 		//	!(data.elements.length > 0)
 		forceEmpty = true;
@@ -863,10 +863,10 @@ describe('ElementService', function() {
 			});
 		forceEmpty = false;
 
-		
+
 		//	!(!elem.hasOwnProperty('owner')), !(elem.hasOwnProperty('sysmlid')), $http.post - pass,
 		//	(data.elements.length > 0)
-		
+
 		// With clean element
 		elem = { name: 'viewPoint', specialization: { type: 'ViewPoint', method: 'methodId' }, owner: 'ownerId' };
 		ElementService.createElement(elem, undefined).then(function(response) {
@@ -878,7 +878,7 @@ describe('ElementService', function() {
 		// elements[viewPoint] now exists
 
 		// With dirty element
-		elem = { name: 'propertyId', specialization: { type: 'Property', isDerived: false, isSlot: false, 
+		elem = { name: 'propertyId', specialization: { type: 'Property', isDerived: false, isSlot: false,
 			propertyType: 'propertyTypeId', value: 'not an array' }, owner: 'ownerId' };
 		ElementService.createElement(elem, undefined).then(function(response) {
 			expect(response.owner).toEqual('ownerId');
@@ -891,20 +891,20 @@ describe('ElementService', function() {
 		}); $httpBackend.flush();
 		// elements[propertyId] now exists
 
-		
+
 		//	!(!elem.hasOwnProperty('owner')), (elem.hasOwnProperty('sysmlid'))
-		
+
 		elem = { name: 'alreadyWithId', sysmlid: 'alreadyWithId', owner: 'ownerId' };
-		ElementService.createElement(elem, undefined).then(function(response) { displayError(); }, 
+		ElementService.createElement(elem, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage.status).toEqual(200);
 				expect(failMessage.message).toEqual('Element create cannot have id');
 			});
 		$rootScope.$apply();
 
-			
+
 		//	(!elem.hasOwnProperty('owner')), !(elem.hasOwnProperty('sysmlid')), $http.post - fail
-		
+
 		elem = { name: 'badElement', specialization: { type: 'Pop-Up' },
 			documentation: 'Element with non-existant type' };
 		ElementService.createElement(elem, undefined).then(function(response) { displayError(); },
@@ -915,11 +915,11 @@ describe('ElementService', function() {
 
 		expect(elem.owner).not.toBeDefined();
 
-		
+
 		//	(!elem.hasOwnProperty('owner')), !(elem.hasOwnProperty('sysmlid')), $http.post - pass,
 		//	(data.elements.length > 0)
 		elem = { name: 'project', specialization: { type: 'Project', version: 'v1' } };
-		ElementService.createElement(elem, undefined).then(function(response) { 
+		ElementService.createElement(elem, undefined).then(function(response) {
 			expect(response.name).toEqual('project');
 			expect(response.specialization.type).toEqual('Project');
 			expect(response.specialization.version).toEqual('v1');
@@ -959,7 +959,7 @@ describe('ElementService', function() {
 
 		// One invalid element
 		elements = [ { sysmlid: 'badElement', documentation:'This should cause an issue' } ];
-		ElementService.createElements(elements, undefined).then(function(response) { displayError(); }, 
+		ElementService.createElements(elements, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage.status).toEqual(200);
 				expect(failMessage.message).toEqual('Element create cannot have id');
@@ -969,7 +969,7 @@ describe('ElementService', function() {
 		// Mixed valid and invalid elements
 		// [invalid, valid]
 		elements.push( { name: 'goodElement' } );
-		ElementService.createElements(elements, undefined).then(function(response) { displayError(); }, 
+		ElementService.createElements(elements, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage.status).toEqual(200);
 				expect(failMessage.message).toEqual('Element create cannot have id');
@@ -977,9 +977,9 @@ describe('ElementService', function() {
 		$httpBackend.flush();
 
 		// [valid, invalid]
-		elements = [ { name: 'goodElement' }, { sysmlid: 'badElement', 
+		elements = [ { name: 'goodElement' }, { sysmlid: 'badElement',
 			documentation:'This should cause an issue' } ];
-		ElementService.createElements(elements, undefined).then(function(response) { displayError(); }, 
+		ElementService.createElements(elements, undefined).then(function(response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage.status).toEqual(200);
 				expect(failMessage.message).toEqual('Element create cannot have id');
@@ -991,7 +991,7 @@ describe('ElementService', function() {
 	// that had no sysmlid --!
 	// done
 	it('getGenericElements', inject(function() {
-		// (!inProgress.hasOwnProperty(progress)), (ver !== 'latest') 
+		// (!inProgress.hasOwnProperty(progress)), (ver !== 'latest')
 		var siteProductsURL = '/alfresco/service/workspaces/master/sites/siteId/products';
 		ElementService.getGenericElements(siteProductsURL, 'products', undefined, undefined, '01-01-2014')
 		.then(function(response) {
@@ -1000,7 +1000,7 @@ describe('ElementService', function() {
 			expect(response[1]).toEqual({sysmlid:'PROJECT-2468', name:'Europa FS', projectVersion:'v34'});
 		}); $httpBackend.flush();
 
-		// (!inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - fail 
+		// (!inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - fail
 		var badURL = '/alfresco/service/workspaces/master/sites/siteId';
 		ElementService.getGenericElements(badURL, 'sites', undefined, undefined, 'latest')
 		.then(function(response) { console.log('This should not be displayed'); }, function(failMes) {
@@ -1008,7 +1008,7 @@ describe('ElementService', function() {
 			expect(failMes.message).toEqual('Server Error');
 		}); $httpBackend.flush();
 
-		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass, 
+		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass,
 		// !(elements.hasOwnProperty(element.sysmlid))
 		var elementsURL = '/alfresco/service/workspaces/master/elements';
 		ElementService.getGenericElements(elementsURL, 'elements', false, undefined, 'latest')
@@ -1021,7 +1021,7 @@ describe('ElementService', function() {
 		// elements[12345] and elements[12346] now exist
 
 
-		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass, 
+		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass,
 		// (elements.hasOwnProperty(element.sysmlid)), !update
 		var new_12345 = {sysmlid:12345, name:'commentElement', documentation:'new documentation',
 		 specialization:{type:'Comment'}};
@@ -1036,7 +1036,7 @@ describe('ElementService', function() {
 			expect(response[1]).toEqual({sysmlid:12346, name:'packageElement', specialization:{type:'Package'}});
 		}); $rootScope.$apply();
 
-		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass, 
+		// !(inProgress.hasOwnProperty(progress)), (ver === 'latest'), $http.get(url) - pass,
 		// (elements.hasOwnProperty(element.sysmlid)), update
 		ElementService.getGenericElements(elementsURL, 'elements', true, undefined, 'latest')
 		.then(function(response) {
@@ -1057,9 +1057,9 @@ describe('ElementService', function() {
 	// done
 	it('isDirty', inject(function() {
 
-		
+
 		//	!(!edits.hasOwnProperty(id)), !(_.isEqual(elements[id], edits[id]))
-		
+
 		var edit;
 		ElementService.getElementForEdit('productId', true, 'master').then(function(response) {
 			edit = response;
@@ -1069,9 +1069,9 @@ describe('ElementService', function() {
 		edit.documentation = 'documentation has now been edited';
 		expect(ElementService.isDirty( 'productId' )).toEqual(true);
 
-		
+
 		//	!(!edits.hasOwnProperty(id)), (_.isEqual(elements[id], edits[id]))
-		
+
 		ElementService.getElementForEdit('operationId', true, 'master'); $httpBackend.flush();
 		// edits[operationId] and elements[operationId] now exist
 		expect(ElementService.isDirty( 'operationId' )).toEqual(false);
@@ -1087,14 +1087,14 @@ describe('ElementService', function() {
 
 		//	$http.get - fail
 		forceFail = true;
-		ElementService.search('muschek', undefined, undefined).then(function (response) { displayError(); }, 
+		ElementService.search('muschek', undefined, undefined).then(function (response) { displayError(); },
 			function(failMessage) {
 				expect(failMessage.status).toEqual(500);
 				expect(failMessage.data).toEqual('Internal Server Error');
 			});
 		$httpBackend.flush();
 		forceFail = false;
-		
+
 		//	$http.get - pass, !(elements.hasOwnProperty(element.sysmlid))
 		ElementService.search('muschek', undefined, undefined).then(function(response) {
 			expect(response.length).toEqual(3);
@@ -1104,7 +1104,7 @@ describe('ElementService', function() {
 			expect(response[2]).toEqual( { sysmlid: 'paramId', description: 'Chris Muschek want to use this parameter for blah, blah, blah...',
 			specialization: { type: 'Parameter', direction: 'one', parameterType: 'band name', defaultValue: undefined } } );
 		}); $httpBackend.flush();
-		
+
 		//	$http.get - pass, (elements.hasOwnProperty(element.sysmlid)), !(update)
 		ElementService.search('muschek', false, undefined).then(function(response) {
 			expect(response.length).toEqual(3);
@@ -1114,7 +1114,7 @@ describe('ElementService', function() {
 			expect(response[2]).toEqual( { sysmlid: 'paramId', description: 'Chris Muschek want to use this parameter for blah, blah, blah...',
 			specialization: { type: 'Parameter', direction: 'one', parameterType: 'band name', defaultValue: undefined } } );
 		}); $rootScope.$apply();
-		
+
 		//	$http.get - pass, (elements.hasOwnProperty(element.sysmlid)), (update)
 		ElementService.search('muschek', true, undefined).then(function(response) {
 			expect(response.length).toEqual(4);

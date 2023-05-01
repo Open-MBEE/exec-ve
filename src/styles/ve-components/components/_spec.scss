@@ -1,0 +1,189 @@
+/* VE base styles */
+@use "src/styles/globals";
+
+.pane-right,
+.revert-spec {
+  h1.prop,
+  h1.prop > .form-control {
+    font-size: 26px;
+    // margin: 30px 0 0;
+    height: inherit;
+    width: 100%;
+    font-weight: globals.$default-font-weight;
+  }
+
+  .tool-spinner {
+    margin: 50%;
+  }
+
+  h1.prop {
+    width: 100%;
+    word-wrap: break-word;
+
+    /* Make presentation element icons smaller and to the top of the name */
+
+    .item-type-view,
+    .item-type-document,
+    .item-type-group,
+    .item-type-tag,
+    .pe-type-paragraph,
+    .pe-type-paragraph-t,
+    .pe-type-section,
+    .pe-type-section-t,
+    .pe-type-text,
+    .pe-type-text-t,
+    .pe-type-table,
+    .pe-type-table-t,
+    .pe-type-image,
+    .pe-type-image-t,
+    .pe-type-equation,
+    .pe-type-comment {
+      &::before {
+        color: globals.$ve-silver-darker-3;
+        font-size: 0.6em;
+        top: -0.3em;
+        padding-right: 6px;
+        position: relative;
+      }
+    }
+  }
+
+  h2.prop-title {
+    padding-top: 24px;
+  }
+
+  span.prop {
+    font-size: 16px;
+    margin-bottom: 20px;
+    margin-top: 2px;
+    word-wrap: break-word;
+    display: block;
+  }
+
+  h1.element-title {
+    word-wrap: break-word;
+  }
+
+  .doc-text {
+    font-family: globals.$font-family-sans-serif;
+
+    /* Add border to left to delineate */
+    padding-left: 8px;
+    border-left: 4px solid globals.$ve-silver-base;
+    max-width: globals.$default-line-length;
+    margin-top: 2px;
+
+    // min-width: 15em;
+  }
+
+  h2.spec-view-doc-heading,
+  h2.spec-view-value-heading,
+  h2.spec-view-type-heading {
+    margin-top: 16px;
+  }
+
+  table {
+    @extend .content-table !optional;
+  }
+
+  spec {
+    mms-transclude-doc {
+      cursor: auto;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------
+Styles that apply to both the spec
+------------------------------------------------------------------- */
+
+.mms-search,
+.pane-right,
+.revert-spec {
+  .elem-wrapper label,
+  .prop-title,
+  .visibility-toggle {
+    font-size: 12px;
+    font-weight: bold;
+    margin: 8px 0 0;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    color: globals.$ve-light-text;
+  }
+
+  .visibility-toggle {
+    list-style: none;
+    margin: 12px 0 0 -14px;
+
+    td {
+      line-height: 2.6em;
+      position: relative;
+    }
+
+    // Show more content caret
+    a {
+      // show more content caret
+      &::after {
+        content: "\f078";
+        font-family: globals.$icon-font-name;
+        font-size: 10px;
+        padding: 0 2px;
+      }
+
+      // Show less content caret
+      &.active::after {
+        content: "\f077";
+        font-family: globals.$icon-font-name;
+      }
+
+      // Add ellipses to list before "show more"
+      &:not(.active)::before {
+        content: "...";
+        font-size: 16px;
+        color: globals.$tertiary-grey;
+        position: absolute;
+        top: -1em;
+      }
+    }
+  }
+
+  /* Light grey boxes for metatype styling */
+  .elem-type {
+    letter-spacing: 0.06em;
+    padding: 1px 5px;
+    white-space: nowrap;
+    margin: 3px 6px 3px 3px;
+    display: inline-block;
+    font-size: 12px;
+    background: globals.$highlight-grey;
+
+    @include globals.border-radius(3px);
+
+    color: globals.$ve-light-text-darker-1;
+    font-weight: 500;
+
+    // border: 1px solid $ve-silver-darker-1;
+  }
+
+  /* pull in metatype wrapper to compensate for padding */
+  .elem-type-wrapper {
+    margin-left: -3px;
+  }
+
+  /* Specific styling for last updated */
+  .elem-updated-wrapper {
+    color: globals.$medium-grey;
+    font-size: 14px;
+    display: block;
+  }
+
+  /* File icon for documents and views */
+  .elem-related-docs-wrapper mms-view-link a::before {
+    content: "\f15b";
+    font-family: globals.$icon-font-name;
+    padding: 0 4px 0 0;
+    font-size: 0.75em;
+    position: relative;
+    top: -0.1em;
+  }
+}

@@ -1,0 +1,75 @@
+Step 1
+(var|const|let)? ?(\$?scope\.)?([a-zA-Z]*) (= )?function? ?(\([A-Za-z, \?]*\))( =>)?
+public $2$3
+
+function? ?([a-zA-Z]*) ?(\([A-Za-z, \?]*\))( =>)?
+^([^\S\r\n])[\s\t]*function ([_a-zA-Z]*) ?(\([A-Za-z, \?]*\))
+public $1$2
+
+Step 2
+([a-zA-Z]*)Service\.(?!provider|factory|service)
+this.\l$1Svc.
+
+(this\.)?((\$interval|\$http|\$window|\$q|\$timeout|\$uibModal|\$state|\$localStorage|autosaveSvc|growl|hotkeys|rootScopeSvc|eventSvc|edit)(\.|\())
+this.$2
+
+function ?(\([0-9a-zA-Z_ ,:]*\))
+$1 =>
+
+
+public $2$3
+Region\.prototype\.([a-zA-Z]*) = (\([a-z,]*\)) =>
+(width|right|left|top|bottom|height)
+([a-zA-Z]*)Service\.(?!provider|factory|service)
+function ?(\([a-zA-Z_ ,]*\))
+
+//Services in constructors
+([a-zA-Z]*)Service(,?)
+private \l$1Svc: $1Service$2
+
+//Angular providers in constructors
+(\$)?([a-zA-Z]{2,20})(,?)
+private $1$2: angular.I\u$2Service
+
+//Constructor to static $inject
+\s*(public|private) (\$)?([a-zA-Z]{2,20}|\$q): [A-Z<>a-z\.]*(,?)\n?
+ '$2$3'$4
+
+//then convert back to Service formal names
+'([a-zA-Z]*)Svc'
+'\u$1Service'
+
+//Bindings
+([A-Za-z]{2,15}),
+$1: "<",\n
+
+: '?"?[@<\?>a-zA-Z]{1,15}'?"?,?
+;
+
+
+this\.(editing|editable|edit|keepMode|editValue)
+
+private ([a-zA-Z]{0,20}) ?:? ?([a-zA-Z$]*)
+
+
+//Change existing prototypes to instances for callback
+(   )(public|private)? ([_a-zA-Z]{2,50})(\<[A-Z,]*\>)?(\([\n_A-Za-z:=>\(\), \$\?]*\))(: [| A-Z_a-z]*)? \{
+$1$2 $3 = $4$5 => {
+
+For refactoring
+((import \{)(, )?(.*)(\} from "@ve-utils/mms-api-client")(;)?\n)?((import \{)(.*), ?(AuthService|CacheService|ElementService|HttpService|PermissionsService|ProjectService|URLService|ViewService)(\n)?(, )?(.*)?(, )?(\} from "@ve-utils/services"))
+import \{$4, $10\} from "@ve-utils/mms-api-client";\n$8$9$11$12$14
+
+
+myStr
+angular.module('veDirectives')['_invokeQueue'].forEach(function(value){
+    var tag = value[2][0].replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
+    console.log(value[1] + ": " + tag);
+});
+
+//Module Exports
+import ("[A-Za-z./]*";)
+export * from $1
+
+
+(\(|: |, )bootstrap.(?!box|gradient|reset|\$link-|\$breadcrumb-|\$popover-|\$padding-|\$cursor-|\$jumbotron-|\$carousel-|\$badge-|\$close-|\$label-|\$line-|\$input-|\$thumbnail-|\$screen-|\$dropdown-|\$navbar-|\$grid-|\$panel|-\$well|\$alert-|\$progress-|\$list|\$border-|\$zindex|\$icon|\$bootstrap|\$caret|\$font|\$line|\$tooltip|\$btn)(\$)?

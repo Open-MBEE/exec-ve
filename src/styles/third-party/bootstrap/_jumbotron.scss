@@ -1,0 +1,56 @@
+@use "sass:color";
+@use "../bootstrap-variables" as bootstrap;
+
+// --------------------------------------------------
+// Jumbotron
+// --------------------------------------------------
+
+.jumbotron {
+  padding-top:    bootstrap.$jumbotron-padding;
+  padding-bottom: bootstrap.$jumbotron-padding;
+  margin-bottom: bootstrap.$jumbotron-padding;
+  color: bootstrap.$jumbotron-color;
+  background-color: bootstrap.$jumbotron-bg;
+
+  h1,
+  .h1 {
+    color: bootstrap.$jumbotron-heading-color;
+  }
+
+  p {
+    margin-bottom: (bootstrap.$jumbotron-padding / 2);
+    font-size: bootstrap.$jumbotron-font-size;
+    font-weight: 200;
+  }
+
+  > hr {
+    border-top-color: color.scale(bootstrap.$jumbotron-bg, $lightness: -10%);
+  }
+
+  .container &,
+  .container-fluid & {
+    border-radius: bootstrap.$border-radius-large; // Only round corners at higher resolutions if contained in a container
+    padding-left:  (bootstrap.$grid-gutter-width / 2);
+    padding-right: (bootstrap.$grid-gutter-width / 2);
+  }
+
+  .container {
+    max-width: 100%;
+  }
+
+  @media screen and (min-width: bootstrap.$screen-sm-min) {
+    padding-top:    (bootstrap.$jumbotron-padding * 1.6);
+    padding-bottom: (bootstrap.$jumbotron-padding * 1.6);
+
+    .container &,
+    .container-fluid & {
+      padding-left:  (bootstrap.$jumbotron-padding * 2);
+      padding-right: (bootstrap.$jumbotron-padding * 2);
+    }
+
+    h1,
+    .h1 {
+      font-size: bootstrap.$jumbotron-heading-font-size;
+    }
+  }
+}

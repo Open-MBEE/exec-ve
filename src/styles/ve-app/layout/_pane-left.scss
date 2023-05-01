@@ -1,0 +1,84 @@
+/* VE base styles */
+@use "src/styles/globals";
+@use "sass:color";
+
+/*************************
+  Styles for the View Editor left pane
+*************************/
+
+$pane-left-btn-group-width: 244px;
+
+#main-pane {
+  > .west-pane {
+    &.ng-pane-orientation-horizontal {
+      .ng-pane-handle > .ng-pane-toggle {
+        @include globals.box-shadow(2px 0 2px 0 rgba(100, 100, 100, 0.2));
+
+        margin-right: 1px;
+
+        &::before {
+          left: -1;
+        }
+      }
+    }
+
+    .west-pane {
+      @include globals.box-shadow(1px 0 1px 0 rgba(0, 0, 0, 0.2));
+    }
+  }
+}
+
+.container-pane-left {
+  height: 100%;
+  width: 100%;
+  background: globals.$ve-silver-lighter-1;
+
+  .tree-view,
+  .pane-left {
+    width: 100%;
+    height: 100%;
+    min-width: $pane-left-btn-group-width;
+    padding-block-end: 40px;
+
+    .tree-spinner {
+      margin: 50%;
+    }
+
+    .tree-view-buttons {
+      padding: 5px 4px;
+      background: globals.$white;
+    }
+
+    h4.tree-view-title {
+      display: block;
+      margin: 20px 0;
+    }
+
+    hr.tree-title-divider {
+      margin: 0 -18px;
+      border-color: globals.$ve-silver-darker-2;
+    }
+
+    .tree-options {
+      display: flex;
+      padding: 4px 5px;
+      background: globals.$white;
+      border-top: 1px solid globals.$ve-silver-darker-1;
+      border-bottom: 1px solid globals.$ve-silver-darker-1;
+
+      .ve-plain-input {
+        margin: 0 2px;
+        border-color: globals.$ve-silver-darker-1;
+      }
+
+      .btn-tools {
+        padding: 4px 6px;
+        background: transparent;
+      }
+    }
+
+    .fa-folder {
+      color: color.scale(globals.$ve-accent, $lightness: 12%);
+    }
+  }
+}
