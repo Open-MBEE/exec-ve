@@ -2,12 +2,10 @@ import angular, { IComponentController } from 'angular'
 
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
-import { handleChange } from '@ve-utils/utils/change.util'
-
-import { veComponents } from '@ve-components'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { RequestObject } from '@ve-types/mms'
+import { veComponents } from "@ve-components";
 
 /**
  * @ngdoc component
@@ -123,8 +121,8 @@ export class CrossReferenceController implements IComponentController {
     }
 }
 
-const ViewCfComponent: VeComponentOptions = {
-    selector: 'viewCf',
+const MmsCfComponent: VeComponentOptions = {
+    selector: 'mmsCf',
     template: `<div></div>`,
     transclude: true,
     bindings: {
@@ -140,10 +138,9 @@ const ViewCfComponent: VeComponentOptions = {
         mmsCfLabel: '@',
     },
     require: {
-        transclusionCtrl: '?^^transclusion', //TODO this will never have anything?
+        transclusionCtrl: '?^^mmsCf',
         mmsViewCtrl: '?^^view',
     },
     controller: CrossReferenceController,
 }
-
-veComponents.component(ViewCfComponent.selector, ViewCfComponent).component('mmsCf', ViewCfComponent)
+veComponents.component(MmsCfComponent.selector, MmsCfComponent)

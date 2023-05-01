@@ -52,15 +52,15 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
         history: null,
         commitSelected: null,
         isOpen: false,
-        refIsOpen: false
+        refIsOpen: false,
     }
-    historyVer: string = "latest"
+    historyVer: string = 'latest'
     compareCommit: Commit = {
         ref: null,
         history: null,
         commitSelected: null,
         isOpen: false,
-        refIsOpen: false
+        refIsOpen: false,
     }
     disableRevert: boolean
     keepCommitSelected: boolean = false
@@ -118,28 +118,31 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
             return
         }
         this.gettingHistory = true
-        this.elementSvc.getElementHistory(reqOb, 2, true).then(
-            (data) => {
-                this.historyVer = 'latest'
-                this.compareCommit.history = data
-                this.compareCommit.commitSelected = this.compareCommit.history[0]
-                this.baseCommit.history = data
-                if (data.length > 1) {
-                    this.baseCommit.commitSelected = this.compareCommit.history[1]
-                } else if (data.length > 0) {
-                    this.baseCommit.commitSelected = this.compareCommit.history[0]
-                } else {
-                    this.baseCommit.commitSelected = '--- none ---'
+        this.elementSvc
+            .getElementHistory(reqOb, 2, true)
+            .then(
+                (data) => {
+                    this.historyVer = 'latest'
+                    this.compareCommit.history = data
+                    this.compareCommit.commitSelected = this.compareCommit.history[0]
+                    this.baseCommit.history = data
+                    if (data.length > 1) {
+                        this.baseCommit.commitSelected = this.compareCommit.history[1]
+                    } else if (data.length > 0) {
+                        this.baseCommit.commitSelected = this.compareCommit.history[0]
+                    } else {
+                        this.baseCommit.commitSelected = '--- none ---'
+                    }
+                    void this.getRefs()
+                },
+                (reason) => {
+                    this.growl.error(`Unable to get Element History - ${reason.message}`)
                 }
-                void this.getRefs()
-            },
-            (reason) => {
-                this.growl.error(`Unable to get Element History - ${reason.message}`)
-            }
-        ).finally(() => {
-            this.gettingHistory = false
-            this.disableRevert = this._isSame()
-        })
+            )
+            .finally(() => {
+                this.gettingHistory = false
+                this.disableRevert = this._isSame()
+            })
     }
 
     // Get ref list for project and details on

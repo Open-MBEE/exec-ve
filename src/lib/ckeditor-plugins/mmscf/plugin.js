@@ -13,8 +13,7 @@ CKEDITOR.plugins.add('mmscf', {
         editor.widgets.add('mmscf', {
             button: 'Insert Cross Reference',
 
-            allowedContent:
-                'mms-cf[*];view-cf[*];',
+            allowedContent: 'mms-cf[*];',
             inline: true,
             insert: () => {
                 var defaultConfig = {
@@ -22,21 +21,14 @@ CKEDITOR.plugins.add('mmscf', {
                         console.log('There is no callback function defined')
                     },
                 }
-                var config = CKEDITOR.tools.extend(
-                    defaultConfig,
-                    editor.config.mmscf || {},
-                    true
-                )
+                var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmscf || {}, true)
                 var tag = config.callbackModalFnc(editor, false)
             },
             // Check the elements that need to be converted to widgets.
             upcast: (element) => {
                 // Return "true" (that element needs to converted to a mmscf widget)
                 // for all <mms-transclude-doc> elements.
-                return (
-                    element.name === 'mms-cf' ||
-                    element.name === 'view-cf'
-                )
+                return element.name === 'mms-cf'
             },
         })
     },

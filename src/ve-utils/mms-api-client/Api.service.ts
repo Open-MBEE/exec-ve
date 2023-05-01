@@ -147,6 +147,9 @@ export class ApiService {
         if (elem.hasOwnProperty('specialization')) {
             delete elem.specialization
         }
+        if (!elem.hasOwnProperty('appliedStereotypeIds') && elem._appliedStereotypeIds) {
+            elem.appliedStereotypeIds = elem._appliedStereotypeIds
+        }
         if (forEdit) {
             //only keep editable or needed keys in edit object instead of everything
             const keys = Object.keys(elem)
@@ -338,16 +341,16 @@ export class ApiService {
      * @returns {boolean} boolean
      */
     public isView = (e: ElementObject): boolean => {
-        if (e._appliedStereotypeIds) {
+        if (e.appliedStereotypeIds) {
             if (
-                e._appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('VIEW_SID', this.schema)) >= 0 ||
-                e._appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)) >= 0
+                e.appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('VIEW_SID', this.schema)) >= 0 ||
+                e.appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)) >= 0
             ) {
                 return true
             }
             const otherViewSids: string[] = this.schemaSvc.getSchema('OTHER_VIEW_SID', this.schema)
             for (const otherViewSid of otherViewSids) {
-                if (e._appliedStereotypeIds.indexOf(otherViewSid) >= 0) {
+                if (e.appliedStereotypeIds.indexOf(otherViewSid) >= 0) {
                     return true
                 }
             }
@@ -364,8 +367,8 @@ export class ApiService {
      */
     public isDocument = (e: ElementObject): boolean => {
         return (
-            e._appliedStereotypeIds &&
-            e._appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)) >= 0
+            e.appliedStereotypeIds &&
+            e.appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)) >= 0
         )
     }
 
@@ -377,10 +380,10 @@ export class ApiService {
      * @returns {boolean} boolean
      */
     public isRequirement = (e: ElementObject): boolean => {
-        if (e._appliedStereotypeIds) {
+        if (e.appliedStereotypeIds) {
             const reqSids = this.schemaSvc.getSchema<string[]>('REQUIREMENT_SID', this.schema)
             for (const reqSid of reqSids) {
-                if (e._appliedStereotypeIds.indexOf(reqSid) >= 0) {
+                if (e.appliedStereotypeIds.indexOf(reqSid) >= 0) {
                     return true
                 }
             }

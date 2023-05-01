@@ -389,7 +389,7 @@ class PresentTableController extends Presentation {
         } else if (!containerDivContent.prop('tagName')) {
             return cell.text().trim()
         } else {
-            const cf = 'view-cf'
+            const cf = 'mms-cf'
             const contentTag: string = (containerDivContent.prop('tagName') as object).toString().toLowerCase()
             const contentTagAttr = containerDivContent.attr('mms-cf-type')
             if (

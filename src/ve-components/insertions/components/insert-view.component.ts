@@ -127,7 +127,7 @@ class InsertViewController extends Insertion<InsertViewData> {
 
     public queryFilter = (): SearchFilter => {
         const filters: SearchFilter = {}
-        filters._appliedStereotypeIds = [
+        filters.appliedStereotypeIds = [
             this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
             this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
             ...this.schemaSvc.getSchema<string[]>('OTHER_VIEW_SID', this.schema),

@@ -114,15 +114,15 @@ const MmsSearchResultsComponent: VeComponentOptions = {
     <label>Related Documents</label>
     <!-- show no more than three related views here-->
     <div ng-repeat="doc in $ctrl.elem.someRelatedDocuments" class="elem-documentation">
-        <view-link suppress-numbering="true" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedDocument.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedDocument, elem)"></view-link>
-        > <view-link suppress-numbering="true" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedView.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedView, elem)"></view-link><br/>
+        <mms-view-link suppress-numbering="true" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedDocument.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedDocument, elem)"></mms-view-link>
+        > <mms-view-link suppress-numbering="true" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedView.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedView, elem)"></mms-view-link><br/>
     </div>
 
     <!-- show the remaining related views when users click on "More" -->
     <div ng-if="$ctrl.elem.remainingRelatedDocuments">
         <div ng-repeat="doc in $ctrl.elem.remainingRelatedDocuments" class="elem-documentation">
-            <view-link suppress-numbering="true" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedDocument.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedDocument, elem)"></view-link>
-            > <view-link suppress-numbering="true" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedView.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedView, elem)"></view-link><br/>
+            <mms-view-link suppress-numbering="true" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedDocument.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedDocument, elem)"></mms-view-link>
+            > <mms-view-link suppress-numbering="true" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedView.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedView, elem)"></mms-view-link><br/>
         </div>
     </div>
 
@@ -136,8 +136,8 @@ const MmsSearchResultsComponent: VeComponentOptions = {
     <label>Metatypes</label>
     <div class="elem-type-wrapper">
         <span class="elem-type">{{$ctrl.elem.type}}</span>
-        <span ng-if="$ctrl.elem._appliedStereotypeIds.length">
-            <span ng-repeat="type in $ctrl.elem._appliedStereotypeIds">
+        <span ng-if="$ctrl.elem.appliedStereotypeIds.length">
+            <span ng-repeat="type in $ctrl.elem.appliedStereotypeIds">
                 <transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" no-click="true"></transclude-name>
             </span>
         </span>

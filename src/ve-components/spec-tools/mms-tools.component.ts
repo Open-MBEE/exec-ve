@@ -111,6 +111,7 @@ class ToolsController {
     editable: boolean
     viewId: string
     elementSaving: boolean
+    elementLoading: boolean
 
     protected errorType: string
 
@@ -203,6 +204,12 @@ class ToolsController {
             })
         )
 
+        this.subs.push(
+            this.eventSvc.binding<boolean>('spec.ready', (data) => {
+                this.elementLoading = !data
+            })
+        )
+
         this.hotkeys.bindTo(this.$scope).add({
             combo: 'alt+a',
             description: 'save all',
@@ -254,14 +261,15 @@ class ToolsController {
                 const go = (): void => {
                     this.editorSvc.cleanUpEdit(this.specSvc.getEdits().key)
                     if (this.autosaveSvc.openEdits() > 0) {
-                        const next = Object.keys(this.autosaveSvc.getAll())[0]
-                        const id = next.split('|')
-                        this.specSvc.tracker.etrackerSelected = next
-                        this.specSvc.keepMode()
-                        this.specApi.elementId = id[0]
-                        this.specApi.projectId = id[1]
-                        this.specApi.refId = id[2]
-                        this.specApi.commitId = 'latest'
+                        const id = Object.keys(this.autosaveSvc.getAll())[0]
+                        const info = id.split('|')
+                        const data: veCoreEvents.elementSelectedData = {
+                            elementId: info[2],
+                            projectId: info[0],
+                            refId: info[1],
+                            commitId: 'latest',
+                        }
+                        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
                     } else {
                         this.specSvc.setEditing(false)
                         this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
@@ -329,7 +337,11 @@ class ToolsController {
         const tag = this.extensionSvc.getTagByType('spec', id)
         const toolId: string = _.camelCase(id)
         const newTool: JQuery = $(
-            '<div id="' + toolId + '" class="container-fluid" ng-if="$ctrl.show.' + toolId + '"></div>'
+            '<div id="' +
+                toolId +
+                '" class="container-fluid" ng-if="!$ctrl.elementLoading && $ctrl.show.' +
+                toolId +
+                '"></div>'
         )
         if (tag === 'extensionError') {
             this.errorType = this.currentTool.replace('spec-', '')
@@ -381,13 +393,14 @@ class ToolsController {
                         () => {
                             if (this.autosaveSvc.openEdits() > 0) {
                                 const next = Object.keys(this.autosaveSvc.getAll())[0]
-                                const id = next.split('|')
-                                this.specSvc.tracker.etrackerSelected = next
-                                this.specSvc.keepMode()
-                                this.specApi.elementId = id[2]
-                                this.specApi.projectId = id[0]
-                                this.specApi.refId = id[1]
-                                this.specApi.commitId = 'latest'
+                                const info = next.split('|')
+                                const data: veCoreEvents.elementSelectedData = {
+                                    elementId: info[2],
+                                    projectId: info[0],
+                                    refId: info[1],
+                                    commitId: 'latest',
+                                }
+                                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
                             } else {
                                 this.specSvc.setEditing(false)
                                 this.specSvc.toggleSave(this.toolbarId)
@@ -417,13 +430,16 @@ class ToolsController {
     }
 }
 
-const ViewToolsComponent: VeComponentOptions = {
-    selector: 'viewTools',
+const MmsToolsComponent: VeComponentOptions = {
+    selector: 'mmsTools',
     template: `
     <div class="container-fluid">
     <h4 class="right-pane-title">{{$ctrl.currentTitle}}</h4>
     <hr class="right-title-divider">
-    <div id="tools"></div>
+    <div ng-if="$ctrl.elementLoading" class="tool-spinner" >
+        <i class="fa fa-spin fa-spinner"></i>
+    </div>
+    <div ng-hide="$ctrl.elementLoading" id="tools"></div>
 </div>
     `,
     bindings: {
@@ -433,4 +449,4 @@ const ViewToolsComponent: VeComponentOptions = {
     controller: ToolsController,
 }
 
-veComponents.component(ViewToolsComponent.selector, ViewToolsComponent)
+veComponents.component(MmsToolsComponent.selector, MmsToolsComponent)

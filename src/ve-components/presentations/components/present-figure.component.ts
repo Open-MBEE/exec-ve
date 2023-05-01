@@ -6,7 +6,7 @@ import { IPresentationComponentOptions } from '@ve-types/components/presentation
 
 const PresentFigureComponent: IPresentationComponentOptions = {
     selector: 'presentFigure',
-    template: `<view-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></view-cf>
+    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
 `,
     bindings: {
         peObject: '<',

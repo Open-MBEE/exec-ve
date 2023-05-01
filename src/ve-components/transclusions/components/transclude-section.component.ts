@@ -1,17 +1,17 @@
+import { PresentationService } from '@ve-components/presentations'
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { DeletableTransclusion, ITransclusion, Transclusion } from '@ve-components/transclusions'
+import { DeletableTransclusion, ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import {editor_buttons, EditorService} from '@ve-core/editor'
+import { editor_buttons, EditorService } from '@ve-core/editor'
 import { MathService, UtilsService, ImageService, RootScopeService } from '@ve-utils/application'
 import { EditService, EventService } from '@ve-utils/core'
-import {ElementService, ViewService} from '@ve-utils/mms-api-client'
+import { ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import {InstanceValueObject} from "@ve-types/mms";
-import {PresentationService} from "@ve-components/presentations";
+import { InstanceValueObject } from '@ve-types/mms'
 
 /**
  * @ngdoc component
@@ -68,7 +68,7 @@ export class TranscludeSectionController extends DeletableTransclusion implement
         imageSvc: ImageService,
         viewSvc: ViewService,
         private presentationSvc: PresentationService,
-        private rootScopeSvc: RootScopeService,
+        private rootScopeSvc: RootScopeService
     ) {
         super(
             $q,
@@ -108,9 +108,11 @@ export class TranscludeSectionController extends DeletableTransclusion implement
             if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element)
             e.stopPropagation()
         })
-        this.subs.push(this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VENUMBERINGON, (data) => {
-            this.showNumbering = data
-        }))
+        this.subs.push(
+            this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VENUMBERINGON, (data) => {
+                this.showNumbering = data
+            })
+        )
     }
 
     $onDestroy(): void {
@@ -128,7 +130,7 @@ export class TranscludeSectionController extends DeletableTransclusion implement
             }
         }
         const deferred = this.$q.defer<string>()
-        deferred.reject({status: 200}); //don't recompile
+        deferred.reject({ status: 200 }) //don't recompile
         return deferred.promise
     }
 }

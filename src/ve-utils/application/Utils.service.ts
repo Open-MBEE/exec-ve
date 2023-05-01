@@ -155,7 +155,7 @@ export class UtilsService {
         let prefix = ''
         const el = printElement.find('#' + sysmlId)
         const refs = printElement.find(
-            'view-link[mms-pe-id="' + sysmlId + '"], view-link[data-mms-pe-id="' + sysmlId + '"]'
+            'mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]'
         )
         let cap = ''
         let name = ''
@@ -293,7 +293,7 @@ export class UtilsService {
             capEq.html(equationCap)
             // If caption does not exist, add to html
             if (capEq.length === 0) {
-                el.find('present-equation > view-cf > transclude-doc > p')
+                el.find('present-equation > mms-cf > transclude-doc > p')
                     .last()
                     .append('<span class="caption-type-equation pull-right">' + equationCap + '</span>')
             }
@@ -402,7 +402,7 @@ export class UtilsService {
      * @returns {void} nothing
      */
     public convertViewLinks(printElement: JQuery<HTMLElement>): void {
-        printElement.find('view-link, mms-view-link').each((index) => {
+        printElement.find('mms-view-link').each((index) => {
             const $this = $(this)
             let elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id')
             if (!elementId) {

@@ -1101,6 +1101,14 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@openmbee/angularjs-dropdown-multiselect@./lib/openmbee-angularjs-dropdown-multiselect-v1.0.2.tgz":
+  version "1.0.2"
+  resolved "./lib/openmbee-angularjs-dropdown-multiselect-v1.0.2.tgz#d219ab5df1b76b2c1690b20df09119f7746973e3"
+  dependencies:
+    angular "1.8.3"
+    jquery "^3.6.0"
+    lodash "^4.17.21"
+
 "@openmbee/html-to-vdom@^0.9.0":
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/@openmbee/html-to-vdom/-/html-to-vdom-0.9.0.tgz#0da7385a3b933934fed6aaf5272d1c771d2a458f"
@@ -1197,6 +1205,11 @@
   version "1.8.4"
   resolved "https://registry.npmjs.org/@types/angular/-/angular-1.8.4.tgz"
   integrity sha512-wPS/ncJWhyxJsndsW1B6Ta8D4mi97x1yItSu+rkLDytU3oRIh2CFAjMuJceYwFAh9+DIohndWM0QBA9OU2Hv0g==
+
+"@types/ckeditor4@^4.20.0":
+  version "4.20.0"
+  resolved "https://registry.yarnpkg.com/@types/ckeditor4/-/ckeditor4-4.20.0.tgz#b6ff5630266e5bc6c0e832941ac08718115d05fa"
+  integrity sha512-qpLHaH3TLNKJz4hr8dYCqhHo1HZRh6BgfUC8uFQ/VrhR0d+c32YYn9+ZvZvIFZ8V6COX1a66n6k3d8WWjBje4g==
 
 "@types/diff@^3.5.0":
   version "3.5.5"
@@ -1734,9 +1747,9 @@ angular-ui-tree@^2.22.6:
   resolved "https://registry.npmjs.org/angular-ui-tree/-/angular-ui-tree-2.22.6.tgz"
   integrity sha512-VzuXM6NdYeQD0Y1RF5oTYc3o8yoW9mtxhnJs5Fvwu40V1Alzq7ybJj+kvApXZ69M0mvRd8LLM+3Q4pI26md+fA==
 
-angular@^1.8.2:
+angular@1.8.3, angular@^1.8.2:
   version "1.8.3"
-  resolved "https://registry.npmjs.org/angular/-/angular-1.8.3.tgz"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.3.tgz#851ad75d5163c105a7e329555ef70c90aa706894"
   integrity sha512-5qjkWIQQVsHj4Sb5TcEs4WZWpFeVFHXwxEBHUhrny41D8UrBAd6T/6nPPAsLngJCReIOqi95W3mxdveveutpZw==
 
 angulartics-piwik@^1.0.6:

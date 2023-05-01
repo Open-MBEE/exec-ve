@@ -64,7 +64,9 @@ export class ViewHtmlService {
             result.push('</thead>')
         }
         if (this.applicationSvc.getState().inDoc && !table.excludeFromList) {
-            result.push('<caption>Table {{$ctrl.instanceSpec._veNumber}}. {{$ctrl.table.title || $ctrl.instanceSpec.name}}</caption>')
+            result.push(
+                '<caption>Table {{$ctrl.instanceSpec._veNumber}}. {{$ctrl.table.title || $ctrl.instanceSpec.name}}</caption>'
+            )
         } else if (table.title) {
             result.push('<caption>' + table.title + '</caption>')
         } //same for caption to control stacking context
@@ -199,7 +201,7 @@ export class ViewHtmlService {
         if (para.nonEditable) {
             attr = ` non-editable="${para.nonEditable.toString()}"`
         }
-        return '<view-cf mms-cf-type="' + t + '" mms-element-id="' + para.source + '"' + attr + '></view-cf>'
+        return '<mms-cf mms-cf-type="' + t + '" mms-element-id="' + para.source + '"' + attr + '></mms-cf>'
     }
 
     public makeHtml = (thing: PresentationInstanceObject): string => {
@@ -210,7 +212,7 @@ export class ViewHtmlService {
         } else if (thing.type === 'List') {
             return this.makeHtmlList(thing as PresentListObject)
         } else if (thing.type === 'Image') {
-            return `<view-cf mms-cf-type="img" mms-element-id="${(thing as PresentImageObject).id}"></view-cf>`
+            return `<mms-cf mms-cf-type="img" mms-element-id="${(thing as PresentImageObject).id}"></mms-cf>`
         }
     }
 }

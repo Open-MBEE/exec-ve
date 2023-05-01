@@ -1,11 +1,12 @@
+import { handleChange } from '@ve-utils/utils'
+
 import { veComponents } from '@ve-components'
 
 import { HtmlRenderedDiff } from '../../../lib/html-rendered-diff'
-import {handleChange} from "@ve-utils/utils";
-import {VeComponentOptions} from "@ve-types/angular";
+
+import { VeComponentOptions } from '@ve-types/angular'
 
 class DiffHtmlController {
-
     //bindings
     private base: string
     private compare: string
@@ -19,7 +20,11 @@ class DiffHtmlController {
 
     static $inject = ['$scope', '$timeout', 'growl']
 
-    constructor(private  $scope: angular.IScope, private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService) {
+    constructor(
+        private $scope: angular.IScope,
+        private $timeout: angular.ITimeoutService,
+        private growl: angular.growl.IGrowlService
+    ) {
         this.htmlRenderedDiff = window.HtmlRenderedDiff
     }
 

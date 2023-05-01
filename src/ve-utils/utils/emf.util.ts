@@ -4,8 +4,7 @@ export class Element implements ElementObject {
     id: string = ''
     _projectId: string = ''
     _refId: string = ''
-    _appliedStereotypeIds: string[] = []
-    appliedStereotypeInstanceId: string = null
+    appliedStereotypeIds: string[] = []
     documentation: string = ''
     mdExtensionsIds: string[] = []
     syncElementId: string = null

@@ -1,9 +1,7 @@
 import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
 import angular from 'angular'
-import _ from 'lodash'
 
-import { EditService, CacheService } from '@ve-utils/core'
-import { ApiService, AuthService } from '@ve-utils/mms-api-client'
+import { AuthService } from '@ve-utils/mms-api-client'
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
 import { veApp } from '@ve-app'

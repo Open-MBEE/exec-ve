@@ -2,7 +2,7 @@ import $ from 'jquery'
 
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
-import { CrossReferenceController } from '@ve-components/transclusions/view-cf.component'
+import { CrossReferenceController } from '@ve-components/transclusions/mms-cf.component'
 import { ApplicationService } from '@ve-utils/application'
 import { ApiService, ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
@@ -224,8 +224,8 @@ class ViewLinkController implements angular.IComponentController {
     }
 }
 
-export const ViewLinkComponent: VeComponentOptions = {
-    selector: 'viewLink',
+export const MmsViewLinkComponent: VeComponentOptions = {
+    selector: 'mmsViewLink',
     template: `
     <span ng-if="!$ctrl.loading">
     <a target="{{$ctrl.target}}" ng-class="$ctrl.linkClass" ui-sref="{{$ctrl.href}}">
@@ -241,7 +241,7 @@ export const ViewLinkComponent: VeComponentOptions = {
 </span>        
 `,
     require: {
-        mmsCfCtrl: '?^^transclusion', //TODO this will never have anything
+        mmsCfCtrl: '?^^mmsCf',
         mmsViewCtrl: '?^^view',
     },
     bindings: {
@@ -262,4 +262,4 @@ export const ViewLinkComponent: VeComponentOptions = {
     controller: ViewLinkController,
 }
 
-veComponents.component(ViewLinkComponent.selector, ViewLinkComponent)
+veComponents.component(MmsViewLinkComponent.selector, MmsViewLinkComponent)

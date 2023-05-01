@@ -3,6 +3,7 @@ import angular from 'angular'
 
 import { PrintConfirmResult, PrintModalResolveFn } from '@ve-app/main/modals/print-confirm-modal.component'
 import { TableExportModalResolveFn } from '@ve-app/main/modals/table-export-modal.component'
+import { Table2CSVService } from '@ve-components/presentations/services/Table2CSV.service'
 import { TreeService } from '@ve-components/trees'
 import { UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -13,7 +14,6 @@ import { veApp } from '@ve-app'
 import { VePromise, VeQService } from '@ve-types/angular'
 import { RefObject, ViewObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
-import {Table2CSVService} from "@ve-components/presentations/services/Table2CSV.service";
 
 export interface DocumentStructure {
     cover: string
@@ -110,7 +110,7 @@ if (window.navigator.msSaveOrOpenBlob) {
                 tables.find('table').each((index: number, elt: HTMLTableElement) => {
                     const tableObj = {
                         caption: 'no caption',
-                        val: Table2CSVService.export(angular.element(elt),{ delivery: 'value' }),
+                        val: Table2CSVService.export(angular.element(elt), { delivery: 'value' }),
                     }
                     if (elt.caption) {
                         tableObj.caption = elt.caption.innerHTML

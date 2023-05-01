@@ -25,7 +25,7 @@ import {
     InstanceValueObject,
     PresentationReference,
     ViewInstanceSpec,
-    ViewObject
+    ViewObject,
 } from '@ve-types/mms'
 
 /**
@@ -67,7 +67,7 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         permissionsSvc: PermissionsService,
         eventSvc: EventService,
         specSvc: SpecService,
-        toolbarSvc: ToolbarService,
+        toolbarSvc: ToolbarService
     ) {
         super(
             $q,
@@ -130,7 +130,7 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                         )
                         const saved = elements.filter((val) => val.id === this.view.id)
                         if (saved.length > 0) {
-                            this.eventSvc.$broadcast('element.updated', {element: saved[0]})
+                            this.eventSvc.$broadcast('element.updated', { element: saved[0] })
                         }
                         this.eventSvc.$broadcast('spec-reorder.saved', this.view.id)
                         this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
@@ -152,7 +152,6 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                         )
                     }
                 )
-
             })
         )
         this.subs.push(
@@ -223,23 +222,22 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         }
         const specs: ExpressionObject = viewEdit._contents || viewEdit.specification
         const origSpecs: ExpressionObject = this.view._contents || this.view.specification
-            // Update the View edit object on Save
-            if (specs.operand) {
-                specs.operand = []
-                this.elementReferenceTree.forEach((elementRef) => {
-                    specs.operand.push(elementRef.instanceVal)
-                })
-                if (specs && !_.isEqual(specs.operand, origSpecs.operand)) {
-                    elementObsToUpdate.push(viewEdit)
-                }
-            }
-            // Recurse
-            this.elementReferenceTree.forEach((elementReference) => {
-                if (elementReference.sectionElements && elementReference.sectionElements.length > 0) {
-                    updateSectionElementOrder(elementReference)
-                }
+        // Update the View edit object on Save
+        if (specs.operand) {
+            specs.operand = []
+            this.elementReferenceTree.forEach((elementRef) => {
+                specs.operand.push(elementRef.instanceVal)
             })
-
+            if (specs && !_.isEqual(specs.operand, origSpecs.operand)) {
+                elementObsToUpdate.push(viewEdit)
+            }
+        }
+        // Recurse
+        this.elementReferenceTree.forEach((elementReference) => {
+            if (elementReference.sectionElements && elementReference.sectionElements.length > 0) {
+                updateSectionElementOrder(elementReference)
+            }
+        })
 
         return this.elementSvc.updateElements(elementObsToUpdate, false)
     }

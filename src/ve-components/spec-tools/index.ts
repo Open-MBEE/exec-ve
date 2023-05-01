@@ -6,7 +6,7 @@ export * from './spec-tool.controller'
 //Services
 import './services/Spec.service'
 //Core Components
-import './view-tools.component'
+import './mms-tools.component'
 //Default Extensions
 import './components/spec-inspector.component'
 import './components/spec-editor.component'

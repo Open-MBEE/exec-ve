@@ -1,3 +1,4 @@
+import angular from 'angular'
 import _ from 'lodash'
 
 import { ViewData } from '@ve-utils/mms-api-client'
@@ -36,8 +37,8 @@ export class FullDocumentApi {
         return isViewLoadedBefore
     }
 
-    public loadRemainingViews = (callback: () => void): void => {
-        if (this._isFullDocFullyLoaded) {
+    public loadRemainingViews = (callback?: () => void): void => {
+        if (this._isFullDocFullyLoaded && callback) {
             callback()
         } else {
             let handler: angular.IPromise<unknown>

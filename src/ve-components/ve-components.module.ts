@@ -14,7 +14,7 @@ export const veComponents = angular.module('ve-components', [
 
 // veComponents.config(['$sanitizeProvider', function($sanitizeProvider: angular.sanitize.ISanitizeProvider) {
 //     $sanitizeProvider.addValidElements({
-//         htmlElements: ['mms-cf', 'view-link', 'transclude-doc', 'transclude-val', 'transclude-name', 'transclude-view'],
+//         htmlElements: ['mms-cf', 'mms-view-link', 'transclude-doc', 'transclude-val', 'transclude-name', 'transclude-view'],
 //     })
 //         .addValidAttrs(['mms-data', 'mms-cf-type', 'mms-element-id', 'mms-project-id', 'mms-ref-id',
 //             'mms-commit-id', 'mms-watch-id', 'non-editable', 'mms-generate-for-diff'])

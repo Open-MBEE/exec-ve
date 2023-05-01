@@ -391,9 +391,9 @@ export const ViewComponent: VeComponentOptions = {
             </h1>
         </div>
         <div ng-if="$ctrl.mmsLink" class="view-title">
-          <view-link ng-class="{'docTitle-underlined': $ctrl.isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
-          <view-link class="open-document" ng-mouseover="$ctrl.hoverIn()" ng-mouseleave="$ctrl.hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
-            link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
+          <mms-view-link ng-class="{'docTitle-underlined': $ctrl.isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></mms-view-link>
+          <mms-view-link class="open-document" ng-mouseover="$ctrl.hoverIn()" ng-mouseleave="$ctrl.hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
+            link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></mms-view-link>
         </div>
         <div class="ve-secondary-text last-modified no-print">
           Last Modified: {{$ctrl.modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email">{{ $ctrl.modifier.email }}</b><b ng-if="!$ctrl.modifier.email">{{ $ctrl.modifier }}</b>

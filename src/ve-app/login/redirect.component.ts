@@ -44,7 +44,7 @@ const RedirectComponent: VeComponentOptions = {
                 <div ng-repeat="$ctrl.relatedDocument in $ctrl.redirect_relatedDocs" class="elem-documentation">
                     <a style="text-decoration:underline;" ng-repeat="relatedView in $ctrl.relatedDocument._parentViews" ui-sref="main.project.ref.view.present({documentId: $ctrl.relatedDocument.id, viewId: relatedView.id, projectId: $ctrl.relatedDocument._projectId, refId: $ctrl.relatedDocument._refId, keywords: undefined})" ng-click="userRelatedClick($event, $ctrl.relatedDocument, relatedView, $ctrl.elem)">
                         <i class="fa fa-file" aria-hidden="true"></i>
-                        <view-link mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedDocument.id}}"></view-link> > <view-link mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedView.id}}"></view-link><br/>
+                        <mms-view-link mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedDocument.id}}"></mms-view-link> > <mms-view-link mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedView.id}}"></mms-view-link><br/>
                     </a>
                 </div>
                 <button style="margin-top:60px;" class="btn btn-primary" ng-click="$ctrl.resetSelectPage()">View Editor Home</button>

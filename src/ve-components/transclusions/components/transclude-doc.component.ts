@@ -158,8 +158,8 @@ export class TranscludeDocController extends DeletableTransclusion implements IT
         if (!doc || this.emptyRegex.test(doc)) {
             doc = '<p class="no-print placeholder">(no ' + this.panelType + ')</p>'
         }
-        doc = doc.replace(this.fixPreSpanRegex, '<view-cf')
-        doc = doc.replace(this.fixPostSpanRegex, '</view-cf>')
+        doc = doc.replace(this.fixPreSpanRegex, '<mms-cf')
+        doc = doc.replace(this.fixPostSpanRegex, '</mms-cf>')
         doc = doc.replace(this.spacePeriod, '>.')
         doc = doc.replace(this.spaceSpace, '> ')
         doc = doc.replace(this.spaceComma, '>,')

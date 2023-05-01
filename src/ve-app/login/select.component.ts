@@ -65,7 +65,6 @@ class SelectController implements IComponentController {
 
     $onInit(): void {
         this.rootScopeSvc.veShowLogin(true)
-        this.orgSpin = true
         if (!this.mmsLoginBanner) {
             this.mmsLoginBanner = {
                 labels: ['Select Desired Org/Project Above'],

@@ -1,3 +1,4 @@
+import angular, { IComponentController } from 'angular'
 import $ from 'jquery'
 import _, { DebouncedFunc } from 'lodash'
 
@@ -42,7 +43,7 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
    <editor ng-model="element.documentation"></editor>
    </pre>
  */
-export class EditorController implements angular.IComponentController {
+export class EditorController implements IComponentController {
     private veConfig: VeConfig = window.__env
     private ckEditor = window.CKEDITOR
 
@@ -195,14 +196,13 @@ export class EditorController implements angular.IComponentController {
     }
 
     $onDestroy(): void {
-        this.update().then(
-            () => {
-                this.editorSvc.remove(this.editKey, `${this.editField}${this.editIndex ? this.editIndex : ''}`)
-            },
-            () => {
-                console.log('Error updating destroyed editor')
-            }
-        )
+        this.destroy()
+    }
+
+    public destroy(): void {
+        this.instance.config.autosave = { enableAutosave: false }
+        this.editorSvc.remove(this.editKey, `${this.editField}${this.editIndex ? this.editIndex : ''}`)
+        if (this.ckEditor.instances[this.id]) this.ckEditor.instances[this.id].destroy(true)
     }
 
     public startEditor(): void {
@@ -269,14 +269,13 @@ export class EditorController implements angular.IComponentController {
                         if (
                             element.name.startsWith('transclude-') ||
                             element.name.startsWith('present-') ||
-                            element.name.startsWith('view')
+                            element.name.startsWith('mms-')
                         ) {
                             if (
-                                element.name !== 'view-link' &&
-                                element.name !== 'transclusion' &&
-                                element.name !== 'transclude-group-docs' &&
-                                element.name !== 'transclude-diff-attr' &&
-                                element.name !== 'transclude-value-link'
+                                element.name !== 'mms-view-link' &&
+                                element.name !== 'mms-cf' &&
+                                element.name !== 'mms-diff-attr' &&
+                                element.name !== 'mms-group-docs'
                             ) {
                                 element.replaceWithChildren()
                                 return
@@ -325,13 +324,13 @@ export class EditorController implements angular.IComponentController {
                         if (
                             element.name.startsWith('transclude-') ||
                             element.name.startsWith('present-') ||
-                            element.name.startsWith('view')
+                            element.name.startsWith('mms-')
                         ) {
                             if (
-                                element.name !== 'view-link' &&
-                                element.name !== 'transclude-group-docs' &&
-                                element.name !== 'transclude-diff-merge-attr' &&
-                                element.name !== 'mms-value-link'
+                                element.name !== 'mms-view-link' &&
+                                element.name !== 'mms-cf' &&
+                                element.name !== 'mms-diff-attr' &&
+                                element.name !== 'mms-group-docs'
                             ) {
                                 element.replaceWithChildren()
                                 return
@@ -426,35 +425,35 @@ export class EditorController implements angular.IComponentController {
         })
         this.instance.on('fileUploadResponse', (e: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) => {
             //this._waitForEditor((evt) => {
-                // Prevent the default response handler.
-                e.stop()
+            // Prevent the default response handler.
+            e.stop()
 
-                // Get XHR and response.
-                const data = e.data
-                const xhr = data.fileLoader.xhr
-                const response: ElementsResponse<ElementObject> = JSON.parse(
-                    xhr.response as string
-                ) as ElementsResponse<ElementObject>
+            // Get XHR and response.
+            const data = e.data
+            const xhr = data.fileLoader.xhr
+            const response: ElementsResponse<ElementObject> = JSON.parse(
+                xhr.response as string
+            ) as ElementsResponse<ElementObject>
 
-                if (
-                    !response.elements ||
-                    response.elements.length == 0 ||
-                    !response.elements[0]._artifacts ||
-                    response.elements[0]._artifacts.length == 0
-                ) {
-                    // An error occurred during upload.
-                    //data.message = response[ 1 ];
-                    e.cancel()
-                } else {
-                    //TODO does this need to be smarter?
-                    const element = response.elements[0]
-                    data.url = this.uRLSvc.getArtifactURL({
-                        projectId: element._projectId,
-                        refId: element._refId,
-                        elementId: element.id,
-                        artifactExtension: element._artifacts[0].extension,
-                    })
-                }
+            if (
+                !response.elements ||
+                response.elements.length == 0 ||
+                !response.elements[0]._artifacts ||
+                response.elements[0]._artifacts.length == 0
+            ) {
+                // An error occurred during upload.
+                //data.message = response[ 1 ];
+                e.cancel()
+            } else {
+                //TODO does this need to be smarter?
+                const element = response.elements[0]
+                data.url = this.uRLSvc.getArtifactURL({
+                    projectId: element._projectId,
+                    refId: element._refId,
+                    elementId: element.id,
+                    artifactExtension: element._artifacts[0].extension,
+                })
+            }
             //}, e)
         })
     }
@@ -625,11 +624,7 @@ export class EditorController implements angular.IComponentController {
         cInstance.result.then(
             (data) => {
                 const tag =
-                    '<mms-cf mms-cf-type="com" mms-element-id="' +
-                    data.id +
-                    '">comment:' +
-                    data._creator +
-                    '</mms-cf>'
+                    '<mms-cf mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</mms-cf>'
                 this._addWidgetTag(tag, editor)
             },
             (reason) => {
@@ -672,10 +667,10 @@ export class EditorController implements angular.IComponentController {
 
     public mmsResetCallback = (ed: CKEDITOR.editor): void => {
         const body: CKEDITOR.dom.element = ed.document.getBody()
-        this.resetCrossRef(body.find("view-cf[mms-cf-type='name']").toArray(), '.name]')
-        this.resetCrossRef(body.find("view-cf[mms-cf-type='doc']").toArray(), '.doc]')
-        this.resetCrossRef(body.find("view-cf[mms-cf-type='val']").toArray(), '.val]')
-        this.resetCrossRef(body.find('view-link').toArray(), '.vlink]')
+        this.resetCrossRef(body.find("mms-cf[mms-cf-type='name']").toArray(), '.name]')
+        this.resetCrossRef(body.find("mms-cf[mms-cf-type='doc']").toArray(), '.doc]')
+        this.resetCrossRef(body.find("mms-cf[mms-cf-type='val']").toArray(), '.val]')
+        this.resetCrossRef(body.find('mms-view-link').toArray(), '.vlink]')
         this.update().then(
             () => {
                 /**/
@@ -686,7 +681,7 @@ export class EditorController implements angular.IComponentController {
         )
     }
 
-    public update = (): VePromise<boolean, string> => {
+    public update = (destroy?: boolean): VePromise<boolean, string> => {
         // getData() returns CKEditor's processed/clean HTML content.
         return new this.$q((resolve, reject) => {
             if (this.instance) {
@@ -700,6 +695,7 @@ export class EditorController implements angular.IComponentController {
                     })
                 }
             }
+            if (destroy) this.destroy()
             resolve(true)
         })
     }

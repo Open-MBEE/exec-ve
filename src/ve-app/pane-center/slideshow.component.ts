@@ -1,7 +1,6 @@
 import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirouter/angularjs'
 import { Transition } from '@uirouter/core'
 
-import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService, ResolveService } from '@ve-app/main/services'
 import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'

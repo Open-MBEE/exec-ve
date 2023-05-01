@@ -652,7 +652,7 @@ const LeftPaneComponent: VeComponentOptions = {
             </div>
         </div>
     </ng-pane>
-    <view-trees toolbar-id="{{$ctrl.toolbarId}}" button-id="{{$ctrl.buttonId}}"></view-trees>
+    <mms-trees toolbar-id="{{$ctrl.toolbarId}}" button-id="{{$ctrl.buttonId}}"></mms-trees>
 </div>
   
   

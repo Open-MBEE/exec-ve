@@ -31,7 +31,7 @@ export class MMSMentionController implements angular.IComponentController {
 
     private _createCf($item: ElementObject): void {
         const tag =
-            '<view-cf mms-cf-type="' +
+            '<mms-cf mms-cf-type="' +
             $item.type +
             '" mms-element-id="' +
             $item.id +
@@ -39,7 +39,7 @@ export class MMSMentionController implements angular.IComponentController {
             $item.name +
             '.' +
             $item.type +
-            ']</view-cf>'
+            ']</mms-cf>'
         this.mmsEditor.insertHtml(tag)
         this.editorSvc.focusOnEditorAfterAddingWidgetTag(this.mmsEditor)
     }

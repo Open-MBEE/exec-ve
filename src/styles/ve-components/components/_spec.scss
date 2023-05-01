@@ -6,10 +6,14 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 26px;
-    //margin: 30px 0 0;
+    // margin: 30px 0 0;
     height: inherit;
     width: 100%;
     font-weight: globals.$default-font-weight;
+  }
+
+  .tool-spinner {
+    margin: 50%;
   }
 
   h1.prop {
@@ -116,9 +120,9 @@ Styles that apply to both the spec
       position: relative;
     }
 
-    //Show more content caret
+    // Show more content caret
     a {
-      //show more content caret
+      // show more content caret
       &::after {
         content: "\f078";
         font-family: globals.$icon-font-name;
@@ -126,13 +130,13 @@ Styles that apply to both the spec
         padding: 0 2px;
       }
 
-      //Show less content caret
+      // Show less content caret
       &.active::after {
         content: "\f077";
         font-family: globals.$icon-font-name;
       }
 
-      //Add ellipses to list before "show more"
+      // Add ellipses to list before "show more"
       &:not(.active)::before {
         content: "...";
         font-size: 16px;
@@ -158,7 +162,7 @@ Styles that apply to both the spec
     color: globals.$ve-light-text-darker-1;
     font-weight: 500;
 
-    //border: 1px solid $ve-silver-darker-1;
+    // border: 1px solid $ve-silver-darker-1;
   }
 
   /* pull in metatype wrapper to compensate for padding */
@@ -174,8 +178,7 @@ Styles that apply to both the spec
   }
 
   /* File icon for documents and views */
-  .elem-related-docs-wrapper mms-view-link a::before,
-  .elem-related-docs-wrapper view-link a::before {
+  .elem-related-docs-wrapper mms-view-link a::before {
     content: "\f15b";
     font-family: globals.$icon-font-name;
     padding: 0 4px 0 0;

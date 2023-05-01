@@ -464,7 +464,7 @@ veApp.config([
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
                             mmsRefs: 'refObs',
-                            mmsRef: 'refOb'
+                            mmsRef: 'refOb',
                         },
                     },
                     'toolbar-right@main': {
@@ -745,7 +745,7 @@ veApp.config([
                             mmsRef: 'refOb',
                             mmsRefs: 'refObs',
                             mmsRoot: 'documentOb',
-                            mmsDocument: 'documentOb'
+                            mmsDocument: 'documentOb',
                         },
                     },
                     'banner-bottom@main': {

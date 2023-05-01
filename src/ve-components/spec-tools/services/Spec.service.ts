@@ -52,7 +52,7 @@ export class SpecService implements angular.Injectable<any> {
     public editable: boolean
     private keeping: boolean = false
 
-    public specApi: SpecApi = {refType: '', refId: '', elementId: '', projectId: ''}
+    public specApi: SpecApi = { refType: '', refId: '', elementId: '', projectId: '' }
     public tracker: {
         etrackerSelected?: string
     } = {}
