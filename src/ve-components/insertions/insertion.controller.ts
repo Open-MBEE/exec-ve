@@ -237,12 +237,12 @@ export class Insertion<
      *
      */
     public queryFilter = (): {
-        _appliedStereotypeIds?: string[]
+        appliedStereotypeIds?: string[]
         classifierIds?: string[]
     } => {
         /* Implement and Search Filtering Logic Here */
         return {
-            _appliedStereotypeIds: [],
+            appliedStereotypeIds: [],
             classifierIds: [],
         }
     }

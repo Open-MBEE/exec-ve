@@ -63,7 +63,7 @@ class InsertCommentController extends Insertion<InsertData> {
             documentation: '',
             type: 'Class',
             ownerId: 'holding_bin_' + this.mmsProjectId,
-            _appliedStereotypeIds: [],
+            appliedStereotypeIds: [],
         })
         this.oking = false
     }

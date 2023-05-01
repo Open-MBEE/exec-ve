@@ -5,6 +5,7 @@ import { ExtensionService } from '@ve-components/services'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { RequestObject } from '@ve-types/mms'
+import { veComponents } from "@ve-components";
 
 /**
  * @ngdoc component
@@ -137,8 +138,9 @@ const MmsCfComponent: VeComponentOptions = {
         mmsCfLabel: '@',
     },
     require: {
-        transclusionCtrl: '?^^transclusion', //TODO this will never have anything?
+        transclusionCtrl: '?^^mmsCf',
         mmsViewCtrl: '?^^view',
     },
     controller: CrossReferenceController,
 }
+veComponents.component(MmsCfComponent.selector, MmsCfComponent)

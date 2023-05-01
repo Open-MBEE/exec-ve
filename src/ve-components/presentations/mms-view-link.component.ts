@@ -241,7 +241,7 @@ export const MmsViewLinkComponent: VeComponentOptions = {
 </span>        
 `,
     require: {
-        mmsCfCtrl: '?^^transclusion', //TODO this will never have anything
+        mmsCfCtrl: '?^^mmsCf',
         mmsViewCtrl: '?^^view',
     },
     bindings: {

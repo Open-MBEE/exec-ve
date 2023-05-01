@@ -402,7 +402,7 @@ export class UtilsService {
      * @returns {void} nothing
      */
     public convertViewLinks(printElement: JQuery<HTMLElement>): void {
-        printElement.find('mms-view-link, mms-view-link').each((index) => {
+        printElement.find('mms-view-link').each((index) => {
             const $this = $(this)
             let elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id')
             if (!elementId) {

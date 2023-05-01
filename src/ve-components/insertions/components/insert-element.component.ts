@@ -76,7 +76,7 @@ class InsertElementController extends Insertion<InsertTransclusionData> {
                 name: '',
                 documentation: '',
                 type: 'Class',
-                _appliedStereotypeIds: [],
+                appliedStereotypeIds: [],
             }
         }
         this.disableCreateNew = this.insertData.viewLink

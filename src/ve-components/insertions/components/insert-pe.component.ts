@@ -66,7 +66,7 @@ class InsertPeController extends Insertion<InsertPresentationData> {
 
     public queryFilter = (): SearchFilter => {
         const filters: {
-            _appliedStereotypeIds?: string[]
+            appliedStereotypeIds?: string[]
             classifierIds?: string[]
         } = {}
         if (this.type === 'Table') {

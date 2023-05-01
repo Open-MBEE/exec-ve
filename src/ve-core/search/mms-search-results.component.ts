@@ -136,8 +136,8 @@ const MmsSearchResultsComponent: VeComponentOptions = {
     <label>Metatypes</label>
     <div class="elem-type-wrapper">
         <span class="elem-type">{{$ctrl.elem.type}}</span>
-        <span ng-if="$ctrl.elem._appliedStereotypeIds.length">
-            <span ng-repeat="type in $ctrl.elem._appliedStereotypeIds">
+        <span ng-if="$ctrl.elem.appliedStereotypeIds.length">
+            <span ng-repeat="type in $ctrl.elem.appliedStereotypeIds">
                 <transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" no-click="true"></transclude-name>
             </span>
         </span>

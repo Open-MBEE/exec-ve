@@ -216,7 +216,7 @@ const SpecInspectorComponent: VeComponentOptions = {
             <h2 class="prop-title">Metatypes</h2>
             <span class="elem-type-wrapper prop">
                 <span class="elem-type">{{$ctrl.element.type}}</span>
-                <div ng-repeat="type in $ctrl.element._appliedStereotypeIds" class="elem-type">
+                <div ng-repeat="type in $ctrl.element.appliedStereotypeIds" class="elem-type">
                     <transclude-name mms-element-id="{{type}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" no-click="true"></transclude-name>
                 </div>
             </span>

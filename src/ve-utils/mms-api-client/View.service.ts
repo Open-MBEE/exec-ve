@@ -103,17 +103,8 @@ export class ViewService extends BaseApiService {
     public downgradeDocument(elementOb: ViewObject): VePromise<ViewObject, VePromisesResponse<ViewObject>> {
         return new this.$q<ViewObject, VePromisesResponse<ViewObject>>((resolve, reject) => {
             const clone = _.cloneDeep(elementOb)
-            clone._appliedStereotypeIds = [this.schemaSvc.getSchema('VIEW_SID', this.schema)]
-            const asi = {
-                id: elementOb.id + '_asi',
-                ownerId: elementOb.id,
-                classifierIds: [this.schemaSvc.getSchema('VIEW_SID', this.schema)],
-                type: 'InstanceSpecification',
-                _projectId: elementOb._projectId,
-                _refId: elementOb._refId,
-                stereotypedElementId: elementOb.id,
-            }
-            this.elementSvc.updateElements([clone, asi], false).then(
+            clone.appliedStereotypeIds = [this.schemaSvc.getSchema('VIEW_SID', this.schema)]
+            this.elementSvc.updateElements([clone], false).then(
                 (data) => {
                     const cacheKey = ['documents', elementOb._projectId, elementOb._refId]
                     let index = -1
@@ -163,7 +154,7 @@ export class ViewService extends BaseApiService {
                         stereoIds.forEach((stId) => {
                             searchTerms.push(
                                 this.elementSvc.search<ViewObject>(reqOb, {
-                                    params: { _appliedStereotypeIds: stId },
+                                    params: { appliedStereotypeIds: stId },
                                 })
                             )
                         })
@@ -725,24 +716,6 @@ export class ViewService extends BaseApiService {
             )
             let jsonType = realType
             if (type === 'Comment' || type === 'Paragraph') jsonType = type
-            /*
-        var newDataId = this.apiSvc.createUniqueId();
-        var newDataSInstanceId = this.apiSvc.createUniqueId();
-        var newData = new Class({
-            id: newDataId,
-            name: name + '_' + newDataId,
-            ownerId: 'holding_bin_' + viewOrSectionOb._projectId,
-            documentation: '',
-            _appliedStereotypeIds: [this.apiSvc.BLOCK_SID],
-            appliedStereotypeInstanceId: newDataSInstanceId
-        });
-        var newDataSInstance = new Instance({
-            id: newDataSInstanceId,
-            stereotypedElementId: newDataId,
-            ownerId: newDataId,
-            classifierIds: [this.apiSvc.BLOCK_SID]
-        });
-        */
             const instanceSpecSpec = {
                 type: jsonType,
                 sourceType: 'reference',
@@ -768,7 +741,7 @@ export class ViewService extends BaseApiService {
                     _projectId: viewOrSectionOb._projectId,
                     _refId: viewOrSectionOb._refId,
                 }),
-                _appliedStereotypeIds: [],
+                appliedStereotypeIds: [],
             }
             instanceSpec = new InstanceSpec(instanceSpec)
             if (type === 'Section') {
@@ -920,12 +893,11 @@ export class ViewService extends BaseApiService {
                 }),
                 name: viewOb.name ? viewOb.name : untitledName,
                 documentation: viewOb.documentation ? viewOb.documentation : '',
-                _appliedStereotypeIds: [
+                appliedStereotypeIds: [
                     viewOb.isDoc
                         ? this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema)
                         : this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
                 ],
-                appliedStereotypeInstanceId: newViewId + '_asi',
             })
             let parentView: ViewObject = {
                 _projectId: '',
@@ -973,25 +945,9 @@ export class ViewService extends BaseApiService {
                     _projectId: viewOb._projectId,
                     _refId: viewOb._refId,
                 }),
-                _appliedStereotypeIds: [],
+                appliedStereotypeIds: [],
             })
-            const asi = new InstanceSpec({
-                //create applied stereotype instance
-                id: newViewId + '_asi',
-                _projectId: viewOb._projectId,
-                _refId: viewOb._refId,
-                ownerId: newViewId,
-                documentation: '',
-                name: '',
-                classifierIds: [
-                    viewOb.isDoc
-                        ? this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)
-                        : this.schemaSvc.getSchema('VIEW_SID', this.schema),
-                ],
-                _appliedStereotypeIds: [],
-                stereotypedElementId: newViewId,
-            })
-            const toCreate: ElementObject[] = [pe, view, asi]
+            const toCreate: ElementObject[] = [pe, view]
             if (parentView.id !== '') {
                 const parentViewClass: ElementObject = this.elementSvc.fillInElement(parentView)
                 toCreate.push(parentViewClass)
@@ -1070,8 +1026,7 @@ export class ViewService extends BaseApiService {
      */
     public createGroup(name: string, ownerOb: ViewObject): VePromise<GroupObject> {
         return new this.$q<GroupObject>((resolve, reject) => {
-            const PACKAGE_ID = this.apiSvc.createUniqueId(),
-                PACKAGE_ASI_ID = PACKAGE_ID + '_asi'
+            const PACKAGE_ID = this.apiSvc.createUniqueId()
             // Our Group package element
             const group: GroupObject = new Package({
                 id: PACKAGE_ID,
@@ -1081,19 +1036,9 @@ export class ViewService extends BaseApiService {
                 type: 'Package',
                 ownerId: ownerOb.id,
                 _isGroup: true,
-                _appliedStereotypeIds: [this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)],
-                appliedStereotypeInstanceId: PACKAGE_ASI_ID,
+                appliedStereotypeIds: [this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)],
             })
-            const groupAsi: InstanceSpecObject = new InstanceSpec({
-                classifierIds: [this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)],
-                id: PACKAGE_ASI_ID,
-                _projectId: ownerOb._projectId,
-                _refId: ownerOb._refId,
-                ownerId: PACKAGE_ID,
-                visibility: null,
-                stereotypedElementId: PACKAGE_ID,
-            })
-            const toCreate = [group, groupAsi]
+            const toCreate = [group]
             const reqOb = {
                 projectId: ownerOb._projectId,
                 refId: ownerOb._refId,
@@ -1141,51 +1086,19 @@ export class ViewService extends BaseApiService {
                 type: 'Package',
                 _projectId: packageOb._projectId,
                 _refId: packageOb._refId,
-                _appliedStereotypeIds: [],
+                appliedStereotypeIds: [],
                 classifierIds: null,
             }
 
             updatedPackage._isGroup = false
-            _.remove(packageOb._appliedStereotypeIds, (id: string): boolean => {
+            _.remove(packageOb.appliedStereotypeIds, (id: string): boolean => {
                 return id === this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)
             })
 
-            if (!(packageOb._appliedStereotypeIds.length > 0)) {
-                delete updatedPackage.appliedStereotypeInstanceId
-            } else {
-                updatedPackage._appliedStereotypeIds = packageOb._appliedStereotypeIds
-                updatedPackage.appliedStereotypeInstanceId = packageOb.appliedStereotypeInstanceId
+            if (packageOb.appliedStereotypeIds.length === 0) {
+                updatedPackage.appliedStereotypeIds = packageOb.appliedStereotypeIds
             }
-
             const toUpdate = [updatedPackage]
-            if (updatedPackage.appliedStereotypeInstanceId) {
-                const updateOb = {
-                    id: updatedPackage.id + '_asi',
-                    _refId: updatedPackage._refId,
-                    _projectId: updatedPackage._projectId,
-                    classifierIds: updatedPackage._appliedStereotypeIds,
-                    _appliedStereotypeIds: null,
-                    appliedStereotypeInstanceId: null,
-                }
-                toUpdate.push(updateOb)
-            } else {
-                this.$http
-                    .delete(
-                        this.uRLSvc.getElementURL({
-                            elementId: packageOb.id + '_asi',
-                            refId: packageOb._refId,
-                            projectId: packageOb._projectId,
-                        })
-                    )
-                    .then(
-                        () => {
-                            /*Do Nothing*/
-                        },
-                        (reason: angular.IHttpResponse<ElementsResponse<PackageObject>>) => {
-                            reject(reason)
-                        }
-                    )
-            }
             this.elementSvc.updateElements<PackageObject>(toUpdate, false).then(
                 (data) => {
                     // remove this group for cache
@@ -1645,9 +1558,9 @@ export class ViewService extends BaseApiService {
         if (ob._isGroup) return (ob as GroupObject)._isGroup
         else {
             return (
-                ob._appliedStereotypeIds !== undefined &&
-                ob._appliedStereotypeIds.length > 0 &&
-                ob._appliedStereotypeIds[0] === this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)
+                ob.appliedStereotypeIds !== undefined &&
+                ob.appliedStereotypeIds.length > 0 &&
+                ob.appliedStereotypeIds[0] === this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)
             )
         }
     }

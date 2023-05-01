@@ -25,8 +25,8 @@ export interface ElementObject extends MmsObject {
     _created?: string
     _inRefIds?: string[]
     _artifacts?: ArtifactObject[]
-    appliedStereotypeInstanceId?: string
-    _appliedStereotypeIds?: string[]
+    appliedStereotypeIds?: string[]
+    _appliedStereotypeIds?: string[] // mdk < 6
     type?: string
     typeId?: string
     defaultValue?: ValueObject

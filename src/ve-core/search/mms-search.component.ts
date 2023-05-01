@@ -42,7 +42,7 @@ export interface SearchField {
 }
 
 export interface SearchFilter {
-    _appliedStereotypeIds?: string[]
+    appliedStereotypeIds?: string[]
     classifierIds?: string[]
 }
 
@@ -677,12 +677,12 @@ export class SearchController implements angular.IComponentController {
             ]
             /*If the filter list already contain the view id's do not add them a second time since filtering is done
             client side */
-            if (!filterTerms._appliedStereotypeIds) {
-                filterTerms._appliedStereotypeIds = []
+            if (!filterTerms.appliedStereotypeIds) {
+                filterTerms.appliedStereotypeIds = []
             }
-            filterTerms._appliedStereotypeIds.push(
+            filterTerms.appliedStereotypeIds.push(
                 ...stereoIds.filter((value) => {
-                    return !filterTerms._appliedStereotypeIds.includes(value)
+                    return !filterTerms.appliedStereotypeIds.includes(value)
                 })
             )
         }
