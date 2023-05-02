@@ -1,9 +1,12 @@
 <picture>
 <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/logo.svg?raw=true">
 <source media="(prefers-color-scheme: light)" srcset="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/logo-dark.svg?raw=true">
-<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/logo-dark.svg?raw=true" width="50%" alt="OpenMBEE">&nbsp;&nbsp;&nbsp;
+<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/logo-dark.svg?raw=true" width="50%" alt="OpenMBEE">
+</picture>&nbsp;&nbsp;&nbsp;<picture>
+<source media="(prefers-color-scheme: dark)" srcset="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/ve-logo.svg?raw=true">
+<source media="(prefers-color-scheme: light)" srcset="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/ve-logo-dark.svg?raw=true">
+<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/ve-logo-dark.svg?raw=true" width="50%" alt="View Editor">
 </picture>
-<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/ve-logo.svg?raw=true" width="15%" alt="View Editor (VE)">
 
 
 # About
