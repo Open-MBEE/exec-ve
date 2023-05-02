@@ -1,5 +1,7 @@
-<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/logo.svg?raw=true" width="50%" alt="OpenMBEE"></img>
-<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/ve-logo.svg?raw=true" width="50%" alt="View Editor (VE)"></img>
+<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/logo.svg?raw=true" width="50%" alt="OpenMBEE">&nbsp;&nbsp;&nbsp;
+<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/ve-logo.svg?raw=true" width="15%" alt="View Editor (VE)">
+
+
 # About
 
 View Editor (VE) is a web-based environment designed to interact with a
