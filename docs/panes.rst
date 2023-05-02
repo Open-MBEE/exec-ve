@@ -1,40 +1,41 @@
 .. include:: images.rst
 
-#######################
-Panes
-#######################
+############
+Navigation
+############
+
+View Editor is divided into a `navigation bar <#navigation-bar>`__ (red) and a content display area. The content area is divded into three
+sections, the `left pane <#left-pane-capabilities>`__ or "tree-view" which displays the tree of the current context. The `center pane <#center-pane-capabilities>`__ shows the current
+content and the `right pane <#right-pane-capabilities>`__ hosts a set of tools to further inspect and dive into the model content.
+
+.. image:: media/image1.png
+   :width: 5.90069in
+   :height: 3.6519in
 
 
-********************
-Document View Panes
-********************
 
--  `Navigation Bar
-   Capabilities <#navigation-bar>`__  - Shows
+-  `Navigation Bar <#navigation-bar>`__  - Shows
    context of center pane (current project, branch, etc), allows
    management of branches and tags and provides global search and
    helpful links
 
--  `Left Pane
-   Capabilities <#left-pane-capabilities>`__ -
+-  `Left Pane <#left-pane-capabilities>`__ -
    Shows the project/document hierarchies
 
--  `Center Pane
-   Capabilities <#center-pane-capabilities>`__
+-  `Center Pane <#center-pane-capabilities>`__
    - Shows Document/View content, provides editing capabilities and
    export options
 
--  `Right Pane
-   Capabilities <#right-pane-capabilities>`__ -
+-  `Right Pane <#right-pane-capabilities>`__ -
    Shows detailed information of the selected element, element history
    and more advanced features of View Editor
 
-
+===============
 Navigation Bar
 ===============
 
 Top bar
--------
+=======
 
 -  Current **org** and option to switch
 
@@ -46,7 +47,7 @@ Top bar
    Editor resources
 
 Second bar - current context
-----------------------------
+============================
 
 -  First option on the left displays the **current project** and
    provides quick access to switch between other projects within
@@ -60,8 +61,9 @@ Second bar - current context
      Tags <#version-control-branches-and-tags>`__
    |  |image10|
 
-Left Pane Capabilities
-=======================
+===============
+Left Pane
+===============
 
 The **Left Pane** has the following two display modes:
 
@@ -79,7 +81,7 @@ Below are instructions showing how to use the Left Pane's tools,
 specifically while in a document
 
 The instruction includes:
--------------------------
+=========================
 
 -  Show/Hide Left Pane
 
@@ -174,8 +176,9 @@ and out the pane.
    To delete a view from an existing document, refer to `Delete
    Views <#delete-view>`__.
 
-Right Pane Capabilities
-=================================================
+===========
+Right Pane
+===========
 
 **The Right Pane** lets you inspect the element that is currently
 selected.
@@ -217,7 +220,7 @@ with links to more information.
 
 
 Preview Element
--------------------
+================
 
 "Preview Element" tab displays the following information of the selected
 element:
@@ -250,7 +253,7 @@ properties), depending on the type of element.
    :height: 6.54316in
 
 Edit and Save Elements
------------------------
+=======================
 
 Users can edit elements (refer to `Add Presentation
 Elements <#add-presentation-elements>`__)
@@ -285,58 +288,8 @@ Note: There is an Auto Save plugin that tracks and stores changes in the
 browser's local storage  ( See `Autosave to the browser's
 localStorage <#autosave-to-the-browsers-localstorage>`__ )
 
-Autosave to the browser's localStorage
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This feature automatically stores unsaved contents from any of the
-CKEditors to the browser’s localStorage except for the editor on the
-Comment's Modal, Proposal's Modal, Cross Reference Modal and Workspace's
-description. The contents will be auto saved at a configurable interval
-of 5 seconds and with the users’ consent reloaded automatically to the
-editors which they belong.
-
-These auto saved contents are automatically deleted when either one of
-the following conditions is met:
-
-1. Users press on one of the following buttons on the editor itself:
-
-   a. save
-
-   b. save and continue
-
-   c. cancel: when the dialog shows up and users confirm the
-      cancellation
-
-   d. delete: when the dialog shows up and users confirm the deletion
-
-2. Users press on one of the following buttons on the toolbar located on
-   the right side of the app's layout
-
-   a. save
-
-   b. save and continue
-
-   c. cancel: when the dialog shows up and users confirm the
-      cancellation
-
-   d. saveAll: This button is a little bit special because it shows up
-      in two different situations.
-
-      i.  Shows up after users click on the "Edit Element" button on the
-          toolbar located on the right side of the app's layout. In this
-          case, it will delete all the new auto saved contents related
-          to the specific element the user is editing.
-
-      ii. Shows up after a user modifies one or more elements on the
-          page. In this case, it will delete all the new auto saved
-          contents corresponding to all these elements.
-
-When saving to a full capacity browser’s localStorage, all expired auto
-saved contents will be automatically deleted to make room for new
-contents.
-
 Element History
------------------------------------------
+=========================================
 
 The **Element History tab** has a dropdown with a list of element
 versions. Select a version to display its attributes (same as `Preview
@@ -356,7 +309,7 @@ To visualize the difference between 2 versions, check "Compare Versions"
    :height: 4.25944in
 
 Branches/Tags
----------------------------------------
+=======================================
 
 **Branches/Tags** can be accessed from the right pane. See `Branches and
 Tags <#version-control-branches-and-tags>`__
@@ -366,8 +319,9 @@ for more information
    :width: 5.04281in
    :height: 4.82054in
 
-Center Pane Capabilities
-==================================================
+=============
+Center Pane
+=============
 
 The Center Pane lets you edit the view contents.
 

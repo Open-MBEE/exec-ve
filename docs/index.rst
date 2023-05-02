@@ -13,7 +13,7 @@ create, read, and update model elements, including Documents and Views.
   
   about
   panes
-  groups-documents-and-views
+  groups-docs-views
   search
   version-control
   advanced
