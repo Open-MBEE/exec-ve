@@ -1,4 +1,6 @@
-# View Editor (VE)
+<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/logo.svg?raw=true" width="50%" alt="OpenMBEE"></img>
+<img src="https://github.com/Open-MBEE/ve/blob/release/5.0.0/src/assets/ve-logo.svg?raw=true" width="50%" alt="View Editor (VE)"></img>
+# About
 
 View Editor (VE) is a web-based environment designed to interact with a
 systems model. VE is a document oriented view of the model elements,
@@ -8,10 +10,11 @@ elements without having to open a modeling software (e.g. MagicDraw ).
 This allows users of all levels, including non-modelers, to view or
 modify live documents and values of a singular source of truth.
 
-### Users Guide
+# Users Guide
 http://docs.openmbee.org/projects/ve
 
 
+# Deployment Guide
 ## File Structure
 * /package.json - Manifest file specifying node module dependencies required to build and bundle the app
 * /app/bower.json - Manifest file specifying bower dependencies (js/css library dependencies)
