@@ -6,7 +6,6 @@ tmp
 build
 dist
 deploy
-docs
 app/bower_components
 app/bower_components_target
 .sass-cache
