@@ -1,13 +1,14 @@
 .. include:: images.rst
 
+############################
 Groups, Documents and Views
-=====================================================
+############################
 
 The following documentations provide instructions on what View Editor
 "Group", "Document" and "Views" are and how to use them.
 
 Groups
---------------------------------
+================================
 
 .. |groups| image:: media/image62.png
    :width: 0.27779in
@@ -16,7 +17,7 @@ Groups
 |groups| **Groups** organize documents and other groups within a project
 
 Create Group
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 Since "Group" can only be used to organize documents/groups, it can only
 be created under the project level.
@@ -43,7 +44,7 @@ be created under the project level.
       :height: 1.48619in
 
 Delete Group
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 Only an empty "Group" can be deleted. To delete "Super Classified Group"
 Group in the picture above, 
@@ -69,7 +70,7 @@ Group in the picture above, 
 Follow the same steps to delete "Super Classified Group".
 
 Organize Groups/Documents
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------
 
 "Groups" can be used to group together documents/groups. To move
 documents into a group:
@@ -103,7 +104,7 @@ documents into a group:
    peer.**
 
 Documents
------------------------------------
+===================================
 
 A **Document** is composed of Views (see `Add
 Views <#add-a-new-view>`__), presentation
@@ -115,7 +116,7 @@ To see how a user can sync the new document to MMS, refer to Update from
 MMS.
 
 Create Document
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------
 
 #. In the upper right go to the project home  |image37|
 
@@ -131,7 +132,7 @@ Create Document
 button.
 
 Delete Document
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------
 
 #. Select the document you wish to delete in the tree
 
@@ -141,7 +142,7 @@ Delete Document
     To delete a view permanently, delete it from the model **and** then commit that delete to MMS.
 
 Structure/Edit Document
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 #. Build high level document structure by creating
 `Views <#views>`__
@@ -163,7 +164,7 @@ advantage of using image, table, and equations PEs is that they:
 -  appear in the left document navigation tree
 
 Views
--------------------------------
+======
 
 | Views are sections of a document that can hold pictures, diagrams, or
   textual information to describe ideas and objects.
@@ -178,7 +179,7 @@ Views can be added to a document in three different ways:
 3. Adding an existing View
 
 Add a New View
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------
 
 Select the document (the root on the left pane). Click on the Add
 button  :
@@ -194,7 +195,7 @@ Type in a name, and click on the "CREATE" button.
    :height: 2.69831in
 
 Add a New View as a Subview
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Select the view under which you want to nest the subview and follow the
 same steps above:
@@ -204,7 +205,7 @@ same steps above:
    :height: 1.91677in
 
 Add an Existing View
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 To add an existing view to another document, select a document or view
 to which you want to nest the existing view under, and click on the Add
@@ -241,7 +242,7 @@ Note: The original view will NOT be deleted upon the deletion of this
 view.
 
 Delete View
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 A user can delete any existing view by selecting the view on the left
 pane, and clicking on the Delete button   from a document.
@@ -256,7 +257,7 @@ Upon deletion, the browser redirects the user to the top of the
 document.
 
 Edit Views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 This section focuses on the **editing aspects** that View Editor offers
 including the following capabilities:
@@ -291,7 +292,7 @@ detail.
 presentation elements to edit View content.
 
 Adding Text
-'''''''''''
+"""""""""""
 
     The default PE for new Documents/Views is the text box. This will
 add a paragraph PE.
@@ -305,7 +306,7 @@ add a paragraph PE.
 4. Click on\ |image42|  to add content
 
 Adding Section
-''''''''''''''
+""""""""""""""
 
 Sections are used for adding concrete organization to views. They are
 similar to views in the sense that they provide a specific amount of
@@ -323,7 +324,7 @@ be cross referenced.
 5. You can nest other PEs to the section PE.
 
 Adding  Comment
-'''''''''''''''
+"""""""""""""""
 
 You can insert comments to all documents and views. Comments are saved
 in the model and are by default hidden from the view. See `Show
@@ -331,7 +332,7 @@ Comments/Elements <#show-commentselements>`__
 for more information.
 
 Adding Table
-''''''''''''
+""""""""""""
 
 You can add a table PE. Adding a separate table PE adds an element of
 organization (my naming and separating it from text) to the content. It
@@ -346,7 +347,7 @@ also lets you cross reference the content directly.
 4. Click on  |image46| to add content
 
 Adding Figure and Videos
-''''''''''''''''''''''''
+""""""""""""""""""""""""
 
 A user can add figures, such as images or videos, in an image PE.
 
@@ -361,7 +362,7 @@ A user can add figures, such as images or videos, in an image PE.
  
 
 Adding Equation
-'''''''''''''''
+"""""""""""""""
 
 A user can add an equation PE.
 
@@ -374,7 +375,7 @@ A user can add an equation PE.
 4. Click on |image50| to add content 
 
 Cross Reference as Link
-'''''''''''''''''''''''''''''''''''''''''''''''''
+"""""""""""""""""""""""""""""""""""""""""""""""""
 
 A Cross Reference as Link can be inserted to your view to reference an
 existing view or presentation element.
@@ -467,7 +468,7 @@ for cross referencing in View Editor.
  
 
 Create a Cross Reference - name, documentation, and value
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 -  From 2.4.0 on, there is a checkbox in the cross reference popup that
    allows you to restrict the **editability** of the cross referenced
@@ -475,7 +476,7 @@ Create a Cross Reference - name, documentation, and value
    center pane and not in the element specification on the right pane.
 
 Search and add Cross Reference through interface
-''''''''''''''''''''''''''''''''''''''''''''''''
+""""""""""""""""""""""""""""""""""""""""""""""""
 
 1. Enable Edits |image54|
 
@@ -507,7 +508,7 @@ Search and add Cross Reference through interface
  
 
 Find Cross Reference inline 
-''''''''''''''''''''''''''''
+""""""""""""""""""""""""""""
 
 1. Enable Edits |image56|
 
@@ -544,7 +545,7 @@ You can reorder Views and Presentation Elements (PEs) to change the
 hierarchy of the elements.
 
 Reorder Views (Enhanced)
-''''''''''''''''''''''''
+""""""""""""""""""""""""
 
 1. Click on the **"Reorder Views" button** on the **left pane**.
 
@@ -593,7 +594,7 @@ view reordering page still showing numbers as if sections aren't
 numbered. We are working on a more robust reordering option.
 
 Reorder Presentation Elements (PEs)
-'''''''''''''''''''''''''''''''''''
+"""""""""""""""""""""""""""""""""""
 
 **1. Click on the "Reorder Content" button on the right pane.**
 
@@ -615,7 +616,7 @@ For more information of other tools in the Right Pane, refer to `Right
 Pane Capabilities <#right-pane-capabilities>`__
 
 Save As
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 You can save Documents and Views locally. The following guides
 demonstrate the options for saving Views and Documents.
@@ -671,7 +672,7 @@ See these subsections for more information about specific generations:
 3. `PDF Customization <#pdf-customization>`__
 
 Generate PDF of View/Document
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Save View as PDF **\ |image60|
 
@@ -742,7 +743,7 @@ the associated presentation elements
                                                                 
 
 Generate PDF with Model Based Cover Page
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 In certain circumstances, you may want to create a custom cover page for
 a chosen document. The cover page is identified as the first View and
@@ -783,7 +784,7 @@ Save to Word Document
 .. _step-by-step-instructions-1:
 
 Step-by-step instructions: 
-'''''''''''''''''''''''''''
+"""""""""""""""""""""""""""
 
 1. Click on " *Export* " button, and select "*Export to Word*" (See
    below)
@@ -802,7 +803,7 @@ Export Tables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Tables to CSV
-'''''''''''''
+""""""""""""'
 
             |image64|
 
@@ -820,7 +821,7 @@ Tables to CSV
    as a CSV file.
 
 Save all tables from document to CSV
-''''''''''''''''''''''''''''''''''''
+""""""""""""""""""""""""""""""""""""
 
 -  Go to the full document by clicking on |image67|\ button.
 

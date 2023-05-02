@@ -6,8 +6,8 @@ project = 'OpenMBEE View Editor'
 copyright = '2013-2023, OpenMBEE Open Source Community'
 author = 'OpenMBEE Open Source Community'
 
-release = '0.1'
-version = '5.0.0'
+release = '5.0.0-alpha'
+version = 'v5'
 
 # -- General configuration
 

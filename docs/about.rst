@@ -3,7 +3,7 @@
 About
 ***************
 
-View Editor is a web-based environment designed to interact with a
+View Editor (VE) is a web-based environment designed to interact with a
 systems model. VE is a document oriented view of the model elements,
 which are stored in OpenMBEE's Model Management Server (MMS). Its purpose is to provide real and
 true data through the web so that users may interact with actual model
@@ -25,6 +25,3 @@ Authors can use model data, and share content across View Editor, in
 documents by **cross referencing** (see `Use Cross
 References <#use-cross-references>`__ )
 
-.. image:: media/image1.png
-   :width: 5.90069in
-   :height: 3.6519in
