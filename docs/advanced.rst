@@ -9,7 +9,7 @@ Visualizations
 ----------------------------------------
 
 For TomSawyer diagrams or plots, please see the DocGen Manual.
-
+ 
 Temporal Diff Tag
 -------------------------------------------
 
