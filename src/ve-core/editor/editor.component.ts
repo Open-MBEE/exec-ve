@@ -223,6 +223,8 @@ export class EditorController implements IComponentController {
             contentsCss: `${this.ckEditor.basePath}contents.css`,
             toolbar: this.getToolbar(),
         })
+
+        // Enable Autosave plugin only when provided with unique identifier (editKey)
         if (this.editKey) {
             // Configuration for autosave plugin
             this.instance.config.autosave = {
@@ -236,140 +238,24 @@ export class EditorController implements IComponentController {
         } else {
             this.instance.config.autosave = { enableAutosave: false }
         }
-        this._waitForEditor(() => {
-            // Enable Autosave plugin only when provided with unique identifier (editKey)
 
-            this._addInlineMention()
-
-            addCkeditorHtmlFilterRule(this.instance)
+        this.instance.on('instanceReady', () => {
+            this.addCkeditorHtmlFilterRule(this.instance)
             this._addContextMenuItems(this.instance)
-            highlightActiveEditor(this.instance)
+            this.highlightActiveEditor(this.instance)
         })
 
-        const highlightActiveEditor = (instance: CKEDITOR.editor): void => {
-            const activeEditorClass = 'activeditor'
-            $('transclude-doc').children('div').removeClass(activeEditorClass)
-            $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
+        this._addInlineMention()
 
-            instance.on('focus', () => {
-                $('transclude-doc').children('div').removeClass(activeEditorClass)
-                $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
-            })
-        }
-
-        const addCkeditorHtmlFilterRule = (instance: CKEDITOR.editor): void => {
-            instance.dataProcessor.htmlFilter.addRules({
-                elements: {
-                    $: (element: CKEDITOR.htmlParser.element) => {
-                        if (element.name === 'script') {
-                            element.remove()
-                            return
-                        }
-
-                        if (
-                            element.name.startsWith('transclude-') ||
-                            element.name.startsWith('present-') ||
-                            element.name.startsWith('mms-')
-                        ) {
-                            if (
-                                element.name !== 'mms-view-link' &&
-                                element.name !== 'mms-cf' &&
-                                element.name !== 'mms-diff-attr' &&
-                                element.name !== 'mms-group-docs'
-                            ) {
-                                element.replaceWithChildren()
-                                return
-                            }
-                        }
-
-                        const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
-                            return attrKey.startsWith('ng-')
-                        })
-                        attributesToDelete.forEach((attrToDelete) => {
-                            delete element.attributes[attrToDelete]
-                        })
-                    },
-                },
-            })
-            instance.dataProcessor.htmlFilter.addRules({
-                elements: {
-                    // Removes the token from the export src to prevent saving of token to server
-                    $: (element: CKEDITOR.htmlParser.element) => {
-                        element
-                            .find((el: CKEDITOR.htmlParser.element) => {
-                                return (
-                                    el.name == 'img' &&
-                                    el.attributes['data-cke-saved-src'] &&
-                                    el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
-                                )
-                            }, true)
-                            .forEach((el: CKEDITOR.htmlParser.element) => {
-                                el.attributes['data-cke-saved-src'] = this.imageSvc.fixImgUrl(
-                                    el.attributes['data-cke-saved-src'],
-                                    false
-                                )
-                                // el.attributes['src'] = el.attributes['data-cke-saved-src'];
-                            })
-                    },
-                },
-            })
-            instance.dataProcessor.dataFilter.addRules({
-                elements: {
-                    $: (element: CKEDITOR.htmlParser.element) => {
-                        if (element.name === 'script') {
-                            element.remove()
-                            return
-                        }
-
-                        if (
-                            element.name.startsWith('transclude-') ||
-                            element.name.startsWith('present-') ||
-                            element.name.startsWith('mms-')
-                        ) {
-                            if (
-                                element.name !== 'mms-view-link' &&
-                                element.name !== 'mms-cf' &&
-                                element.name !== 'mms-diff-attr' &&
-                                element.name !== 'mms-group-docs'
-                            ) {
-                                element.replaceWithChildren()
-                                return
-                            }
-                        }
-
-                        const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
-                            return attrKey.startsWith('ng-')
-                        })
-                        attributesToDelete.forEach((attrToDelete) => {
-                            delete element.attributes[attrToDelete]
-                        })
-                    },
-                },
-            })
-            instance.dataProcessor.dataFilter.addRules({
-                elements: {
-                    // Adds the token to img's in the editor environment to allow images to be displayed while editor
-                    $: (element: CKEDITOR.htmlParser.element) => {
-                        element
-                            .find((el: CKEDITOR.htmlParser.element) => {
-                                return (
-                                    el.name == 'img' &&
-                                    el.attributes['data-cke-saved-src'] &&
-                                    (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1 ||
-                                        el.attributes['data-cke-saved-src'].indexOf('http') < 0)
-                                )
-                            }, true)
-                            .forEach((el: CKEDITOR.htmlParser.element) => {
-                                el.attributes['src'] = this.imageSvc.fixImgUrl(
-                                    el.attributes['data-cke-saved-src'],
-                                    true
-                                )
-                                // el.attributes['src'] = el.attributes['data-cke-saved-src'];
-                            })
-                    },
-                },
-            })
-        }
+        this.instance.on(
+            'toHtml',
+            () => {
+                this.addCkeditorDataFilterRules(this.instance)
+            },
+            null,
+            null,
+            9
+        )
 
         this.instance.on('init', () => {
             this._waitForEditor(() => {
@@ -455,6 +341,107 @@ export class EditorController implements IComponentController {
                 })
             }
             //}, e)
+        })
+    }
+
+    public highlightActiveEditor = (instance: CKEDITOR.editor): void => {
+        const activeEditorClass = 'activeditor'
+        $('transclude-doc').children('div').removeClass(activeEditorClass)
+        $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
+
+        instance.on('focus', () => {
+            $('transclude-doc').children('div').removeClass(activeEditorClass)
+            $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
+        })
+    }
+    public addCkeditorDataFilterRules = (instance: CKEDITOR.editor): void => {
+        instance.dataProcessor.dataFilter.addRules({
+            elements: {
+                $: (element: CKEDITOR.htmlParser.element) => {
+                    if (element.name === 'script') {
+                        element.remove()
+                        return
+                    }
+
+                    if (element.name.startsWith('transclude-') || element.name.startsWith('present-')) {
+                        element.replaceWithChildren()
+                        return
+                    }
+
+                    const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
+                        return attrKey.startsWith('ng-')
+                    })
+                    attributesToDelete.forEach((attrToDelete) => {
+                        delete element.attributes[attrToDelete]
+                    })
+                },
+            },
+        })
+        instance.dataProcessor.dataFilter.addRules({
+            elements: {
+                // Adds the token to img's in the editor environment to allow images to be displayed while editor
+                $: (element: CKEDITOR.htmlParser.element) => {
+                    element
+                        .find((el: CKEDITOR.htmlParser.element) => {
+                            return (
+                                el.name == 'img' &&
+                                el.attributes['data-cke-saved-src'] &&
+                                (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1 ||
+                                    el.attributes['data-cke-saved-src'].indexOf('http') < 0)
+                            )
+                        }, true)
+                        .forEach((el: CKEDITOR.htmlParser.element) => {
+                            el.attributes['src'] = this.imageSvc.fixImgUrl(el.attributes['data-cke-saved-src'], true)
+                            // el.attributes['src'] = el.attributes['data-cke-saved-src'];
+                        })
+                },
+            },
+        })
+    }
+    public addCkeditorHtmlFilterRule = (instance: CKEDITOR.editor): void => {
+        instance.dataProcessor.htmlFilter.addRules({
+            elements: {
+                $: (element: CKEDITOR.htmlParser.element) => {
+                    if (element.name === 'script') {
+                        element.remove()
+                        return
+                    }
+
+                    if (element.name.startsWith('transclude-') || element.name.startsWith('present-')) {
+                        element.replaceWithChildren()
+                        return
+                    }
+
+                    const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
+                        return attrKey.startsWith('ng-')
+                    })
+                    attributesToDelete.forEach((attrToDelete) => {
+                        delete element.attributes[attrToDelete]
+                    })
+                },
+            },
+        })
+        instance.dataProcessor.htmlFilter.addRules({
+            elements: {
+                // Removes the token from the export src to prevent saving of token to server
+                $: (element: CKEDITOR.htmlParser.element) => {
+                    element
+                        .find((el: CKEDITOR.htmlParser.element) => {
+                            return (
+                                el.name == 'img' &&
+                                el.attributes['data-cke-saved-src'] &&
+                                el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
+                            )
+                        }, true)
+                        .forEach((el: CKEDITOR.htmlParser.element) => {
+                            el.attributes['data-cke-saved-src'] = this.imageSvc.fixImgUrl(
+                                el.attributes['data-cke-saved-src'],
+                                false
+                            )
+                            // el.attributes['src'] = el.attributes['data-cke-saved-src'];
+                        })
+                },
+            },
         })
     }
 
