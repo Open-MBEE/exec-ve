@@ -1048,7 +1048,7 @@ export class ViewService extends BaseApiService {
             this.elementSvc.createElements(reqOb).then(
                 (data) => {
                     const cacheKey = ['groups', ownerOb._projectId, ownerOb._refId]
-                    const groupObj = _.find(data, { id: PACKAGE_ID }) as GroupObject
+                    const groupObj = _.find(data, { id: PACKAGE_ID })
                     if (groupObj) {
                         groupObj._parentId = ownerOb.id.indexOf('holding') != -1 ? null : ownerOb.id
                         if (this.cacheSvc.exists(cacheKey)) {

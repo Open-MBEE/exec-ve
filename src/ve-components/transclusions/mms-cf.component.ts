@@ -3,9 +3,10 @@ import angular, { IComponentController } from 'angular'
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
 
+import { veComponents } from '@ve-components'
+
 import { VeComponentOptions } from '@ve-types/angular'
 import { RequestObject } from '@ve-types/mms'
-import { veComponents } from "@ve-components";
 
 /**
  * @ngdoc component

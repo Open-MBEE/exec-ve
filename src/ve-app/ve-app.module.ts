@@ -4,7 +4,6 @@ import ngPane from '@openmbee/pane-layout'
 import uiRouter, {
     StateProvider,
     StateService,
-    Trace,
     Transition,
     TransitionService,
     UIRouter,
@@ -23,7 +22,6 @@ import angular, {
     IQService,
     IRequestConfig,
 } from 'angular'
-import { Visualizer } from 'ui-router-visualizer'
 
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { ResolveService } from '@ve-app/main/services'
