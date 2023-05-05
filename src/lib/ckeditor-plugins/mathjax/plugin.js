@@ -307,16 +307,6 @@
                                     ignoreHtmlClass: 'tex2jax_ignore',
                                     processHtmlClass: 'tex2jax_process'
                                 },
-                                tex: {
-                                    autoload: {
-                                        color: [],
-                                        colorv2: ['color']
-                                    },
-                                    packages: {'[+]': ['noerrors']}
-                                },
-                                loader: {
-                                    load: ['[tex]/noerrors']
-                                },
                                 startup: {
                                     pageReady: function () {
                                         MathJax.startup.promise.then(function () {
