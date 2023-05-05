@@ -13,18 +13,14 @@ CKEDITOR.plugins.add('mmscomment', {
         editor.widgets.add('mmscomment', {
             button: 'Insert Comment',
             inline: true,
-            allowedContent: 'mms-transclude-com[*];transclude-com[*]',
+            allowedContent: 'mms-cf[*];mms-transclude-com[*];transclude-com[*]',
             insert: () => {
                 var defaultConfig = {
                     callbackModalFnc: () => {
                         console.log('There is no callback function defined')
                     },
                 }
-                var config = CKEDITOR.tools.extend(
-                    defaultConfig,
-                    editor.config.mmscomment || {},
-                    true
-                )
+                var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmscomment || {}, true)
                 var tag = config.callbackModalFnc(editor)
             },
             // Check the elements that need to be converted to widgets.
@@ -33,7 +29,8 @@ CKEDITOR.plugins.add('mmscomment', {
                 // for all <mms-transclude-com> elements.
                 return (
                     element.name === 'transclude-com' ||
-                    element.name === 'mms-transclude-com'
+                    element.name === 'mms-transclude-com' ||
+                    (element.name === 'mms-cf' && element.attributes['mms-cf-type'] === 'com')
                 )
             },
         })
