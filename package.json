@@ -87,7 +87,7 @@
     "buffer": "^6.0.3",
     "diff": "^3.5.0",
     "flatpickr": "^4.6.9",
-    "jquery": "^3.4.1",
+    "jquery": "^3.6.2",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
     "ngstorage": "^0.3.11",
