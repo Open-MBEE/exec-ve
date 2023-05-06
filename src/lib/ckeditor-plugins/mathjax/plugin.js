@@ -290,7 +290,6 @@
                 // and call insertBefore on such element then IE9 will see crash.
                 if (CKEDITOR.env.ie) iFrame.removeAttribute('src')
 
-                var script = editor.config.mathJaxVer === 'v3' ? v3Script() : v2Script()
                 doc.write(
                     `<!doctype html>
                           <html lang="${editor.lang}">
@@ -370,85 +369,6 @@
                           </body>
                       </html>`
                 )
-            }
-
-            function v2Script() {
-                var scriptString =
-                    // MathJax configuration, disable messages.
-                    `MathJax.Hub.Config( {
-                    showMathMenu: false,
-                    messageStyle: "none"
-                    } );` +
-                    // Get main CKEDITOR form parent.
-                    `function getCKE() {
-                    if ( typeof window.parent.CKEDITOR == 'object' ) {
-                    return window.parent.CKEDITOR;
-                    } else {
-                    return window.parent.parent.CKEDITOR;
-                    }
-                    }` +
-                    // Run MathJax.Hub with its actual parser and call callback function after that.
-                    // Because MathJax.Hub is asynchronous create MathJax.Hub.Queue to wait with callback.
-                    `function update() {
-                    MathJax.Hub.Queue(
-                    [ 'Typeset', MathJax.Hub, this.buffer ],
-                    function() {
-                    getCKE().tools.callFunction( 
-                    ${updateDoneHandler}
-                     );
-                    }
-                    );
-                    }` +
-                    // Run MathJax for the first time, when the script is loaded.
-                    // Callback function will be called then it's done.
-                    `MathJax.Hub.Queue( function() {
-                    getCKE().tools.callFunction(
-                    ${loadedHandler}
-                    );
-                    } );`
-
-                return scriptString
-            }
-
-            function v3Script() {
-                var scriptString =
-                    // MathJax configuration, disable  menu
-                    `var MathJax = {
-                    options: {
-                        enableMenu: false
-                    }
-                  }` +
-                    // Get main CKEDITOR form parent.
-                    `function getCKE() {
-                if ( typeof window.parent.CKEDITOR == 'object' ) {
-                return window.parent.CKEDITOR;
-                } else {
-                return window.parent.parent.CKEDITOR;
-                }
-                }` +
-                    // Run MathJax.typesetPromise with its actual parser and call callback on promise return.
-                    // Because MathJax.typesetPromise is asynchronous use Promise API to wait with callback.
-                    `function update() {
-                MathJax.typesetPromise(this.buffer).then(function () {
-                    getCKE().tools.callFunction(${updateDoneHandler}
-                 );
-                }, function (err) {
-                    console.log('Typeset failed: ' + err.message);
-                }
-                );
-                }` +
-                    // Run MathJax for the first time, when the script is loaded.
-                    // Callback function will be called then it's done.
-                    `MathJax.typesetPromise(this.buffer).then(function () {
-                    getCKE().tools.callFunction(${loadedHandler}
-                 );
-                }, function (err) {
-                    console.log('Typeset failed: ' + err.message);
-                }
-                );
-                }`
-
-                return scriptString
             }
 
             // Run MathJax parsing Tex.
