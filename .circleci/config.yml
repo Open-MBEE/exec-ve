@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8.11.2-browsers
+      - image: cimg/node:20.1.0-browsers
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -25,11 +25,11 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - openmbee-ve-
 
-      - run: npm install
+      - run: yarn install
 
       - save_cache:
           paths:
             - node_modules
           key: openmbee-ve-{{ checksum "package.json" }}
 
-      - run: npm prepack
+      - run: yarn prepack
