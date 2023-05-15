@@ -4,7 +4,8 @@ import { TranscludeDocController } from '@ve-components/transclusions/components
 import { DeletableTransclusion } from '@ve-components/transclusions/deletable-transclusion.controller';
 import { ButtonBarService } from '@ve-core/button-bar';
 import { EditorService } from '@ve-core/editor';
-import { ImageService, MathService, UtilsService } from '@ve-utils/application';
+import { ImageService } from '@ve-core/image';
+import { UtilsService, MathService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { ElementService, ViewService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';

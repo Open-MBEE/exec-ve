@@ -3,13 +3,14 @@ import { AuthService } from '@ve-utils/mms-api-client';
 import { veUtils } from '@ve-utils';
 
 import { VeConfig } from '@ve-types/config';
+import { VeModalResolveFn, VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
 export class ImageService {
     public veConfig: VeConfig = window.__env;
 
-    static $inject = ['AuthService'];
+    static $inject = ['$uibModal', 'AuthService'];
 
-    constructor(private authSvc: AuthService) {}
+    constructor(private $uibModal: VeModalService, private authSvc: AuthService) {}
 
     public fixImgSrc(imgDom: JQuery<HTMLElement>): void {
         let src = imgDom.attr('src');
@@ -46,6 +47,19 @@ export class ImageService {
         url.search = params.toString();
         return url.toString();
     };
+
+    public zoomImg(src: string): void {
+        const settings: VeModalSettings<VeModalResolveFn> = {
+            component: 'imageZoomModal',
+            resolve: {
+                imgSrc: () => {
+                    return src;
+                },
+            },
+            windowTopClass: 'zoom-modal',
+        };
+        this.$uibModal.open<VeModalResolveFn, void>(settings);
+    }
 }
 
 veUtils.service('ImageService', ImageService);
