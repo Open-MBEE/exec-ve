@@ -1,13 +1,13 @@
-import _ from 'lodash'
-import * as uuid from 'uuid'
+import _ from 'lodash';
+import * as uuid from 'uuid';
 
-import { URLService } from '@ve-utils/mms-api-client/URL.service'
-import { SchemaService } from '@ve-utils/model-schema'
+import { URLService } from '@ve-utils/mms-api-client/URL.service';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veUtils } from '@ve-utils'
+import { veUtils } from '@ve-utils';
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
-import { VeConfig } from '@ve-types/config'
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VeConfig } from '@ve-types/config';
 import {
     BasicResponse,
     ElementObject,
@@ -20,7 +20,7 @@ import {
     ValueObject,
     VersionResponse,
     ViewObject,
-} from '@ve-types/mms'
+} from '@ve-types/mms';
 
 export class ApiService {
     private editKeys = [
@@ -34,13 +34,13 @@ export class ApiService {
         '_projectId',
         '_refId',
         'type',
-    ]
+    ];
 
-    schema: string = 'cameo'
+    schema: string = 'cameo';
 
-    public veConfig: VeConfig = window.__env
+    public veConfig: VeConfig = window.__env;
 
-    static $inject = ['$q', '$http', 'URLService', 'SchemaService']
+    static $inject = ['$q', '$http', 'URLService', 'SchemaService'];
 
     constructor(
         private $q: VeQService,
@@ -50,21 +50,21 @@ export class ApiService {
     ) {}
 
     public getMmsVersion(): VePromise<string, VersionResponse> {
-        const deferred = this.$q.defer<string>()
+        const deferred = this.$q.defer<string>();
         this.$http.get<VersionResponse>(this.uRLSvc.getMmsVersionURL()).then(
             (response) => {
-                deferred.resolve(response.data.mmsVersion)
+                deferred.resolve(response.data.mmsVersion);
             },
             (response: angular.IHttpResponse<VersionResponse>) => {
-                deferred.reject(this.uRLSvc.handleHttpStatus(response))
+                deferred.reject(this.uRLSvc.handleHttpStatus(response));
             }
-        )
-        return deferred.promise
+        );
+        return deferred.promise;
     }
 
     public getVeVersion = (): string => {
-        return this.veConfig.version
-    }
+        return this.veConfig.version;
+    };
 
     /**
      * @name veUtils/ApiService#handleErrorCallback
@@ -78,14 +78,14 @@ export class ApiService {
         deferredOrReject: angular.IDeferred<U> | angular.IQResolveReject<VePromiseReason<U>>,
         type?: 'error' | 'warning' | 'info'
     ): void {
-        const res = this.uRLSvc.handleHttpStatus<T, U>(response)
+        const res = this.uRLSvc.handleHttpStatus<T, U>(response);
         if (type) {
-            res.type = type
+            res.type = type;
         }
         if ((deferredOrReject as angular.IDeferred<U>).reject) {
-            ;(deferredOrReject as angular.IDeferred<U>).reject(res)
+            (deferredOrReject as angular.IDeferred<U>).reject(res);
         } else {
-            ;(deferredOrReject as angular.IQResolveReject<VePromiseReason<U>>)(res)
+            (deferredOrReject as angular.IQResolveReject<VePromiseReason<U>>)(res);
         }
     }
 
@@ -98,13 +98,13 @@ export class ApiService {
      */
 
     private _cleanValueSpec = (vs: ValueObject): void => {
-        if (vs.hasOwnProperty('valueExpression')) delete vs.valueExpression
+        if (vs.hasOwnProperty('valueExpression')) delete vs.valueExpression;
         if (vs.operand && Array.isArray(vs.operand)) {
             for (let i = 0; i < vs.operand.length; i++) {
-                this._cleanValueSpec(vs.operand[i] as ValueObject)
+                this._cleanValueSpec(vs.operand[i] as ValueObject);
             }
         }
-    }
+    };
 
     /**
      * @name veUtils/UtilsService#cleanElement
@@ -117,50 +117,50 @@ export class ApiService {
     public cleanElement<T extends ElementObject>(elem: T, forEdit?: boolean): T {
         if (elem.type === 'Property' || elem.type === 'Port') {
             if (!elem.defaultValue) {
-                elem.defaultValue = null
+                elem.defaultValue = null;
             }
         }
         if (elem.type === 'Slot') {
-            if (!Array.isArray(elem.value)) (elem as LiteralObject<unknown[]>).value = []
+            if (!Array.isArray(elem.value)) (elem as LiteralObject<unknown[]>).value = [];
         }
         if (elem.value && Array.isArray(elem.value)) {
-            ;(elem as LiteralObject<unknown[]>).value.forEach((value: unknown) => {
+            (elem as LiteralObject<unknown[]>).value.forEach((value: unknown) => {
                 if (typeof value === 'object' && value !== null)
-                    this._cleanValueSpec(value as ExpressionObject<ValueObject>)
-            })
+                    this._cleanValueSpec(value as ExpressionObject<ValueObject>);
+            });
         }
         if (elem._contents) {
-            this._cleanValueSpec((elem as ViewObject)._contents)
+            this._cleanValueSpec((elem as ViewObject)._contents);
         }
         if (elem.specification) {
-            this._cleanValueSpec((elem as InstanceSpecObject).specification)
+            this._cleanValueSpec((elem as InstanceSpecObject).specification);
         }
         if (elem.type === 'Class') {
             if (elem._contents && elem.contains) {
-                delete elem.contains
+                delete elem.contains;
             }
             if (elem._allowedElementIds) {
-                delete elem._allowedElementIds
+                delete elem._allowedElementIds;
             }
         }
 
         if (elem.hasOwnProperty('specialization')) {
-            delete elem.specialization
+            delete elem.specialization;
         }
         if (!elem.hasOwnProperty('appliedStereotypeIds') && elem._appliedStereotypeIds) {
-            elem.appliedStereotypeIds = elem._appliedStereotypeIds
+            elem.appliedStereotypeIds = elem._appliedStereotypeIds;
         }
         if (forEdit) {
             //only keep editable or needed keys in edit object instead of everything
-            const keys = Object.keys(elem)
+            const keys = Object.keys(elem);
             keys.forEach((key) => {
                 if (this.editKeys.indexOf(key) >= 0) {
-                    return
+                    return;
                 }
-                delete elem[key]
-            })
+                delete elem[key];
+            });
         }
-        return elem
+        return elem;
     }
 
     /**
@@ -171,10 +171,10 @@ export class ApiService {
      * @returns {RequestObject} with default values for ref and commit
      */
     public normalize = (reqOb: RequestObject): RequestObject => {
-        reqOb.refId = !reqOb.refId ? 'master' : reqOb.refId
-        reqOb.commitId = !reqOb.commitId ? 'latest' : reqOb.commitId
-        return reqOb
-    }
+        reqOb.refId = !reqOb.refId ? 'master' : reqOb.refId;
+        reqOb.commitId = !reqOb.commitId ? 'latest' : reqOb.commitId;
+        return reqOb;
+    };
 
     /**
      * @name veUtils/UtilsService#makeRequestObject
@@ -188,8 +188,8 @@ export class ApiService {
             projectId: elementOb._projectId,
             refId: elementOb._refId,
             commitId: elementOb._commitId,
-        }
-    }
+        };
+    };
 
     /**
      * @name veUtils/UtilsService#makeElementRequestObject
@@ -204,7 +204,7 @@ export class ApiService {
             projectId: elementOb._projectId,
             refId: elementOb._refId,
             commitId: elementOb._commitId,
-        }
+        };
     }
 
     /**
@@ -218,18 +218,18 @@ export class ApiService {
      * @returns {Array} key to be used in CacheService
      */
     public makeCacheKey(reqOb: RequestObject | null, elementId: string, edit?: boolean, type?: string): string[] {
-        const key: string[] = []
-        const keyType: string = type ? type : 'element'
-        key.push(keyType)
+        const key: string[] = [];
+        const keyType: string = type ? type : 'element';
+        key.push(keyType);
         if (reqOb !== null) {
-            if (reqOb.projectId) key.push(reqOb.projectId)
-            if (reqOb.refId !== null) key.push(!reqOb.refId ? 'master' : reqOb.refId)
+            if (reqOb.projectId) key.push(reqOb.projectId);
+            if (reqOb.refId !== null) key.push(!reqOb.refId ? 'master' : reqOb.refId);
             if (!keyType.includes('history') && reqOb.commitId !== null)
-                key.push(!reqOb.commitId ? 'latest' : reqOb.commitId)
+                key.push(!reqOb.commitId ? 'latest' : reqOb.commitId);
         }
-        if (elementId !== '') key.push(elementId)
-        if (edit) key.push('edit')
-        return key
+        if (elementId !== '') key.push(elementId);
+        if (edit) key.push('edit');
+        return key;
     }
 
     /**
@@ -277,16 +277,16 @@ export class ApiService {
                 i === '_created' ||
                 i === '_commitId'
             ) {
-                continue
+                continue;
             }
             if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
                 if (!_.isEqual(orig[i], server[i])) {
-                    return true
+                    return true;
                 }
             }
         }
-        return false
-    }
+        return false;
+    };
 
     /**
      * @name veUtils/UtilsService#isRestrictedValue
@@ -320,8 +320,8 @@ export class ApiService {
      *
      */
     public createUUID = (): string => {
-        return uuid.v4()
-    }
+        return uuid.v4();
+    };
 
     /**
      * @name veUtils/UtilsService#createUniqueId
@@ -330,8 +330,8 @@ export class ApiService {
      * @returns {string} unique SysML element ID
      */
     public createUniqueId = (): string => {
-        return `ve-${this.getVeVersion().replace(/\./g, '-')}-${this.createUUID()}`
-    }
+        return `ve-${this.getVeVersion().replace(/\./g, '-')}-${this.createUUID()}`;
+    };
 
     /**
      * @name veUtils/UtilsService#isView
@@ -346,17 +346,17 @@ export class ApiService {
                 e.appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('VIEW_SID', this.schema)) >= 0 ||
                 e.appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)) >= 0
             ) {
-                return true
+                return true;
             }
-            const otherViewSids: string[] = this.schemaSvc.getSchema('OTHER_VIEW_SID', this.schema)
+            const otherViewSids: string[] = this.schemaSvc.getSchema('OTHER_VIEW_SID', this.schema);
             for (const otherViewSid of otherViewSids) {
                 if (e.appliedStereotypeIds.indexOf(otherViewSid) >= 0) {
-                    return true
+                    return true;
                 }
             }
         }
-        return false
-    }
+        return false;
+    };
 
     /**
      * @name veUtils/UtilsService#isDocument
@@ -369,8 +369,8 @@ export class ApiService {
         return (
             e.appliedStereotypeIds &&
             e.appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)) >= 0
-        )
-    }
+        );
+    };
 
     /**
      * @name veUtils/UtilsService#isRequirement
@@ -381,15 +381,15 @@ export class ApiService {
      */
     public isRequirement = (e: ElementObject): boolean => {
         if (e.appliedStereotypeIds) {
-            const reqSids = this.schemaSvc.getSchema<string[]>('REQUIREMENT_SID', this.schema)
+            const reqSids = this.schemaSvc.getSchema<string[]>('REQUIREMENT_SID', this.schema);
             for (const reqSid of reqSids) {
                 if (e.appliedStereotypeIds.indexOf(reqSid) >= 0) {
-                    return true
+                    return true;
                 }
             }
         }
-        return false
-    }
+        return false;
+    };
 }
 
-veUtils.service('ApiService', ApiService)
+veUtils.service('ApiService', ApiService);

@@ -1,21 +1,21 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { ComponentService, ExtensionService } from '@ve-components/services'
-import { EditorService } from '@ve-core/editor'
-import { EditDialogService } from '@ve-core/editor/services/EditDialog.service'
-import { veCoreEvents } from '@ve-core/events'
-import { IToolBarButton, ToolbarService } from '@ve-core/toolbar'
-import { RootScopeService } from '@ve-utils/application'
-import { EditObject, EditService, EventService } from '@ve-utils/core'
-import { ElementService, ProjectService, PermissionsService } from '@ve-utils/mms-api-client'
+import { ComponentService, ExtensionService } from '@ve-components/services';
+import { EditorService } from '@ve-core/editor';
+import { EditDialogService } from '@ve-core/editor/services/EditDialog.service';
+import { veCoreEvents } from '@ve-core/events';
+import { IToolBarButton, ToolbarService } from '@ve-core/toolbar';
+import { RootScopeService } from '@ve-utils/application';
+import { EditObject, EditService, EventService } from '@ve-utils/core';
+import { ElementService, ProjectService, PermissionsService } from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { SpecApi, SpecService } from './services/Spec.service'
+import { SpecApi, SpecService } from './services/Spec.service';
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import { ElementObject } from '@ve-types/mms'
-import { VeModalService } from '@ve-types/view-editor'
+import { VeComponentOptions, VeQService } from '@ve-types/angular';
+import { ElementObject } from '@ve-types/mms';
+import { VeModalService } from '@ve-types/view-editor';
 
 /**
  * @ngdoc directive
@@ -87,37 +87,37 @@ import { VeModalService } from '@ve-types/view-editor'
 
 class ToolsController {
     //Bindings
-    toolsCategory: string
+    toolsCategory: string;
 
     //Local
-    elementId: string
-    projectId: string
-    refId: string
-    commitId: string
-    edit: EditObject
-    element: ElementObject
-    inPreviewMode: boolean
-    isEditing: boolean
-    skipBroadcast: boolean
+    elementId: string;
+    projectId: string;
+    refId: string;
+    commitId: string;
+    edit: EditObject;
+    element: ElementObject;
+    inPreviewMode: boolean;
+    isEditing: boolean;
+    skipBroadcast: boolean;
 
-    subs: Rx.IDisposable[]
-    currentTool: string
-    currentTitle: string
-    specApi: SpecApi
+    subs: Rx.IDisposable[];
+    currentTool: string;
+    currentTitle: string;
+    specApi: SpecApi;
     show: {
-        [key: string]: boolean
-    } = {}
+        [key: string]: boolean;
+    } = {};
 
-    editable: boolean
-    viewId: string
-    elementSaving: boolean
-    elementLoading: boolean
+    editable: boolean;
+    viewId: string;
+    elementSaving: boolean;
+    elementLoading: boolean;
 
-    protected errorType: string
+    protected errorType: string;
 
-    toolbarId: string
+    toolbarId: string;
 
-    protected $tools: JQuery
+    protected $tools: JQuery;
     static $inject = [
         '$q',
         '$timeout',
@@ -139,7 +139,7 @@ class ToolsController {
         'ToolbarService',
         'SpecService',
         'ExtensionService',
-    ]
+    ];
 
     constructor(
         private $q: VeQService,
@@ -165,197 +165,197 @@ class ToolsController {
     ) {}
 
     $onInit(): void {
-        this.eventSvc.$init(this)
+        this.eventSvc.$init(this);
 
-        this.$tools = $('#tools')
+        this.$tools = $('#tools');
 
-        this.specApi = this.specSvc.specApi
-        this.elementSaving = false
+        this.specApi = this.specSvc.specApi;
+        this.elementSaving = false;
 
         //Listen for Toolbar Clicked Subject
-        this.subs.push(this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, this.changeTool))
+        this.subs.push(this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, this.changeTool));
 
         this.subs.push(
             this.eventSvc.$on('editor.open', (editOb: ElementObject) => {
-                this.openEdit()
+                this.openEdit();
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on('editor.close', (editOb: ElementObject) => {
-                this.closeEdit()
+                this.closeEdit();
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on('spec-editor.save', () => {
-                this.save(false)
+                this.save(false);
             })
-        )
+        );
         this.subs.push(
             this.eventSvc.$on('spec-editor.save-continue', () => {
-                this.save(true)
+                this.save(true);
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on('element-saving', (data: boolean) => {
-                this.elementSaving = data
+                this.elementSaving = data;
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.binding<boolean>('spec.ready', (data) => {
-                this.elementLoading = !data
+                this.elementLoading = !data;
             })
-        )
+        );
 
         this.hotkeys.bindTo(this.$scope).add({
             combo: 'alt+a',
             description: 'save all',
             callback: () => {
-                this.eventSvc.$broadcast('spec-editor.saveall')
+                this.eventSvc.$broadcast('spec-editor.saveall');
             },
-        })
-        const savingAll = false
+        });
+        const savingAll = false;
         this.subs.push(
             this.eventSvc.$on('spec-editor.saveall', () => {
                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                     (api) => {
-                        api.toggleButtonSpinner('spec-editor.saveall')
+                        api.toggleButtonSpinner('spec-editor.saveall');
                         this.editorSvc
                             .saveAll()
                             .catch(() => {
                                 // reset the last edit elementOb to one of the existing element
-                                const firstEdit = Object.values(this.autosaveSvc.getAll())[0]
-                                this.specSvc.tracker.etrackerSelected = firstEdit.key
-                                this.specSvc.keepMode()
-                                this.specApi.elementId = firstEdit.element.id
-                                this.specApi.projectId = firstEdit.element._projectId
-                                this.specApi.refId = firstEdit.element._refId
-                                this.specApi.commitId = 'latest'
-                                this.growl.error('Some elements failed to save, resolve individually in edit pane')
+                                const firstEdit = Object.values(this.autosaveSvc.getAll())[0];
+                                this.specSvc.tracker.etrackerSelected = firstEdit.key;
+                                this.specSvc.keepMode();
+                                this.specApi.elementId = firstEdit.element.id;
+                                this.specApi.projectId = firstEdit.element._projectId;
+                                this.specApi.refId = firstEdit.element._refId;
+                                this.specApi.commitId = 'latest';
+                                this.growl.error('Some elements failed to save, resolve individually in edit pane');
                             })
                             .finally(() => {
                                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                                     (api) => {
-                                        api.toggleButtonSpinner('spec-editor.saveall')
-                                        this.specSvc.toggleSave(this.toolbarId)
+                                        api.toggleButtonSpinner('spec-editor.saveall');
+                                        this.specSvc.toggleSave(this.toolbarId);
                                     },
                                     (reason) => {
-                                        this.growl.error(ToolbarService.error(reason))
+                                        this.growl.error(ToolbarService.error(reason));
                                     }
-                                )
-                            })
+                                );
+                            });
 
-                        this.specSvc.setEditing(false)
+                        this.specSvc.setEditing(false);
                     },
                     (reason) => {
-                        this.growl.error(ToolbarService.error(reason))
+                        this.growl.error(ToolbarService.error(reason));
                     }
-                )
+                );
             })
-        )
+        );
         this.subs.push(
             this.eventSvc.$on('spec-editor.cancel', () => {
                 const go = (): void => {
-                    this.editorSvc.cleanUpEdit(this.specSvc.getEdits().key)
+                    this.editorSvc.cleanUpEdit(this.specSvc.getEdits().key);
                     if (this.autosaveSvc.openEdits() > 0) {
-                        const id = Object.keys(this.autosaveSvc.getAll())[0]
-                        const info = id.split('|')
+                        const id = Object.keys(this.autosaveSvc.getAll())[0];
+                        const info = id.split('|');
                         const data: veCoreEvents.elementSelectedData = {
                             elementId: info[2],
                             projectId: info[0],
                             refId: info[1],
                             commitId: 'latest',
-                        }
-                        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
+                        };
+                        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
                     } else {
-                        this.specSvc.setEditing(false)
+                        this.specSvc.setEditing(false);
                         this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
                             id: 'spec-inspector',
-                        })
+                        });
                         this.toolbarSvc.waitForApi(this.toolbarId).then(
                             (api) => api.setIcon('spec-editor', 'fa-edit'),
                             (reason) => {
-                                this.growl.error(ToolbarService.error(reason))
+                                this.growl.error(ToolbarService.error(reason));
                             }
-                        )
-                        this.specSvc.toggleSave(this.toolbarId)
+                        );
+                        this.specSvc.toggleSave(this.toolbarId);
                     }
-                }
+                };
                 this.editorSvc.hasEdits(this.specSvc.getEdits()).then(
                     (hasEdits) => {
                         if (hasEdits) {
                             this.editorSvc.deleteEditModal(this.specSvc.getEdits()).result.then(
                                 () => {
-                                    go()
+                                    go();
                                 },
                                 () => {
                                     /* Do Nothing */
                                 }
-                            )
-                        } else go()
+                            );
+                        } else go();
                     },
                     () => {
-                        go()
+                        go();
                     }
-                )
+                );
             })
-        )
+        );
     }
 
     private changeTool = (data: veCoreEvents.toolbarClicked): void => {
         if (!this.currentTool) {
-            this.currentTool = ''
+            this.currentTool = '';
         }
         if (this.currentTool !== data.id) {
-            if (this.currentTool !== '') this.show[_.camelCase(this.currentTool)] = false
+            if (this.currentTool !== '') this.show[_.camelCase(this.currentTool)] = false;
 
-            this.currentTool = data.id
+            this.currentTool = data.id;
 
-            const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(data.id)
+            const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(data.id);
             if (!data.title) {
-                data.title = inspect.tooltip
+                data.title = inspect.tooltip;
             }
             if (!data.category) {
-                data.category = inspect.category
+                data.category = inspect.category;
             }
 
-            this.currentTitle = data.title ? data.title : inspect.tooltip
+            this.currentTitle = data.title ? data.title : inspect.tooltip;
 
             if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
-                this.startTool(data.id)
-                this.show[_.camelCase(data.id)] = true
+                this.startTool(data.id);
+                this.show[_.camelCase(data.id)] = true;
             } else {
-                this.show[_.camelCase(data.id)] = true
+                this.show[_.camelCase(data.id)] = true;
             }
         }
-    }
+    };
 
     private startTool = (id: string): void => {
-        const tag = this.extensionSvc.getTagByType('spec', id)
-        const toolId: string = _.camelCase(id)
+        const tag = this.extensionSvc.getTagByType('spec', id);
+        const toolId: string = _.camelCase(id);
         const newTool: JQuery = $(
             '<div id="' +
                 toolId +
                 '" class="container-fluid" ng-if="!$ctrl.elementLoading && $ctrl.show.' +
                 toolId +
                 '"></div>'
-        )
+        );
         if (tag === 'extensionError') {
-            this.errorType = this.currentTool.replace('spec-', '')
+            this.errorType = this.currentTool.replace('spec-', '');
             newTool.append(
                 '<extension-error type="$ctrl.errorType" mms-element-id="$ctrl.mmsElementId" kind="Spec"></extension-error>'
-            )
+            );
         } else {
-            newTool.append('<' + tag + ' toolbar-id="{{$ctrl.toolbarId}}"></' + tag + '>')
+            newTool.append('<' + tag + ' toolbar-id="{{$ctrl.toolbarId}}"></' + tag + '>');
         }
 
-        this.$tools.append(newTool)
+        this.$tools.append(newTool);
 
-        this.$compile(newTool)(this.$scope)
-    }
+        this.$compile(newTool)(this.$scope);
+    };
 
     // private changeElement= (newVal, oldVal) => {
     //     if (newVal === oldVal) {
@@ -368,66 +368,66 @@ class ToolsController {
     // }
 
     public closeEdit = (): void => {
-        this.specSvc.toggleSave(this.toolbarId)
-    }
+        this.specSvc.toggleSave(this.toolbarId);
+    };
 
     public openEdit = (): void => {
-        this.specSvc.toggleSave(this.toolbarId)
-    }
+        this.specSvc.toggleSave(this.toolbarId);
+    };
 
     public save = (continueEdit: boolean): void => {
         if (this.elementSaving) {
-            this.growl.info('Please Wait...')
-            return
+            this.growl.info('Please Wait...');
+            return;
         }
         this.toolbarSvc.waitForApi(this.toolbarId).then(
             (api) => {
                 if (!continueEdit) {
-                    api.toggleButtonSpinner('spec-editor.save')
+                    api.toggleButtonSpinner('spec-editor.save');
                 } else {
-                    api.toggleButtonSpinner('spec-editor.save-continue')
+                    api.toggleButtonSpinner('spec-editor.save-continue');
                 }
                 this.editorSvc
                     .save(this.specSvc.getEdits().key, continueEdit)
                     .then(
                         () => {
                             if (this.autosaveSvc.openEdits() > 0) {
-                                const next = Object.keys(this.autosaveSvc.getAll())[0]
-                                const info = next.split('|')
+                                const next = Object.keys(this.autosaveSvc.getAll())[0];
+                                const info = next.split('|');
                                 const data: veCoreEvents.elementSelectedData = {
                                     elementId: info[2],
                                     projectId: info[0],
                                     refId: info[1],
                                     commitId: 'latest',
-                                }
-                                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
+                                };
+                                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
                             } else {
-                                this.specSvc.setEditing(false)
-                                this.specSvc.toggleSave(this.toolbarId)
+                                this.specSvc.setEditing(false);
+                                this.specSvc.toggleSave(this.toolbarId);
                                 this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
                                     id: 'spec-inspector',
-                                })
+                                });
                             }
                         },
                         (reason) => {
-                            if (reason.type === 'info') this.growl.info(reason.message)
-                            else if (reason.type === 'warning') this.growl.warning(reason.message)
-                            else if (reason.type === 'error') this.growl.error(reason.message)
+                            if (reason.type === 'info') this.growl.info(reason.message);
+                            else if (reason.type === 'warning') this.growl.warning(reason.message);
+                            else if (reason.type === 'error') this.growl.error(reason.message);
                         }
                     )
                     .finally(() => {
                         if (!continueEdit) {
-                            api.toggleButtonSpinner('spec-editor.save')
+                            api.toggleButtonSpinner('spec-editor.save');
                         } else {
-                            api.toggleButtonSpinner('spec-editor.save-continue')
+                            api.toggleButtonSpinner('spec-editor.save-continue');
                         }
-                    })
+                    });
             },
             (reason) => {
-                this.growl.error(ToolbarService.error(reason))
+                this.growl.error(ToolbarService.error(reason));
             }
-        )
-    }
+        );
+    };
 }
 
 const MmsToolsComponent: VeComponentOptions = {
@@ -447,6 +447,6 @@ const MmsToolsComponent: VeComponentOptions = {
         toolsCategory: '<',
     },
     controller: ToolsController,
-}
+};
 
-veComponents.component(MmsToolsComponent.selector, MmsToolsComponent)
+veComponents.component(MmsToolsComponent.selector, MmsToolsComponent);

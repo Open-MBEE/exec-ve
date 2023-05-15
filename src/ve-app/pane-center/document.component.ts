@@ -1,60 +1,60 @@
-import { IPaneScrollApi } from '@openmbee/pane-layout/lib/components/ng-pane'
-import { HookResult, Ng1Controller, StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs'
-import { Transition } from '@uirouter/core'
-import angular, { IComponentController } from 'angular'
-import Rx from 'rx-lite'
+import { IPaneScrollApi } from '@openmbee/pane-layout/lib/components/ng-pane';
+import { HookResult, Ng1Controller, StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
+import { Transition } from '@uirouter/core';
+import angular, { IComponentController } from 'angular';
+import Rx from 'rx-lite';
 
-import { veAppEvents } from '@ve-app/events'
-import { AppUtilsService, FullDocumentApi, FullDocumentService } from '@ve-app/main/services'
-import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config'
-import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
-import { TreeService } from '@ve-components/trees'
-import { IButtonBarButton, ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
-import { veCoreEvents } from '@ve-core/events'
-import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { PermissionsService, ViewData, ViewService, URLService } from '@ve-utils/mms-api-client'
+import { veAppEvents } from '@ve-app/events';
+import { AppUtilsService, FullDocumentApi, FullDocumentService } from '@ve-app/main/services';
+import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config';
+import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
+import { TreeService } from '@ve-components/trees';
+import { IButtonBarButton, ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
+import { veCoreEvents } from '@ve-core/events';
+import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
+import { PermissionsService, ViewData, ViewService, URLService } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { DocumentObject, ElementObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms'
-import { TreeBranch, View2NodeMap } from '@ve-types/tree'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
+import { DocumentObject, ElementObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms';
+import { TreeBranch, View2NodeMap } from '@ve-types/tree';
 
 class FullDocumentController implements IComponentController, Ng1Controller {
     //Bindings
-    public mmsView: ViewObject
-    public mmsDocument: DocumentObject
-    public mmsProject: ProjectObject
-    public mmsRef: RefObject
+    public mmsView: ViewObject;
+    public mmsDocument: DocumentObject;
+    public mmsProject: ProjectObject;
+    public mmsRef: RefObject;
     //
     // //Locals
     // public document: DocumentObject
     // public project: ProjectObject
     // public ref: RefObject
 
-    public subs: Rx.IDisposable[]
-    bars: string[]
-    bbApi: ButtonBarApi
-    bbId = 'full-doc'
-    fullDocumentApi: FullDocumentApi
-    viewContentLoading: boolean
-    buttons: IButtonBarButton[] = []
-    latestElement: string = ''
-    scrollApi: IPaneScrollApi
-    views: ViewData[] = []
-    viewsBuffer: ViewData[] = []
-    view2Children: { [key: string]: string[] } = {}
-    view2Node: View2NodeMap = {}
-    num = 1
-    seenViewIds = {}
-    shortUrl: string = ''
-    processed: string
+    public subs: Rx.IDisposable[];
+    bars: string[];
+    bbApi: ButtonBarApi;
+    bbId = 'full-doc';
+    fullDocumentApi: FullDocumentApi;
+    viewContentLoading: boolean;
+    buttons: IButtonBarButton[] = [];
+    latestElement: string = '';
+    scrollApi: IPaneScrollApi;
+    views: ViewData[] = [];
+    viewsBuffer: ViewData[] = [];
+    view2Children: { [key: string]: string[] } = {};
+    view2Node: View2NodeMap = {};
+    num = 1;
+    seenViewIds = {};
+    shortUrl: string = '';
+    processed: string;
 
     private dynamicPopover: {
-        templateUrl: string
-        title: string
-    }
+        templateUrl: string;
+        title: string;
+    };
 
     static $inject = [
         '$q',
@@ -81,7 +81,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         'TreeService',
         'EventService',
         'ButtonBarService',
-    ]
+    ];
     constructor(
         private $q: VeQService,
         private $scope: angular.IScope,
@@ -110,71 +110,71 @@ class FullDocumentController implements IComponentController, Ng1Controller {
     ) {}
 
     $onInit(): void {
-        this.rootScopeSvc.veFullDocMode(true)
-        this.rootScopeSvc.veHideLeft(false)
-        this.rootScopeSvc.veHideRight(false)
-        this.rootScopeSvc.veNumberingOn(true)
-        this.eventSvc.$init(this)
+        this.rootScopeSvc.veFullDocMode(true);
+        this.rootScopeSvc.veHideLeft(false);
+        this.rootScopeSvc.veHideRight(false);
+        this.rootScopeSvc.veNumberingOn(true);
+        this.eventSvc.$init(this);
 
         //Init/Reset Tree Updated Subject
-        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
+        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false);
 
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons)
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons);
 
         this.view2Node[this.mmsDocument.id] = {
             label: this.mmsDocument.name,
             data: this.mmsDocument,
             type: 'view',
             children: [],
-        }
-        this.view2Children[this.mmsDocument.id] = []
+        };
+        this.view2Children[this.mmsDocument.id] = [];
 
         // Share URL button settings
-        this.dynamicPopover = this.shortUrlSvc.dynamicPopover
+        this.dynamicPopover = this.shortUrlSvc.dynamicPopover;
 
         this.shortUrl = this.shortUrlSvc.getShortUrl({
             orgId: this.mmsProject.orgId,
             projectId: this.mmsProject.id,
             refId: this.mmsRef.id,
             documentId: this.mmsDocument.id,
-        })
+        });
 
-        this.viewContentLoading = this.rootScopeSvc.veViewContentLoading(false)
+        this.viewContentLoading = this.rootScopeSvc.veViewContentLoading(false);
 
         this.$transitions.onSuccess({}, (transition) => {
-            this._scroll(transition.params().viewId as string)
-        })
+            this._scroll(transition.params().viewId as string);
+        });
 
         this.subs.push(
             this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VEVIEWCONTENTLOADING, (data) => {
-                this.viewContentLoading = data
+                this.viewContentLoading = data;
             })
-        )
+        );
 
         // api to communicate with borderlayout library, no longer works
         this.scrollApi = {
             notifyOnScroll: this.notifyOnScroll,
             isScrollVisible: (): boolean => {
-                return false
+                return false;
             }, // pane's directive (in borderlayout) resets this to the right function
             throttleRate: 500, // how often should the wheel event triggered
             threshold: 3000, // how far from the bottom of the page before adding more views
             frequency: 100, // how fast to add more views
-        }
+        };
 
         this.subs.push(
             this.eventSvc.$on('view.deleted', (deletedBranch: TreeBranch) => {
-                this.fullDocumentApi.handleViewDelete(deletedBranch)
+                this.fullDocumentApi.handleViewDelete(deletedBranch);
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on('view.added', (data: veAppEvents.viewAddedData) => {
-                this.fullDocumentApi.handleViewAdd(this._buildViewData(data.vId, data.curSec), data.prevSibId)
-                this._scroll(data.vId)
-                this.eventSvc.$broadcast('view.selected')
+                this.fullDocumentApi.handleViewAdd(this._buildViewData(data.vId, data.curSec), data.prevSibId);
+                this._scroll(data.vId);
+                this.eventSvc.$broadcast('view.selected');
             })
-        )
+        );
 
         this.subs.push(
             // this.eventSvc.$on<string>('view.scroll', (viewId) => {
@@ -186,36 +186,36 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                         this.bbApi.toggleButton(
                             'show-comments',
                             this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn())
-                        )
-                        break
+                        );
+                        break;
 
                     case 'show-elements':
                         this.bbApi.toggleButton(
                             'show-elements',
                             this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn())
-                        )
+                        );
                         if (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) {
-                            this.bbApi.toggleButton('show-edits', false)
-                            this.rootScopeSvc.veEditMode(false)
+                            this.bbApi.toggleButton('show-edits', false);
+                            this.rootScopeSvc.veEditMode(false);
                         }
-                        break
+                        break;
 
                     case 'show-edits':
                         this.bbApi.toggleButton(
                             'show-edits',
                             this.rootScopeSvc.veEditMode(!this.rootScopeSvc.veEditMode())
-                        )
+                        );
                         if (this.rootScopeSvc.veElementsOn() !== this.rootScopeSvc.veEditMode()) {
-                            this.bbApi.toggleButton('show-elements', this.rootScopeSvc.veEditMode())
-                            this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode())
+                            this.bbApi.toggleButton('show-elements', this.rootScopeSvc.veEditMode());
+                            this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode());
                         }
-                        break
+                        break;
                     case 'show-numbering':
                         this.bbApi.toggleButton(
                             'show-numbering',
                             this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
-                        )
-                        break
+                        );
+                        break;
                     case 'convert-pdf':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             void this.appUtilsSvc.printModal(
@@ -224,9 +224,9 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                                 this.mmsRef,
                                 true,
                                 3
-                            )
-                        })
-                        break
+                            );
+                        });
+                        break;
                     case 'print':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             void this.appUtilsSvc.printModal(
@@ -235,9 +235,9 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                                 this.mmsRef,
                                 true,
                                 1
-                            )
-                        })
-                        break
+                            );
+                        });
+                        break;
                     case 'word':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             void this.appUtilsSvc.printModal(
@@ -246,28 +246,28 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                                 this.mmsRef,
                                 true,
                                 2
-                            )
-                        })
-                        break
+                            );
+                        });
+                        break;
 
                     case 'tabletocsv':
                         this.fullDocumentApi.loadRemainingViews(() => {
-                            this.appUtilsSvc.tableToCsv(angular.element('#print-div'), true)
-                        })
-                        break
+                            this.appUtilsSvc.tableToCsv(angular.element('#print-div'), true);
+                        });
+                        break;
 
                     case 'refresh-numbering':
                         //TODO
-                        break
+                        break;
                 }
             })
-        )
-        this.initViews()
+        );
+        this.initViews();
     }
 
     $onDestroy(): void {
-        this.eventSvc.$destroy(this.subs)
-        this.buttonBarSvc.destroy(this.bbId)
+        this.eventSvc.$destroy(this.subs);
+        this.buttonBarSvc.destroy(this.bbId);
     }
 
     initViews(): void {
@@ -280,35 +280,35 @@ class FullDocumentController implements IComponentController, Ng1Controller {
             refId: this.mmsRef.id,
             refType: this.mmsRef.type,
             refresh: this.$uiRouterGlobals.transition.$from().name === '',
-        }
+        };
 
-        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data)
-        this.fullDocumentApi = this.fullDocumentSvc.get()
-        this.views = this.fullDocumentApi.views
-        this.viewsBuffer = this.fullDocumentApi.viewsBuffer
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data);
+        this.fullDocumentApi = this.fullDocumentSvc.get();
+        this.views = this.fullDocumentApi.views;
+        this.viewsBuffer = this.fullDocumentApi.viewsBuffer;
         this._createViews().then(
             () => {
-                this.fullDocumentApi.addInitialViews(scrollVisible)
+                this.fullDocumentApi.addInitialViews(scrollVisible);
                 if (this.mmsView && this.mmsView.id !== this.mmsDocument.id) {
                     this.fullDocumentApi.handleClickOnBranch(this.mmsView.id, () => {
-                        this._scroll(this.mmsView.id)
-                        this.fullDocumentApi.loadRemainingViews() //remove if scroll works
-                    })
+                        this._scroll(this.mmsView.id);
+                        this.fullDocumentApi.loadRemainingViews(); //remove if scroll works
+                    });
                 } else {
-                    this.fullDocumentApi.loadRemainingViews() //remove if scroll works
+                    this.fullDocumentApi.loadRemainingViews(); //remove if scroll works
                 }
             },
             (reason) => {
-                this.growl.error(reason.message)
+                this.growl.error(reason.message);
             }
-        )
+        );
         const scrollVisible = (): boolean => {
-            return this.scrollApi.isScrollVisible()
-        }
+            return this.scrollApi.isScrollVisible();
+        };
     }
 
     uiOnParamsChanged(newValues: ParamsObject, $transition$: Transition): void {
-        if (newValues.viewId !== this.processed) this._scroll(newValues.viewId)
+        if (newValues.viewId !== this.processed) this._scroll(newValues.viewId);
     }
     uiCanExit(transition: Transition): HookResult {
         //Do nothing
@@ -319,8 +319,8 @@ class FullDocumentController implements IComponentController, Ng1Controller {
             this.mmsRef.type === 'Branch' &&
             this.permissionsSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id)
         ) {
-            api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
-            api.toggleButton('show-edits', this.rootScopeSvc.veEditMode())
+            api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'));
+            api.toggleButton('show-edits', this.rootScopeSvc.veEditMode());
 
             this.hotkeys.bindTo(this.$scope).add({
                 combo: 'alt+d',
@@ -328,20 +328,20 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                 callback: () => {
                     this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
                         clicked: 'show-edits',
-                    })
+                    });
                 },
-            })
+            });
         }
 
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'))
-        api.toggleButton('show-elements', this.rootScopeSvc.veElementsOn())
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
-        api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn())
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
-        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn())
-        api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'));
+        api.toggleButton('show-elements', this.rootScopeSvc.veElementsOn());
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'));
+        api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn());
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'));
+        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn());
+        api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('print'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('export'));
 
         this.hotkeys
             .bindTo(this.$scope)
@@ -351,7 +351,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                 callback: () => {
                     this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
                         clicked: 'show-comments',
-                    })
+                    });
                 },
             })
             .add({
@@ -360,10 +360,10 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                 callback: () => {
                     this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
                         clicked: 'show-elements',
-                    })
+                    });
                 },
-            })
-    }
+            });
+    };
 
     private _scroll = (viewId: string): void => {
         if (this.view2Children[viewId]) {
@@ -374,19 +374,19 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                 projectId: this.mmsProject.id,
                 refId: this.mmsRef.id,
                 refType: this.mmsRef.type,
-            }
+            };
 
-            this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
-            if (viewId === this.processed) return
-            this.processed = viewId
+            this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
+            if (viewId === this.processed) return;
+            this.processed = viewId;
             this.fullDocumentApi.handleClickOnBranch(viewId, () => {
-                document.getElementById(viewId).scrollIntoView(true)
-            })
+                document.getElementById(viewId).scrollIntoView(true);
+            });
         }
-    }
+    };
 
     private _createViews = (): VePromise<void, void> => {
-        const message = this._loadingViewsFromServer()
+        const message = this._loadingViewsFromServer();
         return new this.$q((resolve, reject) => {
             this.views.push({
                 id: this.mmsDocument.id,
@@ -394,9 +394,9 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                     elementTranscluded: this._elementTranscluded,
                     elementClicked: this._elementClicked,
                 },
-            })
+            });
             if (!this.mmsDocument._childViews) {
-                this.mmsDocument._childViews = []
+                this.mmsDocument._childViews = [];
             }
             this.viewSvc
                 .handleChildViews(
@@ -410,27 +410,27 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                 )
                 .then((childIds: string[]) => {
                     for (let i = 0; i < childIds.length; i++) {
-                        this._constructViews(childIds[i], this.num.toString(10))
-                        this.num = this.num + 1
+                        this._constructViews(childIds[i], this.num.toString(10));
+                        this.num = this.num + 1;
                     }
-                    resolve()
+                    resolve();
                 }, reject)
                 .finally(() => {
-                    message.destroy()
-                })
-        })
-    }
+                    message.destroy();
+                });
+        });
+    };
 
     private _loadingViewsFromServer = (): angular.growl.IGrowlMessage => {
-        return this.growl.info('Loading data from server!', { ttl: -1 })
-    }
+        return this.growl.info('Loading data from server!', { ttl: -1 });
+    };
 
     private _elementTranscluded = (elementOb: ElementObject, type: string): void => {
         if (elementOb && type !== 'Comment') {
             if (elementOb._modified && elementOb._modified > this.latestElement)
-                this.latestElement = elementOb._modified
+                this.latestElement = elementOb._modified;
         }
-    }
+    };
 
     private _elementClicked = (elementOb: ElementObject): void => {
         const data = {
@@ -439,9 +439,9 @@ class FullDocumentController implements IComponentController, Ng1Controller {
             projectId: elementOb._projectId,
             refId: elementOb._refId,
             commitId: 'latest',
-        }
-        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
-    }
+        };
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
+    };
 
     private _buildViewData = (vId: string, curSec: string): ViewData => {
         return {
@@ -453,55 +453,55 @@ class FullDocumentController implements IComponentController, Ng1Controller {
             number: curSec,
             topLevel: curSec ? curSec.toString().indexOf('.') === -1 : false,
             first: curSec == '1',
-        }
-    }
+        };
+    };
 
     private _constructViews = (viewId: string, curSection: string): void => {
-        this.views.push(this._buildViewData(viewId, curSection))
+        this.views.push(this._buildViewData(viewId, curSection));
 
         if (this.view2Children[viewId] && Array.isArray(this.view2Children[viewId])) {
-            let num = 1
-            const childIds = this.view2Children[viewId]
+            let num = 1;
+            const childIds = this.view2Children[viewId];
             for (let i = 0; i < childIds.length; i++) {
-                this._constructViews(this.view2Children[viewId][i], `${curSection}.${num}`)
-                num = num + 1
+                this._constructViews(this.view2Children[viewId][i], `${curSection}.${num}`);
+                num = num + 1;
             }
         }
-    }
+    };
 
     private _handleSingleView = (v: ViewObject, aggr: string): string[] => {
-        let childIds = this.view2Children[v.id]
+        let childIds = this.view2Children[v.id];
         if (!childIds) {
-            childIds = []
+            childIds = [];
         }
-        this.view2Children[v.id] = childIds
+        this.view2Children[v.id] = childIds;
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
-            return childIds
+            return childIds;
         }
         for (let i = 0; i < v._childViews.length; i++) {
             if (this.seenViewIds[v._childViews[i].id]) {
-                continue
+                continue;
             }
-            this.seenViewIds[v._childViews[i].id] = true
-            childIds.push(v._childViews[i].id)
+            this.seenViewIds[v._childViews[i].id] = true;
+            childIds.push(v._childViews[i].id);
         }
-        return childIds
-    }
+        return childIds;
+    };
 
     public notifyOnScroll = (): boolean => {
-        return this.fullDocumentApi.handleDocumentScrolling()
-    }
+        return this.fullDocumentApi.handleDocumentScrolling();
+    };
 
     public copyToClipboard = ($event: JQuery.ClickEvent): void => {
         this.shortUrlSvc.copyToClipboard(this.$element, $event).then(
             () => {
-                this.growl.info('Copied to clipboard!', { ttl: 2000 })
+                this.growl.info('Copied to clipboard!', { ttl: 2000 });
             },
             (err) => {
-                this.growl.error('Unable to copy: ' + err.message)
+                this.growl.error('Unable to copy: ' + err.message);
             }
-        )
-    }
+        );
+    };
 }
 
 /* Controller */
@@ -549,6 +549,6 @@ const DocumentComponent: VeComponentOptions = {
         mmsDocument: '<',
     },
     controller: FullDocumentController,
-}
+};
 
-veApp.component(DocumentComponent.selector, DocumentComponent)
+veApp.component(DocumentComponent.selector, DocumentComponent);

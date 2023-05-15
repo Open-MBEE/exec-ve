@@ -1,4 +1,4 @@
-import angular from 'angular'
+import angular from 'angular';
 
 /**
  *
@@ -10,7 +10,7 @@ export const veComponents = angular.module('ve-components', [
     'ui.bootstrap',
     'angular-growl',
     // 'ngSanitize',
-])
+]);
 
 // veComponents.config(['$sanitizeProvider', function($sanitizeProvider: angular.sanitize.ISanitizeProvider) {
 //     $sanitizeProvider.addValidElements({
@@ -24,10 +24,10 @@ veComponents
     .filter('veRealNum', () => {
         return (n: string | number): string => {
             if (Number.isInteger(n)) {
-                return `${n}.0`
+                return `${n}.0`;
             }
-            return n as string
-        }
+            return n as string;
+        };
     })
     .constant('CKEDITOR', window.CKEDITOR)
-    .constant('veConfig', window.__env)
+    .constant('veConfig', window.__env);

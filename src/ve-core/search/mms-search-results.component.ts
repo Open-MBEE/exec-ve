@@ -1,20 +1,20 @@
-import { IComponentController } from 'angular'
+import { IComponentController } from 'angular';
 
-import { SearchController } from '@ve-core/search'
+import { SearchController } from '@ve-core/search';
 
-import { veCore } from '@ve-core'
+import { veCore } from '@ve-core';
 
-import { VeComponentOptions } from '@ve-types/angular'
-import { ElementObject } from '@ve-types/mms'
+import { VeComponentOptions } from '@ve-types/angular';
+import { ElementObject } from '@ve-types/mms';
 
 export class MmsSearchResultsController implements IComponentController {
     //Parent Controllers
-    private $search: SearchController
+    private $search: SearchController;
 
     //Bindings
-    private elem: ElementObject
+    private elem: ElementObject;
 
-    $onChanges
+    $onChanges;
 }
 const MmsSearchResultsComponent: VeComponentOptions = {
     selector: 'mmsSearchResults',
@@ -148,6 +148,6 @@ const MmsSearchResultsComponent: VeComponentOptions = {
 </div>
     `,
     controller: MmsSearchResultsController,
-}
+};
 
-veCore.component(MmsSearchResultsComponent.selector, MmsSearchResultsComponent)
+veCore.component(MmsSearchResultsComponent.selector, MmsSearchResultsComponent);

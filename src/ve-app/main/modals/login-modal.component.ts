@@ -1,30 +1,30 @@
-import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
-import angular from 'angular'
+import { StateService, UIRouterGlobals } from '@uirouter/angularjs';
+import angular from 'angular';
 
-import { AuthService } from '@ve-utils/mms-api-client'
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+import { AuthService } from '@ve-utils/mms-api-client';
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { AuthRequest } from '@ve-types/mms'
-import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
+import { AuthRequest } from '@ve-types/mms';
+import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
 
 export interface LoginModalResolveFn extends VeModalResolveFn {
-    continue(): boolean
+    continue(): boolean;
 }
 
 export interface LoginModalResolve extends VeModalResolve {
-    continue: boolean
+    continue: boolean;
 }
 
 class LoginModalController extends VeModalControllerImpl<boolean, LoginModalResolve> implements VeModalController {
-    static $inject = ['$state', '$uiRouterGlobals', 'growl', 'AuthService']
+    static $inject = ['$state', '$uiRouterGlobals', 'growl', 'AuthService'];
 
     public credentials = {
         username: '',
         password: '',
-    }
-    spin = false
+    };
+    spin = false;
 
     constructor(
         private $state: StateService,
@@ -32,14 +32,14 @@ class LoginModalController extends VeModalControllerImpl<boolean, LoginModalReso
         private growl: angular.growl.IGrowlService,
         private authSvc: AuthService
     ) {
-        super()
+        super();
     }
 
     login(credentials: AuthRequest): void {
-        this.spin = true
+        this.spin = true;
         this.authSvc.getAuthorized(credentials).then(
             (user) => {
-                this.growl.success('Logged in')
+                this.growl.success('Logged in');
                 // Check if user had changes queued before refreshing page data
                 // add edits to cache
                 // const edits = this.autosaveSvc.getAll()
@@ -51,25 +51,25 @@ class LoginModalController extends VeModalControllerImpl<boolean, LoginModalReso
                 if (this.resolve.continue) {
                     this.$state.go(this.$uiRouterGlobals.current, {}, { reload: true }).then(
                         () => {
-                            this.modalInstance.close(true)
+                            this.modalInstance.close(true);
                         },
                         () => {
-                            this.growl.error('Redirect error; Please reload the page')
+                            this.growl.error('Redirect error; Please reload the page');
                         }
-                    )
+                    );
                 }
             },
             (reason) => {
-                this.spin = false
-                this.credentials.password = ''
-                this.growl.error(reason.message)
+                this.spin = false;
+                this.credentials.password = '';
+                this.growl.error(reason.message);
             }
-        )
+        );
     }
 
     cancel = (): void => {
-        this.modalInstance.dismiss(false)
-    }
+        this.modalInstance.dismiss(false);
+    };
 }
 
 const LoginModalComponent: VeModalComponent = {
@@ -94,6 +94,6 @@ const LoginModalComponent: VeModalComponent = {
         resolve: '<',
     },
     controller: LoginModalController,
-}
+};
 
-veApp.component(LoginModalComponent.selector, LoginModalComponent)
+veApp.component(LoginModalComponent.selector, LoginModalComponent);

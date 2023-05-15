@@ -1,11 +1,11 @@
-import angular from 'angular'
-import _ from 'lodash'
+import angular from 'angular';
+import _ from 'lodash';
 
-import { ComponentService } from '@ve-components/services'
-import { SpecTool, ISpecTool, SpecService } from '@ve-components/spec-tools'
-import { ToolbarService } from '@ve-core/toolbar'
-import { ApplicationService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { ComponentService } from '@ve-components/services';
+import { SpecTool, ISpecTool, SpecService } from '@ve-components/spec-tools';
+import { ToolbarService } from '@ve-core/toolbar';
+import { ApplicationService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
 import {
     ApiService,
     ElementService,
@@ -13,14 +13,14 @@ import {
     ProjectService,
     URLService,
     ViewService,
-} from '@ve-utils/mms-api-client'
+} from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular';
 
 class SpecMagicController extends SpecTool implements ISpecTool {
-    static $inject = [...SpecTool.$inject]
+    static $inject = [...SpecTool.$inject];
 
     constructor(
         $q: VeQService,
@@ -55,9 +55,9 @@ class SpecMagicController extends SpecTool implements ISpecTool {
             eventSvc,
             specSvc,
             toolbarSvc
-        )
-        this.specType = _.kebabCase(SpecMagicComponent.selector)
-        this.specTitle = 'Magic Element'
+        );
+        this.specType = _.kebabCase(SpecMagicComponent.selector);
+        this.specTitle = 'Magic Element';
     }
 }
 
@@ -67,6 +67,6 @@ const SpecMagicComponent: VeComponentOptions = {
     <p>Hello World!!</p>
 `,
     controller: SpecMagicController,
-}
+};
 
-veComponents.component(SpecMagicComponent.selector, SpecMagicComponent)
+veComponents.component(SpecMagicComponent.selector, SpecMagicComponent);

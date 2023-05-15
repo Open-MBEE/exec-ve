@@ -1,13 +1,13 @@
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-veComponents.directive('mmsD3RadarPlot', ['PlotService', '$window', mmsD3RadarPlot])
+veComponents.directive('mmsD3RadarPlot', ['PlotService', '$window', mmsD3RadarPlot]);
 function mmsD3RadarPlot(PlotService, $window) {
     const mmsRadarChartLink = function (scope, element, attrs, mmsViewCtrl) {
-        const d3 = $window.d3
-        const colorscale = d3.scaleOrdinal(d3.schemeCategory10)
+        const d3 = $window.d3;
+        const colorscale = d3.scaleOrdinal(d3.schemeCategory10);
 
-        const scopetableColumnHeadersLabel = []
-        const divchart = d3.select(element[0]).append('div')
+        const scopetableColumnHeadersLabel = [];
+        const divchart = d3.select(element[0]).append('div');
 
         const defaultPlotConfig = {
             width: 700 /*parseInt(divchart.style("width"))*0.95*/,
@@ -16,67 +16,67 @@ function mmsD3RadarPlot(PlotService, $window) {
             marginRight: 0,
             marginBottom: 0,
             marginLeft: 0,
-        }
+        };
 
-        let projectId
-        let refId
-        let commitId
+        let projectId;
+        let refId;
+        let commitId;
         if (mmsViewCtrl) {
-            const viewVersion = mmsViewCtrl.getElementOrigin()
-            projectId = viewVersion.projectId
-            refId = viewVersion.refId
-            commitId = viewVersion.commitId
+            const viewVersion = mmsViewCtrl.getElementOrigin();
+            projectId = viewVersion.projectId;
+            refId = viewVersion.refId;
+            commitId = viewVersion.commitId;
         }
         //if ( scope.plot.config.length !== 0){
         //scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); //{"colors: [5,6,7,8,9]"}
         //}
         scope.render = function () {
             PlotService.readValues(scope.plot, projectId, refId, commitId).then(function (value) {
-                scope.tablebody = value.tablebody
-                scope.tableheader = value.tableheader
-                scope.isHeader = value.isHeader
-                scope.valuesO = value.tablebody.valuesO //value objects used in watch
+                scope.tablebody = value.tablebody;
+                scope.tableheader = value.tableheader;
+                scope.isHeader = value.isHeader;
+                scope.valuesO = value.tablebody.valuesO; //value objects used in watch
                 if (scope.tablebody.c3_data.length === 0) {
                     //no data
-                    return
+                    return;
                 }
 
-                const rowvalues: { axis: string; value: number }[][] = [] //[][] {{axis: p2, value: 15}, {axis: p3: value: 1}}...
+                const rowvalues: { axis: string; value: number }[][] = []; //[][] {{axis: p2, value: 15}, {axis: p3: value: 1}}...
                 scope.tablebody.c3_data.forEach(function (row) {
-                    const rowvalue: { axis: string; value: number }[] = []
+                    const rowvalue: { axis: string; value: number }[] = [];
                     for (
                         let i = 1;
                         i < row.length;
                         i++ //ignore row header
                     )
-                        rowvalue.push({ axis: scope.tableheader[i - 1], value: row[i] })
-                    rowvalues.push(rowvalue)
-                })
+                        rowvalue.push({ axis: scope.tableheader[i - 1], value: row[i] });
+                    rowvalues.push(rowvalue);
+                });
 
-                divchart.selectAll('*').remove()
-                divchart.attr('class', 'radar' + scope.$id).attr('style', 'border:1px solid #ddd')
+                divchart.selectAll('*').remove();
+                divchart.attr('class', 'radar' + scope.$id).attr('style', 'border:1px solid #ddd');
 
-                RadarChart.draw('radar' + scope.$id, rowvalues)
+                RadarChart.draw('radar' + scope.$id, rowvalues);
                 //add legends from tableheader
-                const legends: any[] = []
+                const legends: any[] = [];
                 scope.tablebody.c3_data.forEach(function (item) {
-                    legends.push(item[0])
-                })
-                initiateLegend(legends, 'radar' + scope.$id)
-            }) //Plot
-        } //end of scope.render
+                    legends.push(item[0]);
+                });
+                initiateLegend(legends, 'radar' + scope.$id);
+            }); //Plot
+        }; //end of scope.render
 
         scope.$watch(
             'valuesO',
             function (newVals, oldVals) {
-                return scope.render()
+                return scope.render();
             },
             true
-        )
+        );
 
-        const plotConfig = PlotService.plotConfig(scope.plot.config.options, defaultPlotConfig)
+        const plotConfig = PlotService.plotConfig(scope.plot.config.options, defaultPlotConfig);
 
-        let cfg
+        let cfg;
         var RadarChart = {
             draw: function (id, d) {
                 cfg = {
@@ -95,33 +95,33 @@ function mmsD3RadarPlot(PlotService, $window) {
                     ExtraWidthX: 100,
                     ExtraWidthY: 0 /*100 original */,
                     color: colorscale,
-                }
+                };
 
                 cfg.maxValue = Math.max(
                     cfg.maxValue,
                     d3.max(d, function (i) {
                         return d3.max(
                             i.map(function (o) {
-                                return Number(o.value)
+                                return Number(o.value);
                             })
-                        )
+                        );
                     })
-                )
+                );
                 const allAxis = d[0].map(function (i, j) {
-                    return i.axis
-                })
-                const total = allAxis.length
-                const radius = cfg.factor * Math.min(cfg.w / 2, cfg.h / 2)
+                    return i.axis;
+                });
+                const total = allAxis.length;
+                const radius = cfg.factor * Math.min(cfg.w / 2, cfg.h / 2);
 
-                const svg = divchart.append('svg:svg').attr('class', 'rdchart ' + scope.$id)
-                svg.attr('width', plotConfig.width)
-                svg.attr('height', plotConfig.height)
+                const svg = divchart.append('svg:svg').attr('class', 'rdchart ' + scope.$id);
+                svg.attr('width', plotConfig.width);
+                svg.attr('height', plotConfig.height);
 
-                const g = svg.append('g').attr('transform', 'translate(' + cfg.TranslateX + ',' + cfg.TranslateY + ')')
-                let tooltip
+                const g = svg.append('g').attr('transform', 'translate(' + cfg.TranslateX + ',' + cfg.TranslateY + ')');
+                let tooltip;
                 //Text indicating at what % each level is
                 for (let j = 0; j < cfg.levels; j++) {
-                    const levelFactor2 = cfg.factor * radius * ((j + 1) / cfg.levels)
+                    const levelFactor2 = cfg.factor * radius * ((j + 1) / cfg.levels);
                     g.selectAll('.levels')
                         .data([1]) //dummy data
                         .enter()
@@ -140,97 +140,97 @@ function mmsD3RadarPlot(PlotService, $window) {
                                 ')'
                         )
                         .attr('fill', '#737373')
-                        .text(d3.format('.3g')(((j + 1) * cfg.maxValue) / cfg.levels))
+                        .text(d3.format('.3g')(((j + 1) * cfg.maxValue) / cfg.levels));
                 }
                 function getPosition(i, range, factor, func) {
-                    factor = typeof factor !== 'undefined' ? factor : 1
-                    return range * (1 - factor * func((i * cfg.radians) / total))
+                    factor = typeof factor !== 'undefined' ? factor : 1;
+                    return range * (1 - factor * func((i * cfg.radians) / total));
                 }
                 function getHorizontalPosition(i, range, factor?) {
-                    return getPosition(i, range, factor, Math.sin)
+                    return getPosition(i, range, factor, Math.sin);
                 }
                 function getVerticalPosition(i, range, factor?) {
-                    return getPosition(i, range, factor, Math.cos)
+                    return getPosition(i, range, factor, Math.cos);
                 }
                 // //levels && axises
                 const levelFactors = d3.range(0, cfg.levels).map(function (level) {
-                    return radius * ((level + 1) / cfg.levels)
-                })
-                const levelGroups = g.selectAll('.levels').data(levelFactors)
-                levelGroups.enter().append('g')
-                levelGroups.exit().remove()
+                    return radius * ((level + 1) / cfg.levels);
+                });
+                const levelGroups = g.selectAll('.levels').data(levelFactors);
+                levelGroups.enter().append('g');
+                levelGroups.exit().remove();
                 levelGroups.attr('class', function (d, i) {
-                    return 'level-group level-group-' + i
-                })
+                    return 'level-group level-group-' + i;
+                });
                 const levelLine = levelGroups.selectAll('.level').data(function (levelFactor) {
                     return d3.range(0, total).map(function () {
-                        return levelFactor
-                    })
-                })
-                levelLine.enter().append('line')
-                levelLine.exit().remove()
+                        return levelFactor;
+                    });
+                });
+                levelLine.enter().append('line');
+                levelLine.exit().remove();
                 levelLine
                     .attr('class', 'level')
                     .attr('x1', function (levelFactor, i) {
-                        return getHorizontalPosition(i, levelFactor)
+                        return getHorizontalPosition(i, levelFactor);
                     })
                     .attr('y1', function (levelFactor, i) {
-                        return getVerticalPosition(i, levelFactor)
+                        return getVerticalPosition(i, levelFactor);
                     })
                     .attr('x2', function (levelFactor, i) {
-                        return getHorizontalPosition(i + 1, levelFactor)
+                        return getHorizontalPosition(i + 1, levelFactor);
                     })
                     .attr('y2', function (levelFactor, i) {
-                        return getVerticalPosition(i + 1, levelFactor)
+                        return getVerticalPosition(i + 1, levelFactor);
                     })
                     .style('stroke', 'grey')
                     .style('stroke-opacity', '0.75')
                     .style('stroke-width', '0.3px')
                     .attr('transform', function (levelFactor) {
-                        return 'translate(' + (cfg.w / 2 - levelFactor) + ', ' + (cfg.h / 2 - levelFactor) + ')'
-                    })
-                let series = 0
-                const axis = g.selectAll('.axis').data(allAxis).enter().append('g').attr('class', 'axis')
+                        return 'translate(' + (cfg.w / 2 - levelFactor) + ', ' + (cfg.h / 2 - levelFactor) + ')';
+                    });
+                let series = 0;
+                const axis = g.selectAll('.axis').data(allAxis).enter().append('g').attr('class', 'axis');
                 axis.append('line')
                     .attr('x1', cfg.w / 2)
                     .attr('y1', cfg.h / 2)
                     .attr('x2', function (d, i) {
-                        return (cfg.w / 2) * (1 - cfg.factor * Math.sin((i * cfg.radians) / total))
+                        return (cfg.w / 2) * (1 - cfg.factor * Math.sin((i * cfg.radians) / total));
                     })
                     .attr('y2', function (d, i) {
-                        return (cfg.h / 2) * (1 - cfg.factor * Math.cos((i * cfg.radians) / total))
+                        return (cfg.h / 2) * (1 - cfg.factor * Math.cos((i * cfg.radians) / total));
                     })
                     .attr('class', 'line')
                     .style('stroke', 'grey')
-                    .style('stroke-width', '1px')
+                    .style('stroke-width', '1px');
                 axis.append('text')
                     .attr('class', 'legend')
                     .text(function (d) {
-                        return d
+                        return d;
                     })
                     .style('font-family', 'sans-serif')
                     .style('font-size', '12px')
                     .attr('text-anchor', 'middle')
                     .attr('dy', '1.5em')
                     .attr('transform', function (d, i) {
-                        return 'translate(0, -8)'
+                        return 'translate(0, -8)';
                     })
                     .attr('x', function (d, i) {
                         return (
                             (cfg.w / 2) * (1 - cfg.factorLegend * Math.sin((i * cfg.radians) / total)) -
                             60 * Math.sin((i * cfg.radians) / total)
-                        )
+                        );
                     })
                     .attr('y', function (d, i) {
                         return (
                             (cfg.h / 2) * (1 - Math.cos((i * cfg.radians) / total)) -
                             20 * Math.cos((i * cfg.radians) / total)
-                        )
-                    })
+                        );
+                    });
 
-                let dataValues: number[][] = []
+                let dataValues: number[][] = [];
                 d.forEach(function (y, x) {
-                    dataValues = []
+                    dataValues = [];
                     g.selectAll('.nodes').data(y, function (j, i) {
                         dataValues.push([
                             (cfg.w / 2) *
@@ -243,13 +243,13 @@ function mmsD3RadarPlot(PlotService, $window) {
                                     (Math.max(j.value, 0) / cfg.maxValue) *
                                         cfg.factor *
                                         Math.cos((i * cfg.radians) / total)),
-                        ])
+                        ]);
                         // dataValues.push([
                         // cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)),
                         // cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total))
                         // ]);
-                    })
-                    dataValues.push(dataValues[0])
+                    });
+                    dataValues.push(dataValues[0]);
                     g.selectAll('.area')
                         .data([dataValues])
                         .enter()
@@ -258,25 +258,25 @@ function mmsD3RadarPlot(PlotService, $window) {
                         .style('stroke-width', '2px')
                         .style('stroke', cfg.color(series))
                         .attr('points', function (d) {
-                            let str = ''
+                            let str = '';
                             for (let pti = 0; pti < d.length; pti++) {
-                                str = str + d[pti][0] + ',' + d[pti][1] + ' '
+                                str = str + d[pti][0] + ',' + d[pti][1] + ' ';
                             }
-                            return str
+                            return str;
                         })
                         .style('fill', function (j, i) {
-                            return cfg.color(series)
+                            return cfg.color(series);
                         })
                         .style('fill-opacity', 0.1)
                         .on('mouseover', function (d, i) {
-                            d3.select(this).transition(200).style('fill-opacity', 0.7)
+                            d3.select(this).transition(200).style('fill-opacity', 0.7);
                         })
                         .on('mouseout', function (d, i) {
-                            d3.select(this).transition(200).style('fill-opacity', 0.1)
-                        })
-                    series++
-                })
-                series = 0
+                            d3.select(this).transition(200).style('fill-opacity', 0.1);
+                        });
+                    series++;
+                });
+                series = 0;
                 d.forEach(function (y, x) {
                     g.selectAll('.nodes')
                         .data(y)
@@ -285,7 +285,7 @@ function mmsD3RadarPlot(PlotService, $window) {
                         .attr('class', 'radar-chart-serie' + series + ' ' + id)
                         .attr('r', cfg.radius)
                         .attr('alt', function (j) {
-                            return Math.max(j.value, 0)
+                            return Math.max(j.value, 0);
                         })
                         .attr('cx', function (j, i) {
                             dataValues.push([
@@ -299,7 +299,7 @@ function mmsD3RadarPlot(PlotService, $window) {
                                         (Math.max(j.value, 0) / cfg.maxValue) *
                                             cfg.factor *
                                             Math.cos((i * cfg.radians) / total)),
-                            ])
+                            ]);
                             // dataValues.push([
                             //     cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)),
                             //     cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total))
@@ -310,7 +310,7 @@ function mmsD3RadarPlot(PlotService, $window) {
                                     (Math.max(j.value, 0) / cfg.maxValue) *
                                         cfg.factor *
                                         Math.sin((i * cfg.radians) / total))
-                            )
+                            );
                         })
                         .attr('cy', function (j, i) {
                             return (
@@ -319,41 +319,41 @@ function mmsD3RadarPlot(PlotService, $window) {
                                     (Math.max(j.value, 0) / cfg.maxValue) *
                                         cfg.factor *
                                         Math.cos((i * cfg.radians) / total))
-                            )
+                            );
                         })
                         .attr('data-id', function (j) {
-                            return j.axis
+                            return j.axis;
                         })
                         .style('fill', cfg.color(series))
                         .style('fill-opacity', 0.9)
                         .on('mouseover', function (d) {
-                            const newX = parseFloat(d3.select(this).attr('cx')) - 10
-                            const newY = parseFloat(d3.select(this).attr('cy')) - 5
+                            const newX = parseFloat(d3.select(this).attr('cx')) - 10;
+                            const newY = parseFloat(d3.select(this).attr('cy')) - 5;
                             tooltip
                                 .attr('x', newX)
                                 .attr('y', newY)
                                 .text(d.value.toString())
                                 .transition(200)
-                                .style('opacity', 1)
+                                .style('opacity', 1);
                         })
                         .on('mouseout', function () {
-                            tooltip.transition(200).style('opacity', 0)
+                            tooltip.transition(200).style('opacity', 0);
                         })
                         .append('svg:title')
                         .text(function (j) {
-                            return Math.max(j.value, 0)
-                        })
-                    series++
-                })
+                            return Math.max(j.value, 0);
+                        });
+                    series++;
+                });
 
                 //Tooltip
                 tooltip = g
                     .append('text')
                     .style('opacity', 0)
                     .style('font-family', 'sans-serif')
-                    .style('font-size', '13px')
+                    .style('font-size', '13px');
             },
-        } //end of RadarChart
+        }; //end of RadarChart
 
         function initiateLegend(LegendOptions, id) {
             const svg = d3
@@ -361,14 +361,14 @@ function mmsD3RadarPlot(PlotService, $window) {
                 .selectAll('svg')
                 .append('svg')
                 .attr('width', cfg.w + 300)
-                .attr('height', cfg.h)
+                .attr('height', cfg.h);
             //Initiate Legend
             const legend = svg
                 .append('g')
                 .attr('class', 'legend')
                 .attr('height', 100)
                 .attr('width', 200)
-                .attr('transform', 'translate(50,50)')
+                .attr('transform', 'translate(50,50)');
 
             //Create colour squares
             legend
@@ -378,34 +378,34 @@ function mmsD3RadarPlot(PlotService, $window) {
                 .append('rect')
                 .attr('x', cfg.w - 65)
                 .attr('y', function (d, i) {
-                    return i * 20
+                    return i * 20;
                 })
                 .attr('width', 10)
                 .attr('height', 10)
                 .style('fill', function (d, i) {
-                    return colorscale(i)
+                    return colorscale(i);
                 })
                 .attr('fill-opacity', 1)
                 .attr('rid', function (d) {
-                    return d
+                    return d;
                 })
                 .on('mouseover', function (d, i) {
                     d3.select('.' + id)
                         .selectAll('svg')
                         .selectAll('polygon')
                         .transition(200)
-                        .style('fill-opacity', 0.1)
+                        .style('fill-opacity', 0.1);
                     d3.select('.radar-chart-serie' + i + '.' + id)
                         .transition(200)
-                        .style('fill-opacity', 0.7)
+                        .style('fill-opacity', 0.7);
                 })
                 .on('mouseout', function (d, i) {
                     d3.select('.' + id)
                         .selectAll('svg')
                         .selectAll('polygon')
                         .transition(200)
-                        .style('fill-opacity', cfg.opacityArea)
-                })
+                        .style('fill-opacity', cfg.opacityArea);
+                });
             //Create text next to squares
             legend
                 .selectAll('text')
@@ -414,32 +414,32 @@ function mmsD3RadarPlot(PlotService, $window) {
                 .append('text')
                 .attr('x', cfg.w - 52)
                 .attr('y', function (d, i) {
-                    return i * 20 + 9
+                    return i * 20 + 9;
                 })
                 .attr('font-size', '11px')
                 .attr('fill', '#737373')
                 .text(function (d) {
-                    return d
+                    return d;
                 })
                 .on('mouseover', function (d, i) {
                     d3.select('.' + id)
                         .selectAll('svg')
                         .selectAll('polygon')
                         .transition(200)
-                        .style('fill-opacity', 0.1)
+                        .style('fill-opacity', 0.1);
                     d3.select('.radar-chart-serie' + i + '.' + id)
                         .transition(200)
-                        .style('fill-opacity', 0.7)
+                        .style('fill-opacity', 0.7);
                 })
                 .on('mouseout', function (d, i) {
                     d3.select('.' + id)
                         .selectAll('svg')
                         .selectAll('polygon')
                         .transition(200)
-                        .style('fill-opacity', 0.1)
-                })
+                        .style('fill-opacity', 0.1);
+                });
         } //end of initiateLegend
-    } //end of link
+    }; //end of link
 
     return {
         restrict: 'EA',
@@ -448,5 +448,5 @@ function mmsD3RadarPlot(PlotService, $window) {
             plot: '<',
         },
         link: mmsRadarChartLink,
-    } //return
+    }; //return
 }
