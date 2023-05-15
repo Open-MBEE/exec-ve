@@ -1,24 +1,24 @@
-import angular from 'angular';
-import _ from 'lodash';
+import angular from 'angular'
+import _ from 'lodash'
 
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
-import { veCore } from '@ve-core';
+import { veCore } from '@ve-core'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular';
-import { RefsResponse } from '@ve-types/mms';
-import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { RefsResponse } from '@ve-types/mms'
+import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 export interface ConfirmDeleteModalResolve extends VeModalResolve {
-    getType: string;
-    getName: string;
-    finalize(): VePromise<void, RefsResponse>;
+    getType: string
+    getName: string
+    finalize(): VePromise<void, RefsResponse>
 }
 
 export interface ConfirmDeleteModalResolveFn extends VeModalResolveFn {
-    getType(): string;
-    getName(): string;
-    finalize(): () => VePromise<void, RefsResponse>;
+    getType(): string
+    getName(): string
+    finalize(): () => VePromise<void, RefsResponse>
 }
 
 const ConfirmDeleteModalComponent: VeComponentOptions = {
@@ -48,53 +48,53 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
         resolve: '<',
     },
     controller: class ConfirmDeleteModalController extends VeModalControllerImpl<string> implements VeModalController {
-        static $inject = ['growl'];
+        static $inject = ['growl']
 
-        protected resolve: ConfirmDeleteModalResolve;
+        protected resolve: ConfirmDeleteModalResolve
 
         //local
-        public oking: boolean;
-        public type: string;
-        public name: string;
+        public oking: boolean
+        public type: string
+        public name: string
 
         constructor(private growl: angular.growl.IGrowlService) {
-            super();
+            super()
         }
 
         $onInit(): void {
-            this.oking = false;
-            this.type = this.resolve.getType;
-            this.name = this.resolve.getName;
+            this.oking = false
+            this.type = this.resolve.getType
+            this.name = this.resolve.getName
         }
 
         ok = (): void => {
             if (this.oking) {
-                this.growl.info('Please wait...');
-                return;
+                this.growl.info('Please wait...')
+                return
             }
-            this.oking = true;
+            this.oking = true
             if (this.resolve.finalize) {
                 this.resolve.finalize().then(
                     () => {
-                        this.growl.success(_.upperFirst(this.type) + ' Removed');
-                        this.oking = false;
-                        this.modalInstance.close('ok');
+                        this.growl.success(_.upperFirst(this.type) + ' Removed')
+                        this.oking = false
+                        this.modalInstance.close('ok')
                     },
                     (reason) => {
                         if (reason.message) {
-                            this.growl.error(this.type + ' Removal Error: ' + reason.message);
+                            this.growl.error(this.type + ' Removal Error: ' + reason.message)
                         }
-                        this.oking = false;
-                        this.modalInstance.dismiss();
+                        this.oking = false
+                        this.modalInstance.dismiss()
                     }
-                );
+                )
             }
-        };
+        }
 
         cancel(): void {
-            this.modalInstance.dismiss();
+            this.modalInstance.dismiss()
         }
     },
-};
+}
 
-veCore.component(ConfirmDeleteModalComponent.selector, ConfirmDeleteModalComponent);
+veCore.component(ConfirmDeleteModalComponent.selector, ConfirmDeleteModalComponent)

@@ -5,9 +5,8 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 */
 
 .hljs {
-    display: block;
-    padding: 0.5em;
-    background: #f0f0f0;
+  display: block; padding: 0.5em;
+  background: #F0F0F0;
 }
 
 .hljs,
@@ -16,7 +15,7 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 .lisp .hljs-title,
 .clojure .hljs-built_in,
 .nginx .hljs-title {
-    color: black;
+  color: black;
 }
 
 .hljs-string,
@@ -47,7 +46,7 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 .asciidoc .hljs-header,
 .markdown .hljs-header,
 .coffeescript .hljs-attribute {
-    color: #800;
+  color: #800;
 }
 
 .smartquote,
@@ -58,7 +57,7 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 .hljs-chunk,
 .asciidoc .hljs-blockquote,
 .markdown .hljs-blockquote {
-    color: #888;
+  color: #888;
 }
 
 .hljs-number,
@@ -76,7 +75,7 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 .markdown .hljs-bullet,
 .asciidoc .hljs-link_url,
 .markdown .hljs-link_url {
-    color: #080;
+  color: #080;
 }
 
 .hljs-label,
@@ -108,7 +107,7 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 .lasso .hljs-attribute,
 .coffeescript .hljs-property,
 .hljs-phony {
-    color: #88f;
+  color: #88F
 }
 
 .hljs-keyword,
@@ -130,16 +129,16 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 .markdown .hljs-strong,
 .hljs-request,
 .hljs-status {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .asciidoc .hljs-emphasis,
 .markdown .hljs-emphasis {
-    font-style: italic;
+  font-style: italic;
 }
 
 .nginx .hljs-built_in {
-    font-weight: normal;
+  font-weight: normal;
 }
 
 .coffeescript .javascript,
@@ -150,5 +149,5 @@ Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiac
 .xml .vbscript,
 .xml .css,
 .xml .hljs-cdata {
-    opacity: 0.5;
+  opacity: 0.5;
 }

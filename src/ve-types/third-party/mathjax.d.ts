@@ -1,3 +1,3 @@
 export interface MathJaxObject {
-    typesetPromise(elements: any[]): Promise<any>;
+    typesetPromise(elements: any[]): Promise<any>
 }

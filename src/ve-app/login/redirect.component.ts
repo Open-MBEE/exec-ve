@@ -1,15 +1,15 @@
-import { StateService } from '@uirouter/angularjs';
-import angular, { IComponentController } from 'angular';
-import Rx from 'rx-lite';
+import { StateService } from '@uirouter/angularjs'
+import angular, { IComponentController } from 'angular'
+import Rx from 'rx-lite'
 
-import { RootScopeService } from '@ve-utils/application';
-import { EventService } from '@ve-utils/core';
-import { ProjectService, ElementService } from '@ve-utils/mms-api-client';
+import { RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ProjectService, ElementService } from '@ve-utils/mms-api-client'
 
-import { veApp } from '@ve-app';
+import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular';
-import { ElementObject, QueryObject, RequestObject, ViewObject } from '@ve-types/mms';
+import { VeComponentOptions, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular'
+import { ElementObject, QueryObject, RequestObject, ViewObject } from '@ve-types/mms'
 
 const RedirectComponent: VeComponentOptions = {
     selector: 'redirect',
@@ -54,16 +54,16 @@ const RedirectComponent: VeComponentOptions = {
 </div>
 `,
     controller: class RedirectController implements IComponentController {
-        public subs: Rx.IDisposable[];
+        public subs: Rx.IDisposable[]
 
-        public redirect_from_old: boolean;
-        redirect_noResults: boolean = false;
-        redirect_element: { name: string; type: string; link: string };
-        spin: boolean = false;
-        elem: ElementObject;
-        redirect_relatedDocs: ViewObject[];
-        projectIds: string[] = [];
-        reqOb: RequestObject;
+        public redirect_from_old: boolean
+        redirect_noResults: boolean = false
+        redirect_element: { name: string; type: string; link: string }
+        spin: boolean = false
+        elem: ElementObject
+        redirect_relatedDocs: ViewObject[]
+        projectIds: string[] = []
+        reqOb: RequestObject
 
         static $inject = [
             '$q',
@@ -75,7 +75,7 @@ const RedirectComponent: VeComponentOptions = {
             'ElementService',
             'RootScopeService',
             'EventService',
-        ];
+        ]
 
         constructor(
             private $q: VeQService,
@@ -90,40 +90,40 @@ const RedirectComponent: VeComponentOptions = {
         ) {}
 
         $onInit(): void {
-            this.eventSvc.$init(this);
+            this.eventSvc.$init(this)
 
-            this.rootScopeSvc.veTitle('Redirecting... | View Editor'); //what to name this?
+            this.rootScopeSvc.veTitle('Redirecting... | View Editor') //what to name this?
 
-            this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld();
+            this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld()
             this.subs.push(
                 this.eventSvc.binding(this.rootScopeSvc.constants.VEREDIRECTFROMOLD, (data: boolean) => {
-                    this.redirect_from_old = data;
+                    this.redirect_from_old = data
                 })
-            );
+            )
 
             this.projectSvc.getProjects().then(
                 (projectObs) => {
                     this.projectIds = projectObs.map((a) => {
-                        return a.id;
-                    });
+                        return a.id
+                    })
                     this.reqOb = {
                         projectId: this.projectIds[0],
                         refId: 'master',
-                    };
-                    this.oldUrlTest(this.rootScopeSvc.veCrushUrl());
+                    }
+                    this.oldUrlTest(this.rootScopeSvc.veCrushUrl())
                 },
                 (reason) => {
-                    this.growl.error('Error getting projects: ' + reason.message);
+                    this.growl.error('Error getting projects: ' + reason.message)
                 }
-            );
+            )
         }
 
         public resetSelectPage = (): void => {
-            void this.$state.go('main.login.select');
-        };
+            void this.$state.go('main.login.select')
+        }
 
         public buildQuery(idList: string[], projectIds: string[]): QueryObject[] {
-            const queryObs: QueryObject[] = [];
+            const queryObs: QueryObject[] = []
             //Filter master ref
             for (const id of idList) {
                 for (const projectId of projectIds) {
@@ -133,32 +133,32 @@ const RedirectComponent: VeComponentOptions = {
                             _projectId: projectId,
                             _inRefIds: 'master',
                         },
-                    };
-                    queryObs.push(queryOb);
+                    }
+                    queryObs.push(queryOb)
                 }
             }
-            return queryObs;
+            return queryObs
         }
 
         public errorHandler = (reason: VePromiseReason<VePromisesResponse<ViewObject>>): void => {
-            this.growl.error(reason.message);
-            void this.$state.go('main.login.select');
-        };
+            this.growl.error(reason.message)
+            void this.$state.go('main.login.select')
+        }
 
         public oldUrlTest = (location: string): void => {
-            const segments: string[] = location.split('/');
-            let successRedirectFnc: (data: ViewObject[]) => void;
-            const searchTermList: string[] = [];
+            const segments: string[] = location.split('/')
+            let successRedirectFnc: (data: ViewObject[]) => void
+            const searchTermList: string[] = []
             const noResultFnc = (): void => {
                 // TODO - Search for document was unsucessful. Please select from the following or contact admin to verify that document exists.
-                this.redirect_noResults = true;
-            };
-            let redirectFnc: () => void = noResultFnc;
+                this.redirect_noResults = true
+            }
+            let redirectFnc: () => void = noResultFnc
 
             if (segments.length === 5) {
                 if (location.includes('sites')) {
                     //Search for site
-                    searchTermList.push(segments[4] + '_cover');
+                    searchTermList.push(segments[4] + '_cover')
                     successRedirectFnc = (data): void => {
                         if (data.length > 0) {
                             this.redirect_element = {
@@ -170,24 +170,24 @@ const RedirectComponent: VeComponentOptions = {
                                     "',refId:'master',preview:'" +
                                     data[0].id +
                                     "'})",
-                            };
+                            }
                             redirectFnc = (): void => {
                                 void this.$state.go('main.project.ref.portal.preview', {
                                     projectId: data[0]._projectId,
                                     refId: 'master',
                                     preview: data[0].id,
-                                });
-                            };
+                                })
+                            }
                         } else {
-                            noResultFnc();
+                            noResultFnc()
                         }
-                    };
+                    }
                 }
             } else if (segments.length === 7) {
                 //Search for document
                 if (location.includes('documents')) {
                     // ["", "workspaces", "master", "sites", "site__18_0_6_eda034b_1489006578377_52061_121780", "document", "_18_0_6_bec02f9_1489697812908_180368_252005"]
-                    searchTermList.push(segments[6]);
+                    searchTermList.push(segments[6])
                     successRedirectFnc = (data): void => {
                         if (data.length > 0) {
                             this.redirect_element = {
@@ -199,20 +199,20 @@ const RedirectComponent: VeComponentOptions = {
                                     "',refId:'master',documentId:'" +
                                     data[0].id +
                                     "'})",
-                            };
+                            }
                             redirectFnc = (): void => {
                                 void this.$state.go('main.project.ref.view.present', {
                                     projectId: data[0]._projectId,
                                     refId: 'master',
                                     documentId: data[0].id,
-                                });
-                            };
+                                })
+                            }
                         } else {
-                            noResultFnc();
+                            noResultFnc()
                         }
-                    };
+                    }
                 } else if (location.includes('document')) {
-                    searchTermList.push(segments[6]);
+                    searchTermList.push(segments[6])
                     successRedirectFnc = (data): void => {
                         if (data.length > 0) {
                             this.redirect_element = {
@@ -224,25 +224,25 @@ const RedirectComponent: VeComponentOptions = {
                                     "',refId:'master',preview:'" +
                                     data[0].id +
                                     "'})",
-                            };
+                            }
                             redirectFnc = (): void => {
                                 void this.$state.go('main.project.ref.portal.preview', {
                                     projectId: data[0]._projectId,
                                     refId: 'master',
                                     preview: data[0].id,
-                                });
-                            };
+                                })
+                            }
                         } else {
-                            noResultFnc();
+                            noResultFnc()
                         }
-                    };
+                    }
                 }
             } else if (segments.length === 9) {
                 //Search for view
                 if (location.includes('views')) {
                     // ["", "workspaces", "master", "sites", "site__18_0_6_eda034b_1489006578377_52061_121780", "documents", "_18_0_6_bec02f9_1489697812908_180368_252005", "views", "MMS_1474405796233_0887698d-1fc7-47ac-87ac-b0f6e7b69d35"]
                     if (segments[6] == segments[8]) {
-                        searchTermList.push(segments[6]);
+                        searchTermList.push(segments[6])
                         successRedirectFnc = (data): void => {
                             if (data.length > 0) {
                                 this.redirect_element = {
@@ -256,22 +256,22 @@ const RedirectComponent: VeComponentOptions = {
                                         "',viewId:'" +
                                         data[0].id +
                                         "'})",
-                                };
+                                }
                                 redirectFnc = (): void => {
                                     void this.$state.go('main.project.ref.view.present', {
                                         projectId: data[0]._projectId,
                                         refId: 'master',
                                         documentId: data[0].id,
                                         viewId: data[0].id,
-                                    });
-                                };
+                                    })
+                                }
                             } else {
-                                noResultFnc();
+                                noResultFnc()
                             }
-                        };
+                        }
                     } else {
-                        searchTermList.push(segments[6]);
-                        searchTermList.push(segments[8]);
+                        searchTermList.push(segments[6])
+                        searchTermList.push(segments[8])
                         successRedirectFnc = (data): void => {
                             if (data.length > 1) {
                                 if (data[0].id === segments[6] && data[1].id === segments[8]) {
@@ -287,15 +287,15 @@ const RedirectComponent: VeComponentOptions = {
                                             "',viewId:'" +
                                             data[1].id +
                                             "'})",
-                                    };
+                                    }
                                     redirectFnc = (): void => {
                                         void this.$state.go('main.project.ref.view.present', {
                                             projectId: data[0]._projectId,
                                             refId: 'master',
                                             documentId: data[0].id,
                                             viewId: data[1].id,
-                                        });
-                                    };
+                                        })
+                                    }
                                 } else if (data[0].id === segments[8] && data[1].id === segments[6]) {
                                     //should check case if data[1] is segent[6] also
                                     this.redirect_element = {
@@ -309,20 +309,20 @@ const RedirectComponent: VeComponentOptions = {
                                             "',viewId:'" +
                                             data[0].id +
                                             "'})",
-                                    };
+                                    }
                                     redirectFnc = (): void => {
                                         void this.$state.go('main.project.ref.view.present', {
                                             projectId: data[0]._projectId,
                                             refId: 'master',
                                             documentId: data[1].id,
                                             viewId: data[0].id,
-                                        });
-                                    };
+                                        })
+                                    }
                                 }
                             } else if (data.length > 0) {
                                 if (data[0].id === segments[8]) {
-                                    this.elem = data[0];
-                                    this.redirect_relatedDocs = data[0]._relatedDocuments;
+                                    this.elem = data[0]
+                                    this.redirect_relatedDocs = data[0]._relatedDocuments
                                 } else if (data[0].id === segments[6]) {
                                     this.redirect_element = {
                                         name: data[0].name,
@@ -333,25 +333,25 @@ const RedirectComponent: VeComponentOptions = {
                                             "',refId:'master',documentId:'" +
                                             data[0].id +
                                             "'})",
-                                    };
+                                    }
                                     redirectFnc = (): void => {
                                         void this.$state.go('main.project.ref.view.present', {
                                             projectId: data[0]._projectId,
                                             refId: 'master',
                                             documentId: data[0].id,
-                                        });
-                                    };
+                                        })
+                                    }
                                 }
                             } else {
-                                noResultFnc();
+                                noResultFnc()
                             }
-                        };
+                        }
                     }
                 }
             } else if (segments.length === 8) {
                 //Search for full doc
                 if (location.includes('full')) {
-                    searchTermList.push(segments[6]);
+                    searchTermList.push(segments[6])
                     successRedirectFnc = (data): void => {
                         if (data.length > 0) {
                             this.redirect_element = {
@@ -363,34 +363,34 @@ const RedirectComponent: VeComponentOptions = {
                                     "',refId:'master',documentId:'" +
                                     data[0].id +
                                     "'})",
-                            };
+                            }
                             redirectFnc = (): void => {
                                 void this.$state.go('main.project.ref.view.present.document', {
                                     projectId: data[0]._projectId,
                                     refId: 'master',
                                     documentId: data[0].id,
-                                });
-                            };
+                                })
+                            }
                         } else {
-                            noResultFnc();
+                            noResultFnc()
                         }
-                    };
+                    }
                 }
             }
             // console.log(segments);
-            const queryObs: QueryObject[] = this.buildQuery(searchTermList, this.projectIds);
-            const promises: angular.IPromise<any>[] = [];
+            const queryObs: QueryObject[] = this.buildQuery(searchTermList, this.projectIds)
+            const promises: angular.IPromise<any>[] = []
             for (const queryOb of queryObs) {
-                promises.push(this.elementSvc.search(this.reqOb, queryOb));
+                promises.push(this.elementSvc.search(this.reqOb, queryOb))
             }
             this.$q
                 .all(promises)
                 .then(successRedirectFnc, this.errorHandler)
                 .finally(() => {
-                    redirectFnc();
-                });
-        };
+                    redirectFnc()
+                })
+        }
     },
-};
+}
 
-veApp.component(RedirectComponent.selector, RedirectComponent);
+veApp.component(RedirectComponent.selector, RedirectComponent)

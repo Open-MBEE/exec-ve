@@ -1,8 +1,8 @@
-import { PresentationLite } from '@ve-components/presentations';
+import { PresentationLite } from '@ve-components/presentations'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { IPresentationComponentOptions } from '@ve-types/components/presentation';
+import { IPresentationComponentOptions } from '@ve-types/components/presentation'
 
 const PresentEquationComponent: IPresentationComponentOptions = {
     selector: 'presentEquation',
@@ -14,6 +14,6 @@ const PresentEquationComponent: IPresentationComponentOptions = {
         peNumber: '<',
     },
     controller: PresentationLite,
-};
+}
 
-veComponents.component(PresentEquationComponent.selector, PresentEquationComponent);
+veComponents.component(PresentEquationComponent.selector, PresentEquationComponent)

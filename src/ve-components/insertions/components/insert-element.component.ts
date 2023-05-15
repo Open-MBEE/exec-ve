@@ -1,29 +1,29 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import { Insertion, InsertionService } from '@ve-components/insertions';
-import { InsertTransclusionData } from '@ve-components/transclusions';
-import { EditorService } from '@ve-core/editor';
-import { ApplicationService, UtilsService } from '@ve-utils/application';
-import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
-import { SchemaService } from '@ve-utils/model-schema';
+import { Insertion, InsertionService } from '@ve-components/insertions'
+import { InsertTransclusionData } from '@ve-components/transclusions'
+import { EditorService } from '@ve-core/editor'
+import { ApplicationService, UtilsService } from '@ve-utils/application'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
-import { ElementObject, MmsObject } from '@ve-types/mms';
-import { VeModalService } from '@ve-types/view-editor';
+import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
+import { ElementObject, MmsObject } from '@ve-types/mms'
+import { VeModalService } from '@ve-types/view-editor'
 
 class InsertElementController extends Insertion<InsertTransclusionData> {
     //Bindings
-    protected parentAction: string;
+    protected parentAction: string
 
     //Locals
     //protected createType: number = 1
-    protected description: string;
-    protected searchExisting: boolean = true;
-    protected disableCreateNew: boolean = false;
+    protected description: string
+    protected searchExisting: boolean = true
+    protected disableCreateNew: boolean = false
 
-    static $inject = Insertion.$inject;
+    static $inject = Insertion.$inject
 
     constructor(
         $scope: angular.IScope,
@@ -58,15 +58,15 @@ class InsertElementController extends Insertion<InsertTransclusionData> {
             apiSvc,
             insertionSvc,
             editorSvc
-        );
+        )
     }
 
     public $onInit(): void {
-        super.$onInit();
+        super.$onInit()
 
         if (this.insertData.selected && this.insertData.isNew) {
-            this.createItem = this.insertData.selected;
-            this.searchExisting = false;
+            this.createItem = this.insertData.selected
+            this.searchExisting = false
         } else {
             this.createItem = {
                 id: `${this.apiSvc.createUniqueId()}`,
@@ -77,32 +77,32 @@ class InsertElementController extends Insertion<InsertTransclusionData> {
                 documentation: '',
                 type: 'Class',
                 appliedStereotypeIds: [],
-            };
+            }
         }
-        this.disableCreateNew = this.insertData.viewLink;
+        this.disableCreateNew = this.insertData.viewLink
         if (!this.disableCreateNew) {
-            this.editItem = this.elementSvc.openEdit(this.createItem, false);
+            this.editItem = this.elementSvc.openEdit(this.createItem, false)
         }
-        this.description = 'Search for an existing element before you ' + this.parentAction;
+        this.description = 'Search for an existing element before you ' + this.parentAction
 
-        this.searchOptions.getProperties = true;
-        this.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to mms-cf a placeholder.';
+        this.searchOptions.getProperties = true
+        this.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to mms-cf a placeholder.'
     }
 
     public create = (): VePromise<ElementObject> => {
-        this.insertData.isNew = true;
-        return this.insertionSvc.createAction(this.createItem, this.insertData.noPublish);
-    };
+        this.insertData.isNew = true
+        return this.insertionSvc.createAction(this.createItem, this.insertData.noPublish)
+    }
 
     public fail = <V extends VePromiseReason<MmsObject>>(reason: V): void => {
         if (reason.status === 401) {
-            this.reLogin();
+            this.reLogin()
         } else if (reason.status === 422) {
-            this.continue = true;
+            this.continue = true
         } else {
-            this.growl.error(`Create ${_.upperCase(this.insertData.type)} Error: ${reason.message}`);
+            this.growl.error(`Create ${_.upperCase(this.insertData.type)} Error: ${reason.message}`)
         }
-    };
+    }
 }
 
 // Component for inserting cross-reference
@@ -176,6 +176,6 @@ const InsertComponent: VeComponentOptions = {
         mmsOrgId: '@',
     },
     controller: InsertElementController,
-};
+}
 
-veComponents.component(InsertComponent.selector, InsertComponent);
+veComponents.component(InsertComponent.selector, InsertComponent)

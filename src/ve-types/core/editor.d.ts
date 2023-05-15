@@ -1,13 +1,13 @@
 export interface EditorActions {
-    cancel(e?): void;
+    cancel(e?): void
 
-    reset(e?): void;
+    reset(e?): void
 
-    delete(e?): void;
+    delete(e?): void
 
-    preview(e?): void;
+    preview(e?): void
 
-    save(e?): void;
+    save(e?): void
 
-    saveC(e?): void;
+    saveC(e?): void
 }

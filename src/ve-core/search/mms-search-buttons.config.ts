@@ -1,4 +1,4 @@
-import { IButtonBarButton } from '@ve-core/button-bar';
+import { IButtonBarButton } from '@ve-core/button-bar'
 
 export const search_default_buttons: IButtonBarButton[] = [
     {
@@ -74,4 +74,4 @@ export const search_default_buttons: IButtonBarButton[] = [
         icon: 'pe-type-req',
         type: 'Requirement',
     },
-];
+]

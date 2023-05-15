@@ -1,32 +1,32 @@
-import { EditorService, MentionService } from '@ve-core/editor';
+import { EditorService, MentionService } from '@ve-core/editor'
 
-import { veCore } from '@ve-core';
+import { veCore } from '@ve-core'
 
-import { ElementObject } from '@ve-types/mms';
+import { ElementObject } from '@ve-types/mms'
 
 export class MMSMentionController implements angular.IComponentController {
     //Bindings
-    public mmsEditor: CKEDITOR.editor;
-    mmsMentionValue: string;
-    mmsMentionId: string;
-    mmsProjectId: string;
-    mmsRefId: string;
+    public mmsEditor: CKEDITOR.editor
+    mmsMentionValue: string
+    mmsMentionId: string
+    mmsProjectId: string
+    mmsRefId: string
 
     //Local
-    public fastCfListing: ElementObject[];
+    public fastCfListing: ElementObject[]
 
-    static $inject = ['MentionService', 'EditorService'];
+    static $inject = ['MentionService', 'EditorService']
 
     constructor(private mentionSvc: MentionService, private editorSvc: EditorService) {}
 
     $onInit(): void {
-        this.fastCfListing = this.mentionSvc.getFastCfListing(this.mmsProjectId, this.mmsRefId);
+        this.fastCfListing = this.mentionSvc.getFastCfListing(this.mmsProjectId, this.mmsRefId)
         // expose this api on the controller itself so that it can be accessed by codes that use $compile service to construct this directive.
     }
 
     public selectMentionItem($item: ElementObject): void {
-        this._createCf($item);
-        this.mentionSvc.handleMentionSelection(this.mmsEditor, this.mmsMentionId);
+        this._createCf($item)
+        this.mentionSvc.handleMentionSelection(this.mmsEditor, this.mmsMentionId)
     }
 
     private _createCf($item: ElementObject): void {
@@ -39,9 +39,9 @@ export class MMSMentionController implements angular.IComponentController {
             $item.name +
             '.' +
             $item.type +
-            ']</mms-cf>';
-        this.mmsEditor.insertHtml(tag);
-        this.editorSvc.focusOnEditorAfterAddingWidgetTag(this.mmsEditor);
+            ']</mms-cf>'
+        this.mmsEditor.insertHtml(tag)
+        this.editorSvc.focusOnEditorAfterAddingWidgetTag(this.mmsEditor)
     }
 }
 
@@ -85,6 +85,6 @@ const MMSMention = {
         mmsRefId: '<',
     },
     controller: MMSMentionController,
-};
+}
 
-veCore.component(MMSMention.selector, MMSMention);
+veCore.component(MMSMention.selector, MMSMention)

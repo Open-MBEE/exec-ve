@@ -4,26 +4,26 @@
 //   background-color: #FFFFFF;
 //   border: 1px solid #b0b09e;
 // @include globals.border-radius(15px);
-// border-radius: 15px;
-// padding: 2px;
+  // border-radius: 15px;
+  // padding: 2px;
 //   width: 180px !important; //Note: This should be set as !important when we define the element. Size should be set from Designer.
 // }
 
 .tsSearchContainingToolbarPanel table {
-    border: none;
+  border: none;
 }
 
 table.tsSearchContainingToolbarPanel {
-    border: none;
+  border: none;
 }
 
 table.tsSearchBox {
-    border: 1px solid silver;
-    border-radius: 15px;
-    -webkit-border-radius: 15px;
-    padding: 2px;
-    -moz-border-radius: 15px;
-    border-collapse: unset;
+  border: 1px solid silver;
+  border-radius: 15px;
+  -webkit-border-radius: 15px;
+  padding: 2px;
+  -moz-border-radius: 15px;
+  border-collapse: unset;
 }
 
 // .tsSearchBox img {
@@ -79,7 +79,7 @@ table.tsSearchBox {
 // }
 
 td.tsToolbarItem {
-    padding: 2px;
+  padding: 2px;
 }
 
 // table.tsToolbarWidget {
@@ -106,12 +106,12 @@ td.tsToolbarItem {
 //   background: #ebebd6;
 // }
 
-.tsNavigationControl tbody > tr > td {
-    //   border: 1px;
-    //   margin: 0em;
-    //   padding: 1px;
-    border-collapse: collapse;
-    border-style: none;
+.tsNavigationControl tbody>tr>td {
+//   border: 1px;
+//   margin: 0em;
+//   padding: 1px;
+  border-collapse: collapse;
+  border-style: none;
 }
 
 // .tsNavigationControl tbody {
@@ -126,21 +126,21 @@ td.tsToolbarItem {
 //   border-style: none;
 // }
 
-table.tsSearchBox tbody > tr > td {
-    border: 0;
-    margin: 0;
-    padding: 0;
-    border-collapse: separate;
-    //   background: transparent;
-    //   // 	border-radius: 15px;
-    //   // 	-moz-border-radius: 15px;
-    //   // 	-webkit-border-radius: 15px;
-    //   // 	padding: 2px;
+table.tsSearchBox tbody>tr>td {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  border-collapse: separate;
+//   background: transparent;
+//   // 	border-radius: 15px;
+//   // 	-moz-border-radius: 15px;
+//   // 	-webkit-border-radius: 15px;
+//   // 	padding: 2px;
 }
 
 .tsToolBar-horizontal table {
-    border-spacing: 2px;
-    border-collapse: separate;
+  border-spacing: 2px;
+  border-collapse: separate;
 }
 
 // .tsTree table>tbody>tr>td {

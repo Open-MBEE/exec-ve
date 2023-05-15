@@ -1,6 +1,6 @@
-@use 'src/styles/ve-base/ve-typography' as *;
-@use 'sass:color';
-@use 'sass:math';
+@use "src/styles/ve-base/ve-typography" as *;
+@use "sass:color";
+@use "sass:math";
 
 $bootstrap-sass-asset-helper: false !default;
 
@@ -14,7 +14,7 @@ $bootstrap-sass-asset-helper: false !default;
 
 $gray-base: #000 !default;
 $gray-darker: color.scale($gray-base, $lightness: 13.5%) !default; // #222
-$gray-dark: color.scale($gray-base, $lightness: 20%) !default; // #333
+$gray-dark: color.scale($gray-base, $lightness: 20%) !default;  // #333
 $gray: color.scale($gray-base, $lightness: 33.5%) !default; // #555
 $gray-light: color.scale($gray-base, $lightness: 46.7%) !default; // #777
 $gray-lighter: color.scale($gray-base, $lightness: 93.5%) !default; // #eee
@@ -48,11 +48,11 @@ $link-hover-decoration: underline !default;
 
 // ## Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif: 'Helvetica Neue', helvetica, arial, sans-serif !default;
-$font-family-serif: georgia, 'Times New Roman', times, serif !default;
+$font-family-sans-serif: "Helvetica Neue", helvetica, arial, sans-serif !default;
+$font-family-serif: georgia, "Times New Roman", times, serif !default;
 
 // ** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
-$font-family-monospace: menlo, monaco, consolas, 'Courier New', monospace !default;
+$font-family-monospace: menlo, monaco, consolas, "Courier New", monospace !default;
 $font-family-base: $font-family-sans-serif !default;
 $font-size-base: 14px !default;
 $font-size-large: math.ceil(($font-size-base * 1.25)) !default; // ~18px
@@ -85,13 +85,13 @@ $headings-color: inherit !default;
 
 // [converter] If $bootstrap-sass-asset-helper if used, provide path relative to the assets load path.
 // [converter] This is because some asset helpers, such as Sprockets, do not work with file-relative paths.
-$icon-font-path: if($bootstrap-sass-asset-helper, 'bootstrap/', '#{$fa-font-path}/') !default;
+$icon-font-path: if($bootstrap-sass-asset-helper, "bootstrap/", "#{$fa-font-path}/") !default;
 
 // ** File name for all font files.
-$icon-font-name: 'glyphicons-halflings-regular' !default;
+$icon-font-name: "glyphicons-halflings-regular" !default;
 
 // ** Element ID within SVG icon file.
-$icon-font-svg-id: 'glyphicons-halflingsregular' !default;
+$icon-font-svg-id: "glyphicons-halflingsregular" !default;
 
 // == Components
 
@@ -814,7 +814,7 @@ $breadcrumb-color: #ccc !default;
 $breadcrumb-active-color: $gray-light !default;
 
 // ** Textual separator for between breadcrumb elements
-$breadcrumb-separator: '/' !default;
+$breadcrumb-separator: "/" !default;
 
 // == Carousel
 

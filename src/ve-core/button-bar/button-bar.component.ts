@@ -1,10 +1,10 @@
-import { BarButton, ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
-import { veCoreEvents } from '@ve-core/events';
-import { EventService } from '@ve-utils/core';
+import { BarButton, ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
+import { veCoreEvents } from '@ve-core/events'
+import { EventService } from '@ve-utils/core'
 
-import { veUtils } from '@ve-utils';
+import { veUtils } from '@ve-utils'
 
-import { VeComponentOptions } from '@ve-types/angular';
+import { VeComponentOptions } from '@ve-types/angular'
 
 const ButtonBarComponent: VeComponentOptions = {
     selector: 'buttonBar',
@@ -50,17 +50,17 @@ const ButtonBarComponent: VeComponentOptions = {
     },
     controller: class ButtonBarController implements angular.IComponentController {
         // Bindings
-        private buttonId: string;
-        private minSize: number = 100;
+        private buttonId: string
+        private minSize: number = 100
 
-        private bbApi: ButtonBarApi;
-        public init: boolean = false;
-        public buttons: BarButton[];
-        public dropdownIcon: { [id: string]: string };
-        private squished: boolean = false;
-        private squishButton: BarButton;
-        private currentHeight: number;
-        static $inject = ['$element', 'growl', 'EventService', 'ButtonBarService'];
+        private bbApi: ButtonBarApi
+        public init: boolean = false
+        public buttons: BarButton[]
+        public dropdownIcon: { [id: string]: string }
+        private squished: boolean = false
+        private squishButton: BarButton
+        private currentHeight: number
+        static $inject = ['$element', 'growl', 'EventService', 'ButtonBarService']
 
         constructor(
             private $element: JQuery<HTMLElement>,
@@ -72,56 +72,56 @@ const ButtonBarComponent: VeComponentOptions = {
         $onInit(): void {
             this.buttonBarSvc.waitForApi(this.buttonId).then(
                 (api) => {
-                    this.bbApi = api;
-                    this.buttons = this.bbApi.buttons;
-                    this.configure();
+                    this.bbApi = api
+                    this.buttons = this.bbApi.buttons
+                    this.configure()
                 },
                 (reason) => {
-                    this.growl.error(reason.message);
+                    this.growl.error(reason.message)
                 }
-            );
+            )
         }
 
         configure = (): void => {
             //Setup Squish
-            this.squishButton = this.buttonBarSvc.getButtonBarButton('button-bar-menu');
-            this.squishButton.dropdown_buttons = this.buttons;
-            const observed = this.$element.children().get(0);
+            this.squishButton = this.buttonBarSvc.getButtonBarButton('button-bar-menu')
+            this.squishButton.dropdown_buttons = this.buttons
+            const observed = this.$element.children().get(0)
             const observer = new ResizeObserver((mutations) =>
                 mutations.forEach((mutationRecord) => {
-                    const size = mutationRecord.borderBoxSize;
-                    const oldHeight = this.currentHeight;
+                    const size = mutationRecord.borderBoxSize
+                    const oldHeight = this.currentHeight
                     this.eventSvc.$broadcast(this.bbApi.WRAP_EVENT, {
                         oldSize: oldHeight,
                         newSize: size[0].blockSize,
-                    });
-                    this.currentHeight = size[0].blockSize;
+                    })
+                    this.currentHeight = size[0].blockSize
                     if (size[0].inlineSize <= this.minSize && !this.squished) {
-                        this.squished = true;
-                        this.buttons = [this.squishButton];
+                        this.squished = true
+                        this.buttons = [this.squishButton]
                     } else if (size[0].inlineSize > this.minSize && this.squished) {
-                        this.squished = false;
-                        this.buttons = this.squishButton.dropdown_buttons;
+                        this.squished = false
+                        this.buttons = this.squishButton.dropdown_buttons
                     }
                 })
-            );
+            )
 
-            observer.observe(observed);
-        };
+            observer.observe(observed)
+        }
 
         buttonClicked(e: JQuery.ClickEvent, button: BarButton): void {
             if (button.action) {
-                button.action(e);
+                button.action(e)
             } else {
                 const data: veCoreEvents.buttonClicked = {
                     $event: e,
                     clicked: button.id,
-                };
+                }
                 //Setup fire button-bar click event
-                this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbApi.id, data);
+                this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbApi.id, data)
             }
         }
     },
-};
+}
 
-veUtils.component(ButtonBarComponent.selector, ButtonBarComponent);
+veUtils.component(ButtonBarComponent.selector, ButtonBarComponent)

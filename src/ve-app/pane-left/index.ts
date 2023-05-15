@@ -1,2 +1,2 @@
-import './left-pane.component';
-import './left-toolbar.component';
+import './left-pane.component'
+import './left-toolbar.component'

@@ -1,17 +1,17 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component';
-import { InsertionService } from '@ve-components/insertions';
-import { EditorService } from '@ve-core/editor';
-import { ApplicationService, UtilsService } from '@ve-utils/application';
-import { EditObject } from '@ve-utils/core';
-import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
-import { SchemaService } from '@ve-utils/model-schema';
+import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
+import { InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
+import { ApplicationService, UtilsService } from '@ve-utils/application'
+import { EditObject } from '@ve-utils/core'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
-import { InsertApi, InsertData } from '@ve-types/components';
-import { BasicResponse, ElementObject, MmsObject } from '@ve-types/mms';
-import { VeModalService, VeModalSettings, veSearchCallback, VeSearchOptions } from '@ve-types/view-editor';
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
+import { InsertApi, InsertData } from '@ve-types/components'
+import { BasicResponse, ElementObject, MmsObject } from '@ve-types/mms'
+import { VeModalService, VeModalSettings, veSearchCallback, VeSearchOptions } from '@ve-types/view-editor'
 
 /**
  * @name veComponents/Insertion
@@ -30,26 +30,26 @@ export class Insertion<
     U extends MmsObject = ElementObject
 > {
     //Bindings
-    public insertData: T;
-    public insertApi: InsertApi<U, VePromiseReason<BasicResponse<MmsObject>>>;
-    public mmsProjectId: string;
-    public mmsRefId: string;
-    public mmsOrgId: string;
+    public insertData: T
+    public insertApi: InsertApi<U, VePromiseReason<BasicResponse<MmsObject>>>
+    public mmsProjectId: string
+    public mmsRefId: string
+    public mmsOrgId: string
 
     //Locals
-    public name: string;
-    public ownerId: string;
-    public searchOptions: VeSearchOptions<U> = null;
-    type: string;
-    createForm: boolean = true;
-    oking: boolean = false;
-    continue: boolean = false;
-    projectId: string;
-    refId: string;
-    orgId: string;
-    insertType: string;
-    createItem: U;
-    editItem: EditObject;
+    public name: string
+    public ownerId: string
+    public searchOptions: VeSearchOptions<U> = null
+    type: string
+    createForm: boolean = true
+    oking: boolean = false
+    continue: boolean = false
+    projectId: string
+    refId: string
+    orgId: string
+    insertType: string
+    createItem: U
+    editItem: EditObject
 
     static $inject = [
         '$scope',
@@ -67,13 +67,13 @@ export class Insertion<
         'ApiService',
         'InsertionService',
         'EditorService',
-    ];
+    ]
 
-    protected schema = 'cameo';
+    protected schema = 'cameo'
 
     //local
 
-    private $componentEl: JQuery<HTMLElement>;
+    private $componentEl: JQuery<HTMLElement>
 
     constructor(
         protected $scope: angular.IScope,
@@ -93,14 +93,14 @@ export class Insertion<
         protected editorSvc: EditorService
     ) {}
 
-    public parentData: ElementObject = {} as ElementObject;
+    public parentData: ElementObject = {} as ElementObject
 
     $onInit(): void {
-        this.insertType = this.insertData.insertType;
-        this.projectId = this.mmsProjectId;
-        this.refId = this.mmsRefId ? this.mmsRefId : '';
-        this.orgId = this.mmsOrgId;
-        this.type = this.insertData.type;
+        this.insertType = this.insertData.insertType
+        this.projectId = this.mmsProjectId
+        this.refId = this.mmsRefId ? this.mmsRefId : ''
+        this.orgId = this.mmsOrgId
+        this.type = this.insertData.type
 
         this.searchOptions = {
             callback: this.callback,
@@ -110,98 +110,98 @@ export class Insertion<
             hideFilterOptions: true,
             closeable: false,
             closeCallback: this.cancel,
-        };
+        }
     }
 
     public ok = (): void => {
         if (this.oking) {
-            this.growl.info('Please wait...');
-            return;
+            this.growl.info('Please wait...')
+            return
         }
-        this.oking = true;
+        this.oking = true
 
-        this.ownerId = this.parentData && this.parentData.id ? this.parentData.id : 'holding_bin_' + this.projectId;
-        let ready = this.$q.resolve(null);
+        this.ownerId = this.parentData && this.parentData.id ? this.parentData.id : 'holding_bin_' + this.projectId
+        let ready = this.$q.resolve(null)
         if (this.editItem) {
-            ready = this.editorSvc.updateAllData(this.editItem.key, true, true);
+            ready = this.editorSvc.updateAllData(this.editItem.key, true, true)
         }
         ready.then(
             () => {
                 this.create()
                     .then((data) => {
-                        this.insertResolve(data, 'created');
+                        this.insertResolve(data, 'created')
                     }, this.insertReject)
-                    .finally(this.insertFinally);
+                    .finally(this.insertFinally)
             },
             (reason) => this.insertReject(reason)
-        );
-    };
+        )
+    }
 
     public loginCb = (result?: boolean): void => {
         if (result) {
-            this.ok();
+            this.ok()
         } else {
             this.insertReject({
                 status: 666,
                 message: 'User not Authenticated',
-            });
+            })
         }
-    };
+    }
 
     public reLogin = (): void => {
-        this.$componentEl = this.$element.children();
-        this.$element.empty();
+        this.$componentEl = this.$element.children()
+        this.$element.empty()
         const settings: VeModalSettings<LoginModalResolveFn> = {
             component: 'loginModal',
             resolve: {
                 continue: () => {
-                    return true;
+                    return true
                 },
             },
-        };
-        const instance = this.$uibModal.open<LoginModalResolveFn, boolean>(settings);
+        }
+        const instance = this.$uibModal.open<LoginModalResolveFn, boolean>(settings)
         instance.result.then(this.loginCb, () => {
             this.insertReject({
                 status: 666,
                 message: 'User Cancelled Authentication',
-            });
-        });
-    };
+            })
+        })
+    }
 
     public insertResolve = (data: U, type: string): void => {
-        this.growl.success(this.type + ' is being ' + type);
-        this.success(data);
-        this.insertApi.resolve(data);
-    };
+        this.growl.success(this.type + ' is being ' + type)
+        this.success(data)
+        this.insertApi.resolve(data)
+    }
 
     protected insertReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(reason: V): void => {
-        this.fail(reason);
+        this.fail(reason)
         if (!this.continue) {
-            this.insertApi.reject(reason);
+            this.insertApi.reject(reason)
         }
-        this.continue = false;
-    };
+        this.continue = false
+    }
 
     public success = (data?: U): void => {
         /* Put custom success logic here*/
-    };
+    }
 
     public fail = <V extends VePromiseReason<MmsObject>>(reason: V): void => {
         if (reason.status === 401) {
-            this.reLogin();
+            this.reLogin()
         } else {
-            this.growl.error(`Create ${_.upperCase(this.insertData.type)} Error: ${reason.message}`);
+            this.growl.error(`Create ${_.upperCase(this.insertData.type)} Error: ${reason.message}`)
         }
-    };
+    }
 
     public last = (): void => {
         /* Put custom finally logic here*/
-    };
+    }
 
     public insertFinally = (): void => {
-        this.last();
-        this.oking = false;
-    };
+        this.last()
+        this.oking = false
+    }
 
     /**
      * @name Insertion/callback
@@ -210,51 +210,51 @@ export class Insertion<
      */
     public callback: veSearchCallback<U> = (data: U, property?: string): void => {
         if (this.oking) {
-            this.growl.info('Please wait...');
-            return;
+            this.growl.info('Please wait...')
+            return
         }
-        this.oking = true;
+        this.oking = true
         this.addExisting(data, property)
             .then((finalData) => {
                 if (this.editItem) {
-                    this.editorSvc.cleanUpEdit(this.editItem.key);
+                    this.editorSvc.cleanUpEdit(this.editItem.key)
                 }
-                this.insertData.isNew = false;
-                this.insertResolve(finalData, 'added');
+                this.insertData.isNew = false
+                this.insertResolve(finalData, 'added')
             }, this.insertReject)
-            .finally(this.insertFinally);
-    };
+            .finally(this.insertFinally)
+    }
 
     public cancel = (): void => {
         if (this.insertData.selected) {
-            this.insertionSvc.cancelAction(this.insertData.selected);
+            this.insertionSvc.cancelAction(this.insertData.selected)
         }
         if (this.insertApi.reject) {
-            this.insertApi.reject({ status: 444, message: 'User cancelled request' });
+            this.insertApi.reject({ status: 444, message: 'User cancelled request' })
         }
-    };
+    }
     /**
      *
      */
     public queryFilter = (): {
-        appliedStereotypeIds?: string[];
-        classifierIds?: string[];
+        appliedStereotypeIds?: string[]
+        classifierIds?: string[]
     } => {
         /* Implement and Search Filtering Logic Here */
         return {
             appliedStereotypeIds: [],
             classifierIds: [],
-        };
-    };
+        }
+    }
 
     /**
      *
      * @return {VePromise<U, BasicResponse<U>>}
      */
     public create = (): VePromise<U, BasicResponse<U>> => {
-        this.growl.error(`Add Item of Type ${this.type} is not supported`);
-        return this.$q.reject();
-    };
+        this.growl.error(`Add Item of Type ${this.type} is not supported`)
+        return this.$q.reject()
+    }
 
     /**
      * @name Insertion/addExisting
@@ -263,6 +263,6 @@ export class Insertion<
      * @return {VePromise<U>}
      */
     public addExisting = (existingOb: U, property?: string): VePromise<U> => {
-        return this.$q.resolve<U>(existingOb);
-    };
+        return this.$q.resolve<U>(existingOb)
+    }
 }

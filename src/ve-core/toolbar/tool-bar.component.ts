@@ -1,13 +1,13 @@
-import { veCoreEvents } from '@ve-core/events';
-import { buttonOnClickFn, IToolBarButton } from '@ve-core/toolbar';
-import { RootScopeService } from '@ve-utils/application';
-import { EventService } from '@ve-utils/core';
+import { veCoreEvents } from '@ve-core/events'
+import { buttonOnClickFn, IToolBarButton } from '@ve-core/toolbar'
+import { RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 
-import { veCore } from '@ve-core';
+import { veCore } from '@ve-core'
 
-import { ToolbarService } from './services/Toolbar.service';
+import { ToolbarService } from './services/Toolbar.service'
 
-import { VeComponentOptions } from '@ve-types/angular';
+import { VeComponentOptions } from '@ve-types/angular'
 
 const ToolBarComponent: VeComponentOptions = {
     selector: 'toolBar',
@@ -30,17 +30,17 @@ const ToolBarComponent: VeComponentOptions = {
         paneToggle: '&',
     },
     controller: class VeToolbarController implements angular.IComponentController {
-        public subs: Rx.IDisposable[];
+        public subs: Rx.IDisposable[]
 
-        private anchor: string;
-        private toolbarId: string;
-        private paneToggle?(): void;
+        private anchor: string
+        private toolbarId: string
+        private paneToggle?(): void
 
-        public buttons: IToolBarButton[];
+        public buttons: IToolBarButton[]
 
-        tooltipAnchor;
+        tooltipAnchor
 
-        static $inject = ['growl', 'RootScopeService', 'EventService', 'ToolbarService'];
+        static $inject = ['growl', 'RootScopeService', 'EventService', 'ToolbarService']
 
         constructor(
             private growl: angular.growl.IGrowlService,
@@ -50,65 +50,65 @@ const ToolBarComponent: VeComponentOptions = {
         ) {}
 
         $onInit(): void {
-            this.eventSvc.$init(this);
+            this.eventSvc.$init(this)
 
             if (this.anchor) {
                 switch (this.anchor) {
                     case 'left':
-                        this.tooltipAnchor = 'right';
-                        break;
+                        this.tooltipAnchor = 'right'
+                        break
                     case 'right':
-                        this.tooltipAnchor = 'left';
-                        break;
+                        this.tooltipAnchor = 'left'
+                        break
                     case 'top':
-                        this.tooltipAnchor = 'bottom';
-                        break;
+                        this.tooltipAnchor = 'bottom'
+                        break
                     case 'bottom':
-                        this.tooltipAnchor = 'top';
-                        break;
+                        this.tooltipAnchor = 'top'
+                        break
                 }
             } else {
-                this.tooltipAnchor = 'left';
+                this.tooltipAnchor = 'left'
             }
 
             this.toolbarSvc.waitForApi(this.toolbarId).then(
                 (api) => {
-                    this.buttons = api.buttons;
+                    this.buttons = api.buttons
                     if (this.buttons.length > 0) {
                         //Binding to catch all "clicks" on tb and execute select function
                         this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, (data) => {
                             this.toolbarSvc.waitForApi(this.toolbarId).then(
                                 (api) => api.select(data.id),
                                 (reason) => this.growl.error(ToolbarService.error(reason))
-                            );
-                        });
+                            )
+                        })
                     }
                 },
                 (reason) => {
-                    this.growl.error(reason.message);
+                    this.growl.error(reason.message)
                 }
-            );
+            )
         }
         public clicked = (button: IToolBarButton): void => {
             if (!button.permission) {
-                return;
+                return
             }
             if (!button.active) {
-                return;
+                return
             }
 
             if (this.paneToggle) {
-                this.paneToggle();
+                this.paneToggle()
             }
 
             if (button.onClick) {
-                button.onClick();
+                button.onClick()
             } else if (this.onClick) {
-                this.onClick(button);
+                this.onClick(button)
             } else {
-                this.growl.error('Button' + button.id + 'has no click function');
+                this.growl.error('Button' + button.id + 'has no click function')
             }
-        };
+        }
 
         protected onClick: buttonOnClickFn = (button) => {
             if (!button.dynamic) {
@@ -116,12 +116,12 @@ const ToolBarComponent: VeComponentOptions = {
                     id: button.id,
                     category: button.category,
                     title: button.tooltip,
-                });
+                })
             } else {
-                this.eventSvc.$broadcast<void>(button.id);
+                this.eventSvc.$broadcast<void>(button.id)
             }
-        };
+        }
     },
-};
+}
 
-veCore.component(ToolBarComponent.selector, ToolBarComponent);
+veCore.component(ToolBarComponent.selector, ToolBarComponent)

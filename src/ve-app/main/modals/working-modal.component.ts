@@ -1,20 +1,20 @@
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
-import { veApp } from '@ve-app';
+import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular';
-import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
+import { VeComponentOptions } from '@ve-types/angular'
+import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 export interface WorkingTimeObject {
-    startTime: Date;
+    startTime: Date
 }
 
 export interface WorkingTimeModalResolveFn extends VeModalResolveFn {
-    getWorkingTime(): WorkingTimeObject;
+    getWorkingTime(): WorkingTimeObject
 }
 
 interface WorkingTimeModalResolve extends VeModalResolve {
-    getWorkingTime: WorkingTimeObject;
+    getWorkingTime: WorkingTimeObject
 }
 
 const WorkingModalComponent: VeComponentOptions = {
@@ -33,12 +33,12 @@ const WorkingModalComponent: VeComponentOptions = {
         extends VeModalControllerImpl<void, WorkingTimeModalResolve>
         implements VeModalController
     {
-        public workingTime;
+        public workingTime
 
         $onInit(): void {
-            this.workingTime = this.resolve.getWorkingTime;
+            this.workingTime = this.resolve.getWorkingTime
         }
     },
-};
+}
 
-veApp.component(WorkingModalComponent.selector, WorkingModalComponent);
+veApp.component(WorkingModalComponent.selector, WorkingModalComponent)

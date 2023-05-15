@@ -1,10 +1,10 @@
-@use 'sass:color';
+@use "sass:color";
 
 /* VE base styles */
-@use 'src/styles/globals';
-@use 'src/styles/third-party/bootstrap/variables' as bootstrap;
+@use "src/styles/globals";
+@use "src/styles/third-party/bootstrap/variables" as bootstrap;
 
-@forward 'src/styles/third-party/bootstrap/variables';
+@forward "src/styles/third-party/bootstrap/variables";
 
 // Override Bootstrap variables here (defaults from bootstrap-sass v3.3.7):
 

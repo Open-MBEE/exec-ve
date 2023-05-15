@@ -1,13 +1,13 @@
-import angular from 'angular';
-import _ from 'lodash';
+import angular from 'angular'
+import _ from 'lodash'
 
-import { Commit, CompareData, DiffMergeService } from '@ve-components/diffs';
-import { ComponentService } from '@ve-components/services';
-import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools';
-import { veCoreEvents } from '@ve-core/events';
-import { ToolbarService } from '@ve-core/toolbar';
-import { ApplicationService } from '@ve-utils/application';
-import { EventService } from '@ve-utils/core';
+import { Commit, CompareData, DiffMergeService } from '@ve-components/diffs'
+import { ComponentService } from '@ve-components/services'
+import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools'
+import { veCoreEvents } from '@ve-core/events'
+import { ToolbarService } from '@ve-core/toolbar'
+import { ApplicationService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import {
     ApiService,
     ElementService,
@@ -15,12 +15,12 @@ import {
     ProjectService,
     URLService,
     ViewService,
-} from '@ve-utils/mms-api-client';
+} from '@ve-utils/mms-api-client'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
-import { CommitObject, ElementsRequest, RefObject } from '@ve-types/mms';
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { CommitObject, ElementsRequest, RefObject } from '@ve-types/mms'
 
 /**
  * @ngdoc component
@@ -45,27 +45,27 @@ import { CommitObject, ElementsRequest, RefObject } from '@ve-types/mms';
  */
 class SpecHistoryController extends SpecTool implements ISpecTool {
     // Locals
-    gettingHistory: boolean;
-    refList: RefObject[] = [];
+    gettingHistory: boolean
+    refList: RefObject[] = []
     baseCommit: Commit = {
         ref: null,
         history: null,
         commitSelected: null,
         isOpen: false,
         refIsOpen: false,
-    };
-    historyVer: string = 'latest';
+    }
+    historyVer: string = 'latest'
     compareCommit: Commit = {
         ref: null,
         history: null,
         commitSelected: null,
         isOpen: false,
         refIsOpen: false,
-    };
-    disableRevert: boolean;
-    keepCommitSelected: boolean = false;
+    }
+    disableRevert: boolean
+    keepCommitSelected: boolean = false
 
-    static $inject = [...SpecTool.$inject, 'DiffMergeService'];
+    static $inject = [...SpecTool.$inject, 'DiffMergeService']
 
     constructor(
         $q: VeQService,
@@ -101,121 +101,121 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
             eventSvc,
             specSvc,
             toolbarSvc
-        );
-        this.specType = _.kebabCase(SpecHistoryComponent.selector);
-        this.specTitle = 'Element History';
+        )
+        this.specType = _.kebabCase(SpecHistoryComponent.selector)
+        this.specTitle = 'Element History'
     }
 
     initCallback = (): void => {
-        if (!this.projectId || !this.refId) return;
+        if (!this.projectId || !this.refId) return
         const reqOb: ElementsRequest<string> = {
             elementId: this.element.id,
             projectId: this.projectId,
             refId: this.refId,
-        };
-        if (this.keepCommitSelected) {
-            this.keepCommitSelected = false;
-            return;
         }
-        this.gettingHistory = true;
+        if (this.keepCommitSelected) {
+            this.keepCommitSelected = false
+            return
+        }
+        this.gettingHistory = true
         this.elementSvc
             .getElementHistory(reqOb, 2, true)
             .then(
                 (data) => {
-                    this.historyVer = 'latest';
-                    this.compareCommit.history = data;
-                    this.compareCommit.commitSelected = this.compareCommit.history[0];
-                    this.baseCommit.history = data;
+                    this.historyVer = 'latest'
+                    this.compareCommit.history = data
+                    this.compareCommit.commitSelected = this.compareCommit.history[0]
+                    this.baseCommit.history = data
                     if (data.length > 1) {
-                        this.baseCommit.commitSelected = this.compareCommit.history[1];
+                        this.baseCommit.commitSelected = this.compareCommit.history[1]
                     } else if (data.length > 0) {
-                        this.baseCommit.commitSelected = this.compareCommit.history[0];
+                        this.baseCommit.commitSelected = this.compareCommit.history[0]
                     } else {
-                        this.baseCommit.commitSelected = '--- none ---';
+                        this.baseCommit.commitSelected = '--- none ---'
                     }
-                    void this.getRefs();
+                    void this.getRefs()
                 },
                 (reason) => {
-                    this.growl.error(`Unable to get Element History - ${reason.message}`);
+                    this.growl.error(`Unable to get Element History - ${reason.message}`)
                 }
             )
             .finally(() => {
-                this.gettingHistory = false;
-                this.disableRevert = this._isSame();
-            });
-    };
+                this.gettingHistory = false
+                this.disableRevert = this._isSame()
+            })
+    }
 
     // Get ref list for project and details on
     getRefs = (): VePromise<void, unknown> => {
-        const deferred = this.$q.defer<void>();
+        const deferred = this.$q.defer<void>()
         this.projectSvc.getRefs(this.projectId).then(
             (data) => {
-                this.refList = data;
+                this.refList = data
                 this.compareCommit.ref = this.refList.filter((ref) => {
-                    return ref.id === this.refId;
-                })[0];
-                this.baseCommit.ref = this.compareCommit.ref;
-                deferred.resolve();
+                    return ref.id === this.refId
+                })[0]
+                this.baseCommit.ref = this.compareCommit.ref
+                deferred.resolve()
             },
             (reason) => {
-                this.growl.error(`Unable to get Refs - ${reason.message}`);
-                deferred.reject();
+                this.growl.error(`Unable to get Refs - ${reason.message}`)
+                deferred.reject()
             }
-        );
-        return deferred.promise;
-    };
+        )
+        return deferred.promise
+    }
 
     commitClicked = (version: CommitObject): void => {
-        this.compareCommit.commitSelected = version;
-        this.historyVer = this.compareCommit.commitSelected.id;
-        this.compareCommit.isOpen = !this.compareCommit.isOpen;
+        this.compareCommit.commitSelected = version
+        this.historyVer = this.compareCommit.commitSelected.id
+        this.compareCommit.isOpen = !this.compareCommit.isOpen
         const data = {
             elementId: this.element.id,
             projectId: this.element._projectId,
             refId: this.element._refId,
             commitId: this.historyVer,
-        };
-        this.keepCommitSelected = true;
-        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
-    };
+        }
+        this.keepCommitSelected = true
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
+    }
 
     getElementHistoryByRef = (ref?: RefObject): void => {
         if (ref) {
-            this.disableRevert = false;
+            this.disableRevert = false
             // scope.gettingCompareHistory = true;
-            this.baseCommit.ref = ref;
+            this.baseCommit.ref = ref
             const reqOb = {
                 elementId: this.element.id,
                 projectId: this.projectId,
                 refId: ref.id,
-            };
+            }
             this.elementSvc
                 .getElementHistory(reqOb, 2)
                 .then(
                     (data) => {
-                        this.baseCommit.history = data;
+                        this.baseCommit.history = data
                         if (data.length > 0) {
-                            this.baseCommit.commitSelected = this.baseCommit.history[0];
+                            this.baseCommit.commitSelected = this.baseCommit.history[0]
                         }
-                        this.disableRevert = this._isSame();
+                        this.disableRevert = this._isSame()
                     },
                     (error) => {
-                        this.baseCommit.history = [];
-                        this.baseCommit.commitSelected = '';
-                        this.disableRevert = true;
+                        this.baseCommit.history = []
+                        this.baseCommit.commitSelected = ''
+                        this.disableRevert = true
                     }
                 )
                 .finally(() => {
                     // scope.gettingCompareHistory = false;
-                    this.baseCommit.refIsOpen = !this.baseCommit.refIsOpen;
-                });
+                    this.baseCommit.refIsOpen = !this.baseCommit.refIsOpen
+                })
         }
-    };
+    }
 
     baseCommitClicked = (version: CommitObject): void => {
-        this.baseCommit.commitSelected = version;
-        this.baseCommit.isOpen = !this.baseCommit.isOpen;
-    };
+        this.baseCommit.commitSelected = version
+        this.baseCommit.isOpen = !this.baseCommit.isOpen
+    }
 
     //TODO
     // check if commit ids are the same - display to user that they are comparing same or disable the commit that matches
@@ -225,27 +225,27 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
                 elementId: this.element.id,
                 projectId: this.projectId,
                 refId: this.refId,
-            };
+            }
             const compareData: CompareData = {
                 compareCommit: this.compareCommit,
                 baseCommit: this.baseCommit,
                 element: this.element,
-            };
-            this.diffMergeSvc.revertAction(reqOb, compareData, this.$element);
-        } else this.growl.warning('Nothing to revert!');
-    };
+            }
+            this.diffMergeSvc.revertAction(reqOb, compareData, this.$element)
+        } else this.growl.warning('Nothing to revert!')
+    }
 
     private _isSame = (): boolean => {
         const compareId =
             typeof this.compareCommit.commitSelected === 'string'
                 ? this.compareCommit.commitSelected
-                : this.compareCommit.commitSelected.id;
+                : this.compareCommit.commitSelected.id
         const baseId =
             typeof this.baseCommit.commitSelected === 'string'
                 ? this.baseCommit.commitSelected
-                : this.baseCommit.commitSelected.id;
-        return baseId == compareId;
-    };
+                : this.baseCommit.commitSelected.id
+        return baseId == compareId
+    }
 }
 
 const SpecHistoryComponent: VeComponentOptions = {
@@ -392,6 +392,6 @@ const SpecHistoryComponent: VeComponentOptions = {
     
 `,
     controller: SpecHistoryController,
-};
+}
 
-veComponents.component(SpecHistoryComponent.selector, SpecHistoryComponent);
+veComponents.component(SpecHistoryComponent.selector, SpecHistoryComponent)

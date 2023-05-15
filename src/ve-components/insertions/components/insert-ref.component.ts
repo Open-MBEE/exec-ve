@@ -1,31 +1,31 @@
-import flatpickr from 'flatpickr';
+import flatpickr from 'flatpickr'
 
-import { Insertion, InsertionService } from '@ve-components/insertions';
-import { EditorService } from '@ve-core/editor';
-import { ApplicationService, UtilsService } from '@ve-utils/application';
-import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
-import { SchemaService } from '@ve-utils/model-schema';
+import { Insertion, InsertionService } from '@ve-components/insertions'
+import { EditorService } from '@ve-core/editor'
+import { ApplicationService, UtilsService } from '@ve-utils/application'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
-import { InsertData } from '@ve-types/components';
-import { CommitObject, RefObject, RefsResponse } from '@ve-types/mms';
-import { VeModalService } from '@ve-types/view-editor';
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { InsertData } from '@ve-types/components'
+import { CommitObject, RefObject, RefsResponse } from '@ve-types/mms'
+import { VeModalService } from '@ve-types/view-editor'
 
 export interface InsertRefData extends InsertData {
-    parentRefId: string;
-    lastCommit: boolean;
+    parentRefId: string
+    lastCommit: boolean
 }
 
 class InsertRefController extends Insertion<InsertRefData, RefObject> {
-    static $inject = [...Insertion.$inject, '$filter'];
+    static $inject = [...Insertion.$inject, '$filter']
 
-    protected parentCommit: CommitObject;
-    protected lastCommit: boolean;
-    protected now: Date;
-    protected dateTimeOpts: flatpickr.Options.Options;
-    protected timestamp: Date;
+    protected parentCommit: CommitObject
+    protected lastCommit: boolean
+    protected now: Date
+    protected dateTimeOpts: flatpickr.Options.Options
+    protected timestamp: Date
 
     constructor(
         $scope: angular.IScope,
@@ -60,22 +60,22 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             apiSvc,
             utils,
             editorSvc
-        );
+        )
     }
 
     public $onInit(): void {
-        super.$onInit();
+        super.$onInit()
 
-        this.lastCommit = this.insertData.lastCommit;
-        this.now = new Date();
-        this.timestamp = this.now;
+        this.lastCommit = this.insertData.lastCommit
+        this.now = new Date()
+        this.timestamp = this.now
         this.createItem = {
             id: this.apiSvc.createUniqueId(),
             _projectId: this.projectId,
             type: this.type,
             description: '',
             permission: 'read',
-        };
+        }
         this.dateTimeOpts = {
             enableTime: true,
             enableSeconds: true,
@@ -84,11 +84,11 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             time_24hr: true,
             maxDate: new Date(),
             onClose: (selectedDates): void => {
-                this.lastCommit = false;
-                this.timestamp = selectedDates[0];
+                this.lastCommit = false
+                this.timestamp = selectedDates[0]
             },
             inline: false,
-        };
+        }
     }
 
     public create = (): VePromise<RefObject, RefsResponse> => {
@@ -99,8 +99,8 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             description: this.createItem.description,
             id: this.apiSvc.createUniqueId(),
             //parentCommitId: null
-        };
-        if (this.insertData.parentRefId) refObj.parentRefId = this.insertData.parentRefId;
+        }
+        if (this.insertData.parentRefId) refObj.parentRefId = this.insertData.parentRefId
         /*
         if (!this.lastCommit || this.type === 'Tag') {
             // Make call to history?maxTimestamp to get closest commit id to branch off
@@ -112,17 +112,17 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             }, this.insertReject)
         } else {
         */
-        return this.projectSvc.createRef(refObj, this.projectId);
+        return this.projectSvc.createRef(refObj, this.projectId)
         //}
-    };
+    }
 
     public resolve = (data: RefObject): void => {
-        this.growl.success(this.type + ' is being created');
+        this.growl.success(this.type + ' is being created')
         if (this.type === 'Tag') {
-            this.growl.info('Please wait for a completion email prior to viewing of the tag.');
+            this.growl.info('Please wait for a completion email prior to viewing of the tag.')
         }
-        this.insertApi.resolve(data);
-    };
+        this.insertApi.resolve(data)
+    }
 }
 
 const InsertRefComponent: VeComponentOptions = {
@@ -203,6 +203,6 @@ const InsertRefComponent: VeComponentOptions = {
         mmsOrgId: '@',
     },
     controller: InsertRefController,
-};
+}
 
-veComponents.component(InsertRefComponent.selector, InsertRefComponent);
+veComponents.component(InsertRefComponent.selector, InsertRefComponent)

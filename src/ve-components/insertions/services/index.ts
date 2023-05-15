@@ -1,3 +1,3 @@
-import './Insertion.service';
+import './Insertion.service'
 
-export * from './Insertion.service';
+export * from './Insertion.service'

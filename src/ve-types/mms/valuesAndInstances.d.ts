@@ -1,42 +1,42 @@
-import { ElementObject } from '@ve-types/mms';
+import { ElementObject } from '@ve-types/mms'
 
 //Value Specs
 export interface ValueObject extends ElementObject {
-    expression?: ExpressionObject;
+    expression?: ExpressionObject
 }
 
 export interface LiteralObject<T> extends ValueObject {
-    value?: T;
+    value?: T
 }
 export interface InstanceValueObject extends ValueObject {
-    instanceId?: string;
+    instanceId?: string
 }
 export interface ElementValueObject extends ValueObject {
-    elementId?: string;
+    elementId?: string
 }
 export interface ExpressionObject<T extends ValueObject = ValueObject> extends ValueObject {
-    operand?: T[];
+    operand?: T[]
 }
 
 //Constraint
 export interface ConstraintObject extends ElementObject {
-    specification?: ValueObject;
+    specification?: ValueObject
 }
 
 //Instances
 export interface InstanceSpecObject extends ElementObject {
-    classifierIds?: string[];
-    specification?: ValueObject;
+    classifierIds?: string[]
+    specification?: ValueObject
 }
 
 export interface SlotObject extends LiteralObject<LiteralObject<unknown>[]> {
-    definingFeatureId: string;
+    definingFeatureId: string
 }
 
 export interface TaggedValueObject extends LiteralObject<LiteralObject<unknown>[]> {
-    tagDefinitionId: string;
+    tagDefinitionId: string
 }
 
 export interface ElementTaggedValueObject extends TaggedValueObject {
-    valueIds: string[];
+    valueIds: string[]
 }

@@ -11,17 +11,21 @@ CKEDITOR.plugins.add('mmsreset', {
             exec: (editor) => {
                 var defaultConfig = {
                     callbackModalFnc: () => {
-                        console.log('There is no callback function defined');
+                        console.log('There is no callback function defined')
                     },
-                };
-                var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmsreset || {}, true);
-                config.callback(editor);
+                }
+                var config = CKEDITOR.tools.extend(
+                    defaultConfig,
+                    editor.config.mmsreset || {},
+                    true
+                )
+                config.callback(editor)
             },
-        });
+        })
 
         editor.ui.addButton('mmsreset', {
             label: 'Update Cross Ref',
             command: 'mmsreset',
-        });
+        })
     },
-});
+})

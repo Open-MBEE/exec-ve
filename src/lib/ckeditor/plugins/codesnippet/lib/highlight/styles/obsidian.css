@@ -4,9 +4,8 @@
  */
 
 .hljs {
-    display: block;
-    padding: 0.5em;
-    background: #282b2e;
+    display: block; padding: 0.5em;
+    background: #282B2E;
 }
 
 .hljs-keyword,
@@ -19,33 +18,33 @@
 .nginx .hljs-title,
 .css .hljs-id,
 .tex .hljs-special {
-    color: #93c763;
+    color: #93C763;
 }
 
 .hljs-number {
-    color: #ffcd22;
+    color: #FFCD22;
 }
 
 .hljs {
-    color: #e0e2e4;
+    color: #E0E2E4;
 }
 
 .css .hljs-tag,
 .css .hljs-pseudo {
-    color: #d0d2b5;
+    color: #D0D2B5;
 }
 
 .hljs-attribute,
 .hljs .hljs-constant {
-    color: #668bb0;
+    color: #668BB0;
 }
 
 .xml .hljs-attribute {
-    color: #b3b689;
+    color: #B3B689;
 }
 
 .xml .hljs-tag .hljs-value {
-    color: #e8e2b7;
+    color: #E8E2B7;
 }
 
 .hljs-code,
@@ -56,16 +55,16 @@
 
 .hljs-class,
 .hljs-hexcolor {
-    color: #93c763;
+    color: #93C763;
 }
 
 .hljs-regexp {
-    color: #d39745;
+    color: #D39745;
 }
 
 .hljs-at_rule,
 .hljs-at_rule .hljs-keyword {
-    color: #a082bd;
+    color: #A082BD;
 }
 
 .hljs-doctype {
@@ -100,11 +99,11 @@
 .apache .hljs-cbracket,
 .tex .hljs-command,
 .hljs-prompt {
-    color: #8cbbad;
+    color: #8CBBAD;
 }
 
 .hljs-string {
-    color: #ec7600;
+    color: #EC7600;
 }
 
 .hljs-comment,
@@ -118,7 +117,7 @@
 .hljs-shebang,
 .apache .hljs-sqbracket,
 .tex .hljs-formula {
-    color: #818e96;
+    color: #818E96;
 }
 
 .hljs-keyword,

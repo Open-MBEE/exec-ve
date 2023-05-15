@@ -1,14 +1,14 @@
-import { CacheService } from '@ve-utils/core';
-import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
-import { URLService } from '@ve-utils/mms-api-client/URL.service';
+import { CacheService } from '@ve-utils/core'
+import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
+import { URLService } from '@ve-utils/mms-api-client/URL.service'
 
-import { veUtils } from '@ve-utils';
+import { veUtils } from '@ve-utils'
 
-import { VePromise, VeQService } from '@ve-types/angular';
-import { UserObject, UsersResponse } from '@ve-types/mms';
+import { VePromise, VeQService } from '@ve-types/angular'
+import { UserObject, UsersResponse } from '@ve-types/mms'
 
 export class UserService extends BaseApiService {
-    static $inject = ['$q', '$http', 'CacheService', 'URLService'];
+    static $inject = ['$q', '$http', 'CacheService', 'URLService']
 
     constructor(
         private $q: VeQService,
@@ -16,20 +16,20 @@ export class UserService extends BaseApiService {
         private cacheSvc: CacheService,
         private uRLSvc: URLService
     ) {
-        super();
+        super()
     }
 
     getUserData(username: string): VePromise<UserObject, UsersResponse> {
-        const key = ['user', username];
-        const url = this.uRLSvc.getPersonURL(username);
-        const cached = this.cacheSvc.get<UserObject>(key);
+        const key = ['user', username]
+        const url = this.uRLSvc.getPersonURL(username)
+        const cached = this.cacheSvc.get<UserObject>(key)
         if (this._isInProgress(url)) {
-            return this._getInProgress(url) as VePromise<UserObject, UsersResponse>;
+            return this._getInProgress(url) as VePromise<UserObject, UsersResponse>
         }
         if (cached) {
             return new this.$q<UserObject, UsersResponse>((resolve, reject) => {
-                return resolve(cached);
-            });
+                return resolve(cached)
+            })
         }
         this._addInProgress(
             url,
@@ -42,25 +42,25 @@ export class UserService extends BaseApiService {
                                 reject({
                                     status: 404,
                                     message: 'User not found',
-                                });
+                                })
                             } else {
-                                this.cacheSvc.put(key, response.data.users[0], false);
-                                resolve(this.cacheSvc.get<UserObject>(key));
+                                this.cacheSvc.put(key, response.data.users[0], false)
+                                resolve(this.cacheSvc.get<UserObject>(key))
                             }
                         },
                         (response: angular.IHttpResponse<UsersResponse>) => {
-                            this.uRLSvc.handleHttpStatus(response);
-                            reject(response);
+                            this.uRLSvc.handleHttpStatus(response)
+                            reject(response)
                         }
                     )
                     .finally(() => {
-                        this._removeInProgress(url);
-                    });
+                        this._removeInProgress(url)
+                    })
             })
-        );
+        )
 
-        return this._getInProgress(url) as VePromise<UserObject, UsersResponse>;
+        return this._getInProgress(url) as VePromise<UserObject, UsersResponse>
     }
 }
 
-veUtils.service('UserService', UserService);
+veUtils.service('UserService', UserService)

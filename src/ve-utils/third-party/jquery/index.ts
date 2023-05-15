@@ -1,2 +1,2 @@
-import './isOnScreen.jquery';
-import './table2CSV.jquery';
+import './isOnScreen.jquery'
+import './table2CSV.jquery'

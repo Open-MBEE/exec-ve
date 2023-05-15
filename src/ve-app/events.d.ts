@@ -1,15 +1,15 @@
-import { TreeBranch } from '@ve-types/tree';
+import { TreeBranch } from '@ve-types/tree'
 
 export namespace veAppEvents {
     interface viewAddedData {
-        vId: string;
-        curSec: string;
-        prevSibId?: string;
+        vId: string
+        curSec: string
+        prevSibId?: string
     }
 
     interface viewDeletedData {
-        parentBranch: TreeBranch;
-        prevBranch: TreeBranch;
-        branch: TreeBranch;
+        parentBranch: TreeBranch
+        prevBranch: TreeBranch
+        branch: TreeBranch
     }
 }

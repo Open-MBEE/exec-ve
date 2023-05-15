@@ -1,6 +1,6 @@
-import './main.component';
+import './main.component'
 
-import './services';
+import './services'
 
-import './modals';
-import './components';
+import './modals'
+import './components'

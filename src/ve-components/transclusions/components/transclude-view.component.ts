@@ -1,15 +1,15 @@
-import { ComponentService, ExtensionService } from '@ve-components/services';
-import { ITransclusion, Transclusion } from '@ve-components/transclusions';
-import { ButtonBarService } from '@ve-core/button-bar';
-import { EditorService } from '@ve-core/editor';
-import { ImageService, MathService, UtilsService } from '@ve-utils/application';
-import { EditService, EventService } from '@ve-utils/core';
-import { ElementService, ViewApi } from '@ve-utils/mms-api-client';
-import { SchemaService } from '@ve-utils/model-schema';
+import { ComponentService, ExtensionService } from '@ve-components/services'
+import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import { ButtonBarService } from '@ve-core/button-bar'
+import { EditorService } from '@ve-core/editor'
+import { ImageService, MathService, UtilsService } from '@ve-utils/application'
+import { EditService, EventService } from '@ve-utils/core'
+import { ElementService, ViewApi } from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -47,11 +47,11 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
  */
 export class TranscludeViewController extends Transclusion implements ITransclusion {
     //Custom Bindings
-    public noTitle: boolean;
+    public noTitle: boolean
 
-    public viewApi: ViewApi;
+    public viewApi: ViewApi
 
-    static $inject = Transclusion.$inject;
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: VeQService,
@@ -88,29 +88,29 @@ export class TranscludeViewController extends Transclusion implements ITransclus
             extensionSvc,
             buttonBarSvc,
             imageSvc
-        );
-        this.cfType = 'view';
-        this.cfTitle = 'View';
-        this.cfKind = 'contents';
-        this.checkCircular = true;
+        )
+        this.cfType = 'view'
+        this.cfTitle = 'View'
+        this.cfKind = 'contents'
+        this.checkCircular = true
     }
 
     $onInit(): void {
-        super.$onInit();
+        super.$onInit()
         if (typeof this.noTitle === 'undefined') {
-            this.noTitle = true;
+            this.noTitle = true
         }
 
         if (this.mmsViewCtrl) {
-            this.viewApi = this.mmsViewCtrl.mmsViewApi;
+            this.viewApi = this.mmsViewCtrl.mmsViewApi
         }
     }
 
     public getContent = (): VePromise<string | HTMLElement[], string> => {
         return this.$q.resolve(
             '<view mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" no-title="{{$ctrl.noTitle}}" mms-view-api="$ctrl.viewApi"></view>'
-        );
-    };
+        )
+    }
 }
 
 const TranscludeViewComponent: VeComponentOptions = {
@@ -132,6 +132,6 @@ const TranscludeViewComponent: VeComponentOptions = {
         mmsViewPresentationElemCtrl: '?^^mmsViewPresentationElem',
     },
     controller: TranscludeViewController,
-};
+}
 
-veComponents.component(TranscludeViewComponent.selector, TranscludeViewComponent);
+veComponents.component(TranscludeViewComponent.selector, TranscludeViewComponent)

@@ -1,8 +1,8 @@
-import { PresentationLite } from '@ve-components/presentations';
+import { PresentationLite } from '@ve-components/presentations'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { IPresentationComponentOptions } from '@ve-types/components/presentation';
+import { IPresentationComponentOptions } from '@ve-types/components/presentation'
 
 const PresentSectionComponent: IPresentationComponentOptions = {
     selector: 'presentSection',
@@ -20,6 +20,6 @@ const PresentSectionComponent: IPresentationComponentOptions = {
         mmsViewCtrl: '?^^view',
         mmsViewPresentationElemCtrl: '?^^viewPe',
     },
-};
+}
 
-veComponents.component(PresentSectionComponent.selector, PresentSectionComponent);
+veComponents.component(PresentSectionComponent.selector, PresentSectionComponent)

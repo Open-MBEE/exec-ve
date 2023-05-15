@@ -1,10 +1,10 @@
-import { TreeService } from '@ve-components/trees';
-import { RootScopeService, UtilsService } from '@ve-utils/application';
-import { EventService } from '@ve-utils/core';
-import { handleChange } from '@ve-utils/utils';
+import { TreeService } from '@ve-components/trees'
+import { RootScopeService, UtilsService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { handleChange } from '@ve-utils/utils'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
-import { TreeBranch, TreeIcons, TreeRow } from '@ve-types/tree';
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { TreeBranch, TreeIcons, TreeRow } from '@ve-types/tree'
 
 /**
  * @ngdoc directive
@@ -96,26 +96,26 @@ import { TreeBranch, TreeIcons, TreeRow } from '@ve-types/tree';
  */
 export class TreeController implements angular.IComponentController {
     //Bindings
-    toolbarId: string;
-    buttonId: string;
-    showPe: boolean;
+    toolbarId: string
+    buttonId: string
+    showPe: boolean
 
-    public init: boolean = false;
+    public init: boolean = false
 
-    public treeRows: TreeRow[] = [];
-    public title;
-    private selectedBranch: any;
-    public treeSpin: boolean = true;
+    public treeRows: TreeRow[] = []
+    public title
+    private selectedBranch: any
+    public treeSpin: boolean = true
 
-    public subs: Rx.IDisposable[];
-    private treeFilter: angular.uiTreeFilter.IFilterUiTree<TreeRow>;
+    public subs: Rx.IDisposable[]
+    private treeFilter: angular.uiTreeFilter.IFilterUiTree<TreeRow>
 
     //Locals
 
-    public icons: TreeIcons;
-    types: string[];
-    id: string;
-    filter: string;
+    public icons: TreeIcons
+    types: string[]
+    id: string
+    filter: string
 
     static $inject = [
         '$q',
@@ -127,7 +127,7 @@ export class TreeController implements angular.IComponentController {
         'TreeService',
         'RootScopeService',
         'EventService',
-    ];
+    ]
 
     constructor(
         protected $q: VeQService,
@@ -140,27 +140,27 @@ export class TreeController implements angular.IComponentController {
         protected rootScopeSvc: RootScopeService,
         protected eventSvc: EventService
     ) {
-        this.types = [''];
+        this.types = ['']
     }
 
     $onInit(): void {
-        this.treeFilter = this.$filter('uiTreeFilter');
+        this.treeFilter = this.$filter('uiTreeFilter')
 
-        this.eventSvc.$init(this);
+        this.eventSvc.$init(this)
         this.subs.push(
             this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
                 if (data) {
                     this.update().catch((reason) => {
-                        this.growl.error(TreeService.treeError(reason));
-                    });
+                        this.growl.error(TreeService.treeError(reason))
+                    })
                 }
             }),
             this.eventSvc.$on<string>(TreeService.events.RELOAD, (data) => {
                 if ((data && this.id === data) || !data) {
-                    this.treeSpin = true;
+                    this.treeSpin = true
                     this.update().catch((reason) => {
-                        this.growl.error(TreeService.treeError(reason));
-                    });
+                        this.growl.error(TreeService.treeError(reason))
+                    })
                 }
             }),
             this.eventSvc.$on<string>(TreeService.events.FILTER, (data) => {
@@ -169,37 +169,37 @@ export class TreeController implements angular.IComponentController {
                         () => {
                             this.treeSvc.expandPathToSelectedBranch().then(
                                 () => {
-                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.id);
-                                    this.filter = data;
+                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.id)
+                                    this.filter = data
                                 },
                                 (reason) => {
-                                    this.growl.error(TreeService.treeError(reason));
+                                    this.growl.error(TreeService.treeError(reason))
                                 }
-                            );
+                            )
                         },
                         (reason) => {
-                            this.growl.error(TreeService.treeError(reason));
+                            this.growl.error(TreeService.treeError(reason))
                         }
-                    );
+                    )
                 } else {
                     // expand all branches so that the filter works correctly
                     this.treeSvc.expandAll().then(
                         () => {
-                            this.eventSvc.$broadcast(TreeService.events.RELOAD, this.id);
-                            this.filter = data;
+                            this.eventSvc.$broadcast(TreeService.events.RELOAD, this.id)
+                            this.filter = data
                         },
                         (reason) => {
-                            this.growl.error(TreeService.treeError(reason));
+                            this.growl.error(TreeService.treeError(reason))
                         }
-                    );
+                    )
                 }
             })
-        );
+        )
 
         if (this.treeSvc.isTreeReady()) {
             this.update().catch((reason) => {
-                this.growl.error(TreeService.treeError(reason));
-            });
+                this.growl.error(TreeService.treeError(reason))
+            })
         }
 
         // this.subs.push(
@@ -227,108 +227,108 @@ export class TreeController implements angular.IComponentController {
             'showPe',
             () => {
                 this.update().catch((reason) => {
-                    this.growl.error(TreeService.treeError(reason));
-                });
+                    this.growl.error(TreeService.treeError(reason))
+                })
             },
             true
-        );
+        )
     }
 
     $onDestroy(): void {
-        this.eventSvc.destroy(this.subs);
+        this.eventSvc.destroy(this.subs)
     }
 
     update(): VePromise<void, unknown> {
-        this.treeRows = [];
-        this.setPeVisibility();
-        this.preConfig();
-        this.selectedBranch = this.treeSvc.getSelectedBranch();
+        this.treeRows = []
+        this.setPeVisibility()
+        this.preConfig()
+        this.selectedBranch = this.treeSvc.getSelectedBranch()
 
-        this.icons = this.icons ? this.icons : this.treeSvc.defaultIcons;
+        this.icons = this.icons ? this.icons : this.treeSvc.defaultIcons
 
-        this.treeSvc.defaultIcon = this.icons.iconDefault;
+        this.treeSvc.defaultIcon = this.icons.iconDefault
         return new this.$q<void>((resolve, reject) => {
             this.treeSvc.updateRows(this.id, this.types, this.treeRows).then(() => {
-                this.treeSpin = false;
-                resolve();
-            }, reject);
-        });
+                this.treeSpin = false
+                resolve()
+            }, reject)
+        })
     }
 
     public expandCallback = (branch: TreeBranch, e: JQuery.ClickEvent): void => {
-        branch.loading = true;
+        branch.loading = true
         if (!branch.expanded && this.treeSvc.treeApi.expandCallback) {
-            this.treeSvc.treeApi.expandCallback(branch.data.id, branch, false);
+            this.treeSvc.treeApi.expandCallback(branch.data.id, branch, false)
         }
         if (e) {
-            e.stopPropagation();
+            e.stopPropagation()
         }
-        const promise = branch.expanded ? this.treeSvc.closeBranch(branch) : this.treeSvc.expandBranch(branch);
+        const promise = branch.expanded ? this.treeSvc.closeBranch(branch) : this.treeSvc.expandBranch(branch)
         promise.then(
             () => {
                 this.update()
                     .catch((reason) => {
-                        this.growl.error(TreeService.treeError(reason));
+                        this.growl.error(TreeService.treeError(reason))
                     })
                     .finally(() => {
-                        branch.loading = false;
-                    });
+                        branch.loading = false
+                    })
             },
             (reason) => {
-                this.growl.error(TreeService.treeError(reason));
+                this.growl.error(TreeService.treeError(reason))
             }
-        );
-    };
+        )
+    }
 
     public userClicksBranch = (branch: TreeBranch): void => {
-        branch.loading = true;
+        branch.loading = true
         this.treeSvc
             .selectBranch(branch, true)
             .then(
                 () => {
                     if (branch.onSelect) {
-                        branch.onSelect(branch);
+                        branch.onSelect(branch)
                     } else if (this.treeSvc.treeApi.onSelect) {
-                        this.treeSvc.treeApi.onSelect(branch);
+                        this.treeSvc.treeApi.onSelect(branch)
                     }
                 },
                 (reason) => {
-                    this.growl.error(TreeService.treeError(reason));
+                    this.growl.error(TreeService.treeError(reason))
                 }
             )
             .finally(() => {
-                branch.loading = false;
-            });
-    };
+                branch.loading = false
+            })
+    }
 
     public userDblClicksBranch = (branch: TreeBranch): void => {
-        branch.loading = true;
+        branch.loading = true
         this.treeSvc
             .selectBranch(branch, true)
             .then(
                 () => {
                     if (branch.onDblClick) {
-                        branch.onDblClick(branch);
+                        branch.onDblClick(branch)
                     } else if (this.treeSvc.treeApi.onDblClick) {
-                        this.treeSvc.treeApi.onDblClick(branch);
+                        this.treeSvc.treeApi.onDblClick(branch)
                     }
                 },
                 (reason) => {
-                    this.growl.error(TreeService.treeError(reason));
+                    this.growl.error(TreeService.treeError(reason))
                 }
             )
             .finally(() => {
-                branch.loading = false;
-            });
-    };
+                branch.loading = false
+            })
+    }
 
     protected setPeVisibility = (): void => {
         //Implement any custom logic for showing PE's here
-    };
+    }
 
     protected preConfig = (): void => {
         //Implement any custom logic that should happen before row generation
-    };
+    }
 
     // public getHref = (row: TreeRow): string => {
     //     //var data = row.branch.data;
@@ -370,4 +370,4 @@ export const TreeOfAnyComponent: VeComponentOptions = {
         buttonId: '@',
         showPe: '<',
     },
-};
+}

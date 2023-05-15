@@ -1,16 +1,16 @@
-import $ from 'jquery';
+import $ from 'jquery'
 
-import { ViewController } from '@ve-components/presentations/view.component';
-import { ExtensionService } from '@ve-components/services';
-import { CrossReferenceController } from '@ve-components/transclusions/mms-cf.component';
-import { ApplicationService } from '@ve-utils/application';
-import { ApiService, ElementService, ViewService } from '@ve-utils/mms-api-client';
-import { handleChange, onChangesCallback } from '@ve-utils/utils';
+import { ViewController } from '@ve-components/presentations/view.component'
+import { ExtensionService } from '@ve-components/services'
+import { CrossReferenceController } from '@ve-components/transclusions/mms-cf.component'
+import { ApplicationService } from '@ve-utils/application'
+import { ApiService, ElementService, ViewService } from '@ve-utils/mms-api-client'
+import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/angular';
-import { ElementObject, ElementsRequest } from '@ve-types/mms';
+import { VeComponentOptions } from '@ve-types/angular'
+import { ElementObject, ElementsRequest } from '@ve-types/mms'
 
 /**
  * @ngdoc directive
@@ -30,35 +30,35 @@ import { ElementObject, ElementsRequest } from '@ve-types/mms';
  */
 class ViewLinkController implements angular.IComponentController {
     //Bindings
-    public mmsElementId: string;
-    mmsProjectId: string;
-    mmsRefId: string;
-    mmsCommitId: string;
-    mmsDocId: string;
-    mmsPeId: string;
-    linkText: string;
-    linkClass: string;
-    linkIconClass: string;
-    linkTarget: string;
-    mmsExternalLink: boolean;
-    suppressNumbering: boolean;
-    showName: boolean;
+    public mmsElementId: string
+    mmsProjectId: string
+    mmsRefId: string
+    mmsCommitId: string
+    mmsDocId: string
+    mmsPeId: string
+    linkText: string
+    linkClass: string
+    linkIconClass: string
+    linkTarget: string
+    mmsExternalLink: boolean
+    suppressNumbering: boolean
+    showName: boolean
 
     // Controllers
-    private mmsCfCtrl: CrossReferenceController;
-    private mmsViewCtrl: ViewController;
+    private mmsCfCtrl: CrossReferenceController
+    private mmsViewCtrl: ViewController
 
     // Locals
-    loading: boolean = true;
-    target: string;
-    private processed: boolean = false;
-    projectId: string;
-    refId: string;
-    commitId: string;
-    element: ElementObject;
-    elementName: string;
-    type: string;
-    $transcludeEl: JQuery<HTMLElement>;
+    loading: boolean = true
+    target: string
+    private processed: boolean = false
+    projectId: string
+    refId: string
+    commitId: string
+    element: ElementObject
+    elementName: string
+    type: string
+    $transcludeEl: JQuery<HTMLElement>
 
     static $inject = [
         '$scope',
@@ -70,13 +70,13 @@ class ViewLinkController implements angular.IComponentController {
         'ViewService',
         'ApplicationService',
         'ExtensionService',
-    ];
-    suffix: string;
-    hash: string;
-    href: string;
-    private docid: string;
-    showNum: boolean;
-    vid: string;
+    ]
+    suffix: string
+    hash: string
+    href: string
+    private docid: string
+    showNum: boolean
+    vid: string
 
     constructor(
         private $scope: angular.IScope,
@@ -91,47 +91,47 @@ class ViewLinkController implements angular.IComponentController {
     ) {}
 
     $onInit(): void {
-        this.target = this.linkTarget ? this.linkTarget : '_self';
+        this.target = this.linkTarget ? this.linkTarget : '_self'
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject): void {
-        handleChange(onChangesObj, 'mmsElementId', this.changeAction);
+        handleChange(onChangesObj, 'mmsElementId', this.changeAction)
     }
 
     $postLink(): void {
-        this.changeAction(this.mmsElementId, '', false);
+        this.changeAction(this.mmsElementId, '', false)
     }
 
     protected changeAction: onChangesCallback<string> = (newVal, oldVal, firstChange) => {
-        if (!newVal || (newVal === oldVal && this.processed)) return;
+        if (!newVal || (newVal === oldVal && this.processed)) return
 
-        this.processed = true;
+        this.processed = true
 
-        let projectId = this.mmsProjectId;
-        let refId = this.mmsRefId;
-        let commitId = this.mmsCommitId;
-        let docid = this.mmsDocId;
+        let projectId = this.mmsProjectId
+        let refId = this.mmsRefId
+        let commitId = this.mmsCommitId
+        let docid = this.mmsDocId
         if (this.mmsCfCtrl) {
-            const cfVersion = this.mmsCfCtrl.getElementOrigin();
-            if (!projectId) projectId = cfVersion.projectId;
-            if (!refId) refId = cfVersion.refId;
-            if (!commitId) commitId = cfVersion.commitId;
+            const cfVersion = this.mmsCfCtrl.getElementOrigin()
+            if (!projectId) projectId = cfVersion.projectId
+            if (!refId) refId = cfVersion.refId
+            if (!commitId) commitId = cfVersion.commitId
         }
         if (this.mmsViewCtrl) {
-            const viewVersion = this.mmsViewCtrl.getElementOrigin();
-            if (!projectId) projectId = viewVersion.projectId;
-            if (!refId) refId = viewVersion.refId;
-            if (!commitId) commitId = viewVersion.commitId;
+            const viewVersion = this.mmsViewCtrl.getElementOrigin()
+            if (!projectId) projectId = viewVersion.projectId
+            if (!refId) refId = viewVersion.refId
+            if (!commitId) commitId = viewVersion.commitId
         }
         if (!projectId) {
-            return;
+            return
         }
-        this.projectId = projectId;
-        this.refId = refId ? refId : 'master';
-        this.commitId = commitId ? commitId : 'latest';
-        let elementId = this.mmsElementId;
+        this.projectId = projectId
+        this.refId = refId ? refId : 'master'
+        this.commitId = commitId ? commitId : 'latest'
+        let elementId = this.mmsElementId
         if (!elementId && this.mmsPeId && !this.mmsDocId) {
-            elementId = this.applicationSvc.getState().currentDoc;
+            elementId = this.applicationSvc.getState().currentDoc
         }
 
         const reqOb: ElementsRequest<string> = {
@@ -139,89 +139,89 @@ class ViewLinkController implements angular.IComponentController {
             projectId,
             refId,
             commitId,
-        };
+        }
         this.elementSvc
             .getElement(reqOb, 1)
             .then(
                 (data: ElementObject) => {
-                    this.element = data;
-                    this.elementName = data.name;
-                    this.type = 'Section ';
-                    this.suffix = '';
-                    this.hash = '#' + data.id;
+                    this.element = data
+                    this.elementName = data.name
+                    this.type = 'Section '
+                    this.suffix = ''
+                    this.hash = '#' + data.id
                     if (this.mmsPeId && this.mmsPeId !== '') {
                         const reqPEOb: ElementsRequest<string> = {
                             elementId: this.mmsPeId,
                             projectId,
                             refId,
                             commitId,
-                        };
+                        }
                         this.elementSvc.getElement(reqPEOb).then(
                             (pe) => {
-                                this.vid = pe.id;
-                                this.element = pe;
-                                this.elementName = pe.name;
+                                this.vid = pe.id
+                                this.element = pe
+                                this.elementName = pe.name
                                 if (this.viewSvc.isTable(pe)) {
-                                    this.type = 'Table ';
+                                    this.type = 'Table '
                                 } else if (this.viewSvc.isFigure(pe)) {
-                                    this.type = 'Fig. ';
+                                    this.type = 'Fig. '
                                 } else if (this.viewSvc.isEquation(pe)) {
-                                    this.type = 'Eq. (';
-                                    this.suffix = ')';
+                                    this.type = 'Eq. ('
+                                    this.suffix = ')'
                                 }
                                 if (this.applicationSvc.getState().fullDoc) {
-                                    this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`;
+                                    this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                                 } else {
-                                    this.href = `main.project.ref.view.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`;
+                                    this.href = `main.project.ref.view.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                                 }
                             },
                             (reason) => {
-                                this.growl.warning(`Unable to retrieve element: ${reason.message}`);
+                                this.growl.warning(`Unable to retrieve element: ${reason.message}`)
                             }
-                        );
+                        )
                     }
                     if (this.apiSvc.isDocument(data)) {
-                        docid = data.id;
-                        this.docid = docid;
-                        this.vid = data.id;
+                        docid = data.id
+                        this.docid = docid
+                        this.vid = data.id
                     } else if (this.apiSvc.isView(data) || data.type === 'InstanceSpecification') {
                         if (!docid || docid === '') {
-                            docid = this.applicationSvc.getState().currentDoc;
+                            docid = this.applicationSvc.getState().currentDoc
                         }
-                        this.docid = docid;
-                        this.vid = data.id;
+                        this.docid = docid
+                        this.vid = data.id
                     } else {
-                        this.$element.html('<span class="ve-error">view link doesn\'t refer to a view</span>');
+                        this.$element.html('<span class="ve-error">view link doesn\'t refer to a view</span>')
                     }
                     if (this.applicationSvc.getState().fullDoc) {
-                        this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`;
+                        this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                     } else {
-                        this.href = `main.project.ref.view.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`;
+                        this.href = `main.project.ref.view.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                     }
                     this.showNum =
                         this.applicationSvc.getState().inDoc &&
                         this.applicationSvc.getState().currentDoc === this.docid &&
-                        !this.suppressNumbering;
+                        !this.suppressNumbering
                 },
                 (reason) => {
-                    this.$element.empty();
+                    this.$element.empty()
                     this.$transcludeEl = $(
                         '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
-                    );
-                    this.$element.append(this.$transcludeEl);
+                    )
+                    this.$element.append(this.$transcludeEl)
                     this.$compile(this.$transcludeEl)(
                         Object.assign(this.$scope.$new(), {
                             elementId: reqOb.elementId,
                             recentElement: reason.recentVersionOfElement,
                             type: 'link',
                         })
-                    );
+                    )
                 }
             )
             .finally(() => {
-                this.loading = false;
-            });
-    };
+                this.loading = false
+            })
+    }
 }
 
 export const MmsViewLinkComponent: VeComponentOptions = {
@@ -260,6 +260,6 @@ export const MmsViewLinkComponent: VeComponentOptions = {
         showName: '<',
     },
     controller: ViewLinkController,
-};
+}
 
-veComponents.component(MmsViewLinkComponent.selector, MmsViewLinkComponent);
+veComponents.component(MmsViewLinkComponent.selector, MmsViewLinkComponent)

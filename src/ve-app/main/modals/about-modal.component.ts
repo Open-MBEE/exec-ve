@@ -1,11 +1,11 @@
-import { IComponentController } from 'angular';
+import { IComponentController } from 'angular'
 
-import { ApiService } from '@ve-utils/mms-api-client';
+import { ApiService } from '@ve-utils/mms-api-client'
 
-import { veApp } from '@ve-app';
+import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular';
-import { VeModalInstanceService } from '@ve-types/view-editor';
+import { VeComponentOptions } from '@ve-types/angular'
+import { VeModalInstanceService } from '@ve-types/view-editor'
 
 const AboutModalComponent: VeComponentOptions = {
     selector: 'aboutModal',
@@ -28,36 +28,36 @@ const AboutModalComponent: VeComponentOptions = {
         resolve: '@',
     },
     controller: class AboutModalController implements IComponentController {
-        static $inject = ['ApiService'];
+        static $inject = ['ApiService']
 
         //bindings
-        public modalInstance: VeModalInstanceService<void>;
-        public resolve;
+        public modalInstance: VeModalInstanceService<void>
+        public resolve
 
         //local
-        public veV;
-        public mmsV;
+        public veV
+        public mmsV
 
         constructor(private apiSvc: ApiService) {}
 
         $onInit(): void {
-            this.veV = window.__env.version ? window.__env.version : 'No Version Specified';
-            this.mmsV = 'Loading...';
+            this.veV = window.__env.version ? window.__env.version : 'No Version Specified'
+            this.mmsV = 'Loading...'
 
             this.apiSvc.getMmsVersion().then(
                 (data) => {
-                    this.mmsV = data;
+                    this.mmsV = data
                 },
                 (reason) => {
-                    this.mmsV = 'Could not retrieve due to failure: ' + reason.message;
+                    this.mmsV = 'Could not retrieve due to failure: ' + reason.message
                 }
-            );
+            )
         }
 
         cancel(): void {
-            this.modalInstance.dismiss();
+            this.modalInstance.dismiss()
         }
     },
-};
+}
 
-veApp.component(AboutModalComponent.selector, AboutModalComponent);
+veApp.component(AboutModalComponent.selector, AboutModalComponent)

@@ -1,8 +1,8 @@
-import { ComponentService } from '@ve-components/services';
-import { EditorService } from '@ve-core/editor';
-import { ToolbarService } from '@ve-core/toolbar';
-import { UtilsService } from '@ve-utils/application';
-import { EditObject, EditService, EventService } from '@ve-utils/core';
+import { ComponentService } from '@ve-components/services'
+import { EditorService } from '@ve-core/editor'
+import { ToolbarService } from '@ve-core/toolbar'
+import { UtilsService } from '@ve-utils/application'
+import { EditObject, EditService, EventService } from '@ve-utils/core'
 import {
     ApiService,
     AuthService,
@@ -13,11 +13,11 @@ import {
     UserService,
     ViewService,
     ValueService,
-} from '@ve-utils/mms-api-client';
+} from '@ve-utils/mms-api-client'
 
-import { PropertySpec, veComponents } from '@ve-components';
+import { PropertySpec, veComponents } from '@ve-components'
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
@@ -27,37 +27,37 @@ import {
     ValueObject,
     ViewInstanceSpec,
     ViewObject,
-} from '@ve-types/mms';
+} from '@ve-types/mms'
 
 export interface SpecApi extends ElementsRequest<string> {
-    rootId?: string;
-    refType: string;
-    displayOldSpec?: boolean | null;
-    relatedDocuments?: ViewObject[];
-    propSpec?: PropertySpec;
-    typeClass?: string;
-    dataLink?: string;
-    qualifiedName?: string;
+    rootId?: string
+    refType: string
+    displayOldSpec?: boolean | null
+    relatedDocuments?: ViewObject[]
+    propSpec?: PropertySpec
+    typeClass?: string
+    dataLink?: string
+    qualifiedName?: string
 }
 
 export class SpecService implements angular.Injectable<any> {
-    private element: ElementObject;
-    private view: ViewObject | ViewInstanceSpec;
-    private document: DocumentObject;
-    private modifier: UserObject;
-    private ref: RefObject;
-    private values: ValueObject[];
-    private edit: EditObject;
-    private editing: boolean = false;
-    public editable: boolean;
-    private keeping: boolean = false;
+    private element: ElementObject
+    private view: ViewObject | ViewInstanceSpec
+    private document: DocumentObject
+    private modifier: UserObject
+    private ref: RefObject
+    private values: ValueObject[]
+    private edit: EditObject
+    private editing: boolean = false
+    public editable: boolean
+    private keeping: boolean = false
 
-    public specApi: SpecApi = { refType: '', refId: '', elementId: '', projectId: '' };
+    public specApi: SpecApi = { refType: '', refId: '', elementId: '', projectId: '' }
     public tracker: {
-        etrackerSelected?: string;
-    } = {};
+        etrackerSelected?: string
+    } = {}
 
-    public editValues: ValueObject[] = [];
+    public editValues: ValueObject[] = []
 
     static $inject = [
         '$q',
@@ -78,10 +78,10 @@ export class SpecService implements angular.Injectable<any> {
         'ApiService',
         'ValueService',
         'EditorService',
-    ];
-    private ran: boolean;
-    private lastid: string;
-    private gettingSpec: boolean;
+    ]
+    private ran: boolean
+    private lastid: string
+    private gettingSpec: boolean
     constructor(
         private $q: VeQService,
         private $timeout: angular.ITimeoutService,
@@ -111,13 +111,13 @@ export class SpecService implements angular.Injectable<any> {
      */
     public toggleEditing = (): boolean => {
         if (!this.editing) {
-            if (this.editable) this.editing = true;
-            else return false;
+            if (this.editable) this.editing = true
+            else return false
         } else {
-            this.editing = false;
+            this.editing = false
         }
-        return true;
-    };
+        return true
+    }
     /**
      * @name veComponents.component:mmsSpec#setEditing
      * sets editor state
@@ -127,11 +127,11 @@ export class SpecService implements angular.Injectable<any> {
      */
     public setEditing = (mode): boolean => {
         if (mode) {
-            if (this.editable) this.editing = true;
-            else return false;
-        } else this.editing = false;
-        return true;
-    };
+            if (this.editable) this.editing = true
+            else return false
+        } else this.editing = false
+        return true
+    }
     /**
      * @name veComponents.component:mmsSpec#getEditing
      * get editor state
@@ -139,8 +139,8 @@ export class SpecService implements angular.Injectable<any> {
      * @return {boolean} editor or not
      */
     public getEditing = (): boolean => {
-        return this.editing;
-    };
+        return this.editing
+    }
     /**
      * @name veComponents.component:mmsSpec#getEdits
      * get current edit object
@@ -149,98 +149,98 @@ export class SpecService implements angular.Injectable<any> {
      *  current element object that can be edited (may include changes)
      */
     public getEdits = (): EditObject => {
-        return this.edit;
-    };
+        return this.edit
+    }
 
     public setEdits = (editOb: EditObject): void => {
         if (this.valueSvc.isValue(editOb.element)) {
-            editOb.values = this.valueSvc.getValues(editOb.element);
+            editOb.values = this.valueSvc.getValues(editOb.element)
         }
-        this.edit = editOb;
-    };
+        this.edit = editOb
+    }
 
     public getElement = (): ElementObject => {
-        return this.element;
-    };
+        return this.element
+    }
 
     public getDocument = (): DocumentObject => {
-        return this.document;
-    };
+        return this.document
+    }
 
     public getView = (): ElementObject => {
-        return this.view;
-    };
+        return this.view
+    }
 
     public getModifier = (): UserObject => {
-        return this.modifier;
-    };
+        return this.modifier
+    }
 
     public getValues(): ValueObject[] {
-        return this.values;
+        return this.values
     }
 
     public getRef = (): RefObject => {
-        return this.ref;
-    };
+        return this.ref
+    }
 
     public getTypeClass = (element: ElementObject): void => {
         // Get Type
-        this.specApi.typeClass = this.utilsSvc.getElementTypeClass(element, this.viewSvc.getElementType(element));
-    };
+        this.specApi.typeClass = this.utilsSvc.getElementTypeClass(element, this.viewSvc.getElementType(element))
+    }
 
     public getQualifiedName(element: ElementObject): VePromise<boolean> {
-        const deferred = this.$q.defer<boolean>();
-        if (this.edit) element = this.edit.element;
+        const deferred = this.$q.defer<boolean>()
+        if (this.edit) element = this.edit.element
         const reqOb: ElementsRequest<string> = {
             commitId: element._commitId ? element._commitId : 'latest',
             projectId: element._projectId,
             refId: element._refId,
             elementId: element.id,
-        };
+        }
         this.elementSvc.getElementQualifiedName(reqOb).then(
             (result) => {
-                this.specApi.qualifiedName = result;
-                deferred.resolve(true);
+                this.specApi.qualifiedName = result
+                deferred.resolve(true)
             },
             (reason) => {
-                deferred.reject(reason);
+                deferred.reject(reason)
             }
-        );
-        return deferred.promise;
+        )
+        return deferred.promise
     }
 
     public setElement = (): void => {
-        this.specApi.relatedDocuments = null;
-        this.specApi.propSpec = {};
+        this.specApi.relatedDocuments = null
+        this.specApi.propSpec = {}
 
-        this.ran = true;
-        this.lastid = this.specApi.elementId;
+        this.ran = true
+        this.lastid = this.specApi.elementId
 
-        this.specApi.extended = !(this.specApi.commitId && this.specApi.commitId !== 'latest');
+        this.specApi.extended = !(this.specApi.commitId && this.specApi.commitId !== 'latest')
 
-        this._updateElement();
-    };
+        this._updateElement()
+    }
 
     private _updateElement = (): void => {
-        const reqOb = Object.assign({}, this.specApi);
+        const reqOb = Object.assign({}, this.specApi)
         this.elementSvc
             .getElement(reqOb, 2, false)
             .then(
                 (data) => {
-                    const promises: angular.IPromise<any>[] = [];
+                    const promises: angular.IPromise<any>[] = []
                     if (data.id !== this.lastid) {
-                        return;
+                        return
                     }
-                    this.element = data;
+                    this.element = data
                     if (this.apiSvc.isView(data) || this.viewSvc.isSection(data)) {
-                        this.view = data;
+                        this.view = data
                     }
-                    this.values = this.valueSvc.getValues(data);
+                    this.values = this.valueSvc.getValues(data)
                     promises.push(
                         this.userSvc.getUserData(data._modifier).then((result) => {
-                            this.modifier = result;
+                            this.modifier = result
                         })
-                    );
+                    )
                     /* no more related docs search supported
                     if (!this.specApi.commitId || this.specApi.commitId === 'latest') {
                         promises.push(
@@ -276,32 +276,32 @@ export class SpecService implements angular.Injectable<any> {
                             projectId: this.specApi.projectId,
                             refId: this.specApi.refId,
                             commitId: this.specApi.commitId ? this.specApi.commitId : 'latest',
-                        };
+                        }
                         promises.push(
                             this.viewSvc.getProjectDocument(docReq, 1).then((result) => {
-                                this.document = result;
+                                this.document = result
                             })
-                        );
+                        )
                     }
                     if (
                         (this.specApi.commitId && this.specApi.commitId !== 'latest') ||
                         !this.permissionsSvc.hasBranchEditPermission(data._projectId, data._refId) ||
                         this.specApi.refType === 'Tag'
                     ) {
-                        this.editable = false;
-                        this.edit = null;
-                        this.setEditing(false);
+                        this.editable = false
+                        this.edit = null
+                        this.setEditing(false)
                     } else {
-                        this.editable = true;
+                        this.editable = true
                         // only get edit object if in spec edit
                     }
                     promises.push(
                         this.projectSvc.getRef(this.specApi.refId, this.specApi.projectId).then((result) => {
-                            this.ref = result;
+                            this.ref = result
                         })
-                    );
-                    this.getTypeClass(this.element);
-                    promises.push(this.getQualifiedName(this.element));
+                    )
+                    this.getTypeClass(this.element)
+                    promises.push(this.getQualifiedName(this.element))
                     this.specApi.dataLink =
                         this.uRLSvc.getRoot() +
                         '/projects/' +
@@ -313,56 +313,56 @@ export class SpecService implements angular.Injectable<any> {
                         '?commitId=' +
                         this.element._commitId +
                         '&token=' +
-                        this.authSvc.getToken();
+                        this.authSvc.getToken()
 
                     this.$q.allSettled(promises).then(
                         () => this.eventSvc.resolve<boolean>('spec.ready', true),
                         (reason: VePromiseReason<unknown>) => {
-                            this.growl.error('Getting Element Error: ' + reason.message);
+                            this.growl.error('Getting Element Error: ' + reason.message)
                         }
-                    );
+                    )
                 },
                 (reason) => {
-                    this.growl.error('Getting Element Error: ' + reason.message);
+                    this.growl.error('Getting Element Error: ' + reason.message)
                 }
             )
             .finally(() => {
-                this.gettingSpec = false;
-            });
-    };
+                this.gettingSpec = false
+            })
+    }
 
     public setKeepMode = (value?: boolean): void => {
         if (value === undefined) {
-            this.keepMode();
+            this.keepMode()
         }
-        this.keeping = value;
-    };
+        this.keeping = value
+    }
 
     public getKeepMode = (): boolean => {
-        return this.keeping;
-    };
+        return this.keeping
+    }
 
     public keepMode = (): void => {
-        this.keeping = true;
-    };
+        this.keeping = true
+    }
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
     public toggleSave = (toolbarId: string): void => {
         this.toolbarSvc.waitForApi(toolbarId).then(
             (api) => {
                 if (this.autosaveSvc.openEdits() > 0) {
-                    api.setPermission('spec-editor.saveall', true);
-                    api.setIcon('spec-editor', 'fa-edit-asterisk');
+                    api.setPermission('spec-editor.saveall', true)
+                    api.setIcon('spec-editor', 'fa-edit-asterisk')
                 } else {
-                    api.setPermission('spec-editor.saveall', false);
-                    api.setIcon('spec-editor', 'fa-edit');
+                    api.setPermission('spec-editor.saveall', false)
+                    api.setIcon('spec-editor', 'fa-edit')
                 }
             },
             (reason) => {
-                this.growl.error(ToolbarService.error(reason));
+                this.growl.error(ToolbarService.error(reason))
             }
-        );
-    };
+        )
+    }
     //
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
@@ -384,4 +384,4 @@ export class SpecService implements angular.Injectable<any> {
     // }
 }
 
-veComponents.service('SpecService', SpecService);
+veComponents.service('SpecService', SpecService)

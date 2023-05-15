@@ -18,18 +18,18 @@ CKEDITOR.plugins.add('mmsvlink', {
             insert: () => {
                 var defaultConfig = {
                     callbackModalFnc: () => {
-                        console.log('There is no callback function defined');
+                        console.log('There is no callback function defined')
                     },
-                };
-                var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmsvlink || {}, true);
-                var tag = config.callbackModalFnc(editor, false);
+                }
+                var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmsvlink || {}, true)
+                var tag = config.callbackModalFnc(editor, false)
             },
             // Check the elements that need to be converted to widgets.
             upcast: (element) => {
                 // Return "true" (that element needs to converted to a mmsvlink widget)
                 // for all <mms-view-link> elements.
-                return element.name === 'mms-view-link';
+                return element.name === 'mms-view-link'
             },
-        });
+        })
     },
-});
+})

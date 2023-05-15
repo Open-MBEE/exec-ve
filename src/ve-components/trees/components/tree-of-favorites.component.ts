@@ -1,19 +1,19 @@
-import { TreeService, TreeController } from '@ve-components/trees';
-import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application';
-import { EventService } from '@ve-utils/core';
+import { TreeService, TreeController } from '@ve-components/trees'
+import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 
 class TreeOfFavoritesController extends TreeController {
     public icons = {
         iconExpand: 'fa-solid fa-caret-down fa-lg fa-fw',
         iconCollapse: 'fa-solid fa-caret-right fa-lg fa-fw',
         iconDefault: 'fa-solid fa-star fa-fw',
-    };
+    }
 
-    static $inject = [...TreeController.$inject, 'ApplicationService'];
+    static $inject = [...TreeController.$inject, 'ApplicationService']
 
     constructor(
         $q: VeQService,
@@ -27,10 +27,10 @@ class TreeOfFavoritesController extends TreeController {
         eventSvc: EventService,
         private applicationSvc: ApplicationService
     ) {
-        super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc);
-        this.id = 'table-of-favorites';
-        this.types = ['favorite'];
-        this.title = 'Table of Favorites';
+        super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
+        this.id = 'table-of-favorites'
+        this.types = ['favorite']
+        this.title = 'Table of Favorites'
     }
 }
 
@@ -64,6 +64,6 @@ const TreeOfFavoritesComponent: VeComponentOptions = {
         showPe: '<',
     },
     controller: TreeOfFavoritesController,
-};
+}
 
-veComponents.component(TreeOfFavoritesComponent.selector, TreeOfFavoritesComponent);
+veComponents.component(TreeOfFavoritesComponent.selector, TreeOfFavoritesComponent)

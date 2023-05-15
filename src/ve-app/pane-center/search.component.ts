@@ -1,23 +1,23 @@
-import { StateService } from '@uirouter/angularjs';
+import { StateService } from '@uirouter/angularjs'
 
-import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
-import { veCoreEvents } from '@ve-core/events';
-import { RootScopeService } from '@ve-utils/application';
-import { EventService } from '@ve-utils/core';
+import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
+import { veCoreEvents } from '@ve-core/events'
+import { RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 
-import { veApp } from '@ve-app';
+import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular';
-import { ElementObject, ParamsObject } from '@ve-types/mms';
-import { VeSearchOptions } from '@ve-types/view-editor';
+import { VeComponentOptions } from '@ve-types/angular'
+import { ElementObject, ParamsObject } from '@ve-types/mms'
+import { VeSearchOptions } from '@ve-types/view-editor'
 
 class SearchController {
-    params: ParamsObject;
+    params: ParamsObject
 
-    searchContentLoading: boolean = true;
-    searchOptions: VeSearchOptions;
+    searchContentLoading: boolean = true
+    searchOptions: VeSearchOptions
 
-    static $inject = ['$state', 'ContentWindowService', 'RootScopeService', 'EventService'];
+    static $inject = ['$state', 'ContentWindowService', 'RootScopeService', 'EventService']
 
     constructor(
         private $state: StateService,
@@ -27,10 +27,10 @@ class SearchController {
     ) {}
 
     $onInit(): void {
-        this.searchContentLoading = false;
+        this.searchContentLoading = false
 
-        this.contentWindowSvc.toggleLeftPane(true);
-        this.rootScopeSvc.veHideLeft(true);
+        this.contentWindowSvc.toggleLeftPane(true)
+        this.rootScopeSvc.veHideLeft(true)
 
         this.searchOptions = {
             emptyDocTxt: 'This field is empty.',
@@ -44,10 +44,10 @@ class SearchController {
                     projectId: elementOb._projectId,
                     refId: elementOb._refId,
                     commitId: 'latest',
-                };
-                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
+                }
+                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
                 if (typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' && this.rootScopeSvc.rightPaneClosed())
-                    this.eventSvc.$broadcast('right-pane.toggle', false);
+                    this.eventSvc.$broadcast('right-pane.toggle', false)
             },
             relatedCallback: (doc, view, elem): void => {
                 //siteId, documentId, viewId) {
@@ -57,9 +57,9 @@ class SearchController {
                     viewId: view.id,
                     refId: doc._refId,
                     keywords: undefined,
-                });
+                })
             },
-        };
+        }
     }
 }
 
@@ -81,6 +81,6 @@ const SearchComponent: VeComponentOptions = {
         field: '<',
     },
     controller: SearchController,
-};
+}
 
-veApp.component(SearchComponent.selector, SearchComponent);
+veApp.component(SearchComponent.selector, SearchComponent)

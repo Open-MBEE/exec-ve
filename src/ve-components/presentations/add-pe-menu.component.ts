@@ -1,20 +1,20 @@
-import { IComponentController } from 'angular';
+import { IComponentController } from 'angular'
 
-import { PresentationService } from '@ve-components/presentations/services/Presentation.service';
-import { RootScopeService } from '@ve-utils/application';
+import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
+import { RootScopeService } from '@ve-utils/application'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/angular';
-import { ViewObject } from '@ve-types/mms';
+import { VeComponentOptions } from '@ve-types/angular'
+import { ViewObject } from '@ve-types/mms'
 
 class AddPeMenuController implements IComponentController {
     // Bindings
-    private mmsView: ViewObject;
+    private mmsView: ViewObject
 
-    public addPeIndex: number;
+    public addPeIndex: number
 
-    static $inject = ['PresentationService', 'RootScopeService'];
+    static $inject = ['PresentationService', 'RootScopeService']
 
     constructor(private presentationSvc: PresentationService, private rootScopeSvc: RootScopeService) {}
     /**
@@ -23,22 +23,22 @@ class AddPeMenuController implements IComponentController {
      */
     public addEltAction = (index: number, type: string): void => {
         if (!this.rootScopeSvc.veEditMode()) {
-            return;
+            return
         }
-        this.addPeIndex = index;
-        this.presentationSvc.addPresentationElement(this, type, this.mmsView);
-    };
+        this.addPeIndex = index
+        this.presentationSvc.addPresentationElement(this, type, this.mmsView)
+    }
 
     public setPeLineVisibility = ($event: JQuery.ClickEvent): void => {
         window.setTimeout(() => {
-            const peContainer = $($event.currentTarget).closest('.add-pe-button-container');
+            const peContainer = $($event.currentTarget).closest('.add-pe-button-container')
             if (peContainer.find('.dropdown-menu').css('display') == 'none') {
-                peContainer.find('hr').css('visibility', 'hidden');
+                peContainer.find('hr').css('visibility', 'hidden')
             } else {
-                peContainer.find('hr').css('visibility', 'visible');
+                peContainer.find('hr').css('visibility', 'visible')
             }
-        });
-    };
+        })
+    }
 }
 
 const InsertPeMenuComponent: VeComponentOptions = {
@@ -90,6 +90,6 @@ const InsertPeMenuComponent: VeComponentOptions = {
         index: '<',
     },
     controller: AddPeMenuController,
-};
+}
 
-veComponents.component(InsertPeMenuComponent.selector, InsertPeMenuComponent);
+veComponents.component(InsertPeMenuComponent.selector, InsertPeMenuComponent)

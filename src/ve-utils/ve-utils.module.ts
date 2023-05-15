@@ -1,4 +1,4 @@
-import angular from 'angular';
+import angular from 'angular'
 
 /**
  * @ngdoc overview
@@ -55,14 +55,14 @@ import angular from 'angular';
     ]);
     </pre>
  */
-export const veUtils = angular.module('ve-utils', []);
+export const veUtils = angular.module('ve-utils', [])
 
 veUtils
     .config([
         '$sceProvider',
         ($sceProvider: angular.ISCEProvider): void => {
-            $sceProvider.enabled(false);
+            $sceProvider.enabled(false)
         },
     ])
     //.constant('HtmlRenderedDiff', window.HtmlRenderedDiff)
-    .constant('moment', window.moment);
+    .constant('moment', window.moment)

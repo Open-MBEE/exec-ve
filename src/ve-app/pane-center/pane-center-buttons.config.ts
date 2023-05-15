@@ -1,4 +1,4 @@
-import { IButtonBarButton } from '@ve-core/button-bar';
+import { IButtonBarButton } from '@ve-core/button-bar'
 
 export const pane_center_buttons: IButtonBarButton[] = [
     {
@@ -98,4 +98,4 @@ export const pane_center_buttons: IButtonBarButton[] = [
         selectable: false,
         tooltip: 'Table to CSV',
     },
-];
+]

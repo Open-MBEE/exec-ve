@@ -1,48 +1,48 @@
-import { StateService } from '@uirouter/angularjs';
-import { IComponentController } from 'angular';
-import _ from 'lodash';
+import { StateService } from '@uirouter/angularjs'
+import { IComponentController } from 'angular'
+import _ from 'lodash'
 
-import { TreeService } from '@ve-components/trees';
-import { CacheService } from '@ve-utils/core';
-import { ElementService } from '@ve-utils/mms-api-client';
+import { TreeService } from '@ve-components/trees'
+import { CacheService } from '@ve-utils/core'
+import { ElementService } from '@ve-utils/mms-api-client'
 
-import { veApp } from '@ve-app';
+import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular';
-import { DocumentObject, ElementObject, GroupObject, ParamsObject, ProjectObject, RefObject } from '@ve-types/mms';
-import { AngularUITree, VeTreeNodeScope } from '@ve-types/tree';
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { DocumentObject, ElementObject, GroupObject, ParamsObject, ProjectObject, RefObject } from '@ve-types/mms'
+import { AngularUITree, VeTreeNodeScope } from '@ve-types/tree'
 
 interface ReorderGroupNode {
-    data: GroupObject | DocumentObject;
-    children: ReorderGroupNode[];
-    name: string;
-    id: string;
-    type: string;
-    isChild?: boolean;
+    data: GroupObject | DocumentObject
+    children: ReorderGroupNode[]
+    name: string
+    id: string
+    type: string
+    isChild?: boolean
 }
 
 interface ReorderGroupResult {
-    node: ReorderGroupNode;
-    newOwnerId: string;
+    node: ReorderGroupNode
+    newOwnerId: string
 }
 
 class ReorderGroupController implements IComponentController {
-    params: ParamsObject;
-    mmsProject: ProjectObject;
-    mmsRef: RefObject;
-    mmsGroups: GroupObject[];
-    mmsDocuments: DocumentObject[];
+    params: ParamsObject
+    mmsProject: ProjectObject
+    mmsRef: RefObject
+    mmsGroups: GroupObject[]
+    mmsDocuments: DocumentObject[]
 
     //Locals
-    groups: GroupObject[];
-    documents: DocumentObject[];
-    isSaving = false;
-    targetId = '';
+    groups: GroupObject[]
+    documents: DocumentObject[]
+    isSaving = false
+    targetId = ''
 
-    treeOptions: AngularUITree.ICallbacks;
+    treeOptions: AngularUITree.ICallbacks
 
-    static $inject = ['$q', '$scope', '$state', 'growl', 'ElementService', 'CacheService', 'TreeService'];
-    private tree: ReorderGroupNode[];
+    static $inject = ['$q', '$scope', '$state', 'growl', 'ElementService', 'CacheService', 'TreeService']
+    private tree: ReorderGroupNode[]
 
     constructor(
         private $q: VeQService,
@@ -55,102 +55,102 @@ class ReorderGroupController implements IComponentController {
     ) {}
 
     $onInit(): void {
-        this.groups = this.mmsGroups;
-        this.documents = this.mmsDocuments;
+        this.groups = this.mmsGroups
+        this.documents = this.mmsDocuments
 
-        const children = this.generateTree();
-        this.sortRecursively(children);
+        const children = this.generateTree()
+        this.sortRecursively(children)
         const root = this.createNode('Top Level', 'root', children, {
             id: 'root',
             _projectId: this.params.projectId,
             _refId: this.params.refId,
-        });
-        this.tree = [root];
+        })
+        this.tree = [root]
 
         this.treeOptions = {
             dropped: (change): void => {
-                this.sortRecursively(children);
-                this.targetId = '';
+                this.sortRecursively(children)
+                this.targetId = ''
             },
             accept: (sourceNodeScope: VeTreeNodeScope, destNodeScope: VeTreeNodeScope, destIndex): boolean => {
                 // allow moving to the root or to a group
                 const accept =
-                    destNodeScope.node && (destNodeScope.node.type === 'group' || destNodeScope.node.type === 'root');
+                    destNodeScope.node && (destNodeScope.node.type === 'group' || destNodeScope.node.type === 'root')
                 if (accept) {
                     if (
                         destNodeScope.$nodeScope &&
                         destNodeScope.$nodeScope.$modelValue &&
                         (
                             destNodeScope.$nodeScope.$modelValue as {
-                                id: string;
+                                id: string
                             }
                         ).id
                     ) {
                         this.targetId = (
                             destNodeScope.$nodeScope.$modelValue as {
-                                id: string;
+                                id: string
                             }
-                        ).id;
+                        ).id
                     }
                 }
-                return accept;
+                return accept
             },
             dragStart: (data): void => {
                 this.targetId = (
                     data.dest.nodesScope.$nodeScope.$modelValue as {
-                        id: string;
+                        id: string
                     }
-                ).id;
+                ).id
             },
-        };
+        }
     }
 
     public generateTree(): ReorderGroupNode[] {
         // create a node for each groupOb
         let tree = this.groups.map((groupOb) => {
-            return this.createNode(groupOb.name, 'group', [], groupOb);
-        });
+            return this.createNode(groupOb.name, 'group', [], groupOb)
+        })
 
         // add document to its group
         this.documents
             .filter((documentOb) => {
-                return documentOb._groupId;
+                return documentOb._groupId
             })
             .forEach((documentOb) => {
                 const parent = _.find(tree, (node) => {
-                    return node.data.id === documentOb._groupId;
-                });
+                    return node.data.id === documentOb._groupId
+                })
                 if (parent) {
-                    parent.children.push(this.createNode(documentOb.name, 'view', [], documentOb));
+                    parent.children.push(this.createNode(documentOb.name, 'view', [], documentOb))
                 }
-            });
+            })
 
         // for any group that has a parent group, establish that connection
         tree.forEach((groupNode) => {
             const foundParent = _.find(tree, (node) => {
-                return node.data.id === groupNode.data._parentId;
-            });
+                return node.data.id === groupNode.data._parentId
+            })
             if (foundParent) {
-                groupNode.isChild = true;
-                foundParent.children.push(groupNode);
+                groupNode.isChild = true
+                foundParent.children.push(groupNode)
             }
-            return groupNode;
-        });
+            return groupNode
+        })
 
         // only groups that don't have parents show up at root level
         tree = tree.filter((groupNode) => {
-            return !groupNode.isChild;
-        });
+            return !groupNode.isChild
+        })
 
         // add all the documents that don't belong to any group
         this.documents
             .filter((documentOb) => {
-                return !documentOb._groupId;
+                return !documentOb._groupId
             })
             .forEach((documentOb) => {
-                this.tree.push(this.createNode(documentOb.name, 'view', [], documentOb));
-            });
-        return tree;
+                this.tree.push(this.createNode(documentOb.name, 'view', [], documentOb))
+            })
+        return tree
     }
 
     public createNode(
@@ -165,18 +165,18 @@ class ReorderGroupController implements IComponentController {
             children: children,
             data: data,
             id: data.id,
-        };
+        }
     }
 
     public cancelReorder = (): void => {
-        this.navigateAway(false);
-    };
+        this.navigateAway(false)
+    }
 
     public saveReorder = (): void => {
         if (!this.isSaving) {
-            this.isSaving = true;
-            const results: ReorderGroupResult[] = [];
-            this.findNodesToUpdate(results);
+            this.isSaving = true
+            const results: ReorderGroupResult[] = []
+            this.findNodesToUpdate(results)
             const elementsToUpdate: ElementObject[] = results.map((result) => {
                 return {
                     id: result.node.data.id,
@@ -184,40 +184,40 @@ class ReorderGroupController implements IComponentController {
                     _projectId: this.params.projectId,
                     _refId: this.params.refId,
                     type: result.node.data.type,
-                };
-            });
+                }
+            })
             this.elementSvc
                 .updateElements(elementsToUpdate, false)
                 .then(() => {
-                    this.cleanupCache(results);
-                    this.navigateAway(true);
+                    this.cleanupCache(results)
+                    this.navigateAway(true)
                 })
                 .catch(() => {
-                    this.growl.error('Failed to save the grouping!');
+                    this.growl.error('Failed to save the grouping!')
                 })
                 .finally(() => {
-                    this.isSaving = false;
-                });
+                    this.isSaving = false
+                })
         } else {
-            this.growl.info('please wait');
+            this.growl.info('please wait')
         }
-    };
+    }
 
     public findNodesToUpdate = (result: ReorderGroupResult[]): void => {
         // ignore root
-        const root = this.tree[0];
+        const root = this.tree[0]
         root.children.forEach((node) => {
             // handle node change at the root level
             if ((node.type === 'group' && node.data._parentId) || (node.type === 'view' && node.data._groupId)) {
                 result.push({
                     node: node,
                     newOwnerId: 'holding_bin_' + this.params.projectId,
-                });
+                })
             }
 
             // handle change at lower level
-            helper(node, result);
-        });
+            helper(node, result)
+        })
 
         const helper = (node: ReorderGroupNode, result: ReorderGroupResult[]): void => {
             node.children.forEach((childNode) => {
@@ -228,12 +228,12 @@ class ReorderGroupController implements IComponentController {
                     result.push({
                         node: childNode,
                         newOwnerId: node.data.id,
-                    });
+                    })
                 }
-                helper(childNode, result);
-            });
-        };
-    };
+                helper(childNode, result)
+            })
+        }
+    }
 
     public cleanupCache = (results: ReorderGroupResult[]): void => {
         // update cache for documents list and groups list
@@ -241,62 +241,62 @@ class ReorderGroupController implements IComponentController {
             'documents',
             this.params.projectId,
             this.params.refId,
-        ]);
+        ])
         const listOfGroupInCache = this.cacheSvc.get<GroupObject[]>([
             'groups',
             this.params.projectId,
             this.params.refId,
-        ]);
+        ])
         results.forEach((result) => {
             // for group or document that is moved to the root, _parentId for "group" and _groupId for "document" need to be set to undefined
-            const newOwnerId = result.newOwnerId.indexOf(this.params.projectId) !== -1 ? undefined : result.newOwnerId;
+            const newOwnerId = result.newOwnerId.indexOf(this.params.projectId) !== -1 ? undefined : result.newOwnerId
 
             if (result.node.type === 'group') {
                 const cacheGroupOb = _.find(listOfGroupInCache, (groupOb) => {
-                    return groupOb.id === result.node.data.id;
-                });
+                    return groupOb.id === result.node.data.id
+                })
                 if (cacheGroupOb) {
-                    cacheGroupOb._parentId = newOwnerId;
+                    cacheGroupOb._parentId = newOwnerId
                 }
             } else if (result.node.type === 'view') {
                 const cacheDocument = _.find(listOfDocInCache, (documentOb) => {
-                    return documentOb.id === result.node.data.id;
-                });
+                    return documentOb.id === result.node.data.id
+                })
                 if (cacheDocument) {
-                    cacheDocument._groupId = newOwnerId;
+                    cacheDocument._groupId = newOwnerId
                 }
             }
-        });
-    };
+        })
+    }
 
     public comparator = (a: ReorderGroupNode, b: ReorderGroupNode): number => {
         if (a.type === b.type) {
-            return a.name.localeCompare(b.name);
+            return a.name.localeCompare(b.name)
         } else {
             if (a.type === 'group') {
-                return -1;
+                return -1
             } else {
-                return 1;
+                return 1
             }
         }
-    };
+    }
 
     public sortRecursively = (nodes: ReorderGroupNode[]): void => {
-        nodes.sort(this.comparator);
+        nodes.sort(this.comparator)
         nodes.forEach((node) => {
-            this.sortRecursively(node.children);
-        });
-    };
+            this.sortRecursively(node.children)
+        })
+    }
 
     public navigateAway = (reload: boolean): void => {
-        const curBranch = this.treeSvc.getSelectedBranch();
+        const curBranch = this.treeSvc.getSelectedBranch()
         if (curBranch) {
-            const documentId = curBranch.type === 'group' ? 'site_' + curBranch.data.id + '_cover' : curBranch.data.id;
-            void this.$state.go('main.project.ref.portal.preview', { preview: documentId }, { reload: reload });
+            const documentId = curBranch.type === 'group' ? 'site_' + curBranch.data.id + '_cover' : curBranch.data.id
+            void this.$state.go('main.project.ref.portal.preview', { preview: documentId }, { reload: reload })
         } else {
-            void this.$state.go('main.project.ref.portal', {}, { reload: reload });
+            void this.$state.go('main.project.ref.portal', {}, { reload: reload })
         }
-    };
+    }
 }
 
 const ReorderGroupComponent: VeComponentOptions = {
@@ -333,6 +333,6 @@ const ReorderGroupComponent: VeComponentOptions = {
         mmsDocuments: '<',
     },
     controller: ReorderGroupController,
-};
+}
 
-veApp.component(ReorderGroupComponent.selector, ReorderGroupComponent);
+veApp.component(ReorderGroupComponent.selector, ReorderGroupComponent)

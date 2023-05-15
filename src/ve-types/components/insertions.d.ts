@@ -1,34 +1,34 @@
-import { ElementObject } from '@ve-types/mms';
-import { VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
+import { ElementObject } from '@ve-types/mms'
+import { VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 export interface InsertResolveFn<T extends InsertData> extends VeModalResolveFn {
-    getInsertData(): T;
+    getInsertData(): T
 
-    getProjectId(): string;
+    getProjectId(): string
 
-    getRefId(): string;
+    getRefId(): string
 
-    getOrgId(): string;
+    getOrgId(): string
 }
 
 export interface InsertResolve<T extends InsertData> extends VeModalResolve {
-    getInsertData: T;
-    getProjectId: string;
-    getRefId: string;
-    getOrgId: string;
+    getInsertData: T
+    getProjectId: string
+    getRefId: string
+    getOrgId: string
 }
 
 export interface InsertData {
-    type: string;
-    insertType: string;
-    noPublish?: boolean;
-    isNew?: boolean;
-    parentTitle?: string;
-    selected?: ElementObject;
+    type: string
+    insertType: string
+    noPublish?: boolean
+    isNew?: boolean
+    parentTitle?: string
+    selected?: ElementObject
 }
 
 export interface InsertApi<T, U> {
-    resolve(data: T): void;
+    resolve(data: T): void
 
-    reject(reason: U): void;
+    reject(reason: U): void
 }

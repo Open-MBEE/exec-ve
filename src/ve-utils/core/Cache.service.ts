@@ -1,40 +1,40 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import { veUtils } from '@ve-utils';
+import { veUtils } from '@ve-utils'
 
-import { ElementObject, MmsObject } from '@ve-types/mms';
+import { ElementObject, MmsObject } from '@ve-types/mms'
 
 export class CacheService {
-    public cache: { [key: string]: string | unknown | unknown[] } = {};
+    public cache: { [key: string]: string | unknown | unknown[] } = {}
 
-    static $inject = [];
+    static $inject = []
 
     get<T>(key: string | string[], noCopy?: boolean): T | undefined {
-        const realKey: string = this._makeKey(key);
-        const result: T = this._get<T>(realKey);
+        const realKey: string = this._makeKey(key)
+        const result: T = this._get<T>(realKey)
 
-        return result;
+        return result
         //else return _.cloneDeep(result)
     }
 
     private _get = <T>(realKey: string): T => {
         const recurse = (key: string): string | T => {
             if (typeof this.cache[key] === 'string') {
-                return recurse(this.cache[key] as string);
+                return recurse(this.cache[key] as string)
             }
-            return this.cache[key] as T;
-        };
-        if (this.cache.hasOwnProperty(realKey)) {
-            let result: T;
-            if (typeof this.cache[realKey] === 'string') {
-                result = recurse(this.cache[realKey] as string) as T;
-            } else {
-                result = this.cache[realKey] as T;
-            }
-            return result;
+            return this.cache[key] as T
         }
-        return;
-    };
+        if (this.cache.hasOwnProperty(realKey)) {
+            let result: T
+            if (typeof this.cache[realKey] === 'string') {
+                result = recurse(this.cache[realKey] as string) as T
+            } else {
+                result = this.cache[realKey] as T
+            }
+            return result
+        }
+        return
+    }
 
     /**
      * @name CacheService#getElements
@@ -45,10 +45,10 @@ export class CacheService {
      * @returns {Object} Value if found, empty array if not found
      */
     getLatestElements<T extends MmsObject>(projectId: string, refId: string): T[] {
-        const latestElements: T[] = [];
+        const latestElements: T[] = []
         for (const key in this.cache) {
             if (!this.cache.hasOwnProperty(key)) {
-                continue;
+                continue
             }
             if (
                 key.indexOf('|latest') >= 0 &&
@@ -58,13 +58,13 @@ export class CacheService {
                 key.indexOf(refId) >= 0 &&
                 key.indexOf(projectId) >= 0
             ) {
-                const val: T | T[] = this._get<T>(key);
+                const val: T | T[] = this._get<T>(key)
                 if (val) {
-                    Array.isArray(val) ? latestElements.push(...val) : latestElements.push(val);
+                    Array.isArray(val) ? latestElements.push(...val) : latestElements.push(val)
                 }
             }
         }
-        return latestElements;
+        return latestElements
     }
 
     /**
@@ -77,29 +77,29 @@ export class CacheService {
      * @returns {Object} the original value
      */
     put<T extends MmsObject | MmsObject[]>(key: string | string[], value: T, merge?: boolean): T {
-        const m = typeof merge === 'undefined' ? false : merge;
-        const realKey = this._makeKey(key);
-        let currentValue: T = this.get<T>(realKey, true);
+        const m = typeof merge === 'undefined' ? false : merge
+        const realKey = this._makeKey(key)
+        let currentValue: T = this.get<T>(realKey, true)
         if (currentValue && m) {
             _.mergeWith(currentValue, value, (a: unknown, b: unknown, id: string) => {
                 if ((id === '_contents' || id === 'specification') && b && (b as ElementObject).type === 'Expression') {
-                    return b;
+                    return b
                 }
                 if (Array.isArray(a) && Array.isArray(b) && b.length < a.length) {
-                    a.length = 0;
-                    a.push(...(b as unknown[]));
-                    return a as unknown[];
+                    a.length = 0
+                    a.push(...(b as unknown[]))
+                    return a as unknown[]
                 }
                 if (id === '_displayedElementIds' && b) {
-                    return b;
+                    return b
                 }
-                return undefined;
-            });
+                return undefined
+            })
         } else {
-            this.cache[realKey] = value;
-            currentValue = value;
+            this.cache[realKey] = value
+            currentValue = value
         }
-        return currentValue;
+        return currentValue
     }
 
     /**
@@ -110,12 +110,12 @@ export class CacheService {
      * @param {string | string[]} targetKey
      */
     public link(sourceKey: string | string[], targetKey: string | string[]): void {
-        const realSourceKey: string = this._makeKey(sourceKey);
+        const realSourceKey: string = this._makeKey(sourceKey)
         if (this.cache.hasOwnProperty(realSourceKey) && typeof this.cache[realSourceKey] !== 'string') {
-            delete this.cache[realSourceKey];
+            delete this.cache[realSourceKey]
         }
 
-        this.cache[realSourceKey] = this._makeKey(targetKey);
+        this.cache[realSourceKey] = this._makeKey(targetKey)
     }
 
     /**
@@ -126,21 +126,21 @@ export class CacheService {
      * @returns {Object} value that was removed or undefined
      */
     remove<T>(key: string | string[]): T {
-        let realKey: string;
+        let realKey: string
         if (Array.isArray(key)) {
-            realKey = this._makeKey(key);
+            realKey = this._makeKey(key)
         } else {
-            realKey = key;
+            realKey = key
         }
         if (!this.cache.hasOwnProperty(realKey)) {
-            return null;
+            return null
         }
-        const removed = this.cache[realKey];
-        delete this.cache[realKey];
+        const removed = this.cache[realKey]
+        delete this.cache[realKey]
         if (typeof removed === 'string') {
-            return this.remove(removed);
+            return this.remove(removed)
         }
-        return removed as T;
+        return removed as T
     }
 
     /**
@@ -151,39 +151,39 @@ export class CacheService {
      * @returns {boolean} whether value exists for key
      */
     exists(key: string | string[]): boolean {
-        let realKey = '';
+        let realKey = ''
         if (Array.isArray(key)) {
-            realKey = this._makeKey(key);
+            realKey = this._makeKey(key)
         } else {
-            realKey = key;
+            realKey = key
         }
         if (!this.cache.hasOwnProperty(realKey)) {
-            return false;
+            return false
         }
-        const val = this.cache[realKey];
+        const val = this.cache[realKey]
         if (typeof val === 'object') {
-            return true;
+            return true
         }
         if (typeof val === 'string') {
-            return this.exists(val);
+            return this.exists(val)
         }
-        return false;
+        return false
     }
 
     private _makeKey(keys: string | string[]): string {
         if (Array.isArray(keys)) {
-            return keys.join('|');
+            return keys.join('|')
         } else {
-            return keys;
+            return keys
         }
     }
 
     reset = (): void => {
-        const keys = Object.keys(this.cache);
+        const keys = Object.keys(this.cache)
         for (let i = 0; i < keys.length; i++) {
-            delete this.cache[keys[i]];
+            delete this.cache[keys[i]]
         }
-    };
+    }
 }
 
-veUtils.service('CacheService', CacheService);
+veUtils.service('CacheService', CacheService)

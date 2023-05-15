@@ -1,13 +1,13 @@
-import { StateService } from '@uirouter/angularjs';
-import { IComponentController } from 'angular';
-import Rx from 'rx-lite';
+import { StateService } from '@uirouter/angularjs'
+import { IComponentController } from 'angular'
+import Rx from 'rx-lite'
 
-import { RootScopeService, ShortUrlService } from '@ve-utils/application';
+import { RootScopeService, ShortUrlService } from '@ve-utils/application'
 
-import { veApp } from '@ve-app';
+import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular';
-import { ParamsObject } from '@ve-types/mms';
+import { VeComponentOptions } from '@ve-types/angular'
+import { ParamsObject } from '@ve-types/mms'
 
 const ShortUrlComponent: VeComponentOptions = {
     selector: 'shortUrl',
@@ -29,15 +29,15 @@ const ShortUrlComponent: VeComponentOptions = {
         paramsOb: '<',
     },
     controller: class ShortUrlController implements IComponentController {
-        private paramsOb: ParamsObject;
-        public subs: Rx.IDisposable[];
+        private paramsOb: ParamsObject
+        public subs: Rx.IDisposable[]
 
-        decodedUrl: ParamsObject;
-        redirect_noResults: boolean = false;
-        spin: boolean = true;
-        error: string = '';
+        decodedUrl: ParamsObject
+        redirect_noResults: boolean = false
+        spin: boolean = true
+        error: string = ''
 
-        static $inject = ['$state', 'growl', 'ShortUrlService', 'RootScopeService'];
+        static $inject = ['$state', 'growl', 'ShortUrlService', 'RootScopeService']
 
         constructor(
             private $state: StateService,
@@ -47,45 +47,45 @@ const ShortUrlComponent: VeComponentOptions = {
         ) {}
 
         $onInit(): void {
-            this.rootScopeSvc.veTitle('Redirecting... | View Editor'); //what to name this?
+            this.rootScopeSvc.veTitle('Redirecting... | View Editor') //what to name this?
             if (this.paramsOb && this.paramsOb.shortUrl) {
                 this.shortUrlSvc.decodeShortUrl(this.paramsOb.shortUrl).then(
                     (result) => {
-                        this.decodedUrl = result;
+                        this.decodedUrl = result
                         if (this.decodedUrl.viewId) {
-                            void this.$state.go('main.project.ref.view.present', this.decodedUrl);
-                            return;
+                            void this.$state.go('main.project.ref.view.present', this.decodedUrl)
+                            return
                         }
                         if (this.decodedUrl.documentId) {
-                            void this.$state.go('main.project.ref.view.present', this.decodedUrl);
-                            return;
+                            void this.$state.go('main.project.ref.view.present', this.decodedUrl)
+                            return
                         }
                         if (this.decodedUrl.refId) {
-                            void this.$state.go('main.project.ref.portal', this.decodedUrl);
-                            return;
+                            void this.$state.go('main.project.ref.portal', this.decodedUrl)
+                            return
                         }
                         if (this.decodedUrl.projectId) {
-                            void this.$state.go('main.project.refs', this.decodedUrl);
-                            return;
+                            void this.$state.go('main.project.refs', this.decodedUrl)
+                            return
                         }
                     },
                     (reason) => {
-                        this.spin = false;
-                        this.redirect_noResults = true;
-                        this.growl.error(reason.message);
+                        this.spin = false
+                        this.redirect_noResults = true
+                        this.growl.error(reason.message)
                     }
-                );
+                )
             } else {
-                this.spin = false;
-                this.redirect_noResults = true;
-                this.growl.error('No short URL found.');
+                this.spin = false
+                this.redirect_noResults = true
+                this.growl.error('No short URL found.')
             }
         }
 
         public resetSelectPage = (): void => {
-            void this.$state.go('main.login.select');
-        };
+            void this.$state.go('main.login.select')
+        }
     },
-};
+}
 
-veApp.component(ShortUrlComponent.selector, ShortUrlComponent);
+veApp.component(ShortUrlComponent.selector, ShortUrlComponent)

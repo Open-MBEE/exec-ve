@@ -1,20 +1,20 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import { ApiService, DocumentMetadata, URLService } from '@ve-utils/mms-api-client';
+import { ApiService, DocumentMetadata, URLService } from '@ve-utils/mms-api-client'
 
-import { veUtils } from '@ve-utils';
+import { veUtils } from '@ve-utils'
 
-import { VePromise, VeQService } from '@ve-types/angular';
-import { ElementObject, ViewObject } from '@ve-types/mms';
-import { TreeBranch } from '@ve-types/tree';
+import { VePromise, VeQService } from '@ve-types/angular'
+import { ElementObject, ViewObject } from '@ve-types/mms'
+import { TreeBranch } from '@ve-types/tree'
 
 export interface TOCHtmlObject {
-    equations: string;
-    tables: string;
-    figures: string;
-    tableCount: number;
-    equationCount: number;
-    figureCount: number;
+    equations: string
+    tables: string
+    figures: string
+    tableCount: number
+    equationCount: number
+    figureCount: number
 }
 
 /**
@@ -27,7 +27,7 @@ export interface TOCHtmlObject {
  * * Utilities
  */
 export class UtilsService {
-    static $inject = ['$q', '$http', 'URLService', 'ApiService'];
+    static $inject = ['$q', '$http', 'URLService', 'ApiService']
 
     constructor(
         private $q: VeQService,
@@ -44,11 +44,11 @@ export class UtilsService {
      * @returns {string} toc string
      */
     public makeHtmlTOC = (rootBranch: TreeBranch): string => {
-        let result = '<div class="toc"><h1 class="header">Table of Contents</h1>';
-        result += this.makeHtmlTOCChild(rootBranch, true);
-        result += '</div>';
-        return result;
-    };
+        let result = '<div class="toc"><h1 class="header">Table of Contents</h1>'
+        result += this.makeHtmlTOCChild(rootBranch, true)
+        result += '</div>'
+        return result
+    }
 
     /**
      * @name veUtils/UtilsService#makeHtmlTOCChild
@@ -58,30 +58,30 @@ export class UtilsService {
      * @return {string}
      */
     public makeHtmlTOCChild = (branch: TreeBranch, skip?): string => {
-        let result = '';
+        let result = ''
         if (!skip) {
-            const anchor: string = '<a href=#' + branch.data.id + '>';
-            result += `  <li>${anchor}${branch.data._veNumber} ${branch.data.name}</a>`;
+            const anchor: string = '<a href=#' + branch.data.id + '>'
+            result += `  <li>${anchor}${branch.data._veNumber} ${branch.data.name}</a>`
         }
-        let ulAdded = false;
+        let ulAdded = false
         for (const child of branch.children) {
             if (child.type !== 'view' && child.type !== 'section') {
-                continue;
+                continue
             }
             if (!ulAdded) {
-                result += '<ul>';
-                ulAdded = true;
+                result += '<ul>'
+                ulAdded = true
             }
-            result += this.makeHtmlTOCChild(child);
+            result += this.makeHtmlTOCChild(child)
         }
         if (ulAdded) {
-            result += '</ul>';
+            result += '</ul>'
         }
         if (!skip) {
-            result += '</li>';
+            result += '</li>'
         }
-        return result;
-    };
+        return result
+    }
 
     /**
      * @name veUtils/UtilsService#makeTablesAndFiguresTOC
@@ -108,27 +108,27 @@ export class UtilsService {
             tableCount: 0,
             figureCount: 0,
             equationCount: 0,
-        };
+        }
 
         // If both "Generate List of Tables and Figures" && "Use HTML for List of Tables and Figures " options are checked...
         if (html) {
-            ob = this.generateTOCHtmlOption(ob, rootBranch, printElement);
+            ob = this.generateTOCHtmlOption(ob, rootBranch, printElement)
             // return obHTML;
         } else {
             for (let i = 0; i < rootBranch.children.length; i++) {
-                this.makeTablesAndFiguresTOCChild(rootBranch.children[i], printElement, ob, live, false);
+                this.makeTablesAndFiguresTOCChild(rootBranch.children[i], printElement, ob, live, false)
             }
         }
         ob.tables = ob.tables.length
             ? '<div class="tot"><h1 class="header">List of Tables</h1><ul>' + ob.tables + '</ul></div>'
-            : '';
+            : ''
         ob.figures = ob.figures.length
             ? '<div class="tof"><h1 class="header">List of Figures</h1><ul>' + ob.figures + '</ul></div>'
-            : '';
+            : ''
         ob.equations = ob.equations.length
             ? '<div class="tof"><h1 class="header">List of Equations</h1><ul>' + ob.equations + '</ul></div>'
-            : '';
-        return ob;
+            : ''
+        return ob
     }
 
     /**
@@ -149,153 +149,153 @@ export class UtilsService {
         live: boolean,
         showRefName: boolean
     ): void {
-        const pe = child.data;
-        const sysmlId = pe.id;
-        const veNumber = pe._veNumber;
-        let prefix = '';
-        const el = printElement.find('#' + sysmlId);
+        const pe = child.data
+        const sysmlId = pe.id
+        const veNumber = pe._veNumber
+        let prefix = ''
+        const el = printElement.find('#' + sysmlId)
         const refs = printElement.find(
             'mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]'
-        );
-        let cap = '';
-        let name = '';
+        )
+        let cap = ''
+        let name = ''
         if (child.type === 'table') {
-            ob.tableCount++;
-            prefix = 'Table ' + veNumber + '. ';
-            const capTbl = el.find('table > caption');
-            name = capTbl.text();
+            ob.tableCount++
+            prefix = 'Table ' + veNumber + '. '
+            const capTbl = el.find('table > caption')
+            name = capTbl.text()
             if (name !== '' && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
-                name = name.substring(name.indexOf(prefix) + prefix.length);
+                name = name.substring(name.indexOf(prefix) + prefix.length)
             } else if (name === '') {
-                name = pe.name;
+                name = pe.name
             }
-            cap = veNumber + '. ' + name;
-            ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
-            capTbl.html('Table ' + cap);
+            cap = veNumber + '. ' + name
+            ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>'
+            capTbl.html('Table ' + cap)
             // If caption does not exist, add to html
             if (capTbl.length === 0) {
-                el.find('table').prepend('<caption>Table ' + cap + '</caption>');
+                el.find('table').prepend('<caption>Table ' + cap + '</caption>')
             }
             // Change cap value based on showRefName true/false
             if (!showRefName) {
-                cap = veNumber;
+                cap = veNumber
             }
             if (!live) {
-                refs.find('a').attr('href', '#' + sysmlId);
+                refs.find('a').attr('href', '#' + sysmlId)
             }
             refs.filter('[suppress-numbering!="true"]')
                 .filter(':not([link-text])')
                 .find('a')
-                .html('Table ' + cap);
+                .html('Table ' + cap)
         }
         if (child.type === 'figure') {
-            ob.figureCount++;
-            prefix = 'Figure ' + veNumber + '. ';
-            const capFig = el.find('figure > figcaption');
-            name = capFig.text();
+            ob.figureCount++
+            prefix = 'Figure ' + veNumber + '. '
+            const capFig = el.find('figure > figcaption')
+            name = capFig.text()
             if (name !== '' && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
-                name = name.substring(name.indexOf(prefix) + prefix.length);
+                name = name.substring(name.indexOf(prefix) + prefix.length)
             } else if (name === '') {
-                name = pe.name;
+                name = pe.name
             }
-            cap = veNumber + '. ' + name;
-            ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
-            capFig.html('Figure ' + cap);
+            cap = veNumber + '. ' + name
+            ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>'
+            capFig.html('Figure ' + cap)
             // If caption does not exist, add to html
             if (capFig.length === 0) {
                 el.find('img')
                     .wrap('<figure></figure>')
-                    .after('<figcaption>Figure ' + cap + '</figcaption>');
+                    .after('<figcaption>Figure ' + cap + '</figcaption>')
             }
             // Change cap value based on showRefName true/false
             if (!showRefName) {
-                cap = veNumber;
+                cap = veNumber
             }
             if (!live) {
-                refs.find('a').attr('href', '#' + sysmlId);
+                refs.find('a').attr('href', '#' + sysmlId)
             }
             refs.filter('[suppress-numbering!="true"]')
                 .filter(':not([link-text])')
                 .find('a')
-                .html('Fig. ' + cap);
+                .html('Fig. ' + cap)
         }
         if (child.type === 'equation') {
-            ob.equationCount++;
-            cap = veNumber + '. ' + pe.name;
-            ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
-            const equationCap = '(' + veNumber + ')';
-            const capEq = el.find('.caption-type-equation');
-            capEq.html(equationCap);
+            ob.equationCount++
+            cap = veNumber + '. ' + pe.name
+            ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>'
+            const equationCap = '(' + veNumber + ')'
+            const capEq = el.find('.caption-type-equation')
+            capEq.html(equationCap)
             // If caption does not exist, add to html
             if (capEq.length === 0) {
                 el.find('present-equation > transclude > transclude-doc > p')
                     .last()
-                    .append('<span class="caption-type-equation pull-right">' + equationCap + '</span>');
+                    .append('<span class="caption-type-equation pull-right">' + equationCap + '</span>')
             }
             if (!live) {
-                refs.find('a').attr('href', '#' + sysmlId);
+                refs.find('a').attr('href', '#' + sysmlId)
             }
             refs.filter('[suppress-numbering!="true"]')
                 .filter(':not([link-text])')
                 .find('a')
-                .html('Eq. ' + equationCap);
+                .html('Eq. ' + equationCap)
         }
         for (let i = 0; i < child.children.length; i++) {
-            this.makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName);
+            this.makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName)
         }
     }
 
     public addLiveNumbering(pe: ViewObject, el: JQuery<HTMLElement>, type: string): void {
-        const veNumber = pe._veNumber;
+        const veNumber = pe._veNumber
         if (!veNumber) {
-            return;
+            return
         }
-        let prefix = '';
-        let name = '';
-        let cap = '';
+        let prefix = ''
+        let name = ''
+        let cap = ''
         if (type === 'table') {
-            prefix = 'Table ' + veNumber + '. ';
-            const capTbl = el.find('table > caption');
-            name = capTbl.text();
+            prefix = 'Table ' + veNumber + '. '
+            const capTbl = el.find('table > caption')
+            name = capTbl.text()
             if (name !== '' && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
-                name = name.substring(name.indexOf(prefix) + prefix.length);
+                name = name.substring(name.indexOf(prefix) + prefix.length)
             } else if (name === '') {
-                name = pe.name;
+                name = pe.name
             }
-            cap = veNumber + '. ' + name;
-            capTbl.html('Table ' + cap);
+            cap = veNumber + '. ' + name
+            capTbl.html('Table ' + cap)
             // If caption does not exist, add to html
             if (capTbl.length === 0) {
-                el.find('table').prepend('<caption>Table ' + cap + '</caption>');
+                el.find('table').prepend('<caption>Table ' + cap + '</caption>')
             }
         }
         if (type === 'figure') {
-            prefix = 'Figure ' + veNumber + '. ';
-            const capFig = el.find('figure > figcaption');
-            name = capFig.text();
+            prefix = 'Figure ' + veNumber + '. '
+            const capFig = el.find('figure > figcaption')
+            name = capFig.text()
             if (name !== '' && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
-                name = name.substring(name.indexOf(prefix) + prefix.length);
+                name = name.substring(name.indexOf(prefix) + prefix.length)
             } else if (name === '') {
-                name = pe.name;
+                name = pe.name
             }
-            cap = veNumber + '. ' + name;
-            capFig.html('Figure ' + cap);
+            cap = veNumber + '. ' + name
+            capFig.html('Figure ' + cap)
             // If caption does not exist, add to html
             if (capFig.length === 0) {
                 el.find('img')
                     .wrap('<figure></figure>')
-                    .after('<figcaption>Figure ' + cap + '</figcaption>');
+                    .after('<figcaption>Figure ' + cap + '</figcaption>')
             }
         }
         if (type === 'equation') {
-            const equationCap = '(' + veNumber + ')';
-            const capEq = el.find('.caption-type-equation');
-            capEq.html(equationCap);
+            const equationCap = '(' + veNumber + ')'
+            const capEq = el.find('.caption-type-equation')
+            capEq.html(equationCap)
             // If caption does not exist, add to html
             if (capEq.length === 0) {
                 el.find('present-equation > mms-cf > transclude-doc > p')
                     .last()
-                    .append('<span class="caption-type-equation pull-right">' + equationCap + '</span>');
+                    .append('<span class="caption-type-equation pull-right">' + equationCap + '</span>')
             }
         }
     }
@@ -308,8 +308,8 @@ export class UtilsService {
      * @returns {string} unique ID wit prefix, tbl_ or fig_
      */
     public generateAnchorId = (prefix: string): string => {
-        return `${prefix}${this.apiSvc.createUniqueId()}`;
-    };
+        return `${prefix}${this.apiSvc.createUniqueId()}`
+    }
 
     /**
      * @name veUtils/UtilsService#generateTOCHtmlOption
@@ -327,52 +327,52 @@ export class UtilsService {
     ): TOCHtmlObject {
         // Grab all existing tables and figures inside the center pane, and assign them to tables and figures
         const tables = printElement.find('table'),
-            figures = printElement.find('figure');
+            figures = printElement.find('figure')
         // equations = printElement.find('.math-tex');
         let anchorId = '',
             thisCap = '',
             tblCap: JQuery<HTMLElement>,
             tbl: JQuery<HTMLTableElement>,
-            fig: JQuery<HTMLElement>;
+            fig: JQuery<HTMLElement>
 
-        ob.tableCount = tables.length;
-        ob.figureCount = figures.length;
+        ob.tableCount = tables.length
+        ob.figureCount = figures.length
 
         // Tables
         for (let j = 0; j < tables.length; j++) {
-            tbl = $(tables[j]);
-            tblCap = $('caption', tbl);
+            tbl = $(tables[j])
+            tblCap = $('caption', tbl)
 
             // Set the link from the List of Tables to the actual tables
-            anchorId = this.generateAnchorId('tbl_');
-            tbl.attr('id', anchorId);
+            anchorId = this.generateAnchorId('tbl_')
+            tbl.attr('id', anchorId)
 
             // Append li to the List of Tables
-            thisCap = tblCap && tblCap.text() !== '' ? `${j + 1}. ${tblCap.text()}` : `${j + 1}. `;
-            ob.tables += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>';
+            thisCap = tblCap && tblCap.text() !== '' ? `${j + 1}. ${tblCap.text()}` : `${j + 1}. `
+            ob.tables += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>'
 
             // If no caption exists, add empty caption for numbering
             if (tblCap.length === 0) {
-                tbl.prepend('<caption> </caption>');
+                tbl.prepend('<caption> </caption>')
             }
         }
 
         // Figures
         for (let j = 0; j < figures.length; j++) {
-            fig = $(figures[j]);
-            const figcap = $('figcaption', fig);
+            fig = $(figures[j])
+            const figcap = $('figcaption', fig)
 
             // Set the link from the List of Tables to the actual tables
-            anchorId = this.generateAnchorId('fig_');
-            fig.attr('id', anchorId);
+            anchorId = this.generateAnchorId('fig_')
+            fig.attr('id', anchorId)
 
             // Append li to the List of Figures
-            thisCap = figcap && figcap.text() !== '' ? `${j + 1}. ${figcap.text()}` : `${j + 1}`;
-            ob.figures += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>';
+            thisCap = figcap && figcap.text() !== '' ? `${j + 1}. ${figcap.text()}` : `${j + 1}`
+            ob.figures += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>'
 
             // If no caption exists, add empty caption for numbering
             if (figcap.length === 0) {
-                fig.append('<figcaption>&nbsp;</figcaption>');
+                fig.append('<figcaption>&nbsp;</figcaption>')
             }
         }
 
@@ -391,7 +391,7 @@ export class UtilsService {
         //         eq.append('<caption>&nbsp;</caption>');
         //     }
         // }
-        return ob;
+        return ob
     }
 
     /**
@@ -403,17 +403,17 @@ export class UtilsService {
      */
     public convertViewLinks(printElement: JQuery<HTMLElement>): void {
         printElement.find('mms-view-link').each((index) => {
-            const $this = $(this);
-            let elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
+            const $this = $(this)
+            let elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id')
             if (!elementId) {
-                return;
+                return
             }
-            elementId = elementId.replace(/[^\w\-]/gi, '');
-            const isElementInDoc = printElement.find('#' + elementId);
+            elementId = elementId.replace(/[^\w\-]/gi, '')
+            const isElementInDoc = printElement.find('#' + elementId)
             if (isElementInDoc.length) {
-                $this.find('a').attr('href', '#' + elementId);
+                $this.find('a').attr('href', '#' + elementId)
             }
-        });
+        })
     }
 
     /**
@@ -531,10 +531,10 @@ p, div {widows: 2; orphans: 2;}
 
 /*------------------------------------------------------------------
 8. Signature Box
-`;
+`
         for (let i = 1; i < 10; i++) {
             ret += `.h${i} {bookmark-level: ${i};}
-`;
+`
         }
         if (htmlFlag) {
             ret += `
@@ -543,27 +543,27 @@ figure { counter-increment: figure-counter; }
 figcaption::before {content: "Figure " counter(figure-counter) ". "; }
 table { counter-increment: table-counter; }
 caption::before {content: "Table " counter(table-counter) ". "; }
-`;
+`
         }
         if (meta) {
             Object.keys(meta).forEach((key) => {
                 if (meta[key]) {
-                    let content: string;
+                    let content: string
                     if (meta[key] === 'counter(page)') {
-                        content = meta[key] as string;
+                        content = meta[key] as string
                     } else {
-                        content = `"${(meta[key] as string | number).toString()}"`;
+                        content = `"${(meta[key] as string | number).toString()}"`
                     }
                     ret += `@page {@${key} {font-size: 9px; content: ${content};}}
-`;
+`
                 }
-            });
+            })
         }
         if (landscape) {
-            ret += '@page {size: 11in 8.5in;}';
+            ret += '@page {size: 11in 8.5in;}'
         }
-        return ret;
-    };
+        return ret
+    }
 
     /**
      * @name veUtils/UtilsService#exportHtmlAs
@@ -576,25 +576,25 @@ caption::before {content: "Table " counter(table-counter) ". "; }
     public exportHtmlAs(
         exportType: number,
         data: {
-            htmlString: string;
-            name: string;
-            projectId: string;
-            refId: string;
-            css: string;
+            htmlString: string
+            name: string
+            projectId: string
+            refId: string
+            css: string
         }
     ): VePromise<string, string> {
-        let accept: string;
+        let accept: string
         switch (exportType) {
             case 2:
-                accept = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-                break;
+                accept = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                break
             case 3:
-                accept = 'application/pdf';
-                break;
+                accept = 'application/pdf'
+                break
             default:
-                accept = 'application/pdf';
+                accept = 'application/pdf'
         }
-        const deferred = this.$q.defer<string>();
+        const deferred = this.$q.defer<string>()
         this.$http
             .post(
                 this.uRLSvc.getExportHtmlUrl(),
@@ -609,31 +609,31 @@ caption::before {content: "Table " counter(table-counter) ". "; }
             )
             .then(
                 (data2) => {
-                    const blob = new Blob([data2.data as BlobPart], { type: accept });
-                    const a = window.document.createElement('a');
-                    const url = window.URL.createObjectURL(blob);
-                    a.href = url;
-                    a.download = data.name + (exportType == 2 ? '.docx' : '.pdf');
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    deferred.resolve('ok');
+                    const blob = new Blob([data2.data as BlobPart], { type: accept })
+                    const a = window.document.createElement('a')
+                    const url = window.URL.createObjectURL(blob)
+                    a.href = url
+                    a.download = data.name + (exportType == 2 ? '.docx' : '.pdf')
+                    a.click()
+                    window.URL.revokeObjectURL(url)
+                    deferred.resolve('ok')
                 },
                 (error: angular.IHttpResponse<string>) => {
-                    deferred.reject(this.uRLSvc.handleHttpStatus(error));
+                    deferred.reject(this.uRLSvc.handleHttpStatus(error))
                 }
-            );
-        return deferred.promise;
+            )
+        return deferred.promise
     }
 
     public getElementTypeClass = (element: ElementObject, elementType: string): string => {
-        let elementTypeClass = '';
+        let elementTypeClass = ''
         if (element.type === 'InstanceSpecification') {
-            elementTypeClass = 'pe-type-' + _.kebabCase(elementType);
+            elementTypeClass = 'pe-type-' + _.kebabCase(elementType)
         } else {
-            elementTypeClass = 'item-type-' + _.kebabCase(elementType);
+            elementTypeClass = 'item-type-' + _.kebabCase(elementType)
         }
-        return elementTypeClass;
-    };
+        return elementTypeClass
+    }
 }
 
-veUtils.service('UtilsService', UtilsService);
+veUtils.service('UtilsService', UtilsService)

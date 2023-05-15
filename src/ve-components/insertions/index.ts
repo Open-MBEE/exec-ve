@@ -1,8 +1,8 @@
-export * from './insertion.controller';
+export * from './insertion.controller'
 
-import './services';
+import './services'
 
-export * from './services';
-import './insert-element-modal.component';
+export * from './services'
+import './insert-element-modal.component'
 
-import './components';
+import './components'

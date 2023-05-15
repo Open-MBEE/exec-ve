@@ -9,8 +9,8 @@
     "format": "prettier --write \"**/*.ts\" \"**/*.js\"",
     "lint": "DEBUG=eslint:cli-engine eslint ./src",
     "prebuild": "yarn lint && yarn format",
-    "build": "webpack --config webpack.config.ts --mode=production --bail",
-    "watch": "webpack --config webpack.config.ts --mode=development --watch --progress",
+    "build": "webpack --config webpack.config.js --mode=production --bail",
+    "watch": "webpack --config webpack.config.js --mode=development --watch --progress",
     "test": "yarn prebuild && yarn build"
   },
   "devDependencies": {

@@ -1,22 +1,22 @@
-import { StateService } from '@uirouter/angularjs';
-import angular, { IWindowService } from 'angular';
-import _ from 'lodash';
-import Rx from 'rx-lite';
+import { StateService } from '@uirouter/angularjs'
+import angular, { IWindowService } from 'angular'
+import _ from 'lodash'
+import Rx from 'rx-lite'
 
-import { AppUtilsService } from '@ve-app/main/services';
-import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
-import { InsertRefData } from '@ve-components/insertions/components/insert-ref.component';
-import { ConfirmDeleteModalResolveFn } from '@ve-core/modals';
-import { ApplicationService, RootScopeService } from '@ve-utils/application';
-import { EventService } from '@ve-utils/core';
-import { ProjectService, ElementService } from '@ve-utils/mms-api-client';
+import { AppUtilsService } from '@ve-app/main/services'
+import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
+import { InsertRefData } from '@ve-components/insertions/components/insert-ref.component'
+import { ConfirmDeleteModalResolveFn } from '@ve-core/modals'
+import { ApplicationService, RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ProjectService, ElementService } from '@ve-utils/mms-api-client'
 
-import { veApp } from '@ve-app';
+import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular';
-import { InsertResolveFn } from '@ve-types/components';
-import { ProjectObject, RefObject } from '@ve-types/mms';
-import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { InsertResolveFn } from '@ve-types/components'
+import { ProjectObject, RefObject } from '@ve-types/mms'
+import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 class RefsController {
     static $inject = [
@@ -36,29 +36,29 @@ class RefsController {
         'ApplicationService',
         'RootScopeService',
         'EventService',
-    ];
+    ]
 
-    public subs: Rx.IDisposable[];
+    public subs: Rx.IDisposable[]
 
     //Bindings
-    mmsRefs: RefObject[];
-    mmsProject: ProjectObject;
-    mmsRef: RefObject;
+    mmsRefs: RefObject[]
+    mmsProject: ProjectObject
+    mmsRef: RefObject
 
     //Local
-    public refManageView: boolean;
-    isLoading: boolean;
-    refData;
-    bbApi;
-    buttons;
-    project: ProjectObject;
-    refs: RefObject[];
-    branches: RefObject[];
-    tags: RefObject[];
-    refSelected: RefObject;
-    search;
-    view;
-    htmlTooltip: string;
+    public refManageView: boolean
+    isLoading: boolean
+    refData
+    bbApi
+    buttons
+    project: ProjectObject
+    refs: RefObject[]
+    branches: RefObject[]
+    tags: RefObject[]
+    refSelected: RefObject
+    search
+    view
+    htmlTooltip: string
 
     constructor(
         private $sce: angular.ISCEService,
@@ -80,65 +80,65 @@ class RefsController {
     ) {}
 
     $onInit(): void {
-        this.eventSvc.$init(this);
+        this.eventSvc.$init(this)
 
-        this.contentWindowSvc.toggleLeftPane(true);
-        this.rootScopeSvc.veHideLeft(true);
-        this.rootScopeSvc.veHideRight(true);
-        this.refManageView = true;
-        this.refData = [];
-        this.bbApi = {};
-        this.buttons = [];
-        this.refSelected = this.mmsRef;
-        this.search = null;
-        this.view = null;
+        this.contentWindowSvc.toggleLeftPane(true)
+        this.rootScopeSvc.veHideLeft(true)
+        this.rootScopeSvc.veHideRight(true)
+        this.refManageView = true
+        this.refData = []
+        this.bbApi = {}
+        this.buttons = []
+        this.refSelected = this.mmsRef
+        this.search = null
+        this.view = null
 
-        this.refs = this.mmsRefs;
+        this.refs = this.mmsRefs
         this.branches = this.refs.filter((ref) => {
-            return ref.type === 'Branch';
-        });
+            return ref.type === 'Branch'
+        })
         this.tags = this.refs.filter((ref) => {
-            return ref.type === 'Tag';
-        });
+            return ref.type === 'Tag'
+        })
 
-        this.project = this.mmsProject;
+        this.project = this.mmsProject
 
-        this.htmlTooltip = this.$sce.trustAsHtml('Branch temporarily unavailable during duplication.') as string;
+        this.htmlTooltip = this.$sce.trustAsHtml('Branch temporarily unavailable during duplication.') as string
     }
 
     selectMasterDefault = (): void => {
-        const masterIndex = _.findIndex(this.refs, { name: 'master' });
+        const masterIndex = _.findIndex(this.refs, { name: 'master' })
         if (masterIndex > -1) {
-            this.refSelected = this.refs[masterIndex];
+            this.refSelected = this.refs[masterIndex]
         }
-    };
+    }
 
     addBranch = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation();
-        this.insert('Branch');
-    };
+        e.stopPropagation()
+        this.insert('Branch')
+    }
 
     addTag = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation();
-        this.insert('Tag');
-    };
+        e.stopPropagation()
+        this.insert('Tag')
+    }
 
     deleteRef = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation();
-        this.deleteItem();
-    };
+        e.stopPropagation()
+        this.deleteItem()
+    }
 
     refClickHandler = (ref: RefObject): void => {
         this.projectSvc.getRef(ref.id, this.project.id).then(
             (data) => {
-                this.refSelected = data;
+                this.refSelected = data
             },
             (error) => {
-                this.growl.error('Ref click handler error: ' + error.message);
-                return;
+                this.growl.error('Ref click handler error: ' + error.message)
+                return
             }
-        );
-    };
+        )
+    }
 
     insert = (itemType: string): void => {
         const insertData: InsertRefData = {
@@ -147,126 +147,126 @@ class RefsController {
             parentTitle: '',
             insertType: 'ref',
             lastCommit: true,
-        };
-        const branch = this.refSelected;
+        }
+        const branch = this.refSelected
         // Item specific setup:
         if (itemType === 'Branch') {
             if (!branch) {
-                this.growl.warning('Add Branch Error: Select a branch or tag first');
-                return;
+                this.growl.warning('Add Branch Error: Select a branch or tag first')
+                return
             }
             if (branch.type === 'Tag') {
-                insertData.parentTitle = 'Tag ' + branch.name;
+                insertData.parentTitle = 'Tag ' + branch.name
             } else {
-                insertData.parentTitle = 'Branch ' + branch.name;
+                insertData.parentTitle = 'Branch ' + branch.name
             }
-            insertData.parentRefId = branch.id;
+            insertData.parentRefId = branch.id
         } else if (itemType === 'Tag') {
             if (!branch) {
-                this.growl.warning('Add Tag Error: Select a branch or tag first');
-                return;
+                this.growl.warning('Add Tag Error: Select a branch or tag first')
+                return
             }
-            insertData.parentRefId = branch.id;
+            insertData.parentRefId = branch.id
         } else {
-            this.growl.error('Add Item of Type ' + itemType + ' is not supported');
-            return;
+            this.growl.error('Add Item of Type ' + itemType + ' is not supported')
+            return
         }
         const instance = this.$uibModal.open<InsertResolveFn<InsertRefData>, RefObject>({
             component: 'insertElementModal',
             resolve: {
                 getInsertData: () => {
-                    return insertData;
+                    return insertData
                 },
                 getFilter: () => {
-                    return this.$filter;
+                    return this.$filter
                 },
                 getProjectId: () => {
-                    return this.project.id;
+                    return this.project.id
                 },
                 getRefId: () => {
-                    return null;
+                    return null
                 },
                 getOrgId: () => {
-                    return this.project.orgId;
+                    return this.project.orgId
                 },
                 getSeenViewIds: () => {
-                    return null;
+                    return null
                 },
             },
-        });
+        })
         instance.result.then(
             (data) => {
                 if (data.type === 'Branch') {
-                    this.branches.push(data);
-                    this.refSelected = data;
+                    this.branches.push(data)
+                    this.refSelected = data
                 } else {
-                    this.tags.push(data);
-                    this.refSelected = data;
+                    this.tags.push(data)
+                    this.refSelected = data
                 }
             },
             (reason?) => {
                 if (reason && reason.status !== 444) {
-                    this.growl.error('Ref Creation Error:' + reason.message);
+                    this.growl.error('Ref Creation Error:' + reason.message)
                 } else {
                     this.growl.info('Ref Creation Cancelled', {
                         ttl: 1000,
-                    });
+                    })
                 }
             }
-        );
-    };
+        )
+    }
 
     deleteItem = (): void => {
-        const branch = this.refSelected;
+        const branch = this.refSelected
         if (!branch) {
-            this.growl.warning('Select item to delete.');
-            return;
+            this.growl.warning('Select item to delete.')
+            return
         }
         const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
             component: 'confirmDeleteModal',
             resolve: {
                 getName: () => {
-                    return branch.name;
+                    return branch.name
                 },
                 getType: () => {
                     if (branch.type === 'Tag') {
-                        return 'Tag';
+                        return 'Tag'
                     } else if (branch.type === 'Branch') {
-                        return 'Branch';
+                        return 'Branch'
                     }
                 },
                 finalize: () => {
                     return () => {
-                        return this.projectSvc.deleteRef(branch.id, this.project.id);
-                    };
+                        return this.projectSvc.deleteRef(branch.id, this.project.id)
+                    }
                 },
             },
-        };
-        const instance = this.$uibModal.open<ConfirmDeleteModalResolveFn, void>(settings);
+        }
+        const instance = this.$uibModal.open<ConfirmDeleteModalResolveFn, void>(settings)
         instance.result.then(
             () => {
                 //TODO $state project with no selected ref
-                let index: number;
+                let index: number
                 if (this.refSelected.type === 'Branch') {
-                    index = this.branches.indexOf(this.refSelected);
-                    this.branches.splice(index, 1);
+                    index = this.branches.indexOf(this.refSelected)
+                    this.branches.splice(index, 1)
                 } else if (this.refSelected.type === 'Tag') {
-                    index = this.tags.indexOf(this.refSelected);
-                    this.tags.splice(index, 1);
+                    index = this.tags.indexOf(this.refSelected)
+                    this.tags.splice(index, 1)
                 }
-                this.refSelected = null;
+                this.refSelected = null
             },
             (reason?) => {
                 if (reason) {
-                    this.growl.error('Ref Deletion Error:' + reason.message);
+                    this.growl.error('Ref Deletion Error:' + reason.message)
                 } else {
                     this.growl.info('Ref Deletion Cancelled', {
                         ttl: 1000,
-                    });
+                    })
                 }
             }
-        );
-    };
+        )
+    }
 }
 
 const RefsComponent: VeComponentOptions = {
@@ -353,6 +353,6 @@ const RefsComponent: VeComponentOptions = {
         mmsRefs: '<',
     },
     controller: RefsController,
-};
+}
 
-veApp.component(RefsComponent.selector, RefsComponent);
+veApp.component(RefsComponent.selector, RefsComponent)

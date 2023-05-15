@@ -1,22 +1,22 @@
-import angular from 'angular';
+import angular from 'angular'
 
-import { Presentation, PresentationService, ViewHtmlService } from '@ve-components/presentations';
-import { ComponentService, ExtensionService } from '@ve-components/services';
-import { ButtonBarService } from '@ve-core/button-bar';
-import { ImageService } from '@ve-utils/application';
-import { EventService } from '@ve-utils/core';
-import { SchemaService } from '@ve-utils/model-schema';
+import { Presentation, PresentationService, ViewHtmlService } from '@ve-components/presentations'
+import { ComponentService, ExtensionService } from '@ve-components/services'
+import { ButtonBarService } from '@ve-core/button-bar'
+import { ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { SchemaService } from '@ve-utils/model-schema'
 
-import { veComponents } from '@ve-components';
+import { veComponents } from '@ve-components'
 
-import { VePromise, VeQService } from '@ve-types/angular';
-import { IPresentationComponentOptions } from '@ve-types/components/presentation';
-import { PresentContentObject } from '@ve-types/mms';
+import { VePromise, VeQService } from '@ve-types/angular'
+import { IPresentationComponentOptions } from '@ve-types/components/presentation'
+import { PresentContentObject } from '@ve-types/mms'
 
 export interface PresentPlotObject extends PresentContentObject {
-    ptype?: string;
-    config?: string;
-    [key: string]: unknown;
+    ptype?: string
+    config?: string
+    [key: string]: unknown
 }
 
 const ViewPlotComponent: IPresentationComponentOptions = {
@@ -28,10 +28,10 @@ const ViewPlotComponent: IPresentationComponentOptions = {
         peNumber: '<',
     },
     controller: class ViewPlotController extends Presentation {
-        public plot: PresentPlotObject;
-        public plotConfig: PresentPlotObject;
+        public plot: PresentPlotObject
+        public plotConfig: PresentPlotObject
 
-        static $inject = Presentation.$inject;
+        static $inject = Presentation.$inject
         constructor(
             $q: VeQService,
             $element: JQuery<HTMLElement>,
@@ -61,31 +61,31 @@ const ViewPlotComponent: IPresentationComponentOptions = {
                 imageSvc,
                 buttonBarSvc,
                 extensionSvc
-            );
+            )
         }
 
         config = (): void => {
-            this.plot = this.peObject as PresentPlotObject;
-        };
+            this.plot = this.peObject as PresentPlotObject
+        }
 
         getContent = (): VePromise<string, string> => {
             if (this.plot.type === 'Plot') {
                 if (this.plot.config !== undefined && this.plot.config.trim().length !== 0) {
                     try {
-                        this.plotConfig = JSON.parse(this.plot.config.replace(/'/g, '"')) as PresentPlotObject;
+                        this.plotConfig = JSON.parse(this.plot.config.replace(/'/g, '"')) as PresentPlotObject
                         if (this.plotConfig.ptype !== undefined) {
-                            this.plot.ptype = this.plotConfig.ptype;
+                            this.plot.ptype = this.plotConfig.ptype
                         }
                     } catch (err) {
-                        console.log('error ignored');
+                        console.log('error ignored')
                     }
                 }
                 return this.$q.resolve(
                     `<figure><plot-${this.plot.ptype} plot="plot"></plot-${this.plot.ptype}><figcaption>{{$ctrl.plot.title}}</figcaption></figure>`
-                );
+                )
             }
-        };
+        }
     },
-};
+}
 
-veComponents.component(ViewPlotComponent.selector, ViewPlotComponent);
+veComponents.component(ViewPlotComponent.selector, ViewPlotComponent)

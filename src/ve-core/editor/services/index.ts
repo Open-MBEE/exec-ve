@@ -1,8 +1,8 @@
 //Services
-import './Editor.service';
-import './Mention.service';
-import './EditDialog.service';
+import './Editor.service'
+import './Mention.service'
+import './EditDialog.service'
 
-export * from './Editor.service';
-export * from './Mention.service';
-export * from './EditDialog.service';
+export * from './Editor.service'
+export * from './Mention.service'
+export * from './EditDialog.service'

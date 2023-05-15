@@ -8,23 +8,23 @@ CKEDITOR.editorConfig = function (config) {
     // For complete reference see:
     // https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_config.html
 
-    config.disableNativeSpellChecker = false;
-    config.fullPage = false;
-    config.dialog_noConfirmCancel = true;
+    config.disableNativeSpellChecker = false
+    config.fullPage = false
+    config.dialog_noConfirmCancel = true
     //config.enableContextMenu = false;
     //config.tabSpaces = 4;
     //config.height = 350;
     // config.extraPlugins = 'autosave,iframe,mediaembed,embed,
     config.extraPlugins =
-        'liststyle,colordialog,autosave,autogrow,stylescombo,mathjax,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,mmsdropdown,sourcedialog';
-    config.autoGrow_minHeight = 200;
-    config.autoGrow_maxHeight = 600;
-    config.autoGrow_bottomSpace = 50;
-    config.autoGrow_onStartup = true;
-    config.startupFocus = 'end';
-    config.mathJaxLib = 'mathjax/tex-mml-chtml.js';
-    config.mathJaxVer = 'v3';
-    config.allowedContent = true;
+        'liststyle,colordialog,autosave,autogrow,stylescombo,mathjax,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,mmsdropdown,sourcedialog'
+    config.autoGrow_minHeight = 200
+    config.autoGrow_maxHeight = 600
+    config.autoGrow_bottomSpace = 50
+    config.autoGrow_onStartup = true
+    config.startupFocus = 'end'
+    config.mathJaxLib = 'mathjax/tex-mml-chtml.js'
+    config.mathJaxVer = 'v3'
+    config.allowedContent = true
     config.specialChars = [
         '&euro;',
         '&lsquo;',
@@ -192,23 +192,23 @@ CKEDITOR.editorConfig = function (config) {
         '&Chi;',
         '&Psi;',
         '&Omega;',
-    ];
+    ]
     //config.protectedSource.push( /<i[^>]*><\/i>/g );
 
     // Enhanced Image config
-    config.image2_alignClasses = ['image-left', 'image-center', 'image-right'];
-    config.filebrowserUploadUrl = '/alfresco.php';
-    config.uploadUrl = '/alfresco.php';
+    config.image2_alignClasses = ['image-left', 'image-center', 'image-right']
+    config.filebrowserUploadUrl = '/alfresco.php'
+    config.uploadUrl = '/alfresco.php'
 
     // Remove some buttons provided by the standard plugins, which are
     // not needed in the Standard(s) toolbar.
-    config.removeButtons = 'Underline,Subscript,Superscript,Blockquote';
+    config.removeButtons = 'Underline,Subscript,Superscript,Blockquote'
 
     // Set the most common block elements.
-    config.format_tags = 'p;h1;h2;h3;pre';
+    config.format_tags = 'p;h1;h2;h3;pre'
 
     // Simplify the dialog windows.
-    config.removeDialogTabs = 'image:advanced;link:advanced';
+    config.removeDialogTabs = 'image:advanced;link:advanced'
 
     config.stylesSet = [
         { name: 'Paragraph', element: 'p' },
@@ -220,5 +220,5 @@ CKEDITOR.editorConfig = function (config) {
         { name: 'Heading 6', element: 'h6' },
         { name: 'Preformatted Text', element: 'pre' },
         { name: 'Computer Code', element: 'code' },
-    ];
-};
+    ]
+}

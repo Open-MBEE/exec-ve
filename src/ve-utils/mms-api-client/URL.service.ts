@@ -1,7 +1,7 @@
-import { veUtils } from '@ve-utils';
+import { veUtils } from '@ve-utils'
 
-import { VePromiseReason } from '@ve-types/angular';
-import { VeConfig } from '@ve-types/config';
+import { VePromiseReason } from '@ve-types/angular'
+import { VeConfig } from '@ve-types/config'
 import {
     ArtifactsRequest,
     BasicResponse,
@@ -10,7 +10,7 @@ import {
     QueryParams,
     RequestObject,
     ViewsRequest,
-} from '@ve-types/mms';
+} from '@ve-types/mms'
 
 /**
  * @ngdoc service
@@ -33,63 +33,63 @@ import {
  *  actually getting the resources from a different server, solution TBD)
  */
 export class URLService {
-    readonly root: string;
-    readonly url: URL;
-    private token: string;
-    private veConfig: VeConfig = window.__env;
+    readonly root: string
+    readonly url: URL
+    private token: string
+    private veConfig: VeConfig = window.__env
 
-    static $inject = [];
+    static $inject = []
 
     constructor(readonly basePath?: string, readonly apiUrl?: string) {
         if (!this.apiUrl) {
-            this.apiUrl = this.veConfig.apiUrl;
+            this.apiUrl = this.veConfig.apiUrl
         }
         if (!this.apiUrl) {
-            throw new Error('Unable to find "apiUrl" configuration for MMS. Please check your configuration file.');
+            throw new Error('Unable to find "apiUrl" configuration for MMS. Please check your configuration file.')
         }
-        this.url = new URL(this.apiUrl);
-        this.url.pathname = this.veConfig.basePath ? this.veConfig.basePath : '/';
+        this.url = new URL(this.apiUrl)
+        this.url.pathname = this.veConfig.basePath ? this.veConfig.basePath : '/'
 
-        this.root = `${this.apiUrl}${this.basePath ? this.basePath : ''}`;
-        const token = localStorage.getItem('token');
-        this.token = `${token}`;
+        this.root = `${this.apiUrl}${this.basePath ? this.basePath : ''}`
+        const token = localStorage.getItem('token')
+        this.token = `${token}`
     }
 
     getRoot = (): string => {
-        return this.root;
-    };
+        return this.root
+    }
 
     getUrl = (): URL => {
-        return Object.assign({}, this.url);
-    };
+        return Object.assign({}, this.url)
+    }
 
     setToken = (t: string): void => {
-        this.token = t;
-    };
+        this.token = t
+    }
 
     getAuthorizationHeaderValue = (): string => {
-        return 'Bearer ' + this.token;
-    };
+        return 'Bearer ' + this.token
+    }
 
     getAuthorizationHeader = (headers: angular.HttpHeaderType): angular.HttpHeaderType => {
         if (!this.token) {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token')
             if (!token) {
-                return headers;
+                return headers
             } else {
-                this.setToken(token);
+                this.setToken(token)
             }
         }
         if (!headers) {
-            headers = this.getHeaders();
+            headers = this.getHeaders()
         }
-        headers.Authorization = this.getAuthorizationHeaderValue();
-        return headers;
-    };
+        headers.Authorization = this.getAuthorizationHeaderValue()
+        return headers
+    }
 
     getMmsServer = (): string => {
-        return this.apiUrl;
-    };
+        return this.apiUrl
+    }
 
     /**
      * @name veUtils/URLService#setHeader
@@ -101,7 +101,7 @@ export class URLService {
         return {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + this.token,
-        };
+        }
     }
 
     /**
@@ -112,10 +112,10 @@ export class URLService {
      * @returns {boolean} Returns true if the string has '-' in it
      */
     isTimestamp = (version?: string): boolean => {
-        if (!version) return false;
-        else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim())) return true;
-        return false;
-    };
+        if (!version) return false
+        else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim())) return true
+        return false
+    }
 
     /**
      * @name veUtils/URLService#getMmsVersionURL
@@ -124,8 +124,8 @@ export class URLService {
      * @returns {object} Returns object with mmsversion
      */
     getMmsVersionURL = (): string => {
-        return `${this.root}/mmsversion`;
-    };
+        return `${this.root}/mmsversion`
+    }
 
     /**
      * @name veUtils/URLService#getSiteDashboardURL
@@ -135,8 +135,8 @@ export class URLService {
      * @returns {string} The path for site dashboard.
      */
     getSiteDashboardURL = (site: string): string => {
-        return `${this.root}/orgs/${site}/projects/${site}/branches/master/elements`;
-    };
+        return `${this.root}/orgs/${site}/projects/${site}/branches/master/elements`
+    }
 
     /**
      * @name veUtils/URLService#getExportHtmlUrl
@@ -146,67 +146,67 @@ export class URLService {
      * @returns {string} The url
      */
     getExportHtmlUrl = (): string => {
-        return this.veConfig.printUrl;
-    };
+        return this.veConfig.printUrl
+    }
 
     getAuthenticationUrl = (): string => {
-        return `${this.root}/authentication`;
-    };
+        return `${this.root}/authentication`
+    }
 
     getPermissionsLookupURL = (): string => {
-        return `${this.root}/permissions`;
-    };
+        return `${this.root}/permissions`
+    }
 
     getOrgURL = (orgId: string): string => {
-        return `${this.root}/orgs/${orgId}`;
-    };
+        return `${this.root}/orgs/${orgId}`
+    }
 
     getOrgsURL = (): string => {
-        return `${this.root}/orgs`;
-    };
+        return `${this.root}/orgs`
+    }
 
     getProjectsURL = (orgId?: string): string => {
-        if (orgId) return `${this.root}/projects?orgId=${orgId}`;
-        return `${this.root}/projects`;
-    };
+        if (orgId) return `${this.root}/projects?orgId=${orgId}`
+        return `${this.root}/projects`
+    }
 
     getProjectURL = (projectId: string): string => {
-        return `${this.root}/projects/${projectId}`;
-    };
+        return `${this.root}/projects/${projectId}`
+    }
 
     getProjectMountsURL = (projectId: string, refId: string): string => {
-        return `${this.root}/projects/${projectId}/refs/${refId}/mounts`;
-    };
+        return `${this.root}/projects/${projectId}/refs/${refId}/mounts`
+    }
 
     getRefsURL = (projectId: string): string => {
-        return `${this.root}/projects/${projectId}/refs`;
-    };
+        return `${this.root}/projects/${projectId}/refs`
+    }
 
     getRefURL = (projectId: string, refId: string): string => {
-        return `${this.root}/projects/${projectId}/refs/${refId}`;
-    };
+        return `${this.root}/projects/${projectId}/refs/${refId}`
+    }
 
     getCommitsURL = (projectId: string, refId: string, timestamp?: string, limit?: number): string => {
-        let r = `${this.root}/projects/${projectId}/refs/${refId}/commits`;
+        let r = `${this.root}/projects/${projectId}/refs/${refId}/commits`
         if (timestamp && this.isTimestamp(timestamp)) {
-            r = this._addUrlParam({ maxTimestamp: timestamp }, r);
+            r = this._addUrlParam({ maxTimestamp: timestamp }, r)
             if (!limit) {
-                limit = 1;
+                limit = 1
             }
         }
         if (limit) {
-            r = this._addUrlParam({ limit: limit }, r);
+            r = this._addUrlParam({ limit: limit }, r)
         }
-        return r;
-    };
+        return r
+    }
 
     getCommitUrl = (projectId: string, refId: string, commitId: string): string => {
-        return `${this.root}/projects/${projectId}/refs/${refId}/commits/${commitId}`;
-    };
+        return `${this.root}/projects/${projectId}/refs/${refId}/commits/${commitId}`
+    }
 
     getGroupsURL = (projectId: string, refId: string): string => {
-        return `${this.root}/projects/${projectId}/refs/${refId}/groups`;
-    };
+        return `${this.root}/projects/${projectId}/refs/${refId}/groups`
+    }
 
     /**
      * @name veUtils/URLService#getProjectDocumentsURL
@@ -216,9 +216,9 @@ export class URLService {
      * @returns {string} The url
      */
     getProjectDocumentsURL = (reqOb: RequestObject): string => {
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/documents`;
-        return this.addVersion(r, reqOb.commitId);
-    };
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/documents`
+        return this.addVersion(r, reqOb.commitId)
+    }
 
     /**
      * @name veUtils/URLService#getImageURL
@@ -228,8 +228,8 @@ export class URLService {
      * @returns {string} The path for image url queries.
      */
     getImageURL(reqOb: ElementsRequest<string>): string {
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`;
-        return this.addVersion(r, reqOb.commitId);
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`
+        return this.addVersion(r, reqOb.commitId)
     }
 
     /**
@@ -240,8 +240,8 @@ export class URLService {
      * @returns {string} The url.
      */
     getElementURL(reqOb: ElementsRequest<string>): string {
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views/${reqOb.elementId}`;
-        return this.addVersion(r, reqOb.commitId);
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views/${reqOb.elementId}`
+        return this.addVersion(r, reqOb.commitId)
     }
 
     // getViewDataIdsURL (reqOb: RequestObject): string {
@@ -270,16 +270,16 @@ export class URLService {
     // }
 
     getOwnedElementURL(reqOb: ElementsRequest<string>): string {
-        let recurseString = 'recurse=true';
-        if (reqOb.depth) recurseString = `depth=${reqOb.depth}`;
-        let r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`;
-        r = this.addVersion(r, reqOb.commitId);
+        let recurseString = 'recurse=true'
+        if (reqOb.depth) recurseString = `depth=${reqOb.depth}`
+        let r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`
+        r = this.addVersion(r, reqOb.commitId)
         if (r.indexOf('?') > 0) {
-            r += '&' + recurseString;
+            r += '&' + recurseString
         } else {
-            r += '?' + recurseString;
+            r += '?' + recurseString
         }
-        return r;
+        return r
     }
 
     /**
@@ -290,7 +290,7 @@ export class URLService {
      * @returns {string} The url.
      */
     getElementHistoryURL(reqOb: ElementsRequest<string>): string {
-        return `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/commits`;
+        return `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/commits`
     }
 
     /**
@@ -303,8 +303,8 @@ export class URLService {
         return this.addChildViews(
             `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views`,
             reqOb.returnChildViews
-        );
-    };
+        )
+    }
 
     /**
      * @name veUtils/URLService#getPostElementsURL
@@ -314,8 +314,8 @@ export class URLService {
      * @returns {string} The post elements url.
      */
     getPostElementsURL = (reqOb: RequestObject): string => {
-        return `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements`;
-    };
+        return `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements`
+    }
 
     /**
      * @name veUtils/URLService#getPutElementsURL
@@ -325,9 +325,9 @@ export class URLService {
      * @returns {string} The post elements url.
      */
     getPutElementsURL = (reqOb: RequestObject): string => {
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views`;
-        return this.addVersion(r, reqOb.commitId);
-    };
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views`
+        return this.addVersion(r, reqOb.commitId)
+    }
 
     /**
      * @name veUtils/URLService#getElementSearchURL
@@ -338,18 +338,18 @@ export class URLService {
      * @returns {string} The post elements url.
      */
     getElementSearchURL = (reqOb: RequestObject, queryParams?: QueryParams): string => {
-        let r: string;
-        let urlParams = '';
+        let r: string
+        let urlParams = ''
         if (queryParams) {
-            urlParams = this._addUrlParam(queryParams);
+            urlParams = this._addUrlParam(queryParams)
         }
         if (urlParams !== '') {
-            r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/search${urlParams}`;
+            r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/search${urlParams}`
         } else {
-            r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/search`;
+            r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/search`
         }
-        return r;
-    };
+        return r
+    }
 
     /**
      * @ngdocs method
@@ -362,9 +362,9 @@ export class URLService {
      */
     getArtifactURL(reqOb: ElementsRequest<string> | ArtifactsRequest<string>, artifactExtension?: string): string {
         const ext =
-            artifactExtension !== undefined ? artifactExtension : (reqOb as ArtifactsRequest<string>).artifactExtension;
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`;
-        return this.addToken(this.addVersion(r, reqOb.commitId));
+            artifactExtension !== undefined ? artifactExtension : (reqOb as ArtifactsRequest<string>).artifactExtension
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`
+        return this.addToken(this.addVersion(r, reqOb.commitId))
     }
 
     /**
@@ -377,9 +377,9 @@ export class URLService {
      * @returns {string} url
      */
     getArtifactEmbedURL(reqOb: ArtifactsRequest<string>, artifactExtension: string): string {
-        const ext = artifactExtension !== undefined ? artifactExtension : 'undefined';
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`;
-        return this.addVersion(r, reqOb.commitId);
+        const ext = artifactExtension !== undefined ? artifactExtension : 'undefined'
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`
+        return this.addVersion(r, reqOb.commitId)
     }
 
     /**
@@ -391,8 +391,8 @@ export class URLService {
      * @returns {string} url
      */
     getPutArtifactsURL(reqOb: ElementsRequest<string>): string {
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`;
-        return this.addVersion(r, reqOb.commitId);
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`
+        return this.addVersion(r, reqOb.commitId)
     }
 
     /**
@@ -404,16 +404,16 @@ export class URLService {
      * @returns {string} url
      */
     getArtifactHistoryURL(reqOb: ElementsRequest<string>): string {
-        return this.getElementHistoryURL(reqOb);
+        return this.getElementHistoryURL(reqOb)
     }
 
     getCheckTokenURL = (): string => {
-        return `${this.root}/checkAuth`; //TODO remove when server returns 404
-    };
+        return `${this.root}/checkAuth` //TODO remove when server returns 404
+    }
 
     getPersonURL = (username: string): string => {
-        return `${this.root}/users?user=${username}`;
-    };
+        return `${this.root}/users?user=${username}`
+    }
 
     /**
      * @name veUtils/URLService#handleHttpStatus
@@ -435,22 +435,22 @@ export class URLService {
     handleHttpStatus<T extends MmsObject, U = BasicResponse<T>>(
         response: angular.IHttpResponse<U>
     ): VePromiseReason<U> {
-        const result: VePromiseReason<U> = response;
-        const data: U = result.data;
-        if (result.status === 404) result.message = 'Not Found';
+        const result: VePromiseReason<U> = response
+        const data: U = result.data
+        if (result.status === 404) result.message = 'Not Found'
         else if (result.status === 500) {
             if (typeof data === 'string' && data.indexOf('ENOTFOUND') >= 0)
-                result.message = 'Network Error (Please check network)';
-            else result.message = 'Server Error';
-        } else if (result.status === 401 || result.status === 403) result.message = 'Permission Error';
-        else if (result.status === 409) result.message = 'Conflict';
-        else if (result.status === 400) result.message = 'BadRequestObject';
-        else if (result.status === 410) result.message = 'Deleted';
-        else if (result.status === 408) result.message = 'Timed Out';
+                result.message = 'Network Error (Please check network)'
+            else result.message = 'Server Error'
+        } else if (result.status === 401 || result.status === 403) result.message = 'Permission Error'
+        else if (result.status === 409) result.message = 'Conflict'
+        else if (result.status === 400) result.message = 'BadRequestObject'
+        else if (result.status === 410) result.message = 'Deleted'
+        else if (result.status === 408) result.message = 'Timed Out'
         else if (result.status === 501) {
-            result.message = 'Caching';
-        } else result.message = 'Timed Out (Please check network)';
-        return result;
+            result.message = 'Caching'
+        } else result.message = 'Timed Out (Please check network)'
+        return result
     }
 
     /**
@@ -462,18 +462,18 @@ export class URLService {
      * @returns {string} The url with commitId parameter added.
      */
     private addVersion = (url: string, version: string): string => {
-        const r = url;
+        const r = url
         if (version && version !== 'latest') {
-            return this._addUrlParam({ commitId: version }, url);
+            return this._addUrlParam({ commitId: version }, url)
         }
-        return r;
-    };
+        return r
+    }
 
     private addChildViews = (url: string, add: boolean): string => {
-        const r = url;
-        if (!add) return r;
-        return this._addUrlParam({ childviews: true }, r);
-    };
+        const r = url
+        if (!add) return r
+        return this._addUrlParam({ childviews: true }, r)
+    }
 
     /**
      * @name veUtils/URLService#addToken
@@ -483,31 +483,31 @@ export class URLService {
      * @returns {string} The url with commitId parameter added.
      */
     private addToken = (url: string): string => {
-        return this._addUrlParam({ token: this.token }, url);
-    };
+        return this._addUrlParam({ token: this.token }, url)
+    }
 
     private _addUrlParam(
         paramOb: {
-            [key: string]: string | boolean | number;
+            [key: string]: string | boolean | number
         },
         url?: string
     ): string {
-        let urlParams = '';
+        let urlParams = ''
         if (url) {
-            urlParams = url;
+            urlParams = url
         }
         for (const [key, value] of Object.entries(paramOb)) {
-            let v: string;
-            if (typeof value === 'string') v = value;
-            else v = value.toString();
+            let v: string
+            if (typeof value === 'string') v = value
+            else v = value.toString()
             if (urlParams.indexOf('?') > 0) {
-                urlParams += `&${key}=${v}`;
+                urlParams += `&${key}=${v}`
             } else {
-                urlParams += `?${key}=${v}`;
+                urlParams += `?${key}=${v}`
             }
         }
-        return urlParams;
+        return urlParams
     }
 }
 
-veUtils.service('URLService', URLService);
+veUtils.service('URLService', URLService)
