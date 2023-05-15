@@ -6,10 +6,12 @@
   "main": "main.ts",
   "scripts": {
     "start": "cd dist && serve",
-    "build": "webpack --bail --progress --profile",
     "format": "prettier --write \"**/*.ts\" \"**/*.js\"",
     "lint": "DEBUG=eslint:cli-engine eslint ./src",
-    "prepack": "yarn build && yarn lint && yarn format"
+    "prebuild": "yarn lint && yarn format",
+    "build": "webpack --config webpack.config.js --mode=production --bail",
+    "watch": "webpack --config webpack.config.js --mode=development --watch --progress",
+    "test": "yarn prebuild && yarn build"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

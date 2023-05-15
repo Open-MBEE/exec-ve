@@ -153,7 +153,12 @@ const config = (env: any, argv: ArgV): Configuration => ({
         assetModuleFilename: '[name][ext]',
         publicPath: '',
     },
-    watch: true,
+    watch: process.argv.indexOf('--watch') > -1,
+    watchOptions: {
+        aggregateTimeout: 300,
+        poll: 300,
+        ignored: ['**/node_modules/', '**/ckeditor-dev', '**/src/ve-experimental/index.ts'],
+    },
     resolve: {
         modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
         // Add '.ts' and '.tsx' as a resolvable extension.
@@ -174,11 +179,6 @@ const config = (env: any, argv: ArgV): Configuration => ({
                   onlyModule?: boolean
               }[]
             | { [index: string]: string | false | string[] },
-    },
-    watchOptions: {
-        aggregateTimeout: 300,
-        poll: 300,
-        ignored: ['**/node_modules/', '**/ckeditor-dev', '**/src/ve-experimental/index.ts'],
     },
     plugins: [
         new WatchRunPlugin(),

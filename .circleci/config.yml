@@ -32,4 +32,4 @@ jobs:
             - node_modules
           key: openmbee-ve-{{ checksum "package.json" }}
 
-      - run: VE_ENV=example yarn prepack
+      - run: VE_ENV=example yarn test
