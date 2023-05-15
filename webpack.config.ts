@@ -81,7 +81,7 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                         extPath = path.resolve(sourceDir, ext.path)
                     }
 
-                    fs.appendFile(`${extensionsDir}/index.ts`, `\nimport '${extPath}'`, (err) => {
+                    fs.appendFile(`${extensionsDir}/index.ts`, `\nimport '${extPath}';`, (err) => {
                         if (err) {
                             throw err
                         }
