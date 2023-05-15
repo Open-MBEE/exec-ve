@@ -18,7 +18,8 @@
     "typeRoots": [
       "node_modules/@types",
       "node_modules/type-fest/index.d.ts",
-      "src/lib"
+      "src/lib",
+      "node_modules/flatpickr/dist/typings.d.ts"
     ],
     "rootDir": "src",
     "paths": {
