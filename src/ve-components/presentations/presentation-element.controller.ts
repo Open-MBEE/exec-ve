@@ -1,56 +1,56 @@
-import $ from 'jquery'
+import $ from 'jquery';
 
-import { ViewHtmlService, ViewPresentationElemController, PresentationService } from '@ve-components/presentations'
-import { ViewController } from '@ve-components/presentations/view.component'
-import { ComponentService, ExtensionService } from '@ve-components/services'
-import { ButtonBarService } from '@ve-core/button-bar'
-import { ImageService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ViewHtmlService, ViewPresentationElemController, PresentationService } from '@ve-components/presentations';
+import { ViewController } from '@ve-components/presentations/view.component';
+import { ComponentService, ExtensionService } from '@ve-components/services';
+import { ButtonBarService } from '@ve-core/button-bar';
+import { ImageService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular';
 import {
     ElementObject,
     InstanceSpecObject,
     InstanceValueObject,
     PresentationInstanceObject,
     ViewObject,
-} from '@ve-types/mms'
+} from '@ve-types/mms';
 
 export class PresentationLite {
     //Bindings
-    public peObject: PresentationInstanceObject
-    public instanceSpec: InstanceSpecObject
-    public peNumber: string
+    public peObject: PresentationInstanceObject;
+    public instanceSpec: InstanceSpecObject;
+    public peNumber: string;
 }
 
 export class Presentation extends PresentationLite {
     //Bindings
-    protected mmsProjectId: string
-    protected mmsRefId: string
-    protected mmsCommitId: string
+    protected mmsProjectId: string;
+    protected mmsRefId: string;
+    protected mmsCommitId: string;
 
     //Deps
-    protected mmsViewPresentationElemCtrl: ViewPresentationElemController
-    protected mmsViewCtrl: ViewController
+    protected mmsViewPresentationElemCtrl: ViewPresentationElemController;
+    protected mmsViewCtrl: ViewController;
 
-    subs: Rx.IDisposable[]
+    subs: Rx.IDisposable[];
 
     //Common
     //public element: ElementObject;
-    protected $transcludeEl: JQuery<HTMLElement>
-    public view: ViewObject
-    public projectId: string
-    public refId: string
-    public commitId: string
-    public instanceVal: InstanceValueObject
-    protected presentationElem: PresentationInstanceObject | ElementObject
-    protected isDirectChildOfPresentationElement: boolean
+    protected $transcludeEl: JQuery<HTMLElement>;
+    public view: ViewObject;
+    public projectId: string;
+    public refId: string;
+    public commitId: string;
+    public instanceVal: InstanceValueObject;
+    protected presentationElem: PresentationInstanceObject | ElementObject;
+    protected isDirectChildOfPresentationElement: boolean;
 
-    public number: string
-    public level: number
+    public number: string;
+    public level: number;
 
-    private schema = 'cameo'
+    private schema = 'cameo';
 
     static $inject = [
         '$q',
@@ -66,7 +66,7 @@ export class Presentation extends PresentationLite {
         'ImageService',
         'ButtonBarService',
         'ExtensionService',
-    ]
+    ];
     constructor(
         protected $q: VeQService,
         protected $element: JQuery<HTMLElement>,
@@ -82,36 +82,36 @@ export class Presentation extends PresentationLite {
         protected buttonBarSvc: ButtonBarService,
         protected extensionSvc: ExtensionService
     ) {
-        super()
+        super();
     }
 
     /**
      * @listens element.updated
      */
     $onInit(): void {
-        this.eventSvc.$init(this)
+        this.eventSvc.$init(this);
 
-        this.setNumber()
+        this.setNumber();
 
-        let projectId = this.mmsProjectId
-        let refId = this.mmsRefId
-        let commitId = this.mmsCommitId
+        let projectId = this.mmsProjectId;
+        let refId = this.mmsRefId;
+        let commitId = this.mmsCommitId;
 
         if (this.mmsViewCtrl) {
-            const viewVersion = this.mmsViewCtrl.getElementOrigin()
-            if (!projectId) projectId = viewVersion.projectId
-            if (!refId) refId = viewVersion.refId
-            if (!commitId) commitId = viewVersion.commitId
+            const viewVersion = this.mmsViewCtrl.getElementOrigin();
+            if (!projectId) projectId = viewVersion.projectId;
+            if (!refId) refId = viewVersion.refId;
+            if (!commitId) commitId = viewVersion.commitId;
         }
-        this.projectId = projectId
-        this.refId = refId ? refId : 'master'
-        this.commitId = commitId ? commitId : 'latest'
+        this.projectId = projectId;
+        this.refId = refId ? refId : 'master';
+        this.commitId = commitId ? commitId : 'latest';
 
-        this.config()
+        this.config();
     }
 
     $postLink(): void {
-        this.recompile()
+        this.recompile();
     }
 
     // Presentation Api
@@ -124,7 +124,7 @@ export class Presentation extends PresentationLite {
      */
     protected config = (): void => {
         /* Implement any initialization Logic Here */
-    }
+    };
 
     /**
      * @name Presentation/getContent
@@ -132,8 +132,8 @@ export class Presentation extends PresentationLite {
      * @description Extension API method in which presentation components should return the content they wish to display.
      */
     protected getContent = (): VePromise<string | HTMLElement[], string> => {
-        return this.$q.reject('Not Yet Implemented')
-    }
+        return this.$q.reject('Not Yet Implemented');
+    };
 
     /**
      * @name Presentation/recompile
@@ -143,16 +143,16 @@ export class Presentation extends PresentationLite {
      * This function is automatically triggered by the "element.updated" event.
      */
     protected recompile = (): void => {
-        this.setNumber()
+        this.setNumber();
         this.getContent().then(
             (result) => {
-                this.$element.empty()
-                this.$transcludeEl = $(result)
+                this.$element.empty();
+                this.$transcludeEl = $(result);
                 this.$transcludeEl.find('img').each((index, element) => {
-                    this.imageSvc.fixImgSrc($(element))
-                })
-                this.$element.append(this.$transcludeEl)
-                this.$compile(this.$transcludeEl)(this.$scope)
+                    this.imageSvc.fixImgSrc($(element));
+                });
+                this.$element.append(this.$transcludeEl);
+                this.$compile(this.$transcludeEl)(this.$scope);
             },
             (reason) => {
                 const reqOb = {
@@ -161,23 +161,23 @@ export class Presentation extends PresentationLite {
                     refId: this.refId,
                     commitId: this.commitId,
                     //includeRecentVersionElement: true,
-                }
-                this.$element.empty()
+                };
+                this.$element.empty();
                 //TODO: Add reason/errorMessage handling here.
                 this.$transcludeEl = $(
                     '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
-                )
-                this.$element.append(this.$transcludeEl)
+                );
+                this.$element.append(this.$transcludeEl);
                 this.$compile(this.$transcludeEl)(
                     Object.assign(this.$scope.$new(), {
                         elementId: reqOb.elementId,
                         recentElement: reason.recentVersionOfElement,
                         type: 'presentation',
                     })
-                )
+                );
             }
-        )
-    }
+        );
+    };
 
     // Static Helper Functions
     /**
@@ -189,9 +189,9 @@ export class Presentation extends PresentationLite {
      */
     public setNumber = (): void => {
         if (this.peNumber) {
-            if (Number.isInteger(this.peNumber)) this.level = 1
-            else this.level = this.peNumber.split('.').length
-            this.number = this.peNumber
+            if (Number.isInteger(this.peNumber)) this.level = 1;
+            else this.level = this.peNumber.split('.').length;
+            this.number = this.peNumber;
         }
-    }
+    };
 }

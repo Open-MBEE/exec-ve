@@ -5,6 +5,6 @@ const environment = {
         modules: './node_modules/',
     },
     mode: 'local',
-}
+};
 
-export default environment
+export default environment;

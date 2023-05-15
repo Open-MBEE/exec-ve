@@ -42,10 +42,8 @@ CKEDITOR.plugins.add('mmssignature', {
             },
 
             upcast: (element) => {
-                return (
-                    element.name == 'div' && element.hasClass('signature-box')
-                )
+                return element.name == 'div' && element.hasClass('signature-box');
             },
-        })
+        });
     },
-})
+});

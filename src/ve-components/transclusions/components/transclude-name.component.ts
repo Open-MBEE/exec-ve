@@ -1,16 +1,16 @@
-import { ExtensionService, ComponentService } from '@ve-components/services'
-import { SpecTool } from '@ve-components/spec-tools'
-import { ITransclusion, Transclusion } from '@ve-components/transclusions'
-import { ButtonBarService } from '@ve-core/button-bar'
-import { EditorService } from '@ve-core/editor'
-import { MathService, UtilsService, ImageService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ExtensionService, ComponentService } from '@ve-components/services';
+import { SpecTool } from '@ve-components/spec-tools';
+import { ITransclusion, Transclusion } from '@ve-components/transclusions';
+import { ButtonBarService } from '@ve-core/button-bar';
+import { EditorService } from '@ve-core/editor';
+import { MathService, UtilsService, ImageService } from '@ve-utils/application';
+import { EditService, EventService } from '@ve-utils/core';
+import { ElementService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 
 /**
  * @ngdoc component
@@ -54,13 +54,13 @@ export class TranscludeNameController extends Transclusion implements ITransclus
         <span class="input-group-addon" ng-click="$ctrl.cancel($event)"><i class="fa fa-times" title="Cancel"></i></span>
     </form>
 </div>
-`
+`;
 
     //Locals
-    clickHandler: () => void
-    mmsSpecEditorCtrl: SpecTool
+    clickHandler: () => void;
+    mmsSpecEditorCtrl: SpecTool;
 
-    static $inject = Transclusion.$inject
+    static $inject = Transclusion.$inject;
 
     constructor(
         $q: VeQService,
@@ -97,47 +97,47 @@ export class TranscludeNameController extends Transclusion implements ITransclus
             extensionSvc,
             buttonBarSvc,
             imageSvc
-        )
-        this.cfType = 'name'
-        this.cfTitle = ''
-        this.cfKind = 'Text'
-        this.checkCircular = false
+        );
+        this.cfType = 'name';
+        this.cfTitle = '';
+        this.cfKind = 'Text';
+        this.checkCircular = false;
     }
 
     $onInit(): void {
-        super.$onInit()
+        super.$onInit();
         this.$element.on('click', (e) => {
-            if (this.noClick) return
+            if (this.noClick) return;
 
             if (this.clickHandler) {
-                this.clickHandler()
-                return
+                this.clickHandler();
+                return;
             }
-            if (this.startEdit && !this.nonEditable) this.startEdit()
+            if (this.startEdit && !this.nonEditable) this.startEdit();
 
-            if (!this.mmsViewCtrl) return false
+            if (!this.mmsViewCtrl) return false;
 
             if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
-                this.growl.warning('Cross Reference is not editable.')
+                this.growl.warning('Cross Reference is not editable.');
             }
-            this.mmsViewCtrl.transcludeClicked(this.element)
-            e.stopPropagation()
-        })
+            this.mmsViewCtrl.transcludeClicked(this.element);
+            e.stopPropagation();
+        });
     }
 
     public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
-        const deferred = this.$q.defer<string>()
+        const deferred = this.$q.defer<string>();
         const defaultTemplate =
-            '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
+            '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>';
         const editTemplate =
-            '<span ng-if="$ctrl.edit.element.name">{{$ctrl.edit.element.name}}</span><span ng-if="!$ctrl.edit.element.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
+            '<span ng-if="$ctrl.edit.element.name">{{$ctrl.edit.element.name}}</span><span ng-if="!$ctrl.edit.element.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>';
         if (preview) {
-            deferred.resolve('<div class="panel panel-info">' + editTemplate + '</div>')
+            deferred.resolve('<div class="panel panel-info">' + editTemplate + '</div>');
         } else {
-            deferred.resolve(defaultTemplate)
+            deferred.resolve(defaultTemplate);
         }
-        return deferred.promise
-    }
+        return deferred.promise;
+    };
 }
 
 export const TranscludeNameComponent: VeComponentOptions = {
@@ -160,6 +160,6 @@ export const TranscludeNameComponent: VeComponentOptions = {
         mmsSpecEditor: '?^^specEditor',
     },
     controller: TranscludeNameController,
-}
+};
 
-veComponents.component(TranscludeNameComponent.selector, TranscludeNameComponent)
+veComponents.component(TranscludeNameComponent.selector, TranscludeNameComponent);

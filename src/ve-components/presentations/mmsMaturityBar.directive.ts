@@ -1,6 +1,6 @@
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-veComponents.directive('mmsMaturityBar', ['$window', mmsMaturityBar])
+veComponents.directive('mmsMaturityBar', ['$window', mmsMaturityBar]);
 
 /**
  * @ngdoc directive
@@ -12,23 +12,23 @@ veComponents.directive('mmsMaturityBar', ['$window', mmsMaturityBar])
  */
 function mmsMaturityBar($window) {
     const mmsMaturityBarLink = (scope, element, attrs) => {
-        const d3 = $window.d3
+        const d3 = $window.d3;
 
-        const svgContainer = d3.select(element[0]).append('svg').attr('width', 520).attr('height', 70)
-        let colorRect
+        const svgContainer = d3.select(element[0]).append('svg').attr('width', 520).attr('height', 70);
+        let colorRect;
 
         if (scope.state == 'Identified') {
-            colorRect = ['brown', '#B0B0B0', '#B0B0B0', '#B0B0B0', '#B0B0B0']
+            colorRect = ['brown', '#B0B0B0', '#B0B0B0', '#B0B0B0', '#B0B0B0'];
         } else if (scope.state == 'Draft') {
-            colorRect = ['#FF7519', '#FF7519', '#B0B0B0', '#B0B0B0', '#B0B0B0']
+            colorRect = ['#FF7519', '#FF7519', '#B0B0B0', '#B0B0B0', '#B0B0B0'];
         } else if (scope.state == 'Prelim') {
-            colorRect = ['#FFAA00', '#FFAA00', '#FFAA00', '#B0B0B0', '#B0B0B0']
+            colorRect = ['#FFAA00', '#FFAA00', '#FFAA00', '#B0B0B0', '#B0B0B0'];
         } else if (scope.state == 'Baseline') {
-            colorRect = ['#04859E', '#04859E', '#04859E', '#04859E', '#B0B0B0']
+            colorRect = ['#04859E', '#04859E', '#04859E', '#04859E', '#B0B0B0'];
         } else if (scope.state == 'Final') {
-            colorRect = ['#00BD39', '#00BD39', '#00BD39', '#00BD39', '#00BD39']
+            colorRect = ['#00BD39', '#00BD39', '#00BD39', '#00BD39', '#00BD39'];
         } else {
-            colorRect = ['#B0B0B0', '#B0B0B0', '#B0B0B0', '#B0B0B0', '#B0B0B0']
+            colorRect = ['#B0B0B0', '#B0B0B0', '#B0B0B0', '#B0B0B0', '#B0B0B0'];
         }
 
         svgContainer
@@ -39,7 +39,7 @@ function mmsMaturityBar($window) {
             .attr('height', 50)
             .style('fill', colorRect[0])
             .style('stroke', '#fff')
-            .style('stroke-width', 3)
+            .style('stroke-width', 3);
         svgContainer
             .append('text')
             .text('Identified')
@@ -48,7 +48,7 @@ function mmsMaturityBar($window) {
             .attr('dy', '.35em')
             .attr('fill', '#fff')
             .attr('font-family', 'sans-serif')
-            .style('text-anchor', 'middle')
+            .style('text-anchor', 'middle');
         svgContainer
             .append('rect')
             .attr('x', 110)
@@ -57,7 +57,7 @@ function mmsMaturityBar($window) {
             .attr('height', 50)
             .style('fill', colorRect[1])
             .style('stroke', '#fff')
-            .style('stroke-width', 3)
+            .style('stroke-width', 3);
         svgContainer
             .append('text')
             .text('Draft')
@@ -66,7 +66,7 @@ function mmsMaturityBar($window) {
             .attr('dy', '.35em')
             .attr('fill', '#fff')
             .attr('font-family', 'sans-serif')
-            .style('text-anchor', 'middle')
+            .style('text-anchor', 'middle');
         svgContainer
             .append('rect')
             .attr('x', 210)
@@ -75,7 +75,7 @@ function mmsMaturityBar($window) {
             .attr('height', 50)
             .style('fill', colorRect[2])
             .style('stroke', '#fff')
-            .style('stroke-width', 3)
+            .style('stroke-width', 3);
         svgContainer
             .append('text')
             .text('Prelim')
@@ -84,7 +84,7 @@ function mmsMaturityBar($window) {
             .attr('dy', '.35em')
             .attr('fill', '#fff')
             .attr('font-family', 'sans-serif')
-            .style('text-anchor', 'middle')
+            .style('text-anchor', 'middle');
         svgContainer
             .append('rect')
             .attr('x', 310)
@@ -93,7 +93,7 @@ function mmsMaturityBar($window) {
             .attr('height', 50)
             .style('fill', colorRect[3])
             .style('stroke', '#fff')
-            .style('stroke-width', 3)
+            .style('stroke-width', 3);
         svgContainer
             .append('text')
             .text('Baseline')
@@ -102,7 +102,7 @@ function mmsMaturityBar($window) {
             .attr('dy', '.35em')
             .attr('fill', '#fff')
             .attr('font-family', 'sans-serif')
-            .style('text-anchor', 'middle')
+            .style('text-anchor', 'middle');
         svgContainer
             .append('rect')
             .attr('x', 410)
@@ -111,7 +111,7 @@ function mmsMaturityBar($window) {
             .attr('height', 50)
             .style('fill', colorRect[4])
             .style('stroke', '#fff')
-            .style('stroke-width', 3)
+            .style('stroke-width', 3);
         svgContainer
             .append('text')
             .text('Final')
@@ -120,8 +120,8 @@ function mmsMaturityBar($window) {
             .attr('dy', '.35em')
             .attr('fill', '#fff')
             .attr('font-family', 'sans-serif')
-            .style('text-anchor', 'middle')
-    }
+            .style('text-anchor', 'middle');
+    };
 
     return {
         restrict: 'E',
@@ -130,5 +130,5 @@ function mmsMaturityBar($window) {
             state: '@',
         },
         link: mmsMaturityBarLink,
-    }
+    };
 }

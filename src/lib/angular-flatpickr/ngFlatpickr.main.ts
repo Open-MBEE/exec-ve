@@ -1,1 +1,1 @@
-import './ngFlatpickr.module'
+import './ngFlatpickr.module';

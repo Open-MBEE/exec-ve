@@ -1,15 +1,15 @@
-import { StateService, UIRouter } from '@uirouter/angularjs'
+import { StateService, UIRouter } from '@uirouter/angularjs';
 
-import { SelectModalResolveFn } from '@ve-app/main/modals/select-modal.component'
-import { RootScopeService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { AuthService, UserService } from '@ve-utils/mms-api-client'
+import { SelectModalResolveFn } from '@ve-app/main/modals/select-modal.component';
+import { RootScopeService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
+import { AuthService, UserService } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VeComponentOptions } from '@ve-types/angular'
-import { OrgObject, ProjectObject, RefObject, UserObject } from '@ve-types/mms'
-import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular';
+import { OrgObject, ProjectObject, RefObject, UserObject } from '@ve-types/mms';
+import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
 class NavBarController implements angular.IComponentController {
     static $inject = [
@@ -24,32 +24,32 @@ class NavBarController implements angular.IComponentController {
         'UserService',
         'EventService',
         'RootScopeService',
-    ]
+    ];
 
     //bindings
-    public mmsOrg: OrgObject
-    public mmsProject: ProjectObject
-    public mmsProjects: ProjectObject[]
-    public mmsRef: RefObject
-    public mmsOrgs: OrgObject[]
+    public mmsOrg: OrgObject;
+    public mmsProject: ProjectObject;
+    public mmsProjects: ProjectObject[];
+    public mmsRef: RefObject;
+    public mmsOrgs: OrgObject[];
 
     //injectables
-    public subs: Rx.IDisposable[]
+    public subs: Rx.IDisposable[];
 
     //local
-    public isNavCollapsed: boolean
-    public about: string
-    public searchClass: string
-    public username: string
-    public user: UserObject
-    public userBadge: string
+    public isNavCollapsed: boolean;
+    public about: string;
+    public searchClass: string;
+    public username: string;
+    public user: UserObject;
+    public userBadge: string;
 
-    protected showSearch: boolean = true
-    private project: ProjectObject
-    private org: OrgObject
-    private ref: RefObject
-    private projects: ProjectObject[]
-    private orgs: OrgObject[]
+    protected showSearch: boolean = true;
+    private project: ProjectObject;
+    private org: OrgObject;
+    private ref: RefObject;
+    private projects: ProjectObject[];
+    private orgs: OrgObject[];
 
     constructor(
         private $uiRouter: UIRouter,
@@ -64,44 +64,44 @@ class NavBarController implements angular.IComponentController {
         private eventSvc: EventService,
         private rootScopeSvc: RootScopeService
     ) {
-        this.isNavCollapsed = true
+        this.isNavCollapsed = true;
 
-        this.searchClass = ''
+        this.searchClass = '';
     }
 
     $onInit(): void {
-        this.eventSvc.$init(this)
+        this.eventSvc.$init(this);
 
-        this.project = this.mmsProject
-        this.ref = this.mmsRef
-        this.org = this.mmsOrg
+        this.project = this.mmsProject;
+        this.ref = this.mmsRef;
+        this.org = this.mmsOrg;
 
-        this.showSearch = !this.$state.includes('**.search.**')
+        this.showSearch = !this.$state.includes('**.search.**');
 
         void this.authSvc.checkLogin().then(
             (data) => {
-                this.username = data.username
+                this.username = data.username;
                 this.userSvc.getUserData(data.username).then(
                     (userData) => {
-                        this.user = userData
+                        this.user = userData;
                         if (this.user.firstName) {
-                            this.userBadge = this.user.firstName.substring(0, 1).toUpperCase()
-                            this.userBadge += this.user.lastName.substring(0, 1).toUpperCase()
+                            this.userBadge = this.user.firstName.substring(0, 1).toUpperCase();
+                            this.userBadge += this.user.lastName.substring(0, 1).toUpperCase();
                         } else {
                             this.userBadge = this.user.username
                                 ? this.user.username.substring(0, 2).toUpperCase()
-                                : 'VE'
+                                : 'VE';
                         }
                     },
                     () => {
-                        this.userBadge = this.username.substring(0, 1).toUpperCase()
+                        this.userBadge = this.username.substring(0, 1).toUpperCase();
                     }
-                )
+                );
             },
             () => {
-                this.eventSvc.$broadcast('mms.unauthorized')
+                this.eventSvc.$broadcast('mms.unauthorized');
             }
-        )
+        );
     }
 
     updateOrg(): void {
@@ -110,56 +110,56 @@ class NavBarController implements angular.IComponentController {
             windowClass: 've-dropdown-short-modal',
             resolve: {
                 mmsOrgs: () => {
-                    return this.mmsOrgs
+                    return this.mmsOrgs;
                 },
                 mmsOrg: () => {
-                    return this.org
+                    return this.org;
                 },
                 mmsProjects: () => {
-                    return this.mmsProjects
+                    return this.mmsProjects;
                 },
                 mmsProject: () => {
-                    return this.project
+                    return this.project;
                 },
             },
-        }
-        this.$uibModal.open<SelectModalResolveFn, void>(settings)
+        };
+        this.$uibModal.open<SelectModalResolveFn, void>(settings);
     }
 
     toggleHelp(): void {
-        this.hotkeys.toggleCheatSheet()
+        this.hotkeys.toggleCheatSheet();
     }
 
     toggleAbout(): void {
         this.$uibModal.open({
             component: 'aboutModal',
-        })
+        });
     }
 
     logout(): void {
         this.authSvc.logout().then(
             () => {
-                void this.$state.go('main.login')
+                void this.$state.go('main.login');
             },
             () => {
-                this.growl.error('You were not logged out')
+                this.growl.error('You were not logged out');
             }
-        )
+        );
     }
 
     search(searchText: string): void {
         if (this.$state.includes('main.project.ref.view.reorder')) {
-            this.growl.warning('Please finish reorder action first.')
-            return
+            this.growl.warning('Please finish reorder action first.');
+            return;
             // } else if ($state.includes('main.project.diff')) {
             //     growl.warning("Please finish diff action first.");
             //     return;
         } else {
-            this.searchClass = 'fa fa-spin fa-spinner'
+            this.searchClass = 'fa fa-spin fa-spinner';
             void this.$state.go('main.project.ref.search', {
                 keywords: searchText,
                 field: 'name',
-            })
+            });
         }
     }
 }
@@ -245,6 +245,6 @@ const NavBarComponent: VeComponentOptions = {
 </nav>
 `,
     controller: NavBarController,
-}
+};
 
-veApp.component(NavBarComponent.selector, NavBarComponent)
+veApp.component(NavBarComponent.selector, NavBarComponent);

@@ -17,11 +17,11 @@ CKEDITOR.plugins.add('mmscomment', {
             insert: () => {
                 var defaultConfig = {
                     callbackModalFnc: () => {
-                        console.log('There is no callback function defined')
+                        console.log('There is no callback function defined');
                     },
-                }
-                var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmscomment || {}, true)
-                var tag = config.callbackModalFnc(editor)
+                };
+                var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmscomment || {}, true);
+                var tag = config.callbackModalFnc(editor);
             },
             // Check the elements that need to be converted to widgets.
             upcast: (element) => {
@@ -31,8 +31,8 @@ CKEDITOR.plugins.add('mmscomment', {
                     element.name === 'transclude-com' ||
                     element.name === 'mms-transclude-com' ||
                     (element.name === 'mms-cf' && element.attributes['mms-cf-type'] === 'com')
-                )
+                );
             },
-        })
+        });
     },
-})
+});

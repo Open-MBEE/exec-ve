@@ -1,12 +1,12 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { CacheService, EditObject, EditService } from '@ve-utils/core'
-import { ApiService, httpCallback, HttpService, URLService } from '@ve-utils/mms-api-client'
-import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
+import { CacheService, EditObject, EditService } from '@ve-utils/core';
+import { ApiService, httpCallback, HttpService, URLService } from '@ve-utils/mms-api-client';
+import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 
-import { veUtils } from '@ve-utils'
+import { veUtils } from '@ve-utils';
 
-import { VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular';
 import {
     CommitObject,
     CommitResponse,
@@ -21,7 +21,7 @@ import {
     RequestObject,
     SearchResponse,
     TaggedValueObject,
-} from '@ve-types/mms'
+} from '@ve-types/mms';
 
 /**
  * @ngdoc service
@@ -35,7 +35,7 @@ import {
  * * An element CRUD service with additional convenience methods for managing edits.
  */
 export class ElementService extends BaseApiService {
-    static $inject = ['$q', '$http', 'CacheService', 'EditService', 'URLService', 'ApiService', 'HttpService']
+    static $inject = ['$q', '$http', 'CacheService', 'EditService', 'URLService', 'ApiService', 'HttpService'];
 
     constructor(
         private $q: VeQService,
@@ -46,7 +46,7 @@ export class ElementService extends BaseApiService {
         private apiSvc: ApiService,
         private httpSvc: HttpService
     ) {
-        super()
+        super();
     }
 
     /**
@@ -105,71 +105,71 @@ export class ElementService extends BaseApiService {
         refresh?: boolean,
         allowEmpty?: boolean
     ): VePromise<T> {
-        this.apiSvc.normalize(reqOb)
-        const requestCacheKey = this.getRequestKey(reqOb, reqOb.elementId)
+        this.apiSvc.normalize(reqOb);
+        const requestCacheKey = this.getRequestKey(reqOb, reqOb.elementId);
         if (!reqOb.projectId) {
-            console.log('foo')
+            console.log('foo');
         }
-        const url = this.uRLSvc.getElementURL(reqOb)
-        const cached: T = this.cacheSvc.get<T>(requestCacheKey)
+        const url = this.uRLSvc.getElementURL(reqOb);
+        const cached: T = this.cacheSvc.get<T>(requestCacheKey);
         // if it's in the this.inProgress queue get it immediately
         if (this._isInProgress(url)) {
             //change to change priority if it's already in the queue
-            this.httpSvc.ping(url, weight)
-            return this._getInProgress(url) as VePromise<T>
+            this.httpSvc.ping(url, weight);
+            return this._getInProgress(url) as VePromise<T>;
         }
-        const deletedRequestCacheKey = this.getRequestKey(reqOb, reqOb.elementId)
-        deletedRequestCacheKey.push('deleted')
-        const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey)
+        const deletedRequestCacheKey = this.getRequestKey(reqOb, reqOb.elementId);
+        deletedRequestCacheKey.push('deleted');
+        const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey);
         if (deleted && !refresh) {
             return new this.$q<T>((resolve, reject) => {
                 return reject({
                     status: 410,
                     recentVersionOfElement: deleted,
                     message: 'Deleted',
-                })
-            })
+                });
+            });
         }
         if (cached && !refresh) {
             return new this.$q<T>((resolve, reject) => {
-                return resolve(cached)
-            })
+                return resolve(cached);
+            });
         }
         this._addInProgress(
             url,
             new this.$q<T>((resolve, reject) => {
                 const successCallback: httpCallback<ElementsResponse<T>> = (response) => {
-                    const data = response.data
-                    this._removeInProgress(url)
+                    const data = response.data;
+                    this._removeInProgress(url);
                     if (Array.isArray(data.elements) && data.elements.length > 0) {
-                        resolve(this.cacheElement<T>(reqOb, data.elements[0]))
+                        resolve(this.cacheElement<T>(reqOb, data.elements[0]));
                     } else if (allowEmpty) {
-                        resolve(null)
+                        resolve(null);
                     } else {
                         reject({
                             status: 500,
                             message: 'Server Error: empty response',
-                        }) //TODO
+                        }); //TODO
                     }
-                }
+                };
                 const errorCallback: httpCallback<ElementsResponse<T>> = (response) => {
-                    const data = response.data
-                    const reason = this.uRLSvc.handleHttpStatus(response)
-                    this._removeInProgress(url)
+                    const data = response.data;
+                    const reason = this.uRLSvc.handleHttpStatus(response);
+                    this._removeInProgress(url);
                     if (data && data.deleted && data.deleted.length > 0 && data.deleted[0].id === reqOb.elementId) {
-                        reason.recentVersionOfElement = data.deleted[0]
-                        this.cacheDeletedElement(reqOb, data.deleted[0])
+                        reason.recentVersionOfElement = data.deleted[0];
+                        this.cacheDeletedElement(reqOb, data.deleted[0]);
                     }
                     if (allowEmpty && response.status == 404) {
-                        resolve(null)
+                        resolve(null);
                     } else {
-                        reject(reason)
+                        reject(reason);
                     }
-                }
-                this.httpSvc.get<ElementsResponse<T>>(url, successCallback, errorCallback, weight)
+                };
+                this.httpSvc.get<ElementsResponse<T>>(url, successCallback, errorCallback, weight);
             })
-        )
-        return this._getInProgress(url) as VePromise<T>
+        );
+        return this._getInProgress(url) as VePromise<T>;
     }
 
     /**
@@ -190,44 +190,44 @@ export class ElementService extends BaseApiService {
         refresh?: boolean
     ): VePromise<T[], ElementsResponse<T>> {
         return new this.$q<T[], ElementsResponse<T>>((resolve, reject) => {
-            const request: { elements: { id: string }[] } = { elements: [] }
-            const existing: T[] = []
-            this.apiSvc.normalize(reqOb)
+            const request: { elements: { id: string }[] } = { elements: [] };
+            const existing: T[] = [];
+            this.apiSvc.normalize(reqOb);
             for (let i = 0; i < reqOb.elementId.length; i++) {
-                const id = reqOb.elementId[i]
-                const requestCacheKey = this.getRequestKey(reqOb, id)
-                const exist = this.cacheSvc.get<T>(requestCacheKey)
+                const id = reqOb.elementId[i];
+                const requestCacheKey = this.getRequestKey(reqOb, id);
+                const exist = this.cacheSvc.get<T>(requestCacheKey);
                 if (exist && !refresh) {
-                    existing.push(exist)
-                    continue
+                    existing.push(exist);
+                    continue;
                 }
-                request.elements.push({ id: id })
+                request.elements.push({ id: id });
             }
             if (request.elements.length === 0) {
-                resolve(existing)
-                return
+                resolve(existing);
+                return;
             }
             this.$http.put<ElementsResponse<T>>(this.uRLSvc.getPutElementsURL(reqOb), request).then(
                 (response) => {
-                    const data = response.data.elements
-                    let i
+                    const data = response.data.elements;
+                    let i;
                     if (data && data.length > 0) {
                         for (let i = 0; i < data.length; i++) {
-                            existing.push(this.cacheElement<T>(reqOb, data[i]))
+                            existing.push(this.cacheElement<T>(reqOb, data[i]));
                         }
                     }
-                    const deleted = response.data.deleted
+                    const deleted = response.data.deleted;
                     if (deleted && deleted.length > 0) {
                         for (let i = 0; i < deleted.length; i++) {
-                            this.cacheDeletedElement(reqOb, deleted[i])
+                            this.cacheDeletedElement(reqOb, deleted[i]);
                         }
                     }
-                    resolve(existing)
+                    resolve(existing);
                 },
                 (response: angular.IHttpResponse<ElementsResponse<T>>) =>
                     this.apiSvc.handleErrorCallback(response, reject)
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -242,45 +242,45 @@ export class ElementService extends BaseApiService {
      * @returns {object} cached object
      */
     cacheElement<T extends ElementObject>(reqOb: RequestObject, elementOb: T): T {
-        let result: T = this.apiSvc.cleanElement(elementOb)
-        const requestCacheKey = this.getRequestKey(reqOb, result.id)
-        const origResultCommit = result._commitId
+        let result: T = this.apiSvc.cleanElement(elementOb);
+        const requestCacheKey = this.getRequestKey(reqOb, result.id);
+        const origResultCommit = result._commitId;
         if (reqOb.commitId === 'latest') {
-            const resultCommitCopy: T = _.cloneDeep<T>(result)
-            result._commitId = 'latest' //so realCacheKey is right later
-            const commitCacheKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(resultCommitCopy), result.id) //save historic element
-            this.cacheSvc.put(commitCacheKey, resultCommitCopy, true)
+            const resultCommitCopy: T = _.cloneDeep<T>(result);
+            result._commitId = 'latest'; //so realCacheKey is right later
+            const commitCacheKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(resultCommitCopy), result.id); //save historic element
+            this.cacheSvc.put(commitCacheKey, resultCommitCopy, true);
         }
 
-        const realCacheKey = this.getElementKey(result)
-        result._commitId = origResultCommit //restore actual commitId
+        const realCacheKey = this.getElementKey(result);
+        result._commitId = origResultCommit; //restore actual commitId
         if (!_.isEqual(realCacheKey, requestCacheKey)) {
-            this.cacheSvc.link(requestCacheKey, realCacheKey)
+            this.cacheSvc.link(requestCacheKey, realCacheKey);
         }
-        result = this.cacheSvc.put<T>(realCacheKey, result, true)
-        return result
+        result = this.cacheSvc.put<T>(realCacheKey, result, true);
+        return result;
     }
 
     openEdit<T extends ElementObject>(elementOb: T, clean: boolean): EditObject<T> {
-        const result: T = clean ? this.apiSvc.cleanElement(elementOb, true) : elementOb
-        result._commitId = 'latest'
-        const editKey = this.getEditElementKey(elementOb)
+        const result: T = clean ? this.apiSvc.cleanElement(elementOb, true) : elementOb;
+        result._commitId = 'latest';
+        const editKey = this.getEditElementKey(elementOb);
 
-        return this.editSvc.addOrUpdate(editKey, result) as EditObject<T>
+        return this.editSvc.addOrUpdate(editKey, result) as EditObject<T>;
     }
 
     cacheDeletedElement = (reqOb: RequestObject, deletedOb: ElementObject): void => {
-        const requestCacheKey = this.getRequestKey(reqOb, deletedOb.id)
-        requestCacheKey.push('deleted')
+        const requestCacheKey = this.getRequestKey(reqOb, deletedOb.id);
+        requestCacheKey.push('deleted');
         const deletedReqOb: RequestObject = {
             projectId: deletedOb._projectId,
             refId: deletedOb._refId,
             commitId: deletedOb._commitId,
-        }
-        const commitCacheKey = this.apiSvc.makeCacheKey(deletedReqOb, deletedOb.id)
-        this.cacheSvc.link(requestCacheKey, commitCacheKey)
-        this.cacheSvc.put(commitCacheKey, deletedOb, true)
-    }
+        };
+        const commitCacheKey = this.apiSvc.makeCacheKey(deletedReqOb, deletedOb.id);
+        this.cacheSvc.link(requestCacheKey, commitCacheKey);
+        this.cacheSvc.put(commitCacheKey, deletedOb, true);
+    };
 
     /**
      * @name veUtils/ElementService#getElementForEdit
@@ -322,15 +322,15 @@ export class ElementService extends BaseApiService {
         weight?: number,
         overwrite?: boolean
     ): VePromise<EditObject<T>, ElementsResponse<T>> {
-        this.apiSvc.normalize(reqOb)
-        const requestCacheKey = this.getEditKey(reqOb)
-        const url = this.uRLSvc.getElementURL(reqOb) + 'edit'
+        this.apiSvc.normalize(reqOb);
+        const requestCacheKey = this.getEditKey(reqOb);
+        const url = this.uRLSvc.getElementURL(reqOb) + 'edit';
         if (!this._isInProgress(url)) {
-            const openEdit = this.editSvc.get<T>(requestCacheKey)
+            const openEdit = this.editSvc.get<T>(requestCacheKey);
             if (openEdit && !overwrite) {
                 return new this.$q<EditObject<T>, ElementsResponse<T>>((resolve, reject) => {
-                    return resolve(openEdit)
-                })
+                    return resolve(openEdit);
+                });
             }
             this._addInProgress(
                 url,
@@ -338,20 +338,20 @@ export class ElementService extends BaseApiService {
                     this.getElement<T>(reqOb, weight)
                         .then(
                             (result) => {
-                                const copy = this.apiSvc.cleanElement(_.cloneDeep(result), true)
-                                resolve(this.editSvc.addOrUpdate(requestCacheKey, copy, overwrite) as EditObject<T>)
+                                const copy = this.apiSvc.cleanElement(_.cloneDeep(result), true);
+                                resolve(this.editSvc.addOrUpdate(requestCacheKey, copy, overwrite) as EditObject<T>);
                             },
                             (reason) => {
-                                reject(reason)
+                                reject(reason);
                             }
                         )
                         .finally(() => {
-                            this._removeInProgress(url)
-                        })
+                            this._removeInProgress(url);
+                        });
                 })
-            )
+            );
         }
-        return this._getInProgress(url) as VePromise<EditObject<T>, ElementsResponse<T>>
+        return this._getInProgress(url) as VePromise<EditObject<T>, ElementsResponse<T>>;
     }
 
     /**
@@ -370,11 +370,11 @@ export class ElementService extends BaseApiService {
         weight?: number,
         refresh?: boolean
     ): VePromise<ElementObject[], GenericResponse<ElementObject>> {
-        this.apiSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb);
         if (!reqOb.depth) {
-            reqOb.depth = -1
+            reqOb.depth = -1;
         }
-        return this.getGenericElements(this.uRLSvc.getOwnedElementURL(reqOb), reqOb, 'elements', weight, refresh)
+        return this.getGenericElements(this.uRLSvc.getOwnedElementURL(reqOb), reqOb, 'elements', weight, refresh);
     }
 
     /**
@@ -395,17 +395,17 @@ export class ElementService extends BaseApiService {
         weight: number,
         refresh?: boolean
     ): VePromise<T[], GenericResponse<T>> {
-        this.apiSvc.normalize(reqOb)
-        const requestCacheKey = this.getRequestKey(reqOb, jsonKey)
+        this.apiSvc.normalize(reqOb);
+        const requestCacheKey = this.getRequestKey(reqOb, jsonKey);
         if (this._isInProgress(url)) {
-            this.httpSvc.ping(url, weight)
-            return this._getInProgress(url) as VePromise<T[], GenericResponse<T>>
+            this.httpSvc.ping(url, weight);
+            return this._getInProgress(url) as VePromise<T[], GenericResponse<T>>;
         }
-        const cached = this.cacheSvc.get<T[]>(requestCacheKey)
+        const cached = this.cacheSvc.get<T[]>(requestCacheKey);
         if (cached && !refresh) {
             return new this.$q<T[], GenericResponse<T>>((resolve, reject) => {
-                return resolve(cached)
-            })
+                return resolve(cached);
+            });
         }
         this._addInProgress(
             url,
@@ -413,29 +413,29 @@ export class ElementService extends BaseApiService {
                 this.httpSvc.get<GenericResponse<T>>(
                     url,
                     (response) => {
-                        const results: T[] = []
-                        const elements: T[] = response.data[jsonKey]
+                        const results: T[] = [];
+                        const elements: T[] = response.data[jsonKey];
                         for (let i = 0; i < elements.length; i++) {
-                            const element = elements[i]
+                            const element = elements[i];
                             if (!element) {
                                 //check for possible null
-                                continue
+                                continue;
                             }
-                            results.push(this.cacheElement(reqOb, element))
+                            results.push(this.cacheElement(reqOb, element));
                         }
-                        this._removeInProgress(url)
-                        resolve(results)
-                        return
+                        this._removeInProgress(url);
+                        resolve(results);
+                        return;
                     },
                     (response: angular.IHttpResponse<GenericResponse<T>>) => {
-                        this._removeInProgress(url)
-                        reject(this.uRLSvc.handleHttpStatus(response))
+                        this._removeInProgress(url);
+                        reject(this.uRLSvc.handleHttpStatus(response));
                     },
                     weight
-                )
+                );
             })
-        )
-        return this._getInProgress<T, GenericResponse<T>>(url) as VePromise<T[], GenericResponse<T>>
+        );
+        return this._getInProgress<T, GenericResponse<T>>(url) as VePromise<T[], GenericResponse<T>>;
     }
 
     //called by updateElement, fills in all keys for element to be updated
@@ -451,45 +451,45 @@ export class ElementService extends BaseApiService {
         }, 2)
         .then((data) => {
         */
-        const ob = _.cloneDeep(elementOb) //make a copy
-        ob._commitId = 'latest'
-        const editOb = this.editSvc.get(this.getEditElementKey(elementOb))
+        const ob = _.cloneDeep(elementOb); //make a copy
+        ob._commitId = 'latest';
+        const editOb = this.editSvc.get(this.getEditElementKey(elementOb));
         if (editOb && editOb.element) {
             Object.keys(editOb.element).forEach((key) => {
                 if (!elementOb.hasOwnProperty(key)) {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    ob[key] = editOb.element[key]
+                    ob[key] = editOb.element[key];
                 }
-            })
+            });
         }
         if (ob._displayedElementIds) {
-            delete ob._displayedElementIds
+            delete ob._displayedElementIds;
         }
         if (ob._allowedElementIds) {
-            delete ob._allowedElementIds
+            delete ob._allowedElementIds;
         }
         if (ob._childViews && !elementOb._childViews) {
-            delete ob._childViews
+            delete ob._childViews;
         }
         if (ob.type && ob.type.endsWith('TaggedValue') && ob.value && (ob as TaggedValueObject).value.length > 0) {
             // make sure value array only has the value
-            const newvalues = []
+            const newvalues = [];
             for (const val of (ob as TaggedValueObject).value) {
                 if (ob.type === 'ElementTaggedValue') {
-                    newvalues.push(val.elementId)
+                    newvalues.push(val.elementId);
                 } else {
-                    newvalues.push({ value: val.value })
+                    newvalues.push({ value: val.value });
                 }
             }
             if (ob.type === 'ElementTaggedValue') {
-                ob.valueIds = newvalues
-                delete ob.value
+                ob.valueIds = newvalues;
+                delete ob.value;
             } else {
-                ob.value = newvalues
+                ob.value = newvalues;
             }
         }
-        delete ob._commitId
-        return ob
+        delete ob._commitId;
+        return ob;
         /*
             resolve(ob);
         }, () => {
@@ -497,7 +497,7 @@ export class ElementService extends BaseApiService {
         });
         });
         */
-    }
+    };
 
     /**
      * @name veUtils/ElementService#updateElement
@@ -521,12 +521,12 @@ export class ElementService extends BaseApiService {
 
         return new this.$q<T>((resolve, reject) => {
             const handleSuccess = (data: ElementsResponse<T>): void => {
-                let e: T = data.elements[0]
+                let e: T = data.elements[0];
 
                 if (data.elements.length > 1 && elementOb.id) {
                     for (let i = 0; i < data.elements.length; i++) {
                         if (data.elements[i].id === elementOb.id) {
-                            e = data.elements[i]
+                            e = data.elements[i];
                         }
                     }
                 }
@@ -535,33 +535,33 @@ export class ElementService extends BaseApiService {
                     refId: e._refId,
                     commitId: 'latest',
                     elementId: e.id,
-                }
-                const resp: T = this.cacheElement(metaOb, e)
+                };
+                const resp: T = this.cacheElement(metaOb, e);
                 // const editCopy = _.cloneDeep(e)
                 // this.cacheElement(metaOb, editCopy, true)
                 const history = this.cacheSvc.get<CommitObject[]>(
                     this.apiSvc.makeCacheKey(metaOb, metaOb.elementId, false, 'history')
-                )
+                );
                 if (history) {
-                    const id = e._commitId ? e._commitId : 'latest'
+                    const id = e._commitId ? e._commitId : 'latest';
                     history.unshift({
                         _creator: e._modifier,
                         _created: e._modified,
                         id: id,
                         _refId: e._refId,
                         _projectId: e._projectId,
-                    })
+                    });
                 }
-                resolve(resp)
-            }
+                resolve(resp);
+            };
 
             if (!elementOb.hasOwnProperty('id')) {
                 reject({
                     status: 400,
                     message: 'Element id not found, create element first!',
-                })
+                });
             }
-            const postElem = this.fillInElement(elementOb)
+            const postElem = this.fillInElement(elementOb);
             //.then((postElem) => {
             this.$http
                 .post<ElementsResponse<T>>(
@@ -578,32 +578,32 @@ export class ElementService extends BaseApiService {
                 )
                 .then(
                     (response) => {
-                        const rejected = response.data.rejected
+                        const rejected = response.data.rejected;
                         if (rejected && rejected.length > 0 && rejected[0].code === 304 && rejected[0].object) {
                             //elem will be rejected if server detects no changes
-                            resolve(rejected[0].object)
-                            return
+                            resolve(rejected[0].object);
+                            return;
                         }
 
                         if (!Array.isArray(response.data.elements) || response.data.elements.length === 0) {
                             if (allowEmpty) {
-                                resolve(null)
+                                resolve(null);
                             } else {
                                 reject({
                                     status: 500,
                                     message: 'Server Error: empty response',
-                                })
+                                });
                             }
-                            return
+                            return;
                         }
-                        handleSuccess(response.data)
+                        handleSuccess(response.data);
                     },
                     (response: angular.IHttpResponse<ElementsResponse<T>>) => {
                         if (response.status === 409) {
-                            const serverOb = response.data.elements[0]
-                            this.apiSvc.cleanElement(serverOb)
-                            const origCommit = elementOb._commitId
-                            elementOb._commitId = 'latest'
+                            const serverOb = response.data.elements[0];
+                            this.apiSvc.cleanElement(serverOb);
+                            const origCommit = elementOb._commitId;
+                            elementOb._commitId = 'latest';
                             const origOb = this.cacheSvc.get<ElementObject>(
                                 this.apiSvc.makeCacheKey(
                                     {
@@ -613,29 +613,29 @@ export class ElementService extends BaseApiService {
                                     },
                                     elementOb.id
                                 )
-                            )
-                            elementOb._commitId = origCommit
+                            );
+                            elementOb._commitId = origCommit;
                             if (!origOb) {
-                                reject(this.uRLSvc.handleHttpStatus(response))
-                                return
+                                reject(this.uRLSvc.handleHttpStatus(response));
+                                return;
                             }
                             if (!this.apiSvc.hasConflict(postElem, origOb, serverOb)) {
-                                elementOb._modified = serverOb._modified
+                                elementOb._modified = serverOb._modified;
                                 this.updateElement(elementOb, returnChildViews).then(
                                     (good) => {
-                                        resolve(good)
+                                        resolve(good);
                                     },
                                     (reason) => {
-                                        reject(reason)
+                                        reject(reason);
                                     }
-                                )
+                                );
                             } else {
-                                reject(this.uRLSvc.handleHttpStatus(response))
+                                reject(this.uRLSvc.handleHttpStatus(response));
                             }
-                        } else reject(this.uRLSvc.handleHttpStatus(response))
+                        } else reject(this.uRLSvc.handleHttpStatus(response));
                     }
-                )
-        })
+                );
+        });
     }
 
     /**
@@ -655,15 +655,15 @@ export class ElementService extends BaseApiService {
         return new this.$q<T[], VePromisesResponse<T>>((resolve, reject) => {
             if (this._validate(elementObs)) {
                 const postElements = elementObs.map((elementOb) => {
-                    return this.fillInElement(elementOb) as T
-                })
+                    return this.fillInElement(elementOb) as T;
+                });
 
-                const groupOfElements = this._groupElementsByProjectIdAndRefId(postElements)
-                const promises: VePromise<T[], ElementsResponse<T>>[] = []
+                const groupOfElements = this._groupElementsByProjectIdAndRefId(postElements);
+                const promises: VePromise<T[], ElementsResponse<T>>[] = [];
 
                 Object.keys(groupOfElements).forEach((key) => {
-                    promises.push(this._bulkUpdate<T>(groupOfElements[key], returnChildViews))
-                })
+                    promises.push(this._bulkUpdate<T>(groupOfElements[key], returnChildViews));
+                });
 
                 // responses is an array of response corresponding to both successful and failed requests with the following format
                 // [ { state: 'fulfilled', value: the value returned by the server },
@@ -672,27 +672,27 @@ export class ElementService extends BaseApiService {
                 this.$q.allSettled(promises).then((responses) => {
                     // get all the successful requests
                     const successfulRequests = responses.filter((response) => {
-                        return response.state === 'fulfilled'
-                    })
+                        return response.state === 'fulfilled';
+                    });
 
                     const successValues = _.flatten(
                         successfulRequests.map((response) => {
-                            return response.value
+                            return response.value;
                         })
-                    )
+                    );
 
                     if (successfulRequests.length === promises.length) {
                         // All requests succeeded
-                        resolve(successValues)
+                        resolve(successValues);
                     } else {
                         // some requests failed
                         const rejectionReasons: VePromiseReason<ElementsResponse<T>>[] = responses
                             .filter((response) => {
-                                return response.state === 'rejected'
+                                return response.state === 'rejected';
                             })
                             .map((response): unknown => {
-                                return response.reason as VePromiseReason<ElementsResponse<T>>
-                            }) as VePromiseReason<ElementsResponse<T>>[]
+                                return response.reason as VePromiseReason<ElementsResponse<T>>;
+                            }) as VePromiseReason<ElementsResponse<T>>[];
 
                         // since we could have multiple failed requests when having some successful requests,
                         // reject with the following format so that the client can deal with them at a granular level if
@@ -704,18 +704,18 @@ export class ElementService extends BaseApiService {
                                 failedRequests: rejectionReasons,
                                 successfulRequests: successValues,
                             },
-                        })
+                        });
                     }
-                }, reject)
+                }, reject);
             } else {
                 const response: VePromiseReason<VePromisesResponse<T>> = {
                     status: 400,
                     message: 'Some of the elements do not have id, _projectId, _refId',
                     data: {},
-                }
-                reject(response)
+                };
+                reject(response);
             }
-        })
+        });
     }
 
     /**
@@ -728,9 +728,9 @@ export class ElementService extends BaseApiService {
      *      create is successful.
      */
     createElement<T extends ElementObject>(reqOb: ElementCreationRequest<T>): VePromise<T> {
-        this.apiSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb);
         return new this.$q<T>((resolve, reject) => {
-            const url = this.uRLSvc.getPostElementsURL(reqOb)
+            const url = this.uRLSvc.getPostElementsURL(reqOb);
             this.$http
                 .post<ElementsResponse<T>>(url, {
                     elements: reqOb.elements,
@@ -743,23 +743,23 @@ export class ElementService extends BaseApiService {
                                 status: 500,
 
                                 message: 'Server Error: empty response',
-                            })
-                            return
+                            });
+                            return;
                         }
-                        let resp: T = response.data.elements[0]
+                        let resp: T = response.data.elements[0];
                         if (response.data.elements.length > 1 && reqOb.elements[0].id) {
                             for (let i = 0; i < response.data.elements.length; i++) {
                                 if (response.data.elements[i].id === reqOb.elements[0].id) {
-                                    resp = response.data.elements[i]
+                                    resp = response.data.elements[i];
                                 }
                             }
                         }
-                        resolve(this.cacheElement(reqOb, resp))
+                        resolve(this.cacheElement(reqOb, resp));
                     },
                     (response: angular.IHttpResponse<ElementsResponse<T>>) =>
                         this.apiSvc.handleErrorCallback(response, reject)
-                )
-        })
+                );
+        });
     }
 
     /**
@@ -772,9 +772,9 @@ export class ElementService extends BaseApiService {
      *      create is successful.
      */
     createElements<T extends ElementObject>(reqOb: ElementCreationRequest<T>): VePromise<T[], ElementsResponse<T>> {
-        this.apiSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb);
         return new this.$q<T[], ElementsResponse<T>>((resolve, reject) => {
-            const url = this.uRLSvc.getPostElementsURL(reqOb)
+            const url = this.uRLSvc.getPostElementsURL(reqOb);
             this.$http
                 .post<ElementsResponse<T>>(url, {
                     elements: reqOb.elements,
@@ -787,22 +787,22 @@ export class ElementService extends BaseApiService {
                                 status: 500,
 
                                 message: 'Server Error: empty response',
-                            })
-                            return
+                            });
+                            return;
                         }
-                        const results: T[] = []
+                        const results: T[] = [];
                         for (let i = 0; i < response.data.elements.length; i++) {
-                            results.push(this.cacheElement(reqOb, response.data.elements[i]))
+                            results.push(this.cacheElement(reqOb, response.data.elements[i]));
                             // const editCopy = _.cloneDeep(response.data.elements[i])
                             // this.cacheElement(reqOb, editCopy, true)
                         }
-                        resolve(results)
+                        resolve(results);
                     },
                     (response: angular.IHttpResponse<ElementsResponse<T>>) => {
-                        this.apiSvc.handleErrorCallback(response, reject)
+                        this.apiSvc.handleErrorCallback(response, reject);
                     }
-                )
-        })
+                );
+        });
     }
 
     /**
@@ -818,9 +818,9 @@ export class ElementService extends BaseApiService {
         elementOb: T
     ): VePromise<
         {
-            status?: boolean
-            server?: T
-            cache?: T
+            status?: boolean;
+            server?: T;
+            cache?: T;
         },
         ElementsResponse<T>
     > {
@@ -828,46 +828,46 @@ export class ElementService extends BaseApiService {
             projectId: elementOb._projectId,
             refId: elementOb._refId,
             elementId: elementOb.id,
-        }
+        };
         return new this.$q<
             {
-                status?: boolean
-                server?: T
-                cache?: T
+                status?: boolean;
+                server?: T;
+                cache?: T;
             },
             ElementsResponse<T>
         >((resolve, reject) => {
-            const orig = this.cacheSvc.get<T>(this.apiSvc.makeCacheKey(reqOb, elementOb.id, false))
+            const orig = this.cacheSvc.get<T>(this.apiSvc.makeCacheKey(reqOb, elementOb.id, false));
             if (!orig) {
-                return resolve({ status: false })
+                return resolve({ status: false });
             }
             this.$http.get<ElementsResponse<T>>(this.uRLSvc.getElementURL(reqOb)).then(
                 (response) => {
-                    let server = _.cloneDeep(response.data.elements[0])
-                    delete server._modified
-                    delete server._read
-                    delete server._creator
-                    server = this.apiSvc.cleanElement(server)
-                    let current: ElementObject = _.cloneDeep(orig)
-                    delete current._modified
-                    delete current._read
-                    delete current._creator
-                    current = this.apiSvc.cleanElement(current)
+                    let server = _.cloneDeep(response.data.elements[0]);
+                    delete server._modified;
+                    delete server._read;
+                    delete server._creator;
+                    server = this.apiSvc.cleanElement(server);
+                    let current: ElementObject = _.cloneDeep(orig);
+                    delete current._modified;
+                    delete current._read;
+                    delete current._creator;
+                    current = this.apiSvc.cleanElement(current);
                     if (_.isEqual(server, current)) {
-                        resolve({ status: false })
+                        resolve({ status: false });
                     } else {
                         resolve({
                             status: true,
                             server: response.data.elements[0],
                             cache: orig,
-                        })
+                        });
                     }
                 },
                 (response: angular.IHttpResponse<ElementsResponse<T>>) => {
-                    this.apiSvc.handleErrorCallback(response, reject)
+                    this.apiSvc.handleErrorCallback(response, reject);
                 }
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -887,8 +887,8 @@ export class ElementService extends BaseApiService {
         queryParams?: QueryParams,
         weight?
     ): VePromise<SearchResponse<T>, SearchResponse<T>> {
-        this.apiSvc.normalize(reqOb)
-        const url = this.uRLSvc.getElementSearchURL(reqOb, queryParams)
+        this.apiSvc.normalize(reqOb);
+        const url = this.uRLSvc.getElementSearchURL(reqOb, queryParams);
         return new this.$q<SearchResponse<T>, SearchResponse<T>>((resolve, reject) => {
             this.$http.post(url, query).then(
                 (response: angular.IHttpResponse<SearchResponse<T>>) => {
@@ -901,12 +901,12 @@ export class ElementService extends BaseApiService {
                     //    result.push(toAdd);
                     //}
                     //resolve(result);
-                    resolve(response.data)
+                    resolve(response.data);
                 },
                 (response: angular.IHttpResponse<SearchResponse<T>>) =>
                     this.apiSvc.handleErrorCallback(response, reject)
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -923,62 +923,62 @@ export class ElementService extends BaseApiService {
         weight: number,
         update?: boolean
     ): VePromise<CommitObject[], CommitResponse> {
-        this.apiSvc.normalize(reqOb)
-        const url = this.uRLSvc.getElementHistoryURL(reqOb)
+        this.apiSvc.normalize(reqOb);
+        const url = this.uRLSvc.getElementHistoryURL(reqOb);
         if (this._isInProgress(url)) {
-            return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>
+            return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>;
         }
-        const requestCacheKey: string[] = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'history')
+        const requestCacheKey: string[] = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'history');
         if (this.cacheSvc.exists(requestCacheKey) && !update) {
             return new this.$q<CommitObject[], CommitResponse>((resolve, reject) => {
-                return resolve(this.cacheSvc.get(requestCacheKey))
-            })
+                return resolve(this.cacheSvc.get(requestCacheKey));
+            });
         }
         this._addInProgress<CommitObject[], CommitResponse>(
             url,
             new this.$q<CommitObject[], CommitResponse>((resolve, reject) => {
                 this.$http.get(this.uRLSvc.getElementHistoryURL(reqOb)).then(
                     (response: angular.IHttpResponse<CommitResponse>) => {
-                        this.cacheSvc.put<CommitObject[]>(requestCacheKey, response.data.commits, true)
-                        this._removeInProgress(url)
-                        resolve(this.cacheSvc.get<CommitObject[]>(requestCacheKey))
+                        this.cacheSvc.put<CommitObject[]>(requestCacheKey, response.data.commits, true);
+                        this._removeInProgress(url);
+                        resolve(this.cacheSvc.get<CommitObject[]>(requestCacheKey));
                     },
                     (response: angular.IHttpResponse<CommitResponse>) => {
-                        this._removeInProgress(url)
-                        this.apiSvc.handleErrorCallback(response, reject)
+                        this._removeInProgress(url);
+                        this.apiSvc.handleErrorCallback(response, reject);
                     }
-                )
+                );
             })
-        )
-        return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>
+        );
+        return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>;
     }
 
     public getRequestKey(reqOb: RequestObject, id: string, edit?: boolean): string[] {
-        return this.apiSvc.makeCacheKey(reqOb, id, edit)
+        return this.apiSvc.makeCacheKey(reqOb, id, edit);
     }
 
     public getElementRequest(elementOb: ElementObject): ElementsRequest<string> {
-        const req = this.apiSvc.makeRequestObject(elementOb)
-        ;(req as ElementsRequest<string>).elementId = elementOb.id
-        return req as ElementsRequest<string>
+        const req = this.apiSvc.makeRequestObject(elementOb);
+        (req as ElementsRequest<string>).elementId = elementOb.id;
+        return req as ElementsRequest<string>;
     }
 
     public getElementKey(elementOb: ElementObject, edit?: boolean): string[] {
-        return this.getRequestKey(this.getElementRequest(elementOb), elementOb.id, edit)
+        return this.getRequestKey(this.getElementRequest(elementOb), elementOb.id, edit);
     }
 
     public getEditKey(reqOb: ElementsRequest<string>): string[] {
-        const key: string[] = []
+        const key: string[] = [];
         if (reqOb !== null) {
-            if (reqOb.projectId) key.push(reqOb.projectId)
-            if (reqOb.refId !== null) key.push(!reqOb.refId ? 'master' : reqOb.refId)
+            if (reqOb.projectId) key.push(reqOb.projectId);
+            if (reqOb.refId !== null) key.push(!reqOb.refId ? 'master' : reqOb.refId);
         }
-        key.push(reqOb.elementId)
-        return key
+        key.push(reqOb.elementId);
+        return key;
     }
 
     public getEditElementKey(e: ElementObject): string[] {
-        return [e._projectId, e._refId, e.id]
+        return [e._projectId, e._refId, e.id];
     }
 
     public getElementQualifiedName(reqOb: ElementsRequest<string>): VePromise<string, SearchResponse<ElementObject>> {
@@ -991,33 +991,33 @@ export class ElementService extends BaseApiService {
                 recurse: {
                     ownerId: 'id',
                 },
-            }
+            };
             this.search<ElementObject>(reqOb, queryOb).then(
                 (data) => {
-                    let qualifiedName = ''
-                    const elements = data.elements.reverse()
-                    const entries = elements.entries()
+                    let qualifiedName = '';
+                    const elements = data.elements.reverse();
+                    const entries = elements.entries();
                     for (const [i, element] of entries) {
                         if (element.hasOwnProperty('name')) {
-                            qualifiedName += element.name
+                            qualifiedName += element.name;
                         }
                         if (i != elements.length - 1) {
-                            qualifiedName += '/'
+                            qualifiedName += '/';
                         }
                     }
-                    return resolve(qualifiedName)
+                    return resolve(qualifiedName);
                 },
                 (reason) => {
-                    reject(reason)
+                    reject(reason);
                 }
-            )
-        })
+            );
+        });
     }
 
     private _groupElementsByProjectIdAndRefId<T extends ElementObject>(elementObs: T[]): _.Dictionary<T[]> {
         return _.groupBy(elementObs, (element) => {
-            return element._projectId + '|' + element._refId
-        })
+            return element._projectId + '|' + element._refId;
+        });
     }
 
     private _createMetaOb(element: ElementObject): ElementsRequest<string> {
@@ -1026,7 +1026,7 @@ export class ElementService extends BaseApiService {
             refId: element._refId,
             commitId: 'latest',
             elementId: element.id,
-        }
+        };
     }
 
     private _validate(elementObs: ElementObject[]): boolean {
@@ -1035,8 +1035,8 @@ export class ElementService extends BaseApiService {
                 elementOb.hasOwnProperty('id') &&
                 elementOb.hasOwnProperty('_projectId') &&
                 elementOb.hasOwnProperty('_refId')
-            )
-        })
+            );
+        });
     }
 
     private _bulkUpdate<T extends ElementObject, U = ElementsResponse<T>>(
@@ -1053,7 +1053,7 @@ export class ElementService extends BaseApiService {
                 : this.uRLSvc.getPostElementsURL({
                       projectId: elements[0]._projectId,
                       refId: elements[0]._refId,
-                  })
+                  });
             this.$http
                 .post<ElementsResponse<T>>(
                     url,
@@ -1065,32 +1065,32 @@ export class ElementService extends BaseApiService {
                 )
                 .then(
                     (response) => {
-                        this._bulkUpdateSuccessHandler(response, resolve)
+                        this._bulkUpdateSuccessHandler(response, resolve);
                     },
                     (response: angular.IHttpResponse<U>) => {
-                        this.apiSvc.handleErrorCallback(response, reject)
+                        this.apiSvc.handleErrorCallback(response, reject);
                     }
-                )
-        })
+                );
+        });
     }
 
     private _bulkUpdateSuccessHandler<T extends ElementObject>(
         serverResponse: angular.IHttpResponse<ElementsResponse<T>>,
         resolve: angular.IQResolveReject<T[]>
     ): void {
-        const results: T[] = []
-        const elements = serverResponse.data.elements
+        const results: T[] = [];
+        const elements = serverResponse.data.elements;
         if (elements && elements.length > 0) {
             elements.forEach((e) => {
-                const metaOb = this._createMetaOb(e)
+                const metaOb = this._createMetaOb(e);
                 //const editCopy = _.cloneDeep(e)
-                results.push(this.cacheElement(metaOb, e))
+                results.push(this.cacheElement(metaOb, e));
 
                 //this.cacheElement(metaOb, editCopy, true)
 
                 const history = this.cacheSvc.get<CommitObject[]>(
                     this.apiSvc.makeCacheKey(metaOb, metaOb.elementId, false, 'history')
-                )
+                );
                 if (history) {
                     history.unshift({
                         _creator: e._modifier,
@@ -1098,22 +1098,22 @@ export class ElementService extends BaseApiService {
                         id: e._commitId,
                         _refId: e._refId,
                         _projectId: e._projectId,
-                    })
+                    });
                 }
-            })
+            });
         }
-        const rejected: RejectedObject<T>[] = serverResponse.data.rejected
+        const rejected: RejectedObject<T>[] = serverResponse.data.rejected;
         if (rejected && rejected.length > 0) {
             rejected.forEach((e) => {
                 if (e.code === 304 && e.object) {
-                    results.push(e.object) //add any server rejected elements because they haven't changed
-                    console.log(`[BULK UPDATE ELEMENT REJECTED]: ${e.code}: ${e.message}`)
-                    console.log(e.object.id)
+                    results.push(e.object); //add any server rejected elements because they haven't changed
+                    console.log(`[BULK UPDATE ELEMENT REJECTED]: ${e.code}: ${e.message}`);
+                    console.log(e.object.id);
                 }
-            })
+            });
         }
-        resolve(results)
+        resolve(results);
     }
 }
 
-veUtils.service('ElementService', ElementService)
+veUtils.service('ElementService', ElementService);

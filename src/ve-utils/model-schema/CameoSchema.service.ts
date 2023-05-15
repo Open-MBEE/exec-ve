@@ -1,9 +1,9 @@
-import { Schema, SchemaMapping } from '@ve-utils/model-schema/Schema.service'
+import { Schema, SchemaMapping } from '@ve-utils/model-schema/Schema.service';
 
-import { veUtils } from '@ve-utils'
+import { veUtils } from '@ve-utils';
 
 export class CameoSchema implements Schema {
-    jsonName = 'cameo'
+    jsonName = 'cameo';
     schema: SchemaMapping = {
         VIEW_SID: '_11_5EAPbeta_be00301_1147420760998_43940_227',
         OTHER_VIEW_SID: [
@@ -52,7 +52,7 @@ export class CameoSchema implements Schema {
             NumSep: '_18_5_3_8bf0285_1526605817077_688557_15755',
         },
         GROUP_ST_ID: '_18_5_3_8bf0285_1520469040211_2821_15754',
-    }
+    };
     map: SchemaMapping = {
         OPAQUE_CLASSIFIERS: [
             this.schema.TYPE_TO_CLASSIFIER_ID['Image'],
@@ -62,10 +62,10 @@ export class CameoSchema implements Schema {
             this.schema.TYPE_TO_CLASSIFIER_ID['Table'],
             this.schema.TYPE_TO_CLASSIFIER_ID['Figure'],
         ],
-    }
+    };
 }
 
-veUtils.service('CameoSchema', CameoSchema)
+veUtils.service('CameoSchema', CameoSchema);
 
 // TODO: Create Cameo Project Creation Service
 // {

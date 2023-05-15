@@ -1,10 +1,10 @@
-import { IPaneScope } from '@openmbee/pane-layout'
+import { IPaneScope } from '@openmbee/pane-layout';
 
-import { ComponentService } from '@ve-components/services'
-import { veCoreEvents } from '@ve-core/events'
-import { ToolbarService, ToolbarApi } from '@ve-core/toolbar'
-import { ApplicationService } from '@ve-utils/application'
-import { EditObject, EventService } from '@ve-utils/core'
+import { ComponentService } from '@ve-components/services';
+import { veCoreEvents } from '@ve-core/events';
+import { ToolbarService, ToolbarApi } from '@ve-core/toolbar';
+import { ApplicationService } from '@ve-utils/application';
+import { EditObject, EventService } from '@ve-utils/core';
 import {
     ApiService,
     ElementService,
@@ -12,32 +12,32 @@ import {
     ProjectService,
     URLService,
     ViewService,
-} from '@ve-utils/mms-api-client'
+} from '@ve-utils/mms-api-client';
 
-import { SpecApi, SpecService } from './services/Spec.service'
+import { SpecApi, SpecService } from './services/Spec.service';
 
-import { VeQService } from '@ve-types/angular'
-import { ElementObject, RefObject, ValueObject, ViewObject } from '@ve-types/mms'
+import { VeQService } from '@ve-types/angular';
+import { ElementObject, RefObject, ValueObject, ViewObject } from '@ve-types/mms';
 
 export interface ISpecTool extends angular.IComponentController {
-    $scope: ISpecToolScope
-    commitId: string
-    specType: string
-    edit: EditObject
-    element: ElementObject
-    isEditing: boolean
-    inPreviewMode: boolean
-    skipBroadcast: boolean
-    editValues?: ValueObject[]
-    values?: ValueObject[]
+    $scope: ISpecToolScope;
+    commitId: string;
+    specType: string;
+    edit: EditObject;
+    element: ElementObject;
+    isEditing: boolean;
+    inPreviewMode: boolean;
+    skipBroadcast: boolean;
+    editValues?: ValueObject[];
+    values?: ValueObject[];
     //Functions
-    addValue?(type: string): void
-    removeVal?(i: number): void
+    addValue?(type: string): void;
+    removeVal?(i: number): void;
 }
 
 export interface ISpecToolScope extends IPaneScope {
-    $ctrl?: ISpecTool
-    $parent: ISpecToolScope
+    $ctrl?: ISpecTool;
+    $parent: ISpecToolScope;
 }
 
 /**
@@ -76,40 +76,40 @@ export interface ISpecToolScope extends IPaneScope {
  */
 export class SpecTool implements ISpecTool {
     //Bindings
-    protected toolbarId: string
+    protected toolbarId: string;
 
-    public specApi: SpecApi
+    public specApi: SpecApi;
 
     //Customizers
-    public specType: string
-    public specTitle: string
+    public specType: string;
+    public specTitle: string;
 
-    public subs: Rx.IDisposable[]
+    public subs: Rx.IDisposable[];
 
-    public commitId: string
-    protected projectId: string
-    protected refId: string
+    public commitId: string;
+    protected projectId: string;
+    protected refId: string;
 
-    public isEditing: boolean
-    public isEnumeration: boolean
-    public inPreviewMode: boolean
-    public elementSaving: boolean
-    public skipBroadcast: boolean
+    public isEditing: boolean;
+    public isEnumeration: boolean;
+    public inPreviewMode: boolean;
+    public elementSaving: boolean;
+    public skipBroadcast: boolean;
 
-    protected gettingSpec = true
-    public element: ElementObject
-    public document: ViewObject
-    public ref: RefObject
-    public values: any[]
-    public edit: EditObject
-    protected modifier
-    protected options: any
-    protected elementDataLink: string
-    protected qualifiedName: string
+    protected gettingSpec = true;
+    public element: ElementObject;
+    public document: ViewObject;
+    public ref: RefObject;
+    public values: any[];
+    public edit: EditObject;
+    protected modifier;
+    protected options: any;
+    protected elementDataLink: string;
+    protected qualifiedName: string;
 
-    public editValues: any[]
+    public editValues: any[];
 
-    protected template: string | angular.Injectable<(...args: any[]) => string>
+    protected template: string | angular.Injectable<(...args: any[]) => string>;
 
     static $inject = [
         '$q',
@@ -127,7 +127,7 @@ export class SpecTool implements ISpecTool {
         'EventService',
         'SpecService',
         'ToolbarService',
-    ]
+    ];
 
     constructor(
         protected $q: VeQService,
@@ -148,9 +148,9 @@ export class SpecTool implements ISpecTool {
     ) {}
 
     $onInit(): void {
-        this.eventSvc.$init(this)
+        this.eventSvc.$init(this);
 
-        this.editValues = this.specSvc.editValues
+        this.editValues = this.specSvc.editValues;
         this.toolbarSvc.waitForApi(this.toolbarId).then(
             (api) => {
                 if (
@@ -158,24 +158,24 @@ export class SpecTool implements ISpecTool {
                     window.__env &&
                     window.__env.enableDebug
                 ) {
-                    console.log('Spec View: ' + this.specType + 'is missing a button definition')
+                    console.log('Spec View: ' + this.specType + 'is missing a button definition');
                 }
-                this.configToolbar(api)
+                this.configToolbar(api);
             },
             (reason) => {
-                this.growl.error(reason.message)
+                this.growl.error(reason.message);
             }
-        )
+        );
 
-        this.changeElement()
+        this.changeElement();
 
-        this.subs.push(this.eventSvc.binding<boolean>('spec.ready', this.changeElement))
+        this.subs.push(this.eventSvc.binding<boolean>('spec.ready', this.changeElement));
         //this.subs.push(this.eventSvc.$on(this.specType, this.initCallback))
     }
 
     $onDestroy(): void {
-        this.eventSvc.destroy(this.subs)
-        this.destroy()
+        this.eventSvc.destroy(this.subs);
+        this.destroy();
     }
 
     /**
@@ -187,7 +187,7 @@ export class SpecTool implements ISpecTool {
      */
     protected configToolbar = (api: ToolbarApi): void => {
         /* Implement any toolbar initialization Logic Here */
-    }
+    };
 
     /**
      * @name veComponents/SpecTool#initCallback
@@ -198,7 +198,7 @@ export class SpecTool implements ISpecTool {
      */
     protected initCallback: () => void = () => {
         /* Implement any post initialization steps here */
-    }
+    };
 
     /**
      * @name veComponents/SpecTool#destroy
@@ -209,41 +209,41 @@ export class SpecTool implements ISpecTool {
      */
     protected destroy: () => void = () => {
         /* Implement any custom on destroy logic to unregister listeners etc */
-    }
+    };
 
     public changeElement = (ready?: boolean): void => {
-        if (!ready) return
-        this.gettingSpec = true
-        this.specApi = this.specSvc.specApi
-        this.refId = this.specApi.refId
-        this.projectId = this.specApi.projectId
-        this.commitId = this.specApi.commitId
-        this.modifier = this.specSvc.getModifier()
-        this.qualifiedName = this.specApi.qualifiedName
-        this.element = this.specSvc.getElement()
-        this.document = this.specSvc.getDocument()
-        this.values = this.specSvc.getValues()
-        this.ref = this.specSvc.getRef()
-        this.elementDataLink = this.specApi.dataLink
-        this.initCallback()
-        this.gettingSpec = false
-    }
+        if (!ready) return;
+        this.gettingSpec = true;
+        this.specApi = this.specSvc.specApi;
+        this.refId = this.specApi.refId;
+        this.projectId = this.specApi.projectId;
+        this.commitId = this.specApi.commitId;
+        this.modifier = this.specSvc.getModifier();
+        this.qualifiedName = this.specApi.qualifiedName;
+        this.element = this.specSvc.getElement();
+        this.document = this.specSvc.getDocument();
+        this.values = this.specSvc.getValues();
+        this.ref = this.specSvc.getRef();
+        this.elementDataLink = this.specApi.dataLink;
+        this.initCallback();
+        this.gettingSpec = false;
+    };
 
     //Spec Tool Common API
 
     public copyToClipboard($event: JQuery.ClickEvent, selector: string): void {
         this.applicationSvc.copyToClipboard(this.$element.find<HTMLElement>(selector), $event).then(
             () => {
-                this.growl.info('Copied to clipboard!', { ttl: 2000 })
+                this.growl.info('Copied to clipboard!', { ttl: 2000 });
             },
             (err) => {
-                this.growl.error('Unable to copy: ' + err.message)
+                this.growl.error('Unable to copy: ' + err.message);
             }
-        )
+        );
     }
 
     public cleanupVal(obj: { value: unknown }): void {
-        obj.value = parseInt(obj.value as string)
+        obj.value = parseInt(obj.value as string);
     }
 
     public propertyTypeClicked = (id: string): void => {
@@ -252,12 +252,12 @@ export class SpecTool implements ISpecTool {
             projectId: this.element._projectId,
             refId: this.element._refId,
             commitId: 'latest',
-        }
-        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
-    }
+        };
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
+    };
 
     public addHtml(value: { value: string }): void {
-        value.value = '<p>' + value.value + '</p>'
+        value.value = '<p>' + value.value + '</p>';
     }
 
     /**
@@ -275,6 +275,6 @@ export class SpecTool implements ISpecTool {
     // }
 
     public hasHtml = (s: string): boolean => {
-        return this.componentSvc.hasHtml(s)
-    }
+        return this.componentSvc.hasHtml(s);
+    };
 }

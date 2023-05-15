@@ -1,19 +1,19 @@
-import $ from 'jquery'
+import $ from 'jquery';
 
-import { ExtensionService, ComponentService } from '@ve-components/services'
-import { SpecTool } from '@ve-components/spec-tools'
-import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions'
-import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
-import { EditorService, editor_buttons } from '@ve-core/editor'
-import { MathService, UtilsService, ImageService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
-import { ElementService, ValueService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ExtensionService, ComponentService } from '@ve-components/services';
+import { SpecTool } from '@ve-components/spec-tools';
+import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions';
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
+import { EditorService, editor_buttons } from '@ve-core/editor';
+import { MathService, UtilsService, ImageService } from '@ve-utils/application';
+import { EditService, EventService } from '@ve-utils/core';
+import { ElementService, ValueService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { PropertySpec, veComponents } from '@ve-components'
+import { PropertySpec, veComponents } from '@ve-components';
 
-import { VeQService } from '@ve-types/angular'
-import { ValueObject } from '@ve-types/mms'
+import { VeQService } from '@ve-types/angular';
+import { ValueObject } from '@ve-types/mms';
 
 /**
  * @ngdoc component
@@ -46,18 +46,18 @@ import { ValueObject } from '@ve-types/mms'
  */
 export class TranscludeValController extends Transclusion implements ITransclusion {
     //Custom Bindings
-    first: boolean
+    first: boolean;
 
     //Custom Require
-    mmsSpecEditorCtrl: SpecTool
+    mmsSpecEditorCtrl: SpecTool;
 
     //Locals
-    addValueType: string = 'LiteralString'
-    values: ValueObject[] = []
-    editValues: ValueObject[] = []
-    propertySpec: PropertySpec
-    public bbApi: ButtonBarApi
-    public bars: string[]
+    addValueType: string = 'LiteralString';
+    values: ValueObject[] = [];
+    editValues: ValueObject[] = [];
+    propertySpec: PropertySpec;
+    public bbApi: ButtonBarApi;
+    public bars: string[];
 
     //Templates
     template = `
@@ -71,7 +71,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
     <span ng-switch-when="OpaqueExpression">{{::value.body[0]}}</span>
     <span ng-switch-default>{{$ctrl.first ? $ctrl.values : value}}</span>
 </span>
-`
+`;
     previewTemplate = `
     <div class="panel panel-info">
     <span ng-repeat="value in $ctrl.editValues" ng-switch on="value.type">
@@ -85,7 +85,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         <span ng-switch-default>{{value}}</span>
     </span>
 </div>
-`
+`;
     editTemplate = `
     <div class="panel panel-default no-print">
     <div ng-if="!$ctrl.mmsSpecEditorCtrl" class="panel-heading clearfix">
@@ -170,9 +170,9 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         </div>
     </div>
 </div>
-`
+`;
 
-    static $inject = [...Transclusion.$inject, 'ValueService']
+    static $inject = [...Transclusion.$inject, 'ValueService'];
 
     constructor(
         $q: VeQService,
@@ -210,108 +210,108 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             extensionSvc,
             buttonBarSvc,
             imageSvc
-        )
-        this.cfType = 'val'
-        this.cfTitle = 'Value'
-        this.cfKind = 'Value'
-        this.cfField = 'value'
-        this.checkCircular = false
+        );
+        this.cfType = 'val';
+        this.cfTitle = 'Value';
+        this.cfKind = 'Value';
+        this.cfField = 'value';
+        this.checkCircular = false;
     }
 
     $onInit(): void {
-        super.$onInit()
-        this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_${this.cfType}`)
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons)
+        super.$onInit();
+        this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_${this.cfType}`);
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons);
 
         this.$element.on('click', (e) => {
-            e.stopPropagation()
-            if (this.noClick) return
+            e.stopPropagation();
+            if (this.noClick) return;
 
             if (!this.nonEditable && !this.isEditing) {
-                this.startEdit()
+                this.startEdit();
             }
             if (this.mmsViewCtrl) {
-                this.mmsViewCtrl.transcludeClicked(this.element)
+                this.mmsViewCtrl.transcludeClicked(this.element);
             }
             if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
-                this.growl.warning('Cross Reference is not editable.')
+                this.growl.warning('Cross Reference is not editable.');
             }
-        })
+        });
     }
 
     public getContent = (preview?): angular.IPromise<string | HTMLElement[]> => {
-        const deferred = this.$q.defer<string | HTMLElement[]>()
-        const toCompileList: any[] = []
-        let areStrings = false
-        this.values = this.valueSvc.getValues(this.element)
-        let values = this.values
-        let result = ''
+        const deferred = this.$q.defer<string | HTMLElement[]>();
+        const toCompileList: any[] = [];
+        let areStrings = false;
+        this.values = this.valueSvc.getValues(this.element);
+        let values = this.values;
+        let result = '';
         if (preview) {
-            values = this.editValues
+            values = this.editValues;
         }
         for (let i = 0; i < values.length; i++) {
             if (values[i].type === 'LiteralString') {
-                areStrings = true
-                let s = values[i].value as string
+                areStrings = true;
+                let s = values[i].value as string;
                 if (s.indexOf('<p>') === -1) {
-                    s = s.replace('<', '&lt;')
+                    s = s.replace('<', '&lt;');
                 }
-                toCompileList.push(s)
+                toCompileList.push(s);
             } else {
-                break
+                break;
             }
         }
 
         if (values.length === 0 || Object.keys(values[0]).length < 2) {
-            result = '<span class="no-print placeholder">(no value)</span>'
-            deferred.resolve(result)
+            result = '<span class="no-print placeholder">(no value)</span>';
+            deferred.resolve(result);
         } else if (areStrings) {
-            let toCompile = toCompileList.join(' ')
+            let toCompile = toCompileList.join(' ');
             if (toCompile === '' || this.emptyRegex.test(toCompile)) {
-                result = '<span class="no-print placeholder">(no value)</span>'
-                deferred.resolve(result)
+                result = '<span class="no-print placeholder">(no value)</span>';
+                deferred.resolve(result);
             }
-            toCompile = toCompile.replace(this.spacePeriod, '>.')
-            toCompile = toCompile.replace(this.spaceSpace, '> ')
-            toCompile = toCompile.replace(this.spaceComma, '>,')
+            toCompile = toCompile.replace(this.spacePeriod, '>.');
+            toCompile = toCompile.replace(this.spaceSpace, '> ');
+            toCompile = toCompile.replace(this.spaceComma, '>,');
             if (preview) {
-                result = '<div class="panel panel-info">' + toCompile + '</div>'
+                result = '<div class="panel panel-info">' + toCompile + '</div>';
             } else {
-                result = toCompile
+                result = toCompile;
             }
 
             if (!this.mmsGenerateForDiff) {
-                const resultHtml = $('<p></p>').html(result).toArray()
+                const resultHtml = $('<p></p>').html(result).toArray();
                 this.mathSvc.typeset(resultHtml).then(
                     () => deferred.resolve(resultHtml),
                     (reason) => {
-                        deferred.reject(reason)
+                        deferred.reject(reason);
                     }
-                )
+                );
             } else {
-                deferred.resolve(result)
+                deferred.resolve(result);
             }
         } else {
             if (preview) {
-                deferred.resolve(this.previewTemplate)
+                deferred.resolve(this.previewTemplate);
             } else {
                 if (this.first) {
-                    this.values = [this.values[0]]
+                    this.values = [this.values[0]];
                 }
-                deferred.resolve(this.template)
+                deferred.resolve(this.template);
             }
         }
-        return deferred.promise
-    }
+        return deferred.promise;
+    };
 
     protected recompile = (preview?: boolean): void => {
         if (!this.valueSvc.isValue(this.element)) {
-            this.$element.empty()
+            this.$element.empty();
             //TODO: Add reason/errorMessage handling here.
             this.$transcludeEl = $(
                 '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type" mms-field="::field"></annotation>'
-            )
-            this.$element.append(this.$transcludeEl)
+            );
+            this.$element.append(this.$transcludeEl);
             this.$compile(this.$transcludeEl)(
                 Object.assign(this.$scope.$new(), {
                     elementId: this.element.id,
@@ -319,72 +319,72 @@ export class TranscludeValController extends Transclusion implements ITransclusi
                     type: 'transclusion',
                     field: this.cfField,
                 })
-            )
-            return
+            );
+            return;
         }
         if (!this.nonEditable && this.mmsSpecEditorCtrl && !this.edit) {
-            this.startEdit()
+            this.startEdit();
         } else {
-            this.defaultRecompile(preview)
+            this.defaultRecompile(preview);
         }
-    }
+    };
 
     protected startEdit(): void {
         if (this.propertySpec) {
             super.startEdit(() => {
-                this.editValues = this.valueSvc.getValues(this.edit.element)
-            })
-            return
+                this.editValues = this.valueSvc.getValues(this.edit.element);
+            });
+            return;
         }
         this.valueSvc.getPropertySpec(this.element).then(
             (value) => {
-                this.propertySpec = value
+                this.propertySpec = value;
                 super.startEdit(() => {
-                    this.editValues = this.valueSvc.getValues(this.edit.element)
-                })
+                    this.editValues = this.valueSvc.getValues(this.edit.element);
+                });
             },
             (reason) => {
-                this.growl.error('Failed to get property spec: ' + reason.message)
+                this.growl.error('Failed to get property spec: ' + reason.message);
             }
-        )
+        );
     }
 
     public save = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation()
-        this.saveAction(false)
-    }
+        e.stopPropagation();
+        this.saveAction(false);
+    };
 
     public saveC = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation()
-        this.saveAction(true)
-    }
+        e.stopPropagation();
+        this.saveAction(true);
+    };
 
     public cancel = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation()
-        this.cancelAction()
-    }
+        e.stopPropagation();
+        this.cancelAction();
+    };
 
     public addValue(e: JQueryEventObject): void {
-        e.stopPropagation()
-        const newVal = this.valueSvc.addValue(this.edit, this.addValueType)
+        e.stopPropagation();
+        const newVal = this.valueSvc.addValue(this.edit, this.addValueType);
         if (this.editValues.length == 0) {
-            this.editValues.push(newVal)
+            this.editValues.push(newVal);
         }
     }
 
     public addEnumerationValue(e: JQueryEventObject): void {
-        e.stopPropagation()
-        const enumValue = this.valueSvc.addEnumerationValue(this.propertySpec, this.edit)
-        this.editValues.push(enumValue)
+        e.stopPropagation();
+        const enumValue = this.valueSvc.addEnumerationValue(this.propertySpec, this.edit);
+        this.editValues.push(enumValue);
         if (this.element.type == 'Property' || this.element.type == 'Port') {
-            this.edit.element.defaultValue = enumValue
+            this.edit.element.defaultValue = enumValue;
         }
     }
 
     public removeVal = (e: JQueryEventObject, i: number): void => {
-        e.stopPropagation()
-        this.editValues.splice(i, 1)
-    }
+        e.stopPropagation();
+        this.editValues.splice(i, 1);
+    };
 }
 
 export const TranscludeValComponent: ITransclusionComponentOptions = {
@@ -410,6 +410,6 @@ export const TranscludeValComponent: ITransclusionComponentOptions = {
         mmsSpecEditorCtrl: '?^specEditor',
     },
     controller: TranscludeValController,
-}
+};
 
-veComponents.component(TranscludeValComponent.selector, TranscludeValComponent)
+veComponents.component(TranscludeValComponent.selector, TranscludeValComponent);

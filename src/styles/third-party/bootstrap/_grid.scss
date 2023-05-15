@@ -1,7 +1,7 @@
-@use "../bootstrap-variables" as bootstrap;
-@use "./mixins/vendor-prefixes" as vendor;
-@use "./mixins/grid";
-@use "./mixins/grid-framework";
+@use '../bootstrap-variables' as bootstrap;
+@use './mixins/vendor-prefixes' as vendor;
+@use './mixins/grid';
+@use './mixins/grid-framework';
 
 // --------------------------------------------------
 // Grid system
@@ -12,19 +12,19 @@
 // Set the container width, and override it for fixed navbars in media queries.
 
 .container {
-  @include grid.container-fixed;
+    @include grid.container-fixed;
 
-  @media (min-width: bootstrap.$screen-sm-min) {
-    width: bootstrap.$container-sm;
-  }
+    @media (min-width: bootstrap.$screen-sm-min) {
+        width: bootstrap.$container-sm;
+    }
 
-  @media (min-width: bootstrap.$screen-md-min) {
-    width: bootstrap.$container-md;
-  }
+    @media (min-width: bootstrap.$screen-md-min) {
+        width: bootstrap.$container-md;
+    }
 
-  @media (min-width: bootstrap.$screen-lg-min) {
-    width: bootstrap.$container-lg;
-  }
+    @media (min-width: bootstrap.$screen-lg-min) {
+        width: bootstrap.$container-lg;
+    }
 }
 
 // Fluid container
@@ -33,7 +33,7 @@
 // width for fluid, full width layouts.
 
 .container-fluid {
-  @include grid.container-fixed;
+    @include grid.container-fixed;
 }
 
 // Row
@@ -41,7 +41,7 @@
 // Rows contain and clear the floats of your columns.
 
 .row {
-  @include grid.make-row;
+    @include grid.make-row;
 }
 
 // Columns
@@ -63,7 +63,7 @@
 // to tablets.
 
 @media (min-width: bootstrap.$screen-sm-min) {
-  @include grid-framework.make-grid(sm);
+    @include grid-framework.make-grid(sm);
 }
 
 // Medium grid
@@ -71,7 +71,7 @@
 // Columns, offsets, pushes, and pulls for the desktop device range.
 
 @media (min-width: bootstrap.$screen-md-min) {
-  @include grid-framework.make-grid(md);
+    @include grid-framework.make-grid(md);
 }
 
 // Large grid
@@ -79,5 +79,5 @@
 // Columns, offsets, pushes, and pulls for the large desktop device range.
 
 @media (min-width: bootstrap.$screen-lg-min) {
-  @include grid-framework.make-grid(lg);
+    @include grid-framework.make-grid(lg);
 }

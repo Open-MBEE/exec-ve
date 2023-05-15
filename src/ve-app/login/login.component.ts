@@ -1,14 +1,14 @@
-import { StateService, TransitionPromise, UIRouterGlobals, UrlService } from '@uirouter/angularjs'
-import angular, { IComponentController, IQService } from 'angular'
+import { StateService, TransitionPromise, UIRouterGlobals, UrlService } from '@uirouter/angularjs';
+import angular, { IComponentController, IQService } from 'angular';
 
-import { BrandingService, BrandingStyle, RootScopeService } from '@ve-utils/application'
-import { AuthService } from '@ve-utils/mms-api-client'
+import { BrandingService, BrandingStyle, RootScopeService } from '@ve-utils/application';
+import { AuthService } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VeComponentOptions, VePromiseReason } from '@ve-types/angular'
-import { ParamsObject } from '@ve-types/mms'
-import { VeModalResolveFn, VeModalService, VeModalSettings } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromiseReason } from '@ve-types/angular';
+import { ParamsObject } from '@ve-types/mms';
+import { VeModalResolveFn, VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
 const LoginComponent: VeComponentOptions = {
     selector: 'login',
@@ -49,14 +49,14 @@ const LoginComponent: VeComponentOptions = {
             'AuthService',
             'RootScopeService',
             'BrandingService',
-        ]
+        ];
 
-        public spin: boolean = false
-        loginBanner: BrandingStyle
+        public spin: boolean = false;
+        loginBanner: BrandingStyle;
 
         //Bindings
-        private mmsParams: ParamsObject
-        private mmsLoginBanner: BrandingStyle
+        private mmsParams: ParamsObject;
+        private mmsLoginBanner: BrandingStyle;
 
         constructor(
             private $q: IQService,
@@ -71,42 +71,42 @@ const LoginComponent: VeComponentOptions = {
         ) {}
 
         $onInit(): void {
-            this.rootScopeSvc.veTitle('Login')
-            this.rootScopeSvc.veShowLogin(true)
-            this.loginBanner = this.mmsLoginBanner
+            this.rootScopeSvc.veTitle('Login');
+            this.rootScopeSvc.veShowLogin(true);
+            this.loginBanner = this.mmsLoginBanner;
             if (!this.rootScopeSvc.veWarningOk()) {
-                this.warning()
+                this.warning();
             }
         }
 
         login(credentials: { password: string; username: string }): angular.IPromise<TransitionPromise> {
-            const deferred = this.$q.defer<TransitionPromise>()
-            this.spin = true
+            const deferred = this.$q.defer<TransitionPromise>();
+            this.spin = true;
             if (!credentials || !credentials.password || !credentials.username) {
-                let message = 'Missing: '
-                message += !credentials || !credentials.username ? 'Username' : ''
-                message += !credentials ? ' and ' : ''
-                message += !credentials || !credentials.password ? 'Password' : ''
-                this.growl.error(message)
+                let message = 'Missing: ';
+                message += !credentials || !credentials.username ? 'Username' : '';
+                message += !credentials ? ' and ' : '';
+                message += !credentials || !credentials.password ? 'Password' : '';
+                this.growl.error(message);
             } else {
                 const credentialsJSON = {
                     username: credentials.username,
                     password: credentials.password,
-                }
+                };
                 this.authSvc.getAuthorized(credentialsJSON).then(
                     (user) => {
                         if (this.rootScopeSvc.veRedirect()) {
-                            const veRedirect = this.rootScopeSvc.veRedirect()
-                            const toState = veRedirect.toState
-                            const toParams = veRedirect.toParams
-                            toParams.next = undefined
+                            const veRedirect = this.rootScopeSvc.veRedirect();
+                            const toState = veRedirect.toState;
+                            const toParams = veRedirect.toParams;
+                            toParams.next = undefined;
                             deferred.resolve(
                                 this.$state.go(toState.name, toParams, {
                                     reload: true,
                                 })
-                            )
+                            );
                         } else if (this.mmsParams.next) {
-                            this.$urlService.url(this.mmsParams.next, true)
+                            this.$urlService.url(this.mmsParams.next, true);
                         } else {
                             this.$state
                                 .go('main.login.select', {
@@ -114,17 +114,17 @@ const LoginComponent: VeComponentOptions = {
                                 })
                                 .catch(() => {
                                     /* Handled by UIRouter */
-                                })
+                                });
                         }
                     },
                     (reason: VePromiseReason<unknown>) => {
-                        this.spin = false
-                        this.growl.error(reason.message)
-                        deferred.reject(reason)
+                        this.spin = false;
+                        this.growl.error(reason.message);
+                        deferred.reject(reason);
                     }
-                )
+                );
             }
-            return deferred.promise
+            return deferred.promise;
         }
 
         warning(): void {
@@ -135,13 +135,13 @@ const LoginComponent: VeComponentOptions = {
                 windowTopClass: 'modal-center-override',
                 resolve: {
                     loginWarning: () => {
-                        return this.brandingSvc.loginWarning
+                        return this.brandingSvc.loginWarning;
                     },
                 },
-            }
-            this.$uibModal.open<VeModalResolveFn, boolean>(settings)
+            };
+            this.$uibModal.open<VeModalResolveFn, boolean>(settings);
         }
     },
-}
+};
 
-veApp.component(LoginComponent.selector, LoginComponent)
+veApp.component(LoginComponent.selector, LoginComponent);

@@ -1,25 +1,25 @@
-import { MMSMentionController } from '@ve-core/editor/components/mention.component'
+import { MMSMentionController } from '@ve-core/editor/components/mention.component';
 
-import { veCore } from '@ve-core'
+import { veCore } from '@ve-core';
 
-import { ElementObject } from '@ve-types/mms'
+import { ElementObject } from '@ve-types/mms';
 
 class MMSMentionInterceptController implements angular.IComponentController {
-    public mmsMentionInterceptValue: string
-    mmsFastCf: ElementObject[]
+    public mmsMentionInterceptValue: string;
+    mmsFastCf: ElementObject[];
 
-    private ngModel: angular.INgModelController
-    mentionCtrl: MMSMentionController
+    private ngModel: angular.INgModelController;
+    mentionCtrl: MMSMentionController;
 
     $onChanges(changes: angular.IOnChangesObject): void {
         if (changes.mmsMentionInterceptValue) {
-            this.ngModel.$setViewValue(changes.mmsMentionInterceptValue.currentValue)
-            this.ngModel.$render()
+            this.ngModel.$setViewValue(changes.mmsMentionInterceptValue.currentValue);
+            this.ngModel.$render();
         }
     }
 
     public selectMentionItem($item: ElementObject): void {
-        this.mentionCtrl.selectMentionItem($item)
+        this.mentionCtrl.selectMentionItem($item);
     }
 }
 
@@ -45,6 +45,6 @@ const MMSMentionIntercept = {
         mmsMentionId: '<',
     },
     controller: MMSMentionInterceptController,
-}
+};
 
-veCore.component(MMSMentionIntercept.selector, MMSMentionIntercept)
+veCore.component(MMSMentionIntercept.selector, MMSMentionIntercept);

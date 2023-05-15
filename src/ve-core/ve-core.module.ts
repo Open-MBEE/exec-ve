@@ -1,4 +1,4 @@
-import angular from 'angular'
+import angular from 'angular';
 
 /**
  * @ngdoc overview
@@ -76,7 +76,7 @@ export const veCore = angular.module('ve-core', [
     'angular-growl',
     'angularjs-dropdown-multiselect',
     'ui.tree-filter',
-])
+]);
 
 veCore
     .config([
@@ -88,17 +88,17 @@ veCore
             growlProvider: angular.growl.IGrowlProvider,
             uiTreeFilterSettingsProvider
         ): void => {
-            $sceProvider.enabled(false)
-            growlProvider.onlyUniqueMessages(false)
+            $sceProvider.enabled(false);
+            growlProvider.onlyUniqueMessages(false);
             growlProvider.globalTimeToLive({
                 success: 5000,
                 error: -1,
                 warning: 5000,
                 info: 5000,
-            })
-            growlProvider.globalPosition('bottom-right')
-            uiTreeFilterSettingsProvider.addresses = ['label']
-            uiTreeFilterSettingsProvider.descendantCollection = 'children'
+            });
+            growlProvider.globalPosition('bottom-right');
+            uiTreeFilterSettingsProvider.addresses = ['label'];
+            uiTreeFilterSettingsProvider.descendantCollection = 'children';
         },
     ])
-    .constant('CKEDITOR', window.CKEDITOR)
+    .constant('CKEDITOR', window.CKEDITOR);

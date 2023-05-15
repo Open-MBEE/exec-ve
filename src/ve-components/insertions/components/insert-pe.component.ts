@@ -1,28 +1,28 @@
-import { Insertion, InsertionService } from '@ve-components/insertions'
-import { EditorService } from '@ve-core/editor'
-import { SearchFilter } from '@ve-core/search/mms-search.component'
-import { ApplicationService, UtilsService } from '@ve-utils/application'
-import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { Insertion, InsertionService } from '@ve-components/insertions';
+import { EditorService } from '@ve-core/editor';
+import { SearchFilter } from '@ve-core/search/mms-search.component';
+import { ApplicationService, UtilsService } from '@ve-utils/application';
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { InsertData } from '@ve-types/components'
-import { InstanceValueObject, ViewCreationRequest, ViewInstanceSpec } from '@ve-types/mms'
-import { TreeBranch } from '@ve-types/tree'
-import { VeModalService } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
+import { InsertData } from '@ve-types/components';
+import { InstanceValueObject, ViewCreationRequest, ViewInstanceSpec } from '@ve-types/mms';
+import { TreeBranch } from '@ve-types/tree';
+import { VeModalService } from '@ve-types/view-editor';
 
 export interface InsertPresentationData extends InsertData {
-    parentBranch: TreeBranch
-    viewOrSectionOb?: ViewInstanceSpec
-    addPeIndex: number
+    parentBranch: TreeBranch;
+    viewOrSectionOb?: ViewInstanceSpec;
+    addPeIndex: number;
 }
 
 class InsertPeController extends Insertion<InsertPresentationData> {
-    protected aggr: 'composite' | 'shared'
+    protected aggr: 'composite' | 'shared';
 
-    static $inject = Insertion.$inject
+    static $inject = Insertion.$inject;
 
     constructor(
         $scope: angular.IScope,
@@ -57,54 +57,54 @@ class InsertPeController extends Insertion<InsertPresentationData> {
             apiSvc,
             utils,
             editorSvc
-        )
+        );
     }
 
     $onInit(): void {
-        super.$onInit()
+        super.$onInit();
     }
 
     public queryFilter = (): SearchFilter => {
         const filters: {
-            appliedStereotypeIds?: string[]
-            classifierIds?: string[]
-        } = {}
+            appliedStereotypeIds?: string[];
+            classifierIds?: string[];
+        } = {};
         if (this.type === 'Table') {
             filters.classifierIds = [
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'TableT', this.schema),
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Table', this.schema),
-            ]
+            ];
         } else if (this.type === 'List') {
             filters.classifierIds = [
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'ListT', this.schema),
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'List', this.schema),
-            ]
+            ];
         } else if (this.type === 'Image') {
             filters.classifierIds = [
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'ImageT', this.schema),
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Image', this.schema),
-            ]
+            ];
         } else if (this.type === 'Paragraph') {
             filters.classifierIds = [
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'ParagraphT', this.schema),
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Paragraph', this.schema),
-            ]
+            ];
         } else if (this.type === 'Section') {
             filters.classifierIds = [
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'SectionT', this.schema),
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Section', this.schema),
-            ]
+            ];
         } else {
-            filters.classifierIds = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', this.type, this.schema)]
+            filters.classifierIds = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', this.type, this.schema)];
         }
-        return filters
-    }
+        return filters;
+    };
 
     public success = (): void => {
-        const elemType = this.type
-        this.insertionSvc.successUpdates(elemType, this.insertData.viewOrSectionOb.id)
-        this.growl.success(this.type + ' is being created')
-    }
+        const elemType = this.type;
+        this.insertionSvc.successUpdates(elemType, this.insertData.viewOrSectionOb.id);
+        this.growl.success(this.type + ' is being created');
+    };
 
     public insert = (elementOb: ViewInstanceSpec): VePromise<ViewInstanceSpec> => {
         const instanceVal: InstanceValueObject = {
@@ -113,14 +113,14 @@ class InsertPeController extends Insertion<InsertPresentationData> {
             type: 'InstanceValue',
             _projectId: this.projectId,
             _refId: this.refId,
-        }
+        };
         const viewReqOb: ViewCreationRequest = {
             viewId: this.insertData.viewOrSectionOb.id,
             projectId: this.projectId,
             refId: this.refId,
-        }
-        return this.viewSvc.insertToViewOrSection(viewReqOb, instanceVal, this.insertData.addPeIndex)
-    }
+        };
+        return this.viewSvc.insertToViewOrSection(viewReqOb, instanceVal, this.insertData.addPeIndex);
+    };
 
     public create = (): VePromise<ViewInstanceSpec> => {
         return this.viewSvc.createInstanceSpecification(
@@ -128,8 +128,8 @@ class InsertPeController extends Insertion<InsertPresentationData> {
             this.type,
             this.name,
             this.insertData.addPeIndex
-        )
-    }
+        );
+    };
 }
 
 const InsertPeComponent: VeComponentOptions = {
@@ -179,6 +179,6 @@ const InsertPeComponent: VeComponentOptions = {
         mmsOrgId: '@',
     },
     controller: InsertPeController,
-}
+};
 
-veComponents.component(InsertPeComponent.selector, InsertPeComponent)
+veComponents.component(InsertPeComponent.selector, InsertPeComponent);

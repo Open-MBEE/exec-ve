@@ -1,12 +1,12 @@
-import angular, { IComponentController } from 'angular'
+import angular, { IComponentController } from 'angular';
 
-import { ViewController } from '@ve-components/presentations/view.component'
-import { ExtensionService } from '@ve-components/services'
+import { ViewController } from '@ve-components/presentations/view.component';
+import { ExtensionService } from '@ve-components/services';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions } from '@ve-types/angular'
-import { RequestObject } from '@ve-types/mms'
+import { VeComponentOptions } from '@ve-types/angular';
+import { RequestObject } from '@ve-types/mms';
 
 /**
  * @ngdoc component
@@ -28,31 +28,31 @@ import { RequestObject } from '@ve-types/mms'
 
 export class CrossReferenceController implements IComponentController {
     //Bindings
-    mmsElementId: string
-    mmsProjectId: string
-    mmsRefId: string
-    mmsCommitId: string
-    mmsCfType: string
-    mmsWatchId: string
-    nonEditable: boolean
-    mmsGenerateForDiff: boolean
-    mmsAttr: string
-    mmsCfLabel: boolean
+    mmsElementId: string;
+    mmsProjectId: string;
+    mmsRefId: string;
+    mmsCommitId: string;
+    mmsCfType: string;
+    mmsWatchId: string;
+    nonEditable: boolean;
+    mmsGenerateForDiff: boolean;
+    mmsAttr: string;
+    mmsCfLabel: boolean;
 
     //Deps
-    transclusionCtrl: CrossReferenceController
-    mmsViewCtrl: ViewController
+    transclusionCtrl: CrossReferenceController;
+    mmsViewCtrl: ViewController;
 
     //Local
-    projectId: string
-    refId: string
-    commitId: string
-    clearWatch: boolean = false
-    extType: string = 'transclusion'
+    projectId: string;
+    refId: string;
+    commitId: string;
+    clearWatch: boolean = false;
+    extType: string = 'transclusion';
 
-    static $inject = ['$compile', '$scope', '$element', 'ExtensionService']
+    static $inject = ['$compile', '$scope', '$element', 'ExtensionService'];
 
-    protected $transcludeEl: JQuery
+    protected $transcludeEl: JQuery;
 
     constructor(
         private $compile: angular.ICompileService,
@@ -62,7 +62,7 @@ export class CrossReferenceController implements IComponentController {
     ) {}
 
     $onInit(): void {
-        this.changeAction()
+        this.changeAction();
     }
 
     //INFO this was this.getWsAndVersion
@@ -71,39 +71,39 @@ export class CrossReferenceController implements IComponentController {
             projectId: this.projectId,
             refId: this.refId,
             commitId: this.commitId,
-        }
-    }
+        };
+    };
 
     private changeAction = (): void => {
-        let projectId = this.mmsProjectId
-        let refId = this.mmsRefId
-        let commitId = this.mmsCommitId
+        let projectId = this.mmsProjectId;
+        let refId = this.mmsRefId;
+        let commitId = this.mmsCommitId;
         if (this.transclusionCtrl) {
-            const cfVersion = this.transclusionCtrl.getElementOrigin()
-            if (!projectId) projectId = cfVersion.projectId
-            if (!refId) refId = cfVersion.refId
-            if (!commitId) commitId = cfVersion.commitId
+            const cfVersion = this.transclusionCtrl.getElementOrigin();
+            if (!projectId) projectId = cfVersion.projectId;
+            if (!refId) refId = cfVersion.refId;
+            if (!commitId) commitId = cfVersion.commitId;
         }
         if (this.mmsViewCtrl) {
-            const viewVersion = this.mmsViewCtrl.getElementOrigin()
-            if (!projectId) projectId = viewVersion.projectId
-            if (!refId) refId = viewVersion.refId
-            if (!commitId) commitId = viewVersion.commitId
+            const viewVersion = this.mmsViewCtrl.getElementOrigin();
+            if (!projectId) projectId = viewVersion.projectId;
+            if (!refId) refId = viewVersion.refId;
+            if (!commitId) commitId = viewVersion.commitId;
         }
         if (!projectId) {
-            return
+            return;
         }
-        this.projectId = projectId
-        this.refId = refId ? refId : 'master'
-        this.commitId = commitId ? commitId : 'latest'
+        this.projectId = projectId;
+        this.refId = refId ? refId : 'master';
+        this.commitId = commitId ? commitId : 'latest';
         //this.templateElementHtml = this.$element[0].innerHTML;
         if (this.mmsCfType) {
-            this.$element.empty()
-            const tag = this.extensionSvc.getTagByType('transclude', this.mmsCfType)
+            this.$element.empty();
+            const tag = this.extensionSvc.getTagByType('transclude', this.mmsCfType);
             if (tag === 'extension-error') {
                 this.$transcludeEl = $(
                     '<error ext-kind="$ctrl.extType" ext-type="$ctrl.mmsCfType" mms-element-id="$ctrl.mmsElementId"></error>'
-                )
+                );
             } else {
                 this.$transcludeEl = $(
                     '<' +
@@ -114,12 +114,12 @@ export class CrossReferenceController implements IComponentController {
                         ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable"></' +
                         tag +
                         '>'
-                )
+                );
             }
-            this.$element.append(this.$transcludeEl)
-            this.$compile(this.$transcludeEl)(this.$scope)
+            this.$element.append(this.$transcludeEl);
+            this.$compile(this.$transcludeEl)(this.$scope);
         }
-    }
+    };
 }
 
 const MmsCfComponent: VeComponentOptions = {
@@ -143,5 +143,5 @@ const MmsCfComponent: VeComponentOptions = {
         mmsViewCtrl: '?^^view',
     },
     controller: CrossReferenceController,
-}
-veComponents.component(MmsCfComponent.selector, MmsCfComponent)
+};
+veComponents.component(MmsCfComponent.selector, MmsCfComponent);

@@ -7,13 +7,14 @@
 $font-size-base: 16px;
 
 /* Families */
-$font-family-sans-serif: "Helvetica Neue", helvetica, arial, sans-serif !default;
-$light-font-family-sans-serif: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", helvetica, arial, sans-serif;
-$font-family-icon: "FontAwesome";
+$font-family-sans-serif: 'Helvetica Neue', helvetica, arial, sans-serif !default;
+$light-font-family-sans-serif: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', helvetica, arial,
+    sans-serif;
+$font-family-icon: 'FontAwesome';
 $icon-font-name: $font-family-icon;
 
 /* Native Font Awesome Support */
-$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+$fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
 
 /* Weights */
 $light-font-weight: 200;

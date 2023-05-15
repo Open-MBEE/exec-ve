@@ -1,5 +1,5 @@
-import angular from 'angular'
-;('use strict')
+import angular from 'angular';
+('use strict');
 
 angular
     .module('ui.tree-filter', [])
@@ -7,19 +7,19 @@ angular
      * @name ui.tree-filter.provider:uiTreeFilterSettings
      */
     .provider('uiTreeFilterSettings', function () {
-        var uiTreeFilterSettings = this
+        var uiTreeFilterSettings = this;
 
-        this.addresses = ['title']
-        this.regexFlags = 'gi'
-        this.descendantCollection = 'items'
+        this.addresses = ['title'];
+        this.regexFlags = 'gi';
+        this.descendantCollection = 'items';
 
         this.$get = () => {
             return {
                 addresses: uiTreeFilterSettings.addresses,
                 regexFlags: uiTreeFilterSettings.regexFlags,
                 descendantCollection: uiTreeFilterSettings.descendantCollection,
-            }
-        }
+            };
+        };
     })
     /**
      * @name ui.tree-filter.factory:uiTreeFilter
@@ -37,16 +37,14 @@ angular
              * @returns {boolean}
              */
             function visit(collection, pattern, address) {
-                collection = collection || []
-                var foundSoFar = false
+                collection = collection || [];
+                var foundSoFar = false;
 
                 collection.forEach((collectionItem) => {
-                    foundSoFar =
-                        foundSoFar ||
-                        testForField(collectionItem, pattern, address)
-                })
+                    foundSoFar = foundSoFar || testForField(collectionItem, pattern, address);
+                });
 
-                return foundSoFar
+                return foundSoFar;
             }
 
             /**
@@ -57,15 +55,13 @@ angular
              * @returns {*}
              */
             function resolveAddress(object, path) {
-                var parts = path.split('.')
+                var parts = path.split('.');
 
                 if (object === undefined) {
-                    return
+                    return;
                 }
 
-                return parts.length < 2
-                    ? object[parts[0]]
-                    : resolveAddress(object[parts[0]], parts.slice(1).join('.'))
+                return parts.length < 2 ? object[parts[0]] : resolveAddress(object[parts[0]], parts.slice(1).join('.'));
             }
 
             /**
@@ -83,24 +79,12 @@ angular
              * @returns {boolean}
              */
             function testForField(item, pattern, address) {
-                var value = resolveAddress(item, address)
+                var value = resolveAddress(item, address);
                 var found =
                     typeof value === 'string'
-                        ? !!value.match(
-                              new RegExp(
-                                  pattern,
-                                  uiTreeFilterSettings.regexFlags
-                              )
-                          )
-                        : false
-                return (
-                    found ||
-                    visit(
-                        item[uiTreeFilterSettings.descendantCollection],
-                        pattern,
-                        address
-                    )
-                )
+                        ? !!value.match(new RegExp(pattern, uiTreeFilterSettings.regexFlags))
+                        : false;
+                return found || visit(item[uiTreeFilterSettings.descendantCollection], pattern, address);
             }
 
             /**
@@ -112,15 +96,13 @@ angular
              * @returns {boolean}
              */
             return (item, pattern, addresses) => {
-                addresses = addresses || uiTreeFilterSettings.addresses
+                addresses = addresses || uiTreeFilterSettings.addresses;
                 return (
                     pattern === undefined ||
                     addresses.reduce((foundSoFar, fieldName) => {
-                        return (
-                            foundSoFar || testForField(item, pattern, fieldName)
-                        )
+                        return foundSoFar || testForField(item, pattern, fieldName);
                     }, false)
-                )
-            }
+                );
+            };
         },
-    ])
+    ]);

@@ -1,8 +1,8 @@
-@use "../bootstrap-variables" as bootstrap;
-@use "./mixins/vendor-prefixes" as vendor;
-@use "./mixins/clearfix";
-@use "./mixins/hide-text";
-@use "./mixins/center-block";
+@use '../bootstrap-variables' as bootstrap;
+@use './mixins/vendor-prefixes' as vendor;
+@use './mixins/clearfix';
+@use './mixins/hide-text';
+@use './mixins/center-block';
 
 // --------------------------------------------------
 // Utility classes
@@ -12,19 +12,19 @@
 // -------------------------
 
 .clearfix {
-  @include clearfix.clearfix;
+    @include clearfix.clearfix;
 }
 
 .center-block {
-  @include center-block.center-block;
+    @include center-block.center-block;
 }
 
 .pull-right {
-  float: right !important;
+    float: right !important;
 }
 
 .pull-left {
-  float: left !important;
+    float: left !important;
 }
 
 // Toggling content
@@ -32,19 +32,19 @@
 
 // Note: Deprecated .hide in favor of .hidden or .sr-only (as appropriate) in v3.0.1
 .hide {
-  display: none !important;
+    display: none !important;
 }
 
 .show {
-  display: block !important;
+    display: block !important;
 }
 
 .invisible {
-  visibility: hidden;
+    visibility: hidden;
 }
 
 .text-hide {
-  @include hide-text.text-hide;
+    @include hide-text.text-hide;
 }
 
 // Hide from screenreaders and browsers
@@ -52,12 +52,12 @@
 // Credit: HTML5 Boilerplate
 
 .hidden {
-  display: none !important;
+    display: none !important;
 }
 
 // For Affix plugin
 // -------------------------
 
 .affix {
-  position: fixed;
+    position: fixed;
 }

@@ -2,7 +2,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
     requires: ['richcombo'],
     init: (editor) => {
         var config = editor.config,
-            lang = editor.lang.format
+            lang = editor.lang.format;
         function createItem(options) {
             return options.isMmsCustomPlugin
                 ? '<span> <img style="vertical-align:middle; width:auto; height:auto; max-width:17px; max-height:17px;" src="' +
@@ -14,16 +14,14 @@ CKEDITOR.plugins.add('mmsdropdown', {
                       options.iconClass +
                       '_icon"> </span> <span style="margin-left:3px">' +
                       options.label +
-                      '</span> </span>'
+                      '</span> </span>';
         }
         editor.ui.addRichCombo('mmsExtraFeature', {
             title: 'Insert more content',
             className: 'mmsExtraFeature',
             multiSelect: false,
             panel: {
-                css: [CKEDITOR.skin.getPath('editor')].concat(
-                    config.contentsCss
-                ),
+                css: [CKEDITOR.skin.getPath('editor')].concat(config.contentsCss),
             },
 
             init: () => {
@@ -31,25 +29,21 @@ CKEDITOR.plugins.add('mmsdropdown', {
                     'mmscf',
                     createItem({
                         isMmsCustomPlugin: true,
-                        imgSrc:
-                            window.CKEDITOR_BASEPATH +
-                            'plugins/mmscf/icons/mmscf.png',
+                        imgSrc: window.CKEDITOR_BASEPATH + 'plugins/mmscf/icons/mmscf.png',
                         label: 'Cross Reference',
                     }),
                     'Insert Cross Reference'
-                )
+                );
                 this.add(
                     'mmsvlink',
                     createItem({
                         isMmsCustomPlugin: true,
-                        imgSrc:
-                            window.CKEDITOR_BASEPATH +
-                            'plugins/mmsvlink/icons/mmsvlink.png',
+                        imgSrc: window.CKEDITOR_BASEPATH + 'plugins/mmsvlink/icons/mmsvlink.png',
                         label: 'Cross Reference as link',
                     }),
                     'Insert Cross Reference as link (View Link)'
-                )
-                this.add('', '<hr>', 'mms-br')
+                );
+                this.add('', '<hr>', 'mms-br');
 
                 this.add(
                     'link',
@@ -59,7 +53,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Link',
                     }),
                     'Insert link'
-                )
+                );
                 this.add(
                     'table',
                     createItem({
@@ -68,7 +62,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Table',
                     }),
                     'Insert table'
-                )
+                );
                 this.add(
                     'image',
                     createItem({
@@ -77,7 +71,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Image',
                     }),
                     'Insert image'
-                )
+                );
                 this.add(
                     'iframe',
                     createItem({
@@ -86,7 +80,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Iframe',
                     }),
                     'Insert iframe'
-                )
+                );
                 this.add(
                     'mathjax',
                     createItem({
@@ -95,7 +89,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Math',
                     }),
                     'Insert math'
-                )
+                );
                 this.add(
                     'specialchar',
                     createItem({
@@ -104,21 +98,19 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Special Character',
                     }),
                     'Insert symbol'
-                )
-                this.add('', '<hr>', 'mms-br')
+                );
+                this.add('', '<hr>', 'mms-br');
 
                 this.add(
                     'mmscomment',
                     createItem({
                         isMmsCustomPlugin: true,
-                        imgSrc:
-                            window.CKEDITOR_BASEPATH +
-                            'plugins/mmscomment/icons/mmscomment.png',
+                        imgSrc: window.CKEDITOR_BASEPATH + 'plugins/mmscomment/icons/mmscomment.png',
                         label: 'Comment',
                     }),
                     'Insert comment'
-                )
-                this.add('', '<hr>', 'mms-br')
+                );
+                this.add('', '<hr>', 'mms-br');
 
                 this.add(
                     'codeSnippet',
@@ -128,7 +120,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Code Snippet',
                     }),
                     'Insert code snippet'
-                )
+                );
                 this.add(
                     'blockquote',
                     createItem({
@@ -137,8 +129,8 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Quote',
                     }),
                     'Insert quote'
-                )
-                this.add('', '<hr>', 'mms-br')
+                );
+                this.add('', '<hr>', 'mms-br');
 
                 this.add(
                     'pagebreak',
@@ -148,7 +140,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Page break for printing',
                     }),
                     'Insert page break'
-                )
+                );
                 this.add(
                     'horizontalrule',
                     createItem({
@@ -157,36 +149,32 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Horizontal Rule',
                     }),
                     'Insert horizontal rule'
-                )
-                this.add('', '<hr>', 'mms-br')
+                );
+                this.add('', '<hr>', 'mms-br');
 
                 this.add(
                     'mmssignature',
                     createItem({
                         isMmsCustomPlugin: true,
-                        imgSrc:
-                            window.CKEDITOR_BASEPATH +
-                            'plugins/mmssignature/icons/mmssignature.png',
+                        imgSrc: window.CKEDITOR_BASEPATH + 'plugins/mmssignature/icons/mmssignature.png',
                         label: 'Signature template',
                     }),
                     'Insert signature template'
-                )
+                );
             },
 
             onClick: (command) => {
                 if (command !== '') {
-                    editor.execCommand(command)
+                    editor.execCommand(command);
                 }
             },
-        })
+        });
         editor.ui.addRichCombo('mmsExtraFormat', {
             title: 'Extra formatting',
             className: 'mmsExtraFormat',
             multiSelect: false,
             panel: {
-                css: [CKEDITOR.skin.getPath('editor')].concat(
-                    config.contentsCss
-                ),
+                css: [CKEDITOR.skin.getPath('editor')].concat(config.contentsCss),
             },
             init: () => {
                 this.add(
@@ -197,7 +185,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Strikethrough',
                     }),
                     'Strikethrough'
-                )
+                );
                 this.add(
                     'superscript',
                     createItem({
@@ -206,7 +194,7 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Superscript',
                     }),
                     'Superscript'
-                )
+                );
                 this.add(
                     'subscript',
                     createItem({
@@ -215,8 +203,8 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Subscript',
                     }),
                     'Subscript'
-                )
-                this.add('', '<hr>', 'mms-br')
+                );
+                this.add('', '<hr>', 'mms-br');
 
                 this.add(
                     'removeFormat',
@@ -226,14 +214,14 @@ CKEDITOR.plugins.add('mmsdropdown', {
                         label: 'Clear Formatting',
                     }),
                     'Clear Formatting'
-                )
+                );
             },
 
             onClick: (command) => {
                 if (command !== '') {
-                    editor.execCommand(command)
+                    editor.execCommand(command);
                 }
             },
-        })
+        });
     },
-})
+});

@@ -1,54 +1,54 @@
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { RefObject } from '@ve-types/mms'
-import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
+import { RefObject } from '@ve-types/mms';
+import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
 
 export interface MergeConfirmResolve extends VeModalResolve {
-    getSrcRefOb: RefObject
-    getDocName: string
+    getSrcRefOb: RefObject;
+    getDocName: string;
 }
 export interface MergeConfirmResolveFn extends VeModalResolveFn {
-    getSrcRefOb(): RefObject
-    getDocName(): string
+    getSrcRefOb(): RefObject;
+    getDocName(): string;
 }
 
 class MergeConfirmModalController extends VeModalControllerImpl<void> implements VeModalController {
     //Bindings
-    protected resolve: MergeConfirmResolve
+    protected resolve: MergeConfirmResolve;
 
-    oking: boolean
-    commitMessage: string
-    createForm: boolean
-    srcRefOb: RefObject
-    docName: string
+    oking: boolean;
+    commitMessage: string;
+    createForm: boolean;
+    srcRefOb: RefObject;
+    docName: string;
 
-    static $inject = ['growl']
+    static $inject = ['growl'];
 
     constructor(private growl: angular.growl.IGrowlService) {
-        super()
+        super();
     }
 
     $onInit(): void {
-        this.srcRefOb = this.resolve.getSrcRefOb
-        this.docName = this.resolve.getDocName
-        this.oking = false
-        this.commitMessage = ''
-        this.createForm = true
+        this.srcRefOb = this.resolve.getSrcRefOb;
+        this.docName = this.resolve.getDocName;
+        this.oking = false;
+        this.commitMessage = '';
+        this.createForm = true;
     }
 
     public ok = (): void => {
         if (this.oking) {
-            this.growl.info('Please wait...')
-            return
+            this.growl.info('Please wait...');
+            return;
         }
-        this.oking = false
-    }
+        this.oking = false;
+    };
 
     public cancel = (): void => {
-        this.modalInstance.dismiss()
-    }
+        this.modalInstance.dismiss();
+    };
 }
 
 const MergeConfirmModalComponent: VeModalComponent = {
@@ -88,6 +88,6 @@ const MergeConfirmModalComponent: VeModalComponent = {
         resolve: '<',
     },
     controller: MergeConfirmModalController,
-}
+};
 
-veComponents.component(MergeConfirmModalComponent.selector, MergeConfirmModalComponent)
+veComponents.component(MergeConfirmModalComponent.selector, MergeConfirmModalComponent);

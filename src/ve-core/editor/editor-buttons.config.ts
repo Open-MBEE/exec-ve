@@ -1,4 +1,4 @@
-import { IButtonBarButton } from '@ve-core/button-bar'
+import { IButtonBarButton } from '@ve-core/button-bar';
 
 export const editor_buttons: IButtonBarButton[] = [
     {
@@ -43,4 +43,4 @@ export const editor_buttons: IButtonBarButton[] = [
         tooltip: 'Preview Changes',
         api: 'preview',
     },
-]
+];

@@ -1,34 +1,34 @@
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VeComponentOptions } from '@ve-types/angular'
-import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular';
+import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
 
 interface TableExportModalResolve extends VeModalResolve {
-    type: string
+    type: string;
 }
 
 export interface TableExportModalResolveFn extends VeModalResolveFn {
-    type(): string
+    type(): string;
 }
 
 class TableExportModalController extends VeModalControllerImpl<string> implements VeModalController {
     //bindings
-    resolve: TableExportModalResolve
+    resolve: TableExportModalResolve;
     //local
-    type
+    type;
 
     $onInit(): void {
-        this.type = this.resolve.type
+        this.type = this.resolve.type;
     }
 
     public export(): void {
-        this.modalInstance.close('export')
+        this.modalInstance.close('export');
     }
 
     public cancel(): void {
-        this.modalInstance.dismiss()
+        this.modalInstance.dismiss();
     }
 }
 
@@ -67,6 +67,6 @@ const TableExportModalComponent: VeComponentOptions = {
         resolve: '<',
     },
     controller: TableExportModalController,
-}
+};
 
-veApp.component(TableExportModalComponent.selector, TableExportModalComponent)
+veApp.component(TableExportModalComponent.selector, TableExportModalComponent);
