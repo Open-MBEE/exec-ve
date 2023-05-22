@@ -1,55 +1,55 @@
-import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs'
-import angular, { IComponentController } from 'angular'
+import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
+import angular, { IComponentController } from 'angular';
 
-import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { onChangesCallback } from '@ve-utils/utils'
+import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
+import { onChangesCallback } from '@ve-utils/utils';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import { DocumentObject, GroupObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms'
+import { VeComponentOptions, VeQService } from '@ve-types/angular';
+import { DocumentObject, GroupObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms';
 
 interface BreadcrumbObject {
-    name: string
-    id: string
-    type: string
-    link: string
+    name: string;
+    id: string;
+    type: string;
+    link: string;
 }
 
 class MenuController implements IComponentController {
     //bindings
-    public params: ParamsObject
-    public mmsProject: ProjectObject
-    public mmsProjects: ProjectObject[]
-    public mmsGroup: GroupObject
-    public mmsGroups: GroupObject[]
-    public mmsRef: RefObject
-    public mmsRefs: RefObject[]
-    public mmsDocument: DocumentObject
+    public params: ParamsObject;
+    public mmsProject: ProjectObject;
+    public mmsProjects: ProjectObject[];
+    public mmsGroup: GroupObject;
+    public mmsGroups: GroupObject[];
+    public mmsRef: RefObject;
+    public mmsRefs: RefObject[];
+    public mmsDocument: DocumentObject;
 
     //Locals
-    spin: boolean
-    public child: DocumentObject | GroupObject
-    crumbs: BreadcrumbObject[] = []
-    groups: GroupObject[]
-    projects: ProjectObject[]
-    refs: RefObject[]
-    tags: RefObject[]
-    document: DocumentObject
-    view: ViewObject
+    spin: boolean;
+    public child: DocumentObject | GroupObject;
+    crumbs: BreadcrumbObject[] = [];
+    groups: GroupObject[];
+    projects: ProjectObject[];
+    refs: RefObject[];
+    tags: RefObject[];
+    document: DocumentObject;
+    view: ViewObject;
     groupsMap: {
-        [id: string]: { id: string; name: string; parentId: string }
-    } = {}
-    isRefsView: boolean = false
-    public htmlTooltip
-    public currentProject: string
-    public currentRef: RefObject
-    public currentBranch: string
-    public currentTag: string
-    public breadcrumbs: BreadcrumbObject[]
-    public truncateStyle
-    public subs: Rx.IDisposable[]
+        [id: string]: { id: string; name: string; parentId: string };
+    } = {};
+    isRefsView: boolean = false;
+    public htmlTooltip;
+    public currentProject: string;
+    public currentRef: RefObject;
+    public currentBranch: string;
+    public currentTag: string;
+    public breadcrumbs: BreadcrumbObject[];
+    public truncateStyle: { [key: string]: unknown };
+    public subs: Rx.IDisposable[];
 
     static $inject = [
         '$q',
@@ -62,7 +62,7 @@ class MenuController implements IComponentController {
         'UtilsService',
         'RootScopeService',
         'EventService',
-    ]
+    ];
     constructor(
         public $q: VeQService,
         private $uiRouterGlobals: UIRouterGlobals,
@@ -75,77 +75,78 @@ class MenuController implements IComponentController {
         private rootScopeSvc: RootScopeService,
         public eventSvc: EventService
     ) {
-        this.htmlTooltip = 'Branch temporarily unavailable during duplication.'
+        this.htmlTooltip = 'Branch temporarily unavailable during duplication.';
     }
 
     $onInit(): void {
-        this.eventSvc.$init(this)
-        this.projects = this.mmsProjects
-        this.groups = this.mmsGroups
-        this.refs = this.mmsRefs
+        this.eventSvc.$init(this);
+        this.projects = this.mmsProjects;
+        this.groups = this.mmsGroups;
+        this.refs = this.mmsRefs;
         if (this.mmsProject && !this.currentProject) {
-            this.currentProject = this.mmsProject.name
+            this.currentProject = this.mmsProject.name;
         }
         if (this.mmsRef && !this.currentRef) {
-            this.currentRef = this.mmsRef
+            this.currentRef = this.mmsRef;
             if (this.mmsRef.type === 'Branch') {
-                this.currentBranch = this.mmsRef.name
+                this.currentBranch = this.mmsRef.name;
             } else if (this.mmsRef.type === 'Tag') {
-                this.currentTag = this.mmsRef.name
+                this.currentTag = this.mmsRef.name;
             }
         }
         this.tags = this.mmsRefs.filter((ref) => {
-            return ref.type === 'Tag'
-        })
-        this.updateGroups()
+            return ref.type === 'Tag';
+        });
+        this.breadcrumbs = [];
+        this.updateGroups();
 
         this.$transitions.onSuccess({}, () => {
-            this.spin = true
-            this.updateBreadcrumbs()
-        })
+            this.spin = true;
+            this.updateBreadcrumbs();
+        });
     }
 
     updateGroups: onChangesCallback<undefined> = () => {
-        this.groupsMap = {}
-        this.spin = true
+        this.groupsMap = {};
+        this.spin = true;
         if (typeof this.mmsGroups !== 'undefined') {
-            this.groups = this.mmsGroups
+            this.groups = this.mmsGroups;
             for (let i = 0; i < this.groups.length; i++) {
                 this.groupsMap[this.groups[i].id] = {
                     id: this.groups[i].id,
                     name: this.groups[i].name,
                     parentId: this.groups[i]._parentId,
-                }
+                };
             }
-            this.updateBreadcrumbs()
+            this.updateBreadcrumbs();
         } else {
-            this.updateBreadcrumbs()
+            this.updateBreadcrumbs();
         }
-    }
+    };
 
     public updateBreadcrumbs: onChangesCallback<undefined> = () => {
-        let parentId = ''
-        let oldChild = null
-        if (this.child) oldChild = this.child
+        let parentId = '';
+        let oldChild = null;
+        if (this.child) oldChild = this.child;
 
         if (this.mmsDocument) {
-            this.child = this.mmsDocument
-            this.rootScopeSvc.veTitle(this.mmsDocument.name)
+            this.child = this.mmsDocument;
+            this.rootScopeSvc.veTitle(this.mmsDocument.name);
         } else if (this.mmsGroup) {
-            this.rootScopeSvc.veTitle(this.mmsGroup.name)
-            this.child = this.mmsGroup
+            this.rootScopeSvc.veTitle(this.mmsGroup.name);
+            this.child = this.mmsGroup;
         } else {
-            this.rootScopeSvc.veTitle(this.currentProject)
+            this.rootScopeSvc.veTitle(this.currentProject);
         }
 
         // Check for Refs View, Skip the rest if it is
         if (this.$state.includes('main.project.ref.refs')) {
-            this.isRefsView = true
-            return
+            this.isRefsView = true;
+            return;
         }
 
         if (this.child && this.child != oldChild) {
-            this.crumbs = []
+            this.crumbs = [];
             if (this.child.type === 'Package') {
                 //child.hasOwnProperty('_id')) {
                 this.crumbs.push({
@@ -153,9 +154,9 @@ class MenuController implements IComponentController {
                     id: this.child.id,
                     type: 'group',
                     link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', keywords: undefined})",
-                })
+                });
                 if (this.child._parentId) {
-                    parentId = (this.child as GroupObject)._parentId
+                    parentId = (this.child as GroupObject)._parentId;
                 }
             } else {
                 this.crumbs.push({
@@ -163,41 +164,41 @@ class MenuController implements IComponentController {
                     id: this.child.id,
                     type: 'doc',
                     link: 'main.project.ref.view.present({documentId: breadcrumb.id, keywords: undefined})',
-                })
+                });
                 if (this.child._groupId) {
-                    parentId = (this.child as DocumentObject)._groupId
+                    parentId = (this.child as DocumentObject)._groupId;
                 }
             }
             if (parentId) {
                 while (this.groupsMap[parentId] !== undefined) {
-                    const id = this.groupsMap[parentId].id
+                    const id = this.groupsMap[parentId].id;
                     this.crumbs.push({
                         name: this.groupsMap[id].name,
                         id: id,
                         type: 'group',
                         link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', keywords: undefined})",
-                    })
-                    parentId = this.groupsMap[id].parentId
+                    });
+                    parentId = this.groupsMap[id].parentId;
                 }
             }
-            this.breadcrumbs = this.crumbs.reverse()
-            void this.$timeout(() => {
-                const eltChildren = this.$element.children().children()
-                const eltParent = this.$element.parent()[0]
-                const eltWidth = eltParent.clientWidth - eltChildren[1].scrollWidth - eltChildren[3].scrollWidth
-                const crumbcount = this.breadcrumbs.length
-                const liWidth = (eltWidth * 0.85) / crumbcount
-                this.truncateStyle = {
-                    'max-width': liWidth,
-                    'white-space': 'nowrap',
-                    overflow: 'hidden',
-                    'text-overflow': 'ellipsis',
-                    display: 'inline-block',
-                }
-            })
+            this.breadcrumbs = this.crumbs.reverse();
         }
-        this.spin = false
-    }
+        void this.$timeout(() => {
+            const eltChildren = this.$element.children().children();
+            const eltParent = this.$element.parent()[0];
+            const eltWidth = eltParent.clientWidth - eltChildren[1].scrollWidth - eltChildren[3].scrollWidth;
+            const crumbcount = this.breadcrumbs.length;
+            const liWidth = this.breadcrumbs.length > 0 ? (eltWidth * 0.85) / crumbcount : 0;
+            this.truncateStyle = {
+                'max-width': liWidth.toString(),
+                'white-space': 'nowrap',
+                overflow: 'hidden',
+                'text-overflow': 'ellipsis',
+                display: 'inline-block',
+            };
+        });
+        this.spin = false;
+    };
 
     updateProject(project: ProjectObject): void {
         if (project) {
@@ -209,7 +210,7 @@ class MenuController implements IComponentController {
                     keywords: undefined,
                 },
                 { reload: true }
-            )
+            );
         }
     }
 
@@ -223,7 +224,7 @@ class MenuController implements IComponentController {
                     keywords: undefined,
                 },
                 { reload: true }
-            )
+            );
         }
     }
 
@@ -232,14 +233,14 @@ class MenuController implements IComponentController {
             'main.project.ref.refs',
             { projectId: this.params.projectId, refId: this.params.refId },
             { reload: true }
-        )
+        );
     }
 
     goHome(): void {
         void this.$state.go('main.project.ref.portal', {
             field: undefined,
             keywords: undefined,
-        })
+        });
     }
 }
 
@@ -262,7 +263,7 @@ const MainMenuComponent: VeComponentOptions = {
     </div>
     <div ng-hide="$ctrl.spin || $ctrl.isRefsView" class="breadcrumbs">
         <ul>
-            <li ng-style="$ctrl.truncateStyle">
+            <li ng-style="{{ $ctrl.truncateStyle }}">
                 <a type="button" class="back-to-proj" ng-click="$ctrl.goHome()" uib-tooltip="{{ $ctrl.currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i class="fa-solid fa-home fa-1x" aria-hidden="true"></i>
                 </a>
@@ -328,6 +329,6 @@ const MainMenuComponent: VeComponentOptions = {
         mmsDocument: '<',
     },
     controller: MenuController,
-}
+};
 
-veApp.component(MainMenuComponent.selector, MainMenuComponent)
+veApp.component(MainMenuComponent.selector, MainMenuComponent);

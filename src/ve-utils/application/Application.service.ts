@@ -1,12 +1,12 @@
-import { ApiService, ElementService, ProjectService } from '@ve-utils/mms-api-client'
+import { CacheService } from '@ve-utils/core';
+import { ApiService, ElementService, ProjectService } from '@ve-utils/mms-api-client';
 
-import { veUtils } from '@ve-utils'
+import { veUtils } from '@ve-utils';
 
-import { BrandingStyle } from './Branding.service'
+import { BrandingStyle } from './Branding.service';
 
-import { VePromise, VeQService } from '@ve-types/angular'
-import { ElementObject, UsersRequest } from '@ve-types/mms'
-import { CacheService } from '@ve-utils/core'
+import { VePromise, VeQService } from '@ve-types/angular';
+import { ElementObject, UsersRequest } from '@ve-types/mms';
 /**
  * @ngdoc service
  * @name veUtils/ApplicationService
@@ -18,19 +18,19 @@ import { CacheService } from '@ve-utils/core'
  */
 
 export interface ProjectSettingsObject extends ElementObject {
-    banner?: BrandingStyle
-    footer?: BrandingStyle
+    banner?: BrandingStyle;
+    footer?: BrandingStyle;
 }
 
 export interface UserSettingsObject extends ElementObject {
-    pinned?: string[]
+    pinned?: string[];
 }
 
 export interface VeApplicationState {
-    inDoc: boolean
-    fullDoc: boolean
-    currentDoc: string
-    user: string
+    inDoc: boolean;
+    fullDoc: boolean;
+    currentDoc: string;
+    user: string;
 }
 
 export class ApplicationService {
@@ -39,11 +39,11 @@ export class ApplicationService {
         fullDoc: false,
         currentDoc: null,
         user: null,
-    }
+    };
 
-    public PROJECT_URL_PREFIX = '#/projects/'
+    public PROJECT_URL_PREFIX = '#/projects/';
 
-    static $inject = ['$q', 'ProjectService', 'ElementService', 'ApiService', 'CacheService']
+    static $inject = ['$q', 'ProjectService', 'ElementService', 'ApiService', 'CacheService'];
 
     constructor(
         private $q: VeQService,
@@ -54,22 +54,22 @@ export class ApplicationService {
     ) {}
 
     public getState(): VeApplicationState {
-        return this.state
+        return this.state;
     }
 
     public copyToClipboard(target: JQuery<HTMLElement>, $event: JQuery.ClickEvent): VePromise<void, unknown> {
-        const deferred = this.$q.defer<void>()
-        $event.stopPropagation()
+        const deferred = this.$q.defer<void>();
+        $event.stopPropagation();
 
         navigator.clipboard.writeText(target[0].childNodes[0].textContent).then(
             () => {
-                deferred.resolve()
+                deferred.resolve();
             },
             (reason) => {
-                deferred.reject(reason)
+                deferred.reject(reason);
             }
-        )
-        return deferred.promise
+        );
+        return deferred.promise;
     }
 
     public getUserSettings = (
@@ -77,10 +77,10 @@ export class ApplicationService {
         refresh?: boolean,
         weight?: number
     ): VePromise<UserSettingsObject> => {
-        const cacheKey = this.apiSvc.makeCacheKey(reqOb, '_hidden_' + reqOb.username + '_ve_settings', false)
-        const cached = this.cacheSvc.get<UserSettingsObject>(cacheKey)
+        const cacheKey = this.apiSvc.makeCacheKey(reqOb, '_hidden_' + reqOb.username + '_ve_settings', false);
+        const cached = this.cacheSvc.get<UserSettingsObject>(cacheKey);
         if (cached && !refresh) {
-            return this.$q.resolve(cached)
+            return this.$q.resolve(cached);
         }
         return new this.$q<UserSettingsObject>((resolve, reject) => {
             this.elementSvc
@@ -110,18 +110,18 @@ export class ApplicationService {
                                     },
                                 ],
                             })
-                            .then(resolve, reject)
-                    } else resolve(result)
-                }, reject)
-        })
-    }
+                            .then(resolve, reject);
+                    } else resolve(result);
+                }, reject);
+        });
+    };
 
     public updateUserSettings = (
         reqOb: UsersRequest,
         settingsOb: UserSettingsObject
     ): VePromise<UserSettingsObject> => {
-        return this.elementSvc.updateElement<UserSettingsObject>(settingsOb)
-    }
+        return this.elementSvc.updateElement<UserSettingsObject>(settingsOb);
+    };
 
     public getSettings = (
         projectId: string,
@@ -129,11 +129,11 @@ export class ApplicationService {
         refresh?: boolean,
         weight?: number
     ): VePromise<ProjectSettingsObject> => {
-        if (!refId) refId = 'master'
-        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '_hidden_' + projectId + '_settings', false)
-        const cached = this.cacheSvc.get<ProjectSettingsObject>(cacheKey)
+        if (!refId) refId = 'master';
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '_hidden_' + projectId + '_settings', false);
+        const cached = this.cacheSvc.get<ProjectSettingsObject>(cacheKey);
         if (cached && !refresh) {
-            return this.$q.resolve(cached)
+            return this.$q.resolve(cached);
         }
         return new this.$q<ProjectSettingsObject>((resolve, reject) => {
             this.elementSvc
@@ -149,11 +149,11 @@ export class ApplicationService {
                 )
                 .then((result) => {
                     if (result === null) {
-                        this.createSettings(projectId, refId, null).then(resolve, reject)
-                    } else resolve(result)
-                }, reject)
-        })
-    }
+                        this.createSettings(projectId, refId, null).then(resolve, reject);
+                    } else resolve(result);
+                }, reject);
+        });
+    };
 
     public createSettings = (
         projectId: string,
@@ -167,21 +167,21 @@ export class ApplicationService {
                 _projectId: projectId,
                 _refId: refId,
                 type: 'Class',
-            }
+            };
         }
         return this.elementSvc.createElement<ProjectSettingsObject>({
             elementId: '_hidden_' + projectId + '_settings',
             projectId,
             refId,
             elements: [settingsOb],
-        })
-    }
+        });
+    };
 
     addPins(username: string, projectId: string, refId: string, pinned: string[]): VePromise<UserSettingsObject> {
         return new this.$q((resolve, reject) => {
             this.getUserSettings({ username, projectId, refId }).then((result) => {
                 if (result.pinned) {
-                    pinned = [...new Set([...result.pinned, ...pinned])]
+                    pinned = [...new Set([...result.pinned, ...pinned])];
                 }
                 this.elementSvc
                     .updateElement<UserSettingsObject>({
@@ -190,9 +190,9 @@ export class ApplicationService {
                         _projectId: result._projectId,
                         pinned,
                     })
-                    .then(resolve, reject)
-            }, reject)
-        })
+                    .then(resolve, reject);
+            }, reject);
+        });
     }
 
     removePins(username: string, projectId: string, refId: string, unpinned: string[]): VePromise<UserSettingsObject> {
@@ -200,8 +200,8 @@ export class ApplicationService {
             this.getUserSettings({ username, projectId, refId }).then((response) => {
                 if (response.pinned) {
                     const pinned = response.pinned.filter((pin) => {
-                        return unpinned.includes(pin)
-                    })
+                        return unpinned.includes(pin);
+                    });
                     this.elementSvc
                         .updateElement<UserSettingsObject>({
                             id: response.id,
@@ -209,11 +209,11 @@ export class ApplicationService {
                             _projectId: response._projectId,
                             pinned,
                         })
-                        .then(resolve, reject)
-                } else resolve(response)
-            }, reject)
-        })
+                        .then(resolve, reject);
+                } else resolve(response);
+            }, reject);
+        });
     }
 }
 
-veUtils.service('ApplicationService', ApplicationService)
+veUtils.service('ApplicationService', ApplicationService);

@@ -1,4 +1,4 @@
-import angular from 'angular'
+import angular from 'angular';
 
 /**
  *
@@ -10,11 +10,11 @@ export const veComponents = angular.module('ve-components', [
     'ui.bootstrap',
     'angular-growl',
     // 'ngSanitize',
-])
+]);
 
 // veComponents.config(['$sanitizeProvider', function($sanitizeProvider: angular.sanitize.ISanitizeProvider) {
 //     $sanitizeProvider.addValidElements({
-//         htmlElements: ['mms-cf', 'view-link', 'transclude-doc', 'transclude-val', 'transclude-name', 'transclude-view'],
+//         htmlElements: ['mms-cf', 'mms-view-link', 'transclude-doc', 'transclude-val', 'transclude-name', 'transclude-view'],
 //     })
 //         .addValidAttrs(['mms-data', 'mms-cf-type', 'mms-element-id', 'mms-project-id', 'mms-ref-id',
 //             'mms-commit-id', 'mms-watch-id', 'non-editable', 'mms-generate-for-diff'])
@@ -24,10 +24,10 @@ veComponents
     .filter('veRealNum', () => {
         return (n: string | number): string => {
             if (Number.isInteger(n)) {
-                return `${n}.0`
+                return `${n}.0`;
             }
-            return n as string
-        }
+            return n as string;
+        };
     })
     .constant('CKEDITOR', window.CKEDITOR)
-    .constant('veConfig', window.__env)
+    .constant('veConfig', window.__env);

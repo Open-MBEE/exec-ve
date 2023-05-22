@@ -1,10 +1,11 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { ComponentService } from '@ve-components/services'
-import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools'
-import { ToolbarApi, ToolbarService } from '@ve-core/toolbar'
-import { ApplicationService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
+import { ComponentService } from '@ve-components/services';
+import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools';
+import { EditorService } from '@ve-core/editor';
+import { ToolbarApi, ToolbarService } from '@ve-core/toolbar';
+import { ApplicationService } from '@ve-utils/application';
+import { EditService, EventService } from '@ve-utils/core';
 import {
     URLService,
     ElementService,
@@ -12,14 +13,13 @@ import {
     PermissionsService,
     ProjectService,
     ApiService,
-    ValueService
-} from '@ve-utils/mms-api-client'
+    ValueService,
+} from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromiseReason, VeQService } from '@ve-types/angular'
-import { ElementObject, ElementsResponse } from "@ve-types/mms";
-import { EditorService } from "@ve-core/editor";
+import { VeComponentOptions, VePromiseReason, VeQService } from '@ve-types/angular';
+import { ElementObject, ElementsResponse } from '@ve-types/mms';
 
 /**
  * @ngdoc directive
@@ -89,9 +89,9 @@ import { EditorService } from "@ve-core/editor";
  */
 
 class SpecEditorController extends SpecTool implements ISpecTool {
-    static $inject = [...SpecTool.$inject, 'EditService', 'ValueService', 'EditorService']
+    static $inject = [...SpecTool.$inject, 'EditService', 'ValueService', 'EditorService'];
 
-    private isValue: boolean
+    private isValue: boolean;
 
     constructor(
         $q: VeQService,
@@ -129,45 +129,48 @@ class SpecEditorController extends SpecTool implements ISpecTool {
             eventSvc,
             specSvc,
             toolbarSvc
-        )
-        this.specType = _.kebabCase(SpecEditorComponent.selector)
-        this.specTitle = 'Edit Element'
+        );
+        this.specType = _.kebabCase(SpecEditorComponent.selector);
+        this.specTitle = 'Edit Element';
     }
 
     configToolbar = (api: ToolbarApi): void => {
         if (this.autosaveSvc.openEdits() > 0) {
             //Tell toolbar to show an open edit if there are open edits
-            api.setIcon('spec-editor', 'fa-edit-asterisk')
-            api.setPermission('spec-editor.saveall', true)
+            api.setIcon('spec-editor', 'fa-edit-asterisk');
+            api.setPermission('spec-editor.saveall', true);
         }
-    }
+    };
 
     initCallback = (): void => {
-        this.specSvc.setEditing(true)
-        const e = this.specSvc.getElement()
-        this.editorSvc.openEdit(e).then((editOb) => {
-            this.specSvc.tracker.etrackerSelected = editOb.key
-            this.specSvc.toggleSave(this.toolbarId)
-            this.elementSvc.isCacheOutdated(editOb.element).then(
-                (data) => {
-                    const server = data.server ? data.server._modified : new Date()
-                    const cache = data.cache ? data.cache._modified : new Date()
-                    if (data.status && server > cache)
-                        this.growl.error(
-                            'This element has been updated on the server. Please refresh the page to get the latest version.'
-                        )
-                },
-                (reason) => {
-                    this.growl.error(reason.message)
-                }
-            )
-            this.edit = editOb
-            this.specSvc.setEdits(editOb)
-            this.isValue = this.valueSvc.isValue(editOb.element)
-        }, (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
-            this.growl.error(reason.message)
-        })
-    }
+        this.specSvc.setEditing(true);
+        const e = this.specSvc.getElement();
+        this.editorSvc.openEdit(e).then(
+            (editOb) => {
+                this.specSvc.tracker.etrackerSelected = editOb.key;
+                this.specSvc.toggleSave(this.toolbarId);
+                this.elementSvc.isCacheOutdated(editOb.element).then(
+                    (data) => {
+                        const server = data.server ? data.server._modified : new Date();
+                        const cache = data.cache ? data.cache._modified : new Date();
+                        if (data.status && server > cache)
+                            this.growl.error(
+                                'This element has been updated on the server. Please refresh the page to get the latest version.'
+                            );
+                    },
+                    (reason) => {
+                        this.growl.error(reason.message);
+                    }
+                );
+                this.edit = editOb;
+                this.specSvc.setEdits(editOb);
+                this.isValue = this.valueSvc.isValue(editOb.element);
+            },
+            (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
+                this.growl.error(reason.message);
+            }
+        );
+    };
 }
 const SpecEditorComponent: VeComponentOptions = {
     selector: 'specEditor',
@@ -189,7 +192,7 @@ const SpecEditorComponent: VeComponentOptions = {
     <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
     <span class="elem-type-wrapper prop">
         <span class="elem-type">{{$ctrl.element.type}}</span>
-        <div ng-repeat="type in $ctrl.element._appliedStereotypeIds" class="elem-type">
+        <div ng-repeat="type in $ctrl.element.appliedStereotypeIds" class="elem-type">
             <transclude-name mms-element-id="{{type}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" no-click="true"></transclude-name>
         </div>
     </span>
@@ -217,6 +220,6 @@ const SpecEditorComponent: VeComponentOptions = {
         mmsDisplayOldSpec: '<?',
     },
     controller: SpecEditorController,
-}
+};
 
-veComponents.component(SpecEditorComponent.selector, SpecEditorComponent)
+veComponents.component(SpecEditorComponent.selector, SpecEditorComponent);

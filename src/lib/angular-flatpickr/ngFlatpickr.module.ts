@@ -1,10 +1,13 @@
-import angular from 'angular'
-import * as _flatpickr from 'flatpickr'
-import { FlatpickrFn, Instance } from 'flatpickr/dist/types/instance'
+import angular, { IComponentController } from 'angular';
+import flatpickr from 'flatpickr';
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions } from '@ve-types/angular';
 
-const flatpickr: FlatpickrFn = _flatpickr.default
+export interface ngFlatpickrOptions extends flatpickr.Options.Options {
+    placeholder: string;
+}
+
+export type ngFlatpickrCallback = (fpInstance: flatpickr.Instance) => void;
 
 const ngFlatpickrComponent: VeComponentOptions = {
     selector: 'ngFlatpickr',
@@ -19,74 +22,63 @@ const ngFlatpickrComponent: VeComponentOptions = {
         fpOpts: '<',
         fpOnSetup: '&',
     },
-    controller: class ngFlatpickrCtrl implements angular.IComponentController {
-        static $inject = ['$element', '$timeout', '$scope']
+    controller: class ngFlatpickrCtrl implements IComponentController {
+        static $inject = ['$element', '$timeout', '$scope'];
 
         //Bindings
-        private fpOpts
-        private fpOnSetup
+        private fpOpts: ngFlatpickrOptions;
+        private fpOnSetup: ngFlatpickrCallback;
 
-        private inputDate
+        private inputDate: number;
 
-        constructor(
-            private $element: JQuery<HTMLElement>,
-            private $timeout: angular.ITimeoutService,
-            private $scope: angular.IScope
-        ) {}
+        constructor(private $element: JQuery<HTMLElement>, private $timeout: angular.ITimeoutService) {}
 
-        $onInit() {
-            this.fpOpts.placeholder = this.fpOpts.placeholder || 'Select Date..'
+        $onInit(): void {
+            this.fpOpts.placeholder = this.fpOpts.placeholder || 'Select Date..';
         }
 
         $postLink(): void {
-            this.grabElementAndRunFlatpickr()
+            this.grabElementAndRunFlatpickr();
         }
 
-        $onChanges() {
-            this.grabElementAndRunFlatpickr()
+        $onChanges(): void {
+            this.grabElementAndRunFlatpickr();
         }
 
-        grabElementAndRunFlatpickr = () => {
-            this.$timeout(
+        grabElementAndRunFlatpickr = (): void => {
+            void this.$timeout(
                 () => {
-                    const transcludeEl = this.$element.find('ng-transclude')[0]
-                    const element = transcludeEl.children[0]
+                    const transcludeEl = this.$element.find('ng-transclude')[0];
+                    const element = transcludeEl.children[0];
 
-                    this.setDatepicker(element)
+                    this.setDatepicker(element);
                 },
                 0,
                 true
-            )
-        }
+            );
+        };
 
-        setDatepicker = (element) => {
-            const fpLib = flatpickr
-
-            if (!fpLib) {
-                return console.warn('Unable to find any flatpickr installation')
+        setDatepicker = (element: Element): void => {
+            if (!flatpickr) {
+                return console.warn('Unable to find any flatpickr installation');
             }
 
-            const fpInstance: Instance = fpLib(element, this.fpOpts)
+            const fpInstance: flatpickr.Instance = flatpickr(element, this.fpOpts);
 
             if (this.fpOnSetup) {
-                this.fpOnSetup({
-                    fpItem: fpInstance,
-                })
+                this.fpOnSetup(fpInstance);
             }
 
             // If has ngModel set the date
             if (this.inputDate) {
-                fpInstance.setDate(this.inputDate)
+                fpInstance.setDate(this.inputDate);
             }
 
             // destroy the flatpickr instance when the dom element is removed
             angular.element(element).on('$destroy', () => {
-                fpInstance.destroy()
-            })
-
-            // Refresh the scope
-            //this.$scope.$applyAsync();
-        }
+                fpInstance.destroy();
+            });
+        };
     },
-}
-angular.module('angular-flatpickr', []).component(ngFlatpickrComponent.selector, ngFlatpickrComponent)
+};
+angular.module('angular-flatpickr', []).component(ngFlatpickrComponent.selector, ngFlatpickrComponent);

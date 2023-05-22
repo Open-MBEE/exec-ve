@@ -1,16 +1,17 @@
-import { ExtensionService, ComponentService } from '@ve-components/services'
-import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions'
-import { ButtonBarService } from '@ve-core/button-bar'
-import { EditorService } from '@ve-core/editor'
-import { MathService, UtilsService, ImageService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ExtensionService, ComponentService } from '@ve-components/services';
+import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions';
+import { ButtonBarService } from '@ve-core/button-bar';
+import { EditorService } from '@ve-core/editor';
+import { ImageService } from '@ve-core/image';
+import { UtilsService, MathService } from '@ve-utils/application';
+import { EditService, EventService } from '@ve-utils/core';
+import { ElementService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VePromise, VeQService } from '@ve-types/angular'
-import { ElementObject, LiteralObject, SlotObject } from '@ve-types/mms'
+import { VePromise, VeQService } from '@ve-types/angular';
+import { ElementObject, LiteralObject, SlotObject } from '@ve-types/mms';
 
 /**
  * @ngdoc component
@@ -43,9 +44,9 @@ import { ElementObject, LiteralObject, SlotObject } from '@ve-types/mms'
  */
 export class TranscludeNameController extends Transclusion implements ITransclusion {
     //Custom Bindings
-    mmsLinkText: string
+    mmsLinkText: string;
 
-    static $inject = Transclusion.$inject
+    static $inject = Transclusion.$inject;
 
     constructor(
         $q: VeQService,
@@ -82,25 +83,25 @@ export class TranscludeNameController extends Transclusion implements ITransclus
             extensionSvc,
             buttonBarSvc,
             imageSvc
-        )
-        this.cfType = 'name'
-        this.cfTitle = ''
-        this.cfKind = 'Text'
-        this.checkCircular = false
-        this.nonEditable = true
+        );
+        this.cfType = 'name';
+        this.cfTitle = '';
+        this.cfKind = 'Text';
+        this.checkCircular = false;
+        this.nonEditable = true;
     }
 
     $onInit(): void {
-        super.$onInit()
-        if (typeof this.mmsLinkText === 'undefined') this.mmsLinkText = 'Link'
+        super.$onInit();
+        if (typeof this.mmsLinkText === 'undefined') this.mmsLinkText = 'Link';
     }
 
     public getContent = (): VePromise<string | HTMLElement[], string> => {
-        let url = ''
+        let url = '';
         if (this.element.type === 'Property') {
-            const value = this.element.defaultValue
+            const value = this.element.defaultValue;
             if (value && value.type === 'LiteralString') {
-                url = value.value as string
+                url = value.value as string;
             }
         } else if (this.element.type === 'Slot') {
             if (
@@ -108,16 +109,16 @@ export class TranscludeNameController extends Transclusion implements ITransclus
                 this.element.value.length > 0 &&
                 (this.element.value[0] as ElementObject).type === 'LiteralString'
             ) {
-                url = ((this.element as SlotObject).value[0] as LiteralObject<string>).value
+                url = ((this.element as SlotObject).value[0] as LiteralObject<string>).value;
             }
         }
 
         if (url !== '') {
-            return this.$q.resolve('<a ng-href="' + url + '">' + this.mmsLinkText + '</a>')
+            return this.$q.resolve('<a ng-href="' + url + '">' + this.mmsLinkText + '</a>');
         } else {
-            return this.$q.reject('Element does not provide link value.')
+            return this.$q.reject('Element does not provide link value.');
         }
-    }
+    };
 }
 
 export const TranscludeValueLinkComponent: ITransclusionComponentOptions = {
@@ -140,6 +141,6 @@ export const TranscludeValueLinkComponent: ITransclusionComponentOptions = {
         mmsViewCtrl: '?^^view',
     },
     controller: TranscludeNameController,
-}
+};
 
-veComponents.component(TranscludeValueLinkComponent.selector, TranscludeValueLinkComponent)
+veComponents.component(TranscludeValueLinkComponent.selector, TranscludeValueLinkComponent);

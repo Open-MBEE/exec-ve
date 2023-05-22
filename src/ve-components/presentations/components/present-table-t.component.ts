@@ -1,12 +1,12 @@
-import { PresentationLite } from '@ve-components/presentations'
+import { PresentationLite } from '@ve-components/presentations';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { IPresentationComponentOptions } from '@ve-types/components/presentation'
+import { IPresentationComponentOptions } from '@ve-types/components/presentation';
 
 const PresentTableTComponent: IPresentationComponentOptions = {
     selector: 'presentTablet',
-    template: `<view-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></view-cf>
+    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
 `,
     bindings: {
         peObject: '<',
@@ -14,6 +14,6 @@ const PresentTableTComponent: IPresentationComponentOptions = {
         peNumber: '<',
     },
     controller: PresentationLite,
-}
+};
 
-veComponents.component(PresentTableTComponent.selector, PresentTableTComponent)
+veComponents.component(PresentTableTComponent.selector, PresentTableTComponent);

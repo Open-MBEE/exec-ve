@@ -1,1 +1,1 @@
-import './spec-tools/spec-magic.component'
+import './spec-tools/spec-magic.component';

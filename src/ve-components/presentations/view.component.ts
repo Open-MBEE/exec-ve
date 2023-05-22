@@ -1,13 +1,13 @@
-import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
-import { TreeService } from '@ve-components/trees'
-import { RootScopeService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { ElementService, UserService, ViewApi, ViewService } from '@ve-utils/mms-api-client'
-import { handleChange, onChangesCallback } from '@ve-utils/utils'
+import { PresentationService } from '@ve-components/presentations/services/Presentation.service';
+import { TreeService } from '@ve-components/trees';
+import { RootScopeService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
+import { ElementService, UserService, ViewApi, ViewService } from '@ve-utils/mms-api-client';
+import { handleChange, onChangesCallback } from '@ve-utils/utils';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions } from '@ve-types/angular';
 import {
     ElementObject,
     ElementsRequest,
@@ -18,7 +18,7 @@ import {
     ValueObject,
     ViewInstanceSpec,
     ViewObject,
-} from '@ve-types/mms'
+} from '@ve-types/mms';
 
 /**
  * @ngdoc directive
@@ -68,15 +68,15 @@ import {
 
 export class ViewController implements angular.IComponentController {
     // private presentationElemCleanUpFncs: {(): any}[] = [];
-    private mmsElementId: string
-    private mmsProjectId: string
-    private mmsRefId: string
-    private mmsCommitId: string
-    private mmsLink: boolean
-    public mmsViewApi: ViewApi
-    private mmsNumber: number
-    public noTitle: boolean
-    public buttonId: string
+    private mmsElementId: string;
+    private mmsProjectId: string;
+    private mmsRefId: string;
+    private mmsCommitId: string;
+    private mmsLink: boolean;
+    public mmsViewApi: ViewApi;
+    private mmsNumber: number;
+    public noTitle: boolean;
+    public buttonId: string;
 
     static $inject = [
         '$element',
@@ -88,26 +88,26 @@ export class ViewController implements angular.IComponentController {
         'EventService',
         'TreeService',
         'RootScopeService',
-    ]
-    private showEdits: boolean
-    private modified: string
-    private modifier: UserObject
-    private view: ViewObject
+    ];
+    private showEdits: boolean;
+    private modified: string;
+    private modifier: UserObject;
+    private view: ViewObject;
     private reqOb: ElementsRequest<string> = {
         elementId: '',
         projectId: '',
         refId: '',
         commitId: '',
-    }
-    private processed: boolean
-    private isHover: boolean
-    private isSection: boolean
-    private level: number
-    private number: string = ''
-    private showComments: boolean
-    private showElements: boolean
-    private showNumbering: boolean
-    public subs: Rx.IDisposable[]
+    };
+    private processed: boolean;
+    private isHover: boolean;
+    private isSection: boolean;
+    private level: number;
+    private number: string = '';
+    private showComments: boolean;
+    private showElements: boolean;
+    private showNumbering: boolean;
+    public subs: Rx.IDisposable[];
 
     constructor(
         private $element: JQuery<HTMLElement>,
@@ -122,59 +122,59 @@ export class ViewController implements angular.IComponentController {
     ) {}
 
     $onInit(): void {
-        this.eventSvc.$init(this)
+        this.eventSvc.$init(this);
 
         this.reqOb = {
             elementId: this.mmsElementId,
             projectId: this.mmsProjectId,
             refId: this.mmsRefId,
             commitId: this.mmsCommitId,
-        }
-        this.processed = false
+        };
+        this.processed = false;
         if (this.mmsNumber) {
-            this.number = this.mmsNumber.toString(10)
+            this.number = this.mmsNumber.toString(10);
         } else if (this.treeSvc.branch2viewNumber[this.mmsElementId]) {
-            this.number = this.treeSvc.branch2viewNumber[this.mmsElementId]
+            this.number = this.treeSvc.branch2viewNumber[this.mmsElementId];
         }
-        this.showNumbering = this.rootScopeSvc.veNumberingOn()
+        this.showNumbering = this.rootScopeSvc.veNumberingOn();
 
-        this.isSection = false
-        this.showElements = false
-        this.showComments = false
-        this.showEdits = false
+        this.isSection = false;
+        this.showElements = false;
+        this.showComments = false;
+        this.showEdits = false;
 
         this.subs.push(
             this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VEELEMENTSON, (data) => {
-                this.toggleShowElements(data)
+                this.toggleShowElements(data);
             }),
             this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VECOMMENTSON, (data) => {
-                this.toggleShowComments(data)
+                this.toggleShowComments(data);
             }),
             this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VENUMBERINGON, (data) => {
-                this.showNumbering = data
+                this.showNumbering = data;
             }),
             this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VEEDITMODE, (data) => {
-                this.toggleShowEdits(data)
+                this.toggleShowEdits(data);
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
-                if (!data) return
+                if (!data) return;
                 if (this.treeSvc.branch2viewNumber[this.mmsElementId]) {
-                    this.level = this.treeSvc.branch2viewNumber[this.mmsElementId].split('.').length
+                    this.level = this.treeSvc.branch2viewNumber[this.mmsElementId].split('.').length;
                 }
             })
-        )
+        );
 
-        this._changeView(this.mmsElementId, '')
+        this._changeView(this.mmsElementId, '');
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject): void {
         handleChange(onChangesObj, 'mmsNumber', (newVal: string) => {
-            this.number = newVal
-        })
-        handleChange(onChangesObj, 'mmsElementId', this._changeView, true)
+            this.number = newVal;
+        });
+        handleChange(onChangesObj, 'mmsElementId', this._changeView, true);
     }
 
     public isTranscludedElement = (elementName): boolean => {
@@ -185,35 +185,35 @@ export class ViewController implements angular.IComponentController {
             elementName === 'MMS-TRANSCLUDE-IMG' ||
             elementName === 'MMS-TRANSCLUDE-NAME' ||
             elementName === 'MMS-TRANSCLUDE-VAL'
-        )
-    }
+        );
+    };
 
     public isEditable = (): boolean => {
-        return this.showEdits
-    }
+        return this.showEdits;
+    };
 
     public transcludeClicked = (elementOb: ElementObject): void => {
-        if (this.mmsViewApi && this.mmsViewApi.elementClicked && elementOb) this.mmsViewApi.elementClicked(elementOb)
-    }
+        if (this.mmsViewApi && this.mmsViewApi.elementClicked && elementOb) this.mmsViewApi.elementClicked(elementOb);
+    };
 
     public elementTranscluded = (elem: ElementObject, type: string): void => {
         if (elem) {
             if (elem._modified > this.modified && type !== 'Comment') {
-                this.modified = elem._modified
+                this.modified = elem._modified;
                 if (elem._modifier) {
                     this.userSvc.getUserData(elem._modifier).then(
                         (result) => {
-                            this.modifier = result
+                            this.modifier = result;
                         },
                         () => {
-                            this.modifier = { username: elem._modifier }
+                            this.modifier = { username: elem._modifier };
                         }
-                    )
+                    );
                 }
             }
-            if (this.mmsViewApi && this.mmsViewApi.elementTranscluded) this.mmsViewApi.elementTranscluded(elem, type)
+            if (this.mmsViewApi && this.mmsViewApi.elementTranscluded) this.mmsViewApi.elementTranscluded(elem, type);
         }
-    }
+    };
 
     //INFO this was getWsAndVersion
     public getElementOrigin = (): RequestObject => {
@@ -221,20 +221,20 @@ export class ViewController implements angular.IComponentController {
             projectId: this.mmsProjectId,
             refId: this.mmsRefId,
             commitId: this.mmsCommitId,
-        }
-    }
+        };
+    };
 
     public getView = (): ViewObject => {
         // this view gets set in the viewlink fnc
-        return this.view
-    }
+        return this.view;
+    };
 
     public hoverIn = (): void => {
-        this.isHover = true
-    }
+        this.isHover = true;
+    };
     public hoverOut = (): void => {
-        this.isHover = false
-    }
+        this.isHover = false;
+    };
 
     // public setPeLineVisibility($event) {
     //      window.setTimeout(() => {
@@ -248,37 +248,37 @@ export class ViewController implements angular.IComponentController {
     //  };
 
     private _changeView: onChangesCallback<string> = (newVal, oldVal) => {
-        if (!newVal || (newVal === oldVal && this.processed)) return
+        if (!newVal || (newVal === oldVal && this.processed)) return;
 
-        this.processed = true
-        this.$element.addClass('isLoading')
+        this.processed = true;
+        this.$element.addClass('isLoading');
         this.reqOb = {
             elementId: this.mmsElementId,
             projectId: this.mmsProjectId,
             refId: this.mmsRefId,
             commitId: this.mmsCommitId,
-        }
+        };
         this.elementSvc
             .getElement<ViewObject | ViewInstanceSpec>(this.reqOb, 1)
             .then(
                 (data) => {
                     //view accepts a section element
                     if (data.type === 'InstanceSpecification') {
-                        this.isSection = true
+                        this.isSection = true;
                     }
-                    let operand: ValueObject[] = []
+                    let operand: ValueObject[] = [];
                     if (data._contents && (data as ViewObject)._contents.operand) {
-                        operand = (data as ViewObject)._contents.operand
+                        operand = (data as ViewObject)._contents.operand;
                     }
                     if (data.specification && (data as ViewInstanceSpec).specification.operand) {
-                        operand = (data.specification as ExpressionObject<InstanceValueObject>).operand
+                        operand = (data.specification as ExpressionObject<InstanceValueObject>).operand;
                     }
-                    const dups = this.presentationSvc.checkForDuplicateInstances(operand)
+                    const dups = this.presentationSvc.checkForDuplicateInstances(operand);
                     if (dups.length > 0) {
-                        this.growl.warning('There are duplicates in this view, duplicates ignored!')
+                        this.growl.warning('There are duplicates in this view, duplicates ignored!');
                     }
                     if (data._veNumber) {
-                        this.level = data._veNumber.split('.').length
+                        this.level = data._veNumber.split('.').length;
                     }
                     if (
                         //data._numElements && data._numElements > 5000 &&
@@ -287,40 +287,40 @@ export class ViewController implements angular.IComponentController {
                     ) {
                         //threshold where getting view elements in bulk takes too long and it's not latest
                         //getting cached individual elements should be faster
-                        this.view = data
-                        this.modified = data._modified
+                        this.view = data;
+                        this.modified = data._modified;
                         this.userSvc.getUserData(data._modifier).then(
                             (result) => {
-                                this.modifier = result
+                                this.modifier = result;
                             },
                             () => {
-                                this.modifier = { username: data._modifier }
+                                this.modifier = { username: data._modifier };
                             }
-                        )
-                        return
+                        );
+                        return;
                     }
                     this.viewSvc.getViewElements(this.reqOb, 1).finally(() => {
-                        this.view = data
-                        this.modified = data._modified
+                        this.view = data;
+                        this.modified = data._modified;
                         this.userSvc.getUserData(data._modifier).then(
                             (result) => {
-                                this.modifier = result
+                                this.modifier = result;
                             },
                             () => {
-                                this.modifier = { username: data._modifier }
+                                this.modifier = { username: data._modifier };
                             }
-                        )
-                        this.$element.removeClass('isLoading')
-                    })
+                        );
+                        this.$element.removeClass('isLoading');
+                    });
                 },
                 (reason) => {
-                    this.growl.error(`Getting View Error: ${reason.message}: ${this.mmsElementId}`)
+                    this.growl.error(`Getting View Error: ${reason.message}: ${this.mmsElementId}`);
                 }
             )
             .finally(() => {
-                if (this.view) this.$element.removeClass('isLoading')
-            })
-    }
+                if (this.view) this.$element.removeClass('isLoading');
+            });
+    };
 
     /**
      * @name veComponents.component:mmsView#toggleShowElements
@@ -328,16 +328,16 @@ export class ViewController implements angular.IComponentController {
      */
     public toggleShowElements = (value?: boolean): void => {
         if (typeof value !== 'undefined') {
-            this.showElements = value
+            this.showElements = value;
         } else {
-            this.showElements = !this.showElements
+            this.showElements = !this.showElements;
         }
         if (this.showElements) {
-            this.$element.addClass('outline')
+            this.$element.addClass('outline');
         } else if (this.$element.hasClass('outline')) {
-            this.$element.removeClass('outline')
+            this.$element.removeClass('outline');
         }
-    }
+    };
 
     /**
      * @name veComponents.component:mmsView#toggleShowComments
@@ -345,16 +345,16 @@ export class ViewController implements angular.IComponentController {
      */
     public toggleShowComments = (value?: boolean): void => {
         if (typeof value !== 'undefined') {
-            this.showComments = value
+            this.showComments = value;
         } else {
-            this.showComments = !this.showComments
+            this.showComments = !this.showComments;
         }
         if (this.showComments) {
-            this.$element.addClass('reviewing')
+            this.$element.addClass('reviewing');
         } else if (this.$element.hasClass('reviewing')) {
-            this.$element.removeClass('reviewing')
+            this.$element.removeClass('reviewing');
         }
-    }
+    };
 
     /**
      * @name veComponents.component:mmsView#toggleShowEdits
@@ -362,21 +362,21 @@ export class ViewController implements angular.IComponentController {
      */
     public toggleShowEdits = (value?: boolean): void => {
         if (typeof value !== 'undefined') {
-            this.showEdits = value
+            this.showEdits = value;
         } else {
-            this.showEdits = !this.showEdits
+            this.showEdits = !this.showEdits;
         }
         if (this.showEdits) {
-            this.$element.addClass('editing')
+            this.$element.addClass('editing');
         } else if (this.$element.hasClass('editing')) {
-            this.$element.removeClass('editing')
+            this.$element.removeClass('editing');
         }
         // Call the callback functions to clean up frames, show edits, and
         // re-open frames when needed:
         // for (let i = 0; i < this.presentationElemCleanUpFncs.length; i++) {
         //     this.presentationElemCleanUpFncs[i]();
         // }
-    }
+    };
 }
 
 export const ViewComponent: VeComponentOptions = {
@@ -391,9 +391,9 @@ export const ViewComponent: VeComponentOptions = {
             </h1>
         </div>
         <div ng-if="$ctrl.mmsLink" class="view-title">
-          <view-link ng-class="{'doc-title-underlined': $ctrl.isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
-          <view-link class="open-document" ng-mouseover="$ctrl.hoverIn()" ng-mouseleave="$ctrl.hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
-            link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
+          <mms-view-link ng-class="{'doc-title-underlined': $ctrl.isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></mms-view-link>
+          <mms-view-link class="open-document" ng-mouseover="$ctrl.hoverIn()" ng-mouseleave="$ctrl.hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
+            link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></mms-view-link>
         </div>
         <div class="ve-secondary-text last-modified no-print">
           Last Modified: {{$ctrl.modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email">{{ $ctrl.modifier.email }}</b><b ng-if="!$ctrl.modifier.email">{{ $ctrl.modifier }}</b>
@@ -431,6 +431,6 @@ export const ViewComponent: VeComponentOptions = {
         buttonId: '<',
     },
     controller: ViewController,
-}
+};
 
-veComponents.component(ViewComponent.selector, ViewComponent)
+veComponents.component(ViewComponent.selector, ViewComponent);

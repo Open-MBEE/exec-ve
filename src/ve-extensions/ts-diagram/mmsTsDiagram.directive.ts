@@ -1,6 +1,6 @@
-import angular from 'angular'
+import angular from 'angular';
 
-const veDirectives = angular.module('veDirectives')
+const veDirectives = angular.module('veDirectives');
 
 veDirectives.directive('mmsTsDiagram', [
     'ElementService',
@@ -12,7 +12,7 @@ veDirectives.directive('mmsTsDiagram', [
     'AuthService',
     'URLService',
     mmsTsDiagram,
-])
+]);
 
 /**
  * @ngdoc directive
@@ -39,13 +39,13 @@ function mmsTsDiagram(
     AuthService,
     URLService
 ) {
-    let importedTsJs = false
-    const template = 'partials/mms-directives/mmsTsDiagram.html'
-    const mapping = {}
+    let importedTsJs = false;
+    const template = 'partials/mms-directives/mmsTsDiagram.html';
+    const mapping = {};
     // var deferreds = {};
-    const projectId2PeId = {}
-    const peId2projectId = {}
-    const projectIdLoaded = {}
+    const projectId2PeId = {};
+    const peId2projectId = {};
+    const projectIdLoaded = {};
     const viewNameMapping = {
         IBD: 'Internal Block Diagram',
         BDD: 'Block Definition Diagram',
@@ -56,7 +56,7 @@ function mmsTsDiagram(
         PAR: 'Parametric Diagram',
         REQ: 'Requirement Diagram',
         UC: 'Use Case Diagram',
-    }
+    };
     const controlMapping = {
         IBD: 'IBD Controls',
         BDD: 'BDD Controls',
@@ -67,7 +67,7 @@ function mmsTsDiagram(
         PAR: 'PAR Controls',
         REQ: 'REQ Controls',
         UC: 'UC Controls',
-    }
+    };
     const elementTableMapping = {
         IBD: 'IBD Elements',
         BDD: 'BDD Elements',
@@ -78,7 +78,7 @@ function mmsTsDiagram(
         PAR: 'PAR Elements',
         REQ: 'REQ Elements',
         UC: 'UC Elements',
-    }
+    };
     const relTableMapping = {
         IBD: 'IBD Relationships',
         BDD: 'BDD Relationships',
@@ -89,54 +89,54 @@ function mmsTsDiagram(
         PAR: 'PAR Relationships',
         REQ: 'REQ Relationships',
         UC: 'UC Relationships',
-    }
+    };
 
     $window.onPerspectivesCommandSuccess = (successfulCommand) => {
-        console.log('Perspectives command: ' + successfulCommand.command + ' completed successfully')
-        $window.hidePerspectivesProgressIndicator()
-    }
+        console.log('Perspectives command: ' + successfulCommand.command + ' completed successfully');
+        $window.hidePerspectivesProgressIndicator();
+    };
     $window.onPerspectivesCommandFailure = function (failedCommand, message, callstack) {
-        console.log('Perspectives command ' + failedCommand.commmand + ' failed. Reason is: ' + message)
-        $window.hidePerspectivesProgressIndicator()
-        console.log(callstack)
-    }
+        console.log('Perspectives command ' + failedCommand.commmand + ' failed. Reason is: ' + message);
+        $window.hidePerspectivesProgressIndicator();
+        console.log(callstack);
+    };
     $window.onPerspectivesProjectLoad = (projectID) => {
-        console.log('All project UI elements should now be on the DOM for ' + projectID)
-    }
+        console.log('All project UI elements should now be on the DOM for ' + projectID);
+    };
     $window.onPerspectivesProjectReady = (projectID) => {
         console.log(
             'All project RPC calls are complete and you can now access all project resources via the DOM. ' + projectID
-        )
+        );
         if (!projectIdLoaded[projectID]) {
-            $window.showPerspectivesProgressIndicator()
-            $window.invokePerspectivesCommand(mapping[projectID])
-            projectIdLoaded[projectID] = true
+            $window.showPerspectivesProgressIndicator();
+            $window.invokePerspectivesCommand(mapping[projectID]);
+            projectIdLoaded[projectID] = true;
         }
-    }
+    };
     $window.onPerspectivesViewLoaded = function (projectID, moduleName, modelID, viewID, viewName) {
-        console.log('The Perspectives view ' + viewID + ' is now on the DOM.')
-    }
+        console.log('The Perspectives view ' + viewID + ' is now on the DOM.');
+    };
     $window.onPerspectivesViewUpdated = function (projectID, moduleName, modelID, viewID, viewNamem, peObject) {
-        console.log('The Perspectives view' + viewID + ' was udpdated with data ' + peObject)
-    }
+        console.log('The Perspectives view' + viewID + ' was udpdated with data ' + peObject);
+    };
     $window.onPerspectivesViewCanvasRendered = function (projectID, moduleName, modelID, viewID, viewName) {
-        console.log('The Perspectives canvas for view' + viewID + ' was rendered')
-    }
+        console.log('The Perspectives canvas for view' + viewID + ' was rendered');
+    };
     $window.onPerspectivesMouseClickOnObject = (data) => {
         if (data) {
-            console.log('JavaScript Callback = Mouse clicked on object with ID = ' + data.objectID)
+            console.log('JavaScript Callback = Mouse clicked on object with ID = ' + data.objectID);
         }
-    }
+    };
     $window.onPerspectivesMouseDoubleClickOnObject = (data) => {
         if (data) {
-            console.log('JavaScript Callback = Mouse double clicked on object with ID = ' + data.objectID)
+            console.log('JavaScript Callback = Mouse double clicked on object with ID = ' + data.objectID);
         }
-    }
+    };
     $window.PerspectivesErrorDialogHandler = function (message, callStackString) {
         //prevent ts error dialog from appearing for any js exception
-        console.log(message)
-        console.log(callStackString)
-    }
+        console.log(message);
+        console.log(callStackString);
+    };
     //store global mapping of project name to hash, on*** functions can lookup the hash
     const mmsTsDiagramLink = (scope, element, attrs) => {
         if (!$window.invokePerspectivesCommand && !importedTsJs) {
@@ -145,25 +145,25 @@ function mmsTsDiagram(
                     '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/dojo/dojo/dojo.js"></script>\n' +
                     '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSHovering.js"></script>\n' +
                     '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSButtonTooltip.js"></script>'
-            )
+            );
 
-            importedTsJs = true
+            importedTsJs = true;
         }
-        let id = ApplicationService.createUniqueId()
+        let id = ApplicationService.createUniqueId();
         if (peId2projectId[scope.mmsPeId]) {
-            id = peId2projectId[scope.mmsPeId]
+            id = peId2projectId[scope.mmsPeId];
         } else {
-            peId2projectId[scope.mmsPeId] = id
+            peId2projectId[scope.mmsPeId] = id;
         }
-        projectId2PeId[id] = scope.mmsPeId
+        projectId2PeId[id] = scope.mmsPeId;
 
-        scope.containerId = 'tabContainer-' + id
-        scope.viewId = 'view-' + id
-        scope.tableId = 'table-' + id
-        scope.edgeTableId = 'edgeTable-' + id
-        scope.inspectorId = 'inspector-' + id
-        scope.controlsId = 'controls-' + id
-        scope.initElements = []
+        scope.containerId = 'tabContainer-' + id;
+        scope.viewId = 'view-' + id;
+        scope.tableId = 'table-' + id;
+        scope.edgeTableId = 'edgeTable-' + id;
+        scope.inspectorId = 'inspector-' + id;
+        scope.controlsId = 'controls-' + id;
+        scope.initElements = [];
 
         const params = {
             viewName: viewNameMapping[scope.mmsTspSpec.diagramType],
@@ -172,26 +172,26 @@ function mmsTsDiagram(
             edgeTableName: relTableMapping[scope.mmsTspSpec.diagramType],
             inspectorName: 'Details',
             controlsName: controlMapping[scope.mmsTspSpec.diagramType],
-        }
+        };
 
-        if (scope.mmsTspSpec && scope.mmsTspSpec.elements) scope.initElements = scope.mmsTspSpec.elements
-        if (scope.mmsTspSpec && scope.mmsTspSpec.context) scope.context = scope.mmsTspSpec.context
+        if (scope.mmsTspSpec && scope.mmsTspSpec.elements) scope.initElements = scope.mmsTspSpec.elements;
+        if (scope.mmsTspSpec && scope.mmsTspSpec.context) scope.context = scope.mmsTspSpec.context;
 
-        const webProjectCommand = _createWebProjectCommand(scope, params, id)
-        mapping[id] = _createUpdateCommand(scope, params.viewName, id)
+        const webProjectCommand = _createWebProjectCommand(scope, params, id);
+        mapping[id] = _createUpdateCommand(scope, params.viewName, id);
 
         function tryInvokeCommand() {
             if (!$window.invokePerspectivesCommand) {
-                $timeout(tryInvokeCommand, 1000, false)
+                $timeout(tryInvokeCommand, 1000, false);
             } else {
-                $window.invokePerspectivesCommand(webProjectCommand)
+                $window.invokePerspectivesCommand(webProjectCommand);
             }
         }
-        tryInvokeCommand()
-    }
+        tryInvokeCommand();
+    };
 
     function _getElementsArrayString(elements) {
-        return '[{"id": "' + elements.join('"}, {"id": "') + '"}]'
+        return '[{"id": "' + elements.join('"}, {"id": "') + '"}]';
     }
 
     function _createWebProjectCommand(scope, params, id) {
@@ -325,20 +325,20 @@ function mmsTsDiagram(
                     },
                 },
             ],
-        }
-        return webProjectCommand
+        };
+        return webProjectCommand;
     }
 
     function _createUpdateCommand(scope, viewName, id) {
         const updateCommand: {
-            data: object[]
-            command: string
-            onsuccess: string
+            data: object[];
+            command: string;
+            onsuccess: string;
         } = {
             command: 'Group',
             onsuccess: 'onPerspectivesCommandSuccess',
             data: [] as object[],
-        }
+        };
         updateCommand.data.push(
             {
                 command: 'Custom',
@@ -391,9 +391,9 @@ function mmsTsDiagram(
                 },
                 onfailure: 'onPerspectivesCommandFailure',
             }
-        )
+        );
         if (scope.context || scope.initElements.length > 0) {
-            const initialIntegratorIds: string[] = []
+            const initialIntegratorIds: string[] = [];
             if (scope.initElements.length > 0) {
                 updateCommand.data.push({
                     command: 'SetModelAttribute',
@@ -407,10 +407,10 @@ function mmsTsDiagram(
                         viewName: viewName,
                     },
                     onfailure: 'onPerspectivesCommandFailure',
-                })
-                initialIntegratorIds.push('int-add-' + id)
+                });
+                initialIntegratorIds.push('int-add-' + id);
             }
-            initialIntegratorIds.push('int-fcd-' + id)
+            initialIntegratorIds.push('int-fcd-' + id);
             updateCommand.data.push({
                 command: 'Update',
                 onsuccess: 'onPerspectivesCommandSuccess',
@@ -420,7 +420,7 @@ function mmsTsDiagram(
                     module: 'SysML',
                     integratorIDs: initialIntegratorIds,
                 },
-            })
+            });
             if (scope.context) {
                 updateCommand.data.push({
                     command: 'Custom',
@@ -434,10 +434,10 @@ function mmsTsDiagram(
                         args: ['' + scope.context],
                     },
                     onfailure: 'onPerspectivesCommandFailure',
-                })
+                });
             }
         }
-        return updateCommand
+        return updateCommand;
     }
 
     return {
@@ -450,5 +450,5 @@ function mmsTsDiagram(
             mmsPeId: '@',
         },
         link: mmsTsDiagramLink,
-    }
+    };
 }

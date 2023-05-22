@@ -1,4 +1,4 @@
-import { IToolBarButton } from '@ve-core/toolbar'
+import { IToolBarButton } from '@ve-core/toolbar';
 
 export const right_default_toolbar: IToolBarButton[] = [
     {
@@ -57,7 +57,7 @@ export const right_default_toolbar: IToolBarButton[] = [
         spinner: false,
         enabledFor: ['main.project.ref'],
     },
-]
+];
 
 export const right_dynamic_toolbar: IToolBarButton[] = [
     {
@@ -120,4 +120,4 @@ export const right_dynamic_toolbar: IToolBarButton[] = [
         tooltip: 'Cancel',
         spinner: false,
     },
-]
+];

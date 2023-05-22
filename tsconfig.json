@@ -17,9 +17,8 @@
     "target": "es2017",
     "typeRoots": [
       "node_modules/@types",
-      "types",
       "node_modules/type-fest/index.d.ts",
-      "src/lib"
+      "node_modules/flatpickr/dist/typings.d.ts"
     ],
     "rootDir": "src",
     "paths": {

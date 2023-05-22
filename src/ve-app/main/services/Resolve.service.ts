@@ -1,7 +1,7 @@
-import { UIRouter } from '@uirouter/angularjs'
+import { UIRouter } from '@uirouter/angularjs';
 
-import { BrandingService, BrandingStyle, ShortUrlService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { BrandingService, BrandingStyle, ShortUrlService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
 import {
     AuthService,
     ElementService,
@@ -10,11 +10,11 @@ import {
     ProjectService,
     URLService,
     ViewService,
-} from '@ve-utils/mms-api-client'
+} from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular';
 import {
     CheckAuthResponse,
     DocumentObject,
@@ -32,8 +32,8 @@ import {
     RefObject,
     RefsResponse,
     ViewObject,
-} from '@ve-types/mms'
-import { VeStorageService } from '@ve-types/view-editor'
+} from '@ve-types/mms';
+import { VeStorageService } from '@ve-types/view-editor';
 
 export class ResolveService {
     static $inject = [
@@ -51,7 +51,7 @@ export class ResolveService {
         'ElementService',
         'PermissionsService',
         'EventService',
-    ]
+    ];
 
     constructor(
         private $localStorage: VeStorageService,
@@ -71,150 +71,150 @@ export class ResolveService {
     ) {}
 
     public getBanner(params?: ParamsObject): VePromise<BrandingStyle, ProjectsResponse> {
-        return this.brandingSvc.getBanner(params)
+        return this.brandingSvc.getBanner(params);
     }
 
     public getLoginBanner(): VePromise<BrandingStyle, ProjectsResponse> {
-        return this.brandingSvc.getLoginBanner()
+        return this.brandingSvc.getLoginBanner();
     }
 
     public getFooter(params?: ParamsObject): VePromise<BrandingStyle, ProjectsResponse> {
-        return this.brandingSvc.getFooter(params)
+        return this.brandingSvc.getFooter(params);
     }
 
     public getToken(): VePromise<string, CheckAuthResponse> {
-        const deferred = this.$q.defer<string>()
+        const deferred = this.$q.defer<string>();
         this.authSvc.checkLogin().then(
             (data) => {
-                this.uRLSvc.setToken(this.$localStorage.token)
-                deferred.resolve(this.$localStorage.token)
-                this.$cookies.put('com.tomsawyer.web.license.user', data.username, { path: '/' })
+                this.uRLSvc.setToken(this.$localStorage.token);
+                deferred.resolve(this.$localStorage.token);
+                this.$cookies.put('com.tomsawyer.web.license.user', data.username, { path: '/' });
             },
             (rejection) => {
-                deferred.reject(rejection)
+                deferred.reject(rejection);
             }
-        )
-        return deferred.promise
+        );
+        return deferred.promise;
     }
 
     public getOrg(projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> {
-        const promise = this.projectSvc.getOrg(projectOb.orgId)
+        const promise = this.projectSvc.getOrg(projectOb.orgId);
         promise.then(
             (result) => {
-                this.eventSvc.resolve('mmsOrg', result)
+                this.eventSvc.resolve('mmsOrg', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getOrgs(): VePromise<OrgObject[], OrgsResponse> {
-        const promise = this.projectSvc.getOrgs()
+        const promise = this.projectSvc.getOrgs();
         promise.then(
             (result) => {
-                this.eventSvc.resolve('mmsOrgs', result)
+                this.eventSvc.resolve('mmsOrgs', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getProject(params: ParamsObject): VePromise<ProjectObject, ProjectsResponse> {
-        const promise = this.projectSvc.getProject(params.projectId)
+        const promise = this.projectSvc.getProject(params.projectId);
         promise.then(
             (result) => {
-                this.eventSvc.resolve('mmsProject', result)
+                this.eventSvc.resolve('mmsProject', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getProjects(projectOb: ProjectObject, refresh?: boolean): VePromise<ProjectObject[], ProjectsResponse> {
-        const promise = this.projectSvc.getProjects(projectOb.orgId, refresh)
+        const promise = this.projectSvc.getProjects(projectOb.orgId, refresh);
         promise.then(
             (result) => {
-                this.eventSvc.resolve('mmsProjects', result)
+                this.eventSvc.resolve('mmsProjects', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getProjectMounts(params: ParamsObject, refresh?: boolean): VePromise<MountObject, ProjectsResponse> {
-        const promise = this.projectSvc.getProjectMounts(params.projectId, params.refId, refresh)
+        const promise = this.projectSvc.getProjectMounts(params.projectId, params.refId, refresh);
 
         promise.then(
             (result) => {
-                this.eventSvc.resolve<MountObject>('mmsProject', result)
+                this.eventSvc.resolve<MountObject>('mmsProject', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getRef(params: ParamsObject): VePromise<RefObject, RefsResponse> {
-        const promise = this.projectSvc.getRef(params.refId, params.projectId)
+        const promise = this.projectSvc.getRef(params.refId, params.projectId);
         promise.then(
             (result) => {
-                this.eventSvc.resolve('mmsRef', result)
+                this.eventSvc.resolve('mmsRef', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getRefs(params: ParamsObject): VePromise<RefObject[], RefsResponse> {
-        const promise = this.projectSvc.getRefs(params.projectId)
+        const promise = this.projectSvc.getRefs(params.projectId);
         promise.then(
             (result) => {
-                this.eventSvc.resolve('mmsRefs', result)
+                this.eventSvc.resolve('mmsRefs', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getGroups(params: ParamsObject, refresh?: boolean): VePromise<GroupObject[], GroupsResponse> {
         return this.$q<GroupObject[], GroupsResponse>((resolve, reject) => {
             this.projectSvc.getGroups(params.projectId, params.refId, refresh).then(
                 (result) => {
-                    resolve(result)
-                    this.eventSvc.resolve('mmsGroups', result)
+                    resolve(result);
+                    this.eventSvc.resolve('mmsGroups', result);
                 },
                 (reason) => {
-                    reject(reason)
+                    reject(reason);
                 }
-            )
-        })
+            );
+        });
     }
 
     public getGroup(groupObs: GroupObject[], documentOb: DocumentObject): GroupObject {
-        let group: GroupObject = null
+        let group: GroupObject = null;
         if (documentOb) {
             for (let i = 0; i < groupObs.length; i++) {
                 if (groupObs[i].id == documentOb._groupId) {
-                    group = groupObs[i]
-                    break
+                    group = groupObs[i];
+                    break;
                 }
             }
         }
-        this.eventSvc.resolve('mmsGroup', group)
-        return group
+        this.eventSvc.resolve('mmsGroup', group);
+        return group;
     }
 
     public getProjectRoot(params: ParamsObject): VePromise<PackageObject> {
@@ -222,7 +222,7 @@ export class ResolveService {
             projectId: params.projectId,
             refId: params.refId,
             elementId: params.projectId + '_pm',
-        })
+        });
     }
 
     public getCoverDocument(
@@ -231,8 +231,8 @@ export class ResolveService {
         projectOb: ProjectObject,
         refresh?: boolean
     ): VePromise<DocumentObject> {
-        const deferred = this.$q.defer<DocumentObject>()
-        const eid = params.projectId + '_cover'
+        const deferred = this.$q.defer<DocumentObject>();
+        const eid = params.projectId + '_cover';
         this.elementSvc
             .getElement<DocumentObject>(
                 {
@@ -245,14 +245,14 @@ export class ResolveService {
             )
             .then(
                 (data) => {
-                    this.eventSvc.resolve<DocumentObject>('mmsDocument', data)
-                    if (!data._groupId) data._groupId = params.projectId + '_pm'
-                    deferred.resolve(data)
+                    this.eventSvc.resolve<DocumentObject>('mmsDocument', data);
+                    if (!data._groupId) data._groupId = params.projectId + '_pm';
+                    deferred.resolve(data);
                 },
                 (reason) => {
                     if (reason.status === 404) {
                         if (refOb.type === 'Tag') {
-                            deferred.resolve(null)
+                            deferred.resolve(null);
                         } else {
                             this.viewSvc
                                 .createView(
@@ -272,19 +272,19 @@ export class ResolveService {
                                 )
                                 .then(
                                     (data) => {
-                                        this.eventSvc.resolve('mmsDocument', data)
-                                        deferred.resolve(data)
+                                        this.eventSvc.resolve('mmsDocument', data);
+                                        deferred.resolve(data);
                                     },
                                     (reason2) => {
-                                        deferred.resolve(null)
+                                        deferred.resolve(null);
                                     }
-                                )
+                                );
                         }
                     } else if (reason.status === 410) {
                         //resurrect
-                        let name = projectOb.name + ' Cover Page '
+                        let name = projectOb.name + ' Cover Page ';
                         try {
-                            name = `${reason.data.deleted[0].name} `
+                            name = `${reason.data.deleted[0].name} `;
                         } catch (e) {}
                         this.elementSvc
                             .updateElements([
@@ -306,37 +306,37 @@ export class ResolveService {
                             ])
                             .then(
                                 (data) => {
-                                    let resolved = false
+                                    let resolved = false;
                                     if (data.length > 0) {
                                         data.forEach((e) => {
                                             if (e.id == eid) {
-                                                deferred.resolve(e)
-                                                resolved = true
+                                                deferred.resolve(e);
+                                                resolved = true;
                                             }
-                                        })
+                                        });
                                     }
                                     if (!resolved) {
-                                        deferred.resolve(null)
+                                        deferred.resolve(null);
                                     }
                                 },
                                 () => {
-                                    deferred.resolve(null)
+                                    deferred.resolve(null);
                                 }
-                            )
+                            );
                     } else {
-                        deferred.resolve(null) //let user get into project
+                        deferred.resolve(null); //let user get into project
                     }
                 }
-            )
-        return deferred.promise
+            );
+        return deferred.promise;
     }
 
     public getPreviewDocument(params: ParamsObject, refOb: RefObject, refresh?: boolean): VePromise<DocumentObject> {
-        const deferred = this.$q.defer<DocumentObject>()
-        const eid: string = params.preview
-        const coverIndex = eid.indexOf('_cover')
+        const deferred = this.$q.defer<DocumentObject>();
+        const eid: string = params.preview;
+        const coverIndex = eid.indexOf('_cover');
         if (coverIndex > 0) {
-            const groupId = eid.substring(5, coverIndex)
+            const groupId = eid.substring(5, coverIndex);
             this.elementSvc
                 .getElement(
                     {
@@ -350,18 +350,18 @@ export class ResolveService {
                 )
                 .then(
                     (data) => {
-                        this.eventSvc.resolve('mmsDocument', data)
-                        deferred.resolve(data)
+                        this.eventSvc.resolve('mmsDocument', data);
+                        deferred.resolve(data);
                     },
                     (reason) => {
                         if (reason.status === 404) {
                             if (refOb.type === 'Tag') {
-                                deferred.resolve(null)
+                                deferred.resolve(null);
                             } else {
                                 const viewDoc =
                                     '<transclude-group-docs mms-group-id="' +
                                     groupId +
-                                    '">[cf:group docs]</transclude-group-docs>'
+                                    '">[cf:group docs]</transclude-group-docs>';
                                 this.elementSvc
                                     .getElement(
                                         {
@@ -392,35 +392,35 @@ export class ResolveService {
                                                 )
                                                 .then(
                                                     (data) => {
-                                                        this.eventSvc.resolve('mmsDocument', data)
-                                                        deferred.resolve(data)
+                                                        this.eventSvc.resolve('mmsDocument', data);
+                                                        deferred.resolve(data);
                                                     },
                                                     (reason3) => {
-                                                        deferred.reject(reason)
+                                                        deferred.reject(reason);
                                                     }
-                                                )
+                                                );
                                         },
                                         (reason2) => {
-                                            deferred.reject(reason2)
+                                            deferred.reject(reason2);
                                         }
-                                    )
+                                    );
                             }
                         } else {
-                            deferred.reject(reason)
+                            deferred.reject(reason);
                         }
                     }
-                )
+                );
         } else {
             this.getProjectDocument(params, refresh).then(
                 (data) => {
-                    deferred.resolve(data)
+                    deferred.resolve(data);
                 },
                 (reason) => {
-                    deferred.reject(reason)
+                    deferred.reject(reason);
                 }
-            )
+            );
         }
-        return deferred.promise
+        return deferred.promise;
     }
 
     public getProjectDocument(params: ParamsObject, refresh?: boolean): VePromise<ViewObject> {
@@ -432,17 +432,17 @@ export class ResolveService {
             },
             2,
             refresh
-        )
+        );
 
         promise.then(
             (result) => {
-                this.eventSvc.resolve('mmsDocument', result)
+                this.eventSvc.resolve('mmsDocument', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getProjectDocuments(
@@ -461,14 +461,14 @@ export class ResolveService {
                 )
                 .then(
                     (result) => {
-                        resolve(result)
-                        this.eventSvc.resolve('mmsDocuments', result)
+                        resolve(result);
+                        this.eventSvc.resolve('mmsDocuments', result);
                     },
                     (reason) => {
-                        reject(reason)
+                        reject(reason);
                     }
-                )
-        })
+                );
+        });
     }
 
     public getView(params: ParamsObject, refresh?: boolean): VePromise<ViewObject> {
@@ -480,39 +480,39 @@ export class ResolveService {
             },
             2,
             refresh
-        )
+        );
 
         promise.then(
             (result) => {
-                this.eventSvc.resolve('mmsView', result)
+                this.eventSvc.resolve('mmsView', result);
             },
             (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
+                this.growl.error('Resolve Error: ' + reason.message);
             }
-        )
-        return promise
+        );
+        return promise;
     }
 
     public getSearch = (params: ParamsObject): string => {
         if (params.search === undefined) {
-            return null
+            return null;
         }
-        return params.search
-    }
+        return params.search;
+    };
 
     public getField = (params: ParamsObject): string => {
         if (params.field === undefined) {
-            return 'all'
+            return 'all';
         }
-        return params.field
-    }
+        return params.field;
+    };
 
     public initializePermissions(
         projectOb: ProjectObject,
         refOb: RefObject
     ): VePromise<PermissionCache, PermissionsResponse> {
-        return this.permissionsSvc.initializePermissions(projectOb, refOb)
+        return this.permissionsSvc.initializePermissions(projectOb, refOb);
     }
 }
 
-veApp.service('ResolveService', ResolveService)
+veApp.service('ResolveService', ResolveService);

@@ -1,20 +1,20 @@
-import { Insertion, InsertionService } from '@ve-components/insertions'
-import { EditorService } from '@ve-core/editor'
-import { ApplicationService, UtilsService } from '@ve-utils/application'
-import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
-import { Class } from '@ve-utils/utils'
+import { Insertion, InsertionService } from '@ve-components/insertions';
+import { EditorService } from '@ve-core/editor';
+import { ApplicationService, UtilsService } from '@ve-utils/application';
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
+import { Class } from '@ve-utils/utils';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { InsertData } from '@ve-types/components'
-import { ElementCreationRequest, ElementObject } from '@ve-types/mms'
-import { VeModalService } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
+import { InsertData } from '@ve-types/components';
+import { ElementCreationRequest, ElementObject } from '@ve-types/mms';
+import { VeModalService } from '@ve-types/view-editor';
 
 class InsertCommentController extends Insertion<InsertData> {
-    protected comment: ElementObject
-    static $inject = Insertion.$inject
+    protected comment: ElementObject;
+    static $inject = Insertion.$inject;
 
     constructor(
         $scope: angular.IScope,
@@ -49,12 +49,12 @@ class InsertCommentController extends Insertion<InsertData> {
             apiSvc,
             utils,
             editorSvc
-        )
+        );
     }
 
     public $onInit(): void {
-        super.$onInit()
-        const id = this.apiSvc.createUniqueId()
+        super.$onInit();
+        const id = this.apiSvc.createUniqueId();
         this.comment = new Class({
             id: id,
             _projectId: this.mmsProjectId,
@@ -63,25 +63,25 @@ class InsertCommentController extends Insertion<InsertData> {
             documentation: '',
             type: 'Class',
             ownerId: 'holding_bin_' + this.mmsProjectId,
-            _appliedStereotypeIds: [],
-        })
-        this.oking = false
+            appliedStereotypeIds: [],
+        });
+        this.oking = false;
     }
 
     public create = (): VePromise<ElementObject> => {
         if (this.oking) {
-            this.growl.info('Please wait...')
-            return
+            this.growl.info('Please wait...');
+            return;
         }
-        this.oking = true
+        this.oking = true;
         const reqOb: ElementCreationRequest<ElementObject> = {
             elements: [this.comment],
             elementId: this.comment.id,
             projectId: this.mmsProjectId,
             refId: this.mmsRefId,
-        }
-        return this.elementSvc.createElement(reqOb)
-    }
+        };
+        return this.elementSvc.createElement(reqOb);
+    };
 }
 
 const InsertCommentComponent: VeComponentOptions = {
@@ -104,7 +104,7 @@ const InsertCommentComponent: VeComponentOptions = {
 <div class="modal-footer">
     <button class="btn btn-primary" ng-click="$ctrl.ok()">Create <i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i>
     </button>
-    <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
 </div> 
 `,
     bindings: {
@@ -115,6 +115,6 @@ const InsertCommentComponent: VeComponentOptions = {
         mmsOrgId: '@',
     },
     controller: InsertCommentController,
-}
+};
 
-veComponents.component(InsertCommentComponent.selector, InsertCommentComponent)
+veComponents.component(InsertCommentComponent.selector, InsertCommentComponent);

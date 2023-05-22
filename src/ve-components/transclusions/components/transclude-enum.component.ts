@@ -5,18 +5,19 @@
  * responsible person for that particular item which gets saved as the Type/Value? of the property You could additionally add a
  * binding which specifies the template for the creation of new objects as types to be placed in the holding bin.
  */
-import { ComponentService, ExtensionService } from '@ve-components/services'
-import { ITransclusion, Transclusion } from '@ve-components/transclusions'
-import { ButtonBarService } from '@ve-core/button-bar'
-import { EditorService } from '@ve-core/editor'
-import { MathService, UtilsService, ImageService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ComponentService, ExtensionService } from '@ve-components/services';
+import { ITransclusion, Transclusion } from '@ve-components/transclusions';
+import { ButtonBarService } from '@ve-core/button-bar';
+import { EditorService } from '@ve-core/editor';
+import { ImageService } from '@ve-core/image';
+import { UtilsService, MathService } from '@ve-utils/application';
+import { EditService, EventService } from '@ve-utils/core';
+import { ElementService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 
 /**
  * @ngdoc component
@@ -50,10 +51,10 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  */
 export class TranscludeEnumController extends Transclusion implements ITransclusion {
     //Locals
-    noClick: boolean | undefined
-    clickHandler: () => void
+    noClick: boolean | undefined;
+    clickHandler: () => void;
 
-    static $inject = Transclusion.$inject
+    static $inject = Transclusion.$inject;
 
     constructor(
         $q: VeQService,
@@ -90,50 +91,50 @@ export class TranscludeEnumController extends Transclusion implements ITransclus
             extensionSvc,
             buttonBarSvc,
             imageSvc
-        )
-        this.cfType = 'name'
-        this.cfTitle = ''
-        this.cfKind = 'Text'
-        this.checkCircular = false
+        );
+        this.cfType = 'name';
+        this.cfTitle = '';
+        this.cfKind = 'Text';
+        this.checkCircular = false;
     }
 
     $onInit(): void {
-        super.$onInit()
+        super.$onInit();
         // Need a way to put in a query for allowed options.
         // Value to save the resulting pointer
         // Transclusion for new options
         this.$element.on('click', (e) => {
-            if (this.noClick) return
+            if (this.noClick) return;
 
             if (this.clickHandler) {
-                this.clickHandler()
-                return
+                this.clickHandler();
+                return;
             }
-            if (this.startEdit && !this.nonEditable) this.startEdit()
+            if (this.startEdit && !this.nonEditable) this.startEdit();
 
-            if (!this.mmsViewCtrl) return false
+            if (!this.mmsViewCtrl) return false;
 
             if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
-                this.growl.warning('Cross Reference is not editable.')
+                this.growl.warning('Cross Reference is not editable.');
             }
-            this.mmsViewCtrl.transcludeClicked(this.element)
-            e.stopPropagation()
-        })
+            this.mmsViewCtrl.transcludeClicked(this.element);
+            e.stopPropagation();
+        });
     }
 
     public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
-        const deferred = this.$q.defer<string | HTMLElement[]>()
+        const deferred = this.$q.defer<string | HTMLElement[]>();
         const defaultTemplate =
-            '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">(no name)</span>'
+            '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">(no name)</span>';
         const editTemplate =
-            '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">(no name)</span>'
+            '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">(no name)</span>';
         if (preview) {
-            deferred.resolve('<div class="panel panel-info">' + editTemplate + '</div>')
+            deferred.resolve('<div class="panel panel-info">' + editTemplate + '</div>');
         } else {
-            deferred.resolve(defaultTemplate)
+            deferred.resolve(defaultTemplate);
         }
-        return deferred.promise
-    }
+        return deferred.promise;
+    };
 
     // private _startEdit(
     //     ctrl: ComponentController,
@@ -262,6 +263,6 @@ export const TranscludeEnumComponent: VeComponentOptions = {
         mmsSpecEditor: '?^^specEditor',
     },
     controller: TranscludeEnumController,
-}
+};
 
-veComponents.component(TranscludeEnumComponent.selector, TranscludeEnumComponent)
+veComponents.component(TranscludeEnumComponent.selector, TranscludeEnumComponent);

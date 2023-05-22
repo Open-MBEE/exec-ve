@@ -1,47 +1,47 @@
-import { BrandingStyle, RootScopeService } from '@ve-utils/application'
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+import { BrandingStyle, RootScopeService } from '@ve-utils/application';
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
+import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
 
 export interface LoginWarningResolve extends VeModalResolve {
-    loginWarning: BrandingStyle
+    loginWarning: BrandingStyle;
 }
 
 export interface LoginWarningResolveFn extends VeModalResolveFn {
-    loginWarning(): BrandingStyle
+    loginWarning(): BrandingStyle;
 }
 
 class LoginWarningModalController
     extends VeModalControllerImpl<boolean, LoginWarningResolve>
     implements VeModalController
 {
-    static $inject = ['RootScopeService']
+    static $inject = ['RootScopeService'];
 
-    private warningMessage: string[]
-    private loading: boolean
-    private disabled: boolean
-    private warningHeader: string = 'Warning'
+    private warningMessage: string[];
+    private loading: boolean;
+    private disabled: boolean;
+    private warningHeader: string = 'Warning';
 
     constructor(private rootScopeSvc: RootScopeService) {
-        super()
+        super();
     }
 
     $onInit(): void {
         if (Array.isArray(this.resolve.loginWarning.message)) {
-            this.warningMessage = this.resolve.loginWarning.message
-        } else this.warningMessage = [this.resolve.loginWarning.message]
-        this.disabled = this.resolve.loginWarning.disabled ? this.resolve.loginWarning.disabled : false
-        this.loading = false
+            this.warningMessage = this.resolve.loginWarning.message;
+        } else this.warningMessage = [this.resolve.loginWarning.message];
+        this.disabled = this.resolve.loginWarning.disabled ? this.resolve.loginWarning.disabled : false;
+        this.loading = false;
         if (this.rootScopeSvc.veWarningOk() || this.disabled) {
-            this.modalInstance.dismiss()
+            this.modalInstance.dismiss();
         }
     }
 
     continue(): void {
-        this.rootScopeSvc.veWarningOk(true)
-        this.modalInstance.close(true)
+        this.rootScopeSvc.veWarningOk(true);
+        this.modalInstance.close(true);
     }
 }
 
@@ -63,6 +63,6 @@ const LoginWarningModal: VeModalComponent = {
         resolve: '<',
     },
     controller: LoginWarningModalController,
-}
+};
 
-veApp.component(LoginWarningModal.selector, LoginWarningModal)
+veApp.component(LoginWarningModal.selector, LoginWarningModal);

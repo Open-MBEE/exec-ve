@@ -1,41 +1,43 @@
-import { IPane } from '@openmbee/pane-layout'
-import { StateService } from '@uirouter/angularjs'
-import angular, { IComponentController } from 'angular'
-import Rx from 'rx-lite'
+import { IPane } from '@openmbee/pane-layout';
+import { StateService } from '@uirouter/angularjs';
+import angular, { IComponentController } from 'angular';
+import _ from 'lodash';
+import Rx from 'rx-lite';
 
-import { SpecApi, SpecService } from '@ve-components/spec-tools'
-import { veCoreEvents } from '@ve-core/events'
-import { ToolbarService } from '@ve-core/toolbar'
-import { RootScopeService } from '@ve-utils/application'
-import { EditObject, EditService, EventService } from '@ve-utils/core'
-import { ElementService, PermissionsService, ProjectService } from '@ve-utils/mms-api-client'
+import { SpecService } from '@ve-components/spec-tools';
+import { veCoreEvents } from '@ve-core/events';
+import { ToolbarService } from '@ve-core/toolbar';
+import { RootScopeService } from '@ve-utils/application';
+import { EditObject, EditService, EventService } from '@ve-utils/core';
+import { ElementService, PermissionsService, ProjectService } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { ElementObject, RefObject, RefsResponse } from '@ve-types/mms'
-import { VeModalService } from '@ve-types/view-editor'
-import _ from "lodash";
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
+import { ElementObject, RefObject, RefsResponse } from '@ve-types/mms';
+import { VeModalService } from '@ve-types/view-editor';
+
+import elementSelectedData = veCoreEvents.elementSelectedData;
 
 class RightPaneController implements IComponentController {
     //Bindings
-    private mmsRef: RefObject
+    private mmsRef: RefObject;
 
     // Though we don't explicitly use it right now, we do need it to trigger updates when
     // entering/exiting certain states
-    private mmsRoot: ElementObject
+    private mmsRoot: ElementObject;
 
     //Local Values
 
-    public subs: Rx.IDisposable[]
+    public subs: Rx.IDisposable[];
 
-    private openEdits: number
-    private edits: { [id: string]: EditObject }
+    private openEdits: number;
+    private edits: { [id: string]: EditObject };
 
-    private $pane: IPane
-    private $tools: JQuery<HTMLElement>
+    private $pane: IPane;
+    private $tools: JQuery<HTMLElement>;
 
-    private toolbarId: string = 'right-toolbar'
+    private toolbarId: string = 'right-toolbar';
 
     static $inject = [
         '$scope',
@@ -55,7 +57,7 @@ class RightPaneController implements IComponentController {
         'EditService',
         'ToolbarService',
         'SpecService',
-    ]
+    ];
 
     constructor(
         private $scope: angular.IScope,
@@ -78,38 +80,38 @@ class RightPaneController implements IComponentController {
     ) {}
 
     $onInit(): void {
-        this.eventSvc.$init(this)
+        this.eventSvc.$init(this);
 
         //Init Pane Toggle Controls
-        this.rootScopeSvc.rightPaneClosed(this.$pane.closed)
+        this.rootScopeSvc.rightPaneClosed(this.$pane.closed);
 
         //Init spec ready binding
-        this.eventSvc.resolve<boolean>('spec.ready', false)
+        this.eventSvc.resolve<boolean>('spec.ready', true);
 
         this.subs.push(
             this.$pane.$toggled.subscribe(() => {
-                this.rootScopeSvc.rightPaneClosed(this.$pane.closed)
+                this.rootScopeSvc.rightPaneClosed(this.$pane.closed);
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on('right-pane.toggle', (paneClosed) => {
                 if (paneClosed === undefined) {
-                    this.$pane.toggle()
+                    this.$pane.toggle();
                 } else if (paneClosed && !this.$pane.closed) {
-                    this.$pane.toggle()
+                    this.$pane.toggle();
                 } else if (!paneClosed && this.$pane.closed) {
-                    this.$pane.toggle()
+                    this.$pane.toggle();
                 }
-                this.rootScopeSvc.rightPaneClosed(this.$pane.closed)
+                this.rootScopeSvc.rightPaneClosed(this.$pane.closed);
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.elementSelectedData>('element.selected', (data) => {
-                this.changeAction(data)
+                this.changeAction(data);
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.elementUpdatedData>('element.updated', (data) => {
@@ -119,38 +121,37 @@ class RightPaneController implements IComponentController {
                     data.element._refId === this.specSvc.specApi.refId &&
                     !data.continueEdit
                 ) {
-                    this.eventSvc.resolve<boolean>('spec.ready', false)
-                    this.specSvc.setElement()
+                    this.eventSvc.resolve<boolean>('spec.ready', false);
+                    this.specSvc.setElement();
                 }
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.elementSelectedData>('view.selected', (data) => {
-                this.changeAction(data)
+                this.changeAction(data);
             })
-        )
+        );
 
         this.subs.push(
             this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
-                this.openEdits = this.autosaveSvc.openEdits()
+                this.openEdits = this.autosaveSvc.openEdits();
             })
-        )
+        );
 
-        this.edits = this.autosaveSvc.getAll()
+        this.edits = this.autosaveSvc.getAll();
     }
 
     $onDestroy(): void {
-        this.eventSvc.$destroy(this.subs)
+        this.eventSvc.$destroy(this.subs);
     }
 
     changeAction = (data: veCoreEvents.elementSelectedData): void => {
-        this.eventSvc.resolve<boolean>('spec.ready', false)
-        const elementId = data.elementId
-        const refId = data.refId
-        const projectId = data.projectId
-        const commitId = data.commitId ? data.commitId : null
-        const displayOldSpec = data.displayOldSpec ? data.displayOldSpec : null
+        const elementId = data.elementId;
+        const refId = data.refId;
+        const projectId = data.projectId;
+        const commitId = data.commitId ? data.commitId : null;
+        const displayOldSpec = data.displayOldSpec ? data.displayOldSpec : null;
         const promise: VePromise<string, RefsResponse> = new this.$q((resolve, reject) => {
             if (
                 !this.specSvc.specApi.refType ||
@@ -158,12 +159,12 @@ class RightPaneController implements IComponentController {
                 projectId != this.specSvc.specApi.projectId
             ) {
                 this.projectSvc.getRef(refId, projectId).then((ref) => {
-                    resolve(ref.type)
-                }, reject)
+                    resolve(ref.type);
+                }, reject);
             } else {
-                resolve(this.specSvc.specApi.refType)
+                resolve(this.specSvc.specApi.refType);
             }
-        })
+        });
 
         promise.then(
             (refType) => {
@@ -174,7 +175,7 @@ class RightPaneController implements IComponentController {
                     refId,
                     commitId,
                     displayOldSpec,
-                }
+                };
                 if (this.specSvc.specApi) {
                     const current = {
                         elementId: this.specSvc.specApi.elementId,
@@ -182,56 +183,53 @@ class RightPaneController implements IComponentController {
                         refId: this.specSvc.specApi.refId,
                         refType: this.specSvc.specApi.refType,
                         commitId: this.specSvc.specApi.commitId,
-                        displayOldSpec: this.specSvc.specApi.displayOldSpec
-                    }
+                        displayOldSpec: this.specSvc.specApi.displayOldSpec,
+                    };
                     if (_.isEqual(specApi, current)) {
-                        return //don't do unnecessary updates
+                        return; //don't do unnecessary updates
                     }
                 }
-                Object.assign(this.specSvc.specApi, specApi)
+                this.eventSvc.resolve<boolean>('spec.ready', false);
+                Object.assign(this.specSvc.specApi, specApi);
 
-                if (this.specSvc.setEditing) {
-                    this.specSvc.setEditing(false)
-                }
+                // if (this.specSvc.setEditing) {
+                //     this.specSvc.setEditing(false)
+                // }
 
-                this.specSvc.specApi.rootId = data.rootId ? data.rootId : ''
+                this.specSvc.specApi.rootId = data.rootId ? data.rootId : '';
 
                 this.specSvc.editable =
                     data.rootId &&
                     this.mmsRef.type === 'Branch' &&
                     refType === 'Branch' &&
-                    this.permissionsSvc.hasBranchEditPermission(projectId, refId)
+                    this.permissionsSvc.hasBranchEditPermission(projectId, refId);
 
                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                     (api) => api.setIcon('spec-editor', 'fa-edit'),
                     (reason) => this.growl.error(ToolbarService.error(reason))
-                )
-                this.specSvc.setElement()
+                );
+                this.specSvc.setElement();
             },
             (reason) => {
-                this.growl.error('Unable to get ref: ' + reason.message)
+                this.growl.error('Unable to get ref: ' + reason.message);
             }
-        )
-    }
+        );
+    };
 
     public etrackerChange = (): void => {
-        this.specSvc.keepMode()
-        const id = this.specSvc.tracker.etrackerSelected
-        if (!id) return
-        const info = id.split('|')
-        this.specSvc.specApi.elementId = info[2]
-        this.specSvc.specApi.projectId = info[0]
-        this.specSvc.specApi.refId = info[1]
-        this.specSvc.specApi.commitId = 'latest'
-        this.toolbarSvc.waitForApi(this.toolbarId).then(
-            (api) => {
-                api.setPermission('spec-editor', true)
-            },
-            (reason) => {
-                this.growl.error(ToolbarService.error(reason))
-            }
-        )
-    }
+        this.specSvc.keepMode();
+        const id = this.specSvc.tracker.etrackerSelected;
+        if (!id) return;
+        const info = id.split('|');
+        const data: veCoreEvents.elementSelectedData = {
+            elementId: info[2],
+            projectId: info[0],
+            refId: info[1],
+            commitId: 'latest',
+        };
+
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
+    };
 }
 
 const RightPaneComponent: VeComponentOptions = {
@@ -252,7 +250,7 @@ const RightPaneComponent: VeComponentOptions = {
         </form>
         <hr class="right-title-divider">
     </div>
-    <view-tools toolbar-id="{{$ctrl.toolbarId}}"></view-tools>
+    <mms-tools toolbar-id="{{$ctrl.toolbarId}}"></mms-tools>
 </div>
     `,
     require: {
@@ -263,6 +261,6 @@ const RightPaneComponent: VeComponentOptions = {
         mmsRoot: '<',
     },
     controller: RightPaneController,
-}
+};
 
-veApp.component(RightPaneComponent.selector, RightPaneComponent)
+veApp.component(RightPaneComponent.selector, RightPaneComponent);

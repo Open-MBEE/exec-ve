@@ -1,42 +1,42 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { RevertConfirmResolveFn } from '@ve-components/diffs'
-import { ApiService, ElementService } from '@ve-utils/mms-api-client'
+import { RevertConfirmResolveFn } from '@ve-components/diffs';
+import { ApiService, ElementService } from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VePromise, VeQService } from '@ve-types/angular'
-import { CommitObject, ElementObject, ElementsRequest, RefObject } from '@ve-types/mms'
-import { VeModalService } from '@ve-types/view-editor'
+import { VePromise, VeQService } from '@ve-types/angular';
+import { CommitObject, ElementObject, ElementsRequest, RefObject } from '@ve-types/mms';
+import { VeModalService } from '@ve-types/view-editor';
 
 export interface Commit {
-    ref: RefObject
-    isOpen: boolean
-    refIsOpen?: boolean
-    history: CommitObject[]
-    commitSelected: CommitObject | string
+    ref: RefObject;
+    isOpen: boolean;
+    refIsOpen?: boolean;
+    history: CommitObject[];
+    commitSelected: CommitObject | string;
 }
 
 export interface CompareData {
-    baseCommit: Commit
-    compareCommit: Commit
-    element: ElementObject
+    baseCommit: Commit;
+    compareCommit: Commit;
+    element: ElementObject;
 }
 
 export interface DiffResponse {
-    status?: 'new' | 'deleted' | 'changed'
-    diff?: DiffDetail
+    status?: 'new' | 'deleted' | 'changed';
+    diff?: DiffDetail;
 }
 
 export interface DiffDetail {
-    name: boolean
-    documentation: boolean
-    value: boolean
-    [key: string]: boolean
+    name: boolean;
+    documentation: boolean;
+    value: boolean;
+    [key: string]: boolean;
 }
 
 export class DiffMergeService {
-    static $inject = ['$q', 'growl', '$uibModal', 'ApiService', 'ElementService']
+    static $inject = ['$q', 'growl', '$uibModal', 'ApiService', 'ElementService'];
     constructor(
         private $q: VeQService,
         private growl: angular.growl.IGrowlService,
@@ -66,80 +66,80 @@ export class DiffMergeService {
             component: 'revertConfirm',
             resolve: {
                 reqOb: () => {
-                    return reqOb
+                    return reqOb;
                 },
                 revertData: () => {
-                    return revertData
+                    return revertData;
                 },
             },
-        })
+        });
         instance.result.then(
             () => {
-                this.growl.success('Element reverted')
+                this.growl.success('Element reverted');
             },
             () => {
-                this.growl.error('Revert Cancelled')
+                this.growl.error('Revert Cancelled');
             }
-        )
+        );
     }
 
     public checkDiff(sourceOb: ElementObject): VePromise<DiffResponse> {
-        const deferred = this.$q.defer<DiffResponse>()
+        const deferred = this.$q.defer<DiffResponse>();
         const diff: DiffDetail = {
             name: false,
             documentation: false,
             value: false,
-        }
-        let response: DiffResponse
+        };
+        let response: DiffResponse;
         this.elementSvc.getElement<ElementObject>(this.apiSvc.makeElementRequestObject(sourceOb), 1, true, true).then(
             (targetOb) => {
                 if (!targetOb) {
-                    response.status = 'new'
-                    deferred.resolve(response)
+                    response.status = 'new';
+                    deferred.resolve(response);
                 }
                 if (sourceOb.name !== targetOb.name) {
-                    diff.name = true
+                    diff.name = true;
                 }
                 if (sourceOb.documentation !== targetOb.documentation) {
-                    diff.documentation = true
+                    diff.documentation = true;
                 }
                 if (
                     (sourceOb.type === 'Property' || sourceOb.type === 'Port') &&
                     !_.isEqual(sourceOb.defaultValue, targetOb.defaultValue)
                 ) {
-                    diff.value = true
+                    diff.value = true;
                 } else if (sourceOb.type === 'Slot' && !_.isEqual(sourceOb.value, targetOb.value)) {
-                    diff.value = true
+                    diff.value = true;
                 } else if (
                     sourceOb.type === 'Constraint' &&
                     !_.isEqual(sourceOb.specification, targetOb.specification)
                 ) {
-                    diff.value = true
+                    diff.value = true;
                 }
-                let changed = false
+                let changed = false;
                 Object.keys(diff).forEach((value) => {
-                    changed = changed || diff[value]
-                })
+                    changed = changed || diff[value];
+                });
                 if (changed) {
                     response = {
                         status: 'changed',
                         diff,
-                    }
+                    };
                 }
-                deferred.resolve(response)
+                deferred.resolve(response);
             },
             (reason) => {
                 if (reason.status === 410) {
-                    response.status = 'deleted'
-                    deferred.resolve(response)
+                    response.status = 'deleted';
+                    deferred.resolve(response);
                 } else {
-                    this.growl.error(`Diff Check not completed - ${reason.message}`)
-                    deferred.reject(null)
+                    this.growl.error(`Diff Check not completed - ${reason.message}`);
+                    deferred.reject(null);
                 }
             }
-        )
-        return deferred.promise
+        );
+        return deferred.promise;
     }
 }
 
-veComponents.service('DiffMergeService', DiffMergeService)
+veComponents.service('DiffMergeService', DiffMergeService);

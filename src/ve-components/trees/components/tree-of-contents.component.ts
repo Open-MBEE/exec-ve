@@ -1,12 +1,12 @@
-import angular from 'angular'
+import angular from 'angular';
 
-import { TreeService, TreeController } from '@ve-components/trees'
-import { RootScopeService, UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { TreeService, TreeController } from '@ve-components/trees';
+import { RootScopeService, UtilsService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular';
 
 export class TreeOfContentsController extends TreeController {
     constructor(
@@ -20,20 +20,20 @@ export class TreeOfContentsController extends TreeController {
         rootScopeSvc: RootScopeService,
         eventSvc: EventService
     ) {
-        super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
+        super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc);
 
-        this.types = ['view', 'section']
-        this.id = 'tree-of-contents'
+        this.types = ['view', 'section'];
+        this.id = 'tree-of-contents';
     }
 
     protected setPeVisibility = (): void => {
-        this.types.length = 0
+        this.types.length = 0;
         if (this.showPe) {
-            this.types.push('all')
+            this.types.push('all');
         } else {
-            this.types = ['view', 'section']
+            this.types = ['view', 'section'];
         }
-    }
+    };
 }
 
 const TreeOfContentsComponent: VeComponentOptions = {
@@ -70,6 +70,6 @@ const TreeOfContentsComponent: VeComponentOptions = {
         showPe: '<',
     },
     controller: TreeOfContentsController,
-}
+};
 
-veComponents.component(TreeOfContentsComponent.selector, TreeOfContentsComponent)
+veComponents.component(TreeOfContentsComponent.selector, TreeOfContentsComponent);

@@ -23,7 +23,7 @@
 
 // Toolbar button style
 .btn-tools {
-  @include button-variant(globals.$base-grey, globals.$white, globals.$white);
+  @include button-outline-variant(globals.$base-grey);
 
   .fa,
   .fa-solid,

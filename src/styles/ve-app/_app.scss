@@ -1,3 +1,9 @@
+/*************************
+  Main combinator file for
+  View Editor stylesheets
+*************************/
+
+/* VE base styles */
 @use "../globals";
 
 .ng-hide {
@@ -433,6 +439,22 @@ table caption {
   position: relative;
   z-index: 2;
   min-height: 52px;
+
+  .close-button-container {
+    position: absolute;
+    top: 0.5em;
+    right: 2em;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .close-button {
+    position: fixed;
+    font-size: 1.5em;
+    color: globals.$tertiary-grey;
+  }
 }
 
 .modal-body {
@@ -643,6 +665,7 @@ span.inline-btn-label {
 ------------------------------------------------------------------- */
 
 // Grid with narrower gutter so input can be wider
+
 .row.narrow-gutter-row {
   margin-left: -3px;
   margin-right: -3px;
@@ -702,5 +725,25 @@ span.inline-btn-label {
   .ve-plain-input {
     margin: 0;
     width: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------
+10. Images
+------------------------------------------------------------------- */
+.zoom-modal {
+  .modal-dialog {
+    width: 100%;
+  }
+}
+
+transclude-img {
+  position: relative;
+  .zoom-img { display: block; }
+
+  .zoom-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
   }
 }

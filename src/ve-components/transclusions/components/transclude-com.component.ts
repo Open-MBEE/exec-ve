@@ -1,17 +1,18 @@
-import { ExtensionService, ComponentService } from '@ve-components/services'
-import { ITransclusion, ITransclusionComponentOptions } from '@ve-components/transclusions'
-import { TranscludeDocController } from '@ve-components/transclusions/components/transclude-doc.component'
-import { DeletableTransclusion } from '@ve-components/transclusions/deletable-transclusion.controller'
-import { ButtonBarService } from '@ve-core/button-bar'
-import { EditorService } from '@ve-core/editor'
-import { ImageService, MathService, UtilsService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
-import { ElementService, ViewService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ExtensionService, ComponentService } from '@ve-components/services';
+import { ITransclusion, ITransclusionComponentOptions } from '@ve-components/transclusions';
+import { TranscludeDocController } from '@ve-components/transclusions/components/transclude-doc.component';
+import { DeletableTransclusion } from '@ve-components/transclusions/deletable-transclusion.controller';
+import { ButtonBarService } from '@ve-core/button-bar';
+import { EditorService } from '@ve-core/editor';
+import { ImageService } from '@ve-core/image';
+import { UtilsService, MathService } from '@ve-utils/application';
+import { EditService, EventService } from '@ve-utils/core';
+import { ElementService, ViewService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular';
 
 /**
  * @ngdoc directive
@@ -38,7 +39,7 @@ import { VePromise, VeQService } from '@ve-types/angular'
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 export class TranscludeComController extends TranscludeDocController implements ITransclusion {
-    static $inject = DeletableTransclusion.$inject
+    static $inject = DeletableTransclusion.$inject;
 
     constructor(
         $q: VeQService,
@@ -77,49 +78,49 @@ export class TranscludeComController extends TranscludeDocController implements 
             buttonBarSvc,
             imageSvc,
             viewSvc
-        )
-        this.cfType = 'doc'
-        this.cfTitle = 'comment'
-        this.cfKind = 'Comment'
-        this.checkCircular = true
+        );
+        this.cfType = 'doc';
+        this.cfTitle = 'comment';
+        this.cfKind = 'Comment';
+        this.checkCircular = true;
     }
 
     $onInit(): void {
-        super.$onInit()
+        super.$onInit();
         if (this.mmsViewPresentationElemCtrl) {
             if (this.isDeletable) {
-                const instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
-                this.panelTitle = instanceSpec ? instanceSpec.name : 'Comment'
+                const instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec();
+                this.panelTitle = instanceSpec ? instanceSpec.name : 'Comment';
             }
-            this.panelType = 'Comment'
+            this.panelType = 'Comment';
         }
     }
 
     public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
-        const deferred = this.$q.defer<string | HTMLElement[]>()
+        const deferred = this.$q.defer<string | HTMLElement[]>();
 
-        let doc = (preview ? this.edit.element.documentation : this.element.documentation) || '(No comment)'
-        doc += ' - <span class="mms-commenter"> Comment by <b>' + this.element._creator + '</b></span>'
+        let doc = (preview ? this.edit.element.documentation : this.element.documentation) || '(No comment)';
+        doc += ' - <span class="mms-commenter"> Comment by <b>' + this.element._creator + '</b></span>';
 
-        let result = ''
+        let result = '';
         if (preview) {
-            result = '<div class="panel panel-info">' + doc + '</div>'
+            result = '<div class="panel panel-info">' + doc + '</div>';
         } else {
-            result = doc
+            result = doc;
         }
         if (!this.mmsGenerateForDiff) {
-            const resultHtml = $('<p></p>').html(result).toArray()
+            const resultHtml = $('<p></p>').html(result).toArray();
             this.mathSvc.typeset(resultHtml).then(
                 () => deferred.resolve(resultHtml),
                 (reason) => {
-                    deferred.reject(reason)
+                    deferred.reject(reason);
                 }
-            )
+            );
         } else {
-            deferred.resolve(result)
+            deferred.resolve(result);
         }
-        return deferred.promise
-    }
+        return deferred.promise;
+    };
 }
 
 export const TranscludeComComponent: ITransclusionComponentOptions = {
@@ -141,6 +142,6 @@ export const TranscludeComComponent: ITransclusionComponentOptions = {
         mmsViewPresentationElemCtrl: '?^viewPe',
     },
     controller: TranscludeComController,
-}
+};
 
-veComponents.component(TranscludeComComponent.selector, TranscludeComComponent)
+veComponents.component(TranscludeComComponent.selector, TranscludeComComponent);

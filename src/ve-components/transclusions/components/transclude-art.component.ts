@@ -1,15 +1,16 @@
-import { ExtensionService, ComponentService } from '@ve-components/services'
-import { Transclusion, ITransclusion, ITransclusionComponentOptions } from '@ve-components/transclusions'
-import { ButtonBarService } from '@ve-core/button-bar'
-import { EditorService } from '@ve-core/editor'
-import { UtilsService, MathService, ImageService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
-import { ElementService, URLService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ExtensionService, ComponentService } from '@ve-components/services';
+import { Transclusion, ITransclusion, ITransclusionComponentOptions } from '@ve-components/transclusions';
+import { ButtonBarService } from '@ve-core/button-bar';
+import { EditorService } from '@ve-core/editor';
+import { ImageService } from '@ve-core/image';
+import { UtilsService, MathService } from '@ve-utils/application';
+import { EditService, EventService } from '@ve-utils/core';
+import { ElementService, URLService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular';
 
 /**
  * @ngdoc component
@@ -47,13 +48,13 @@ import { VePromise, VeQService } from '@ve-types/angular'
  */
 export class TranscludeArtController extends Transclusion implements ITransclusion {
     //Custom Bindings
-    mmsArtExt: string
+    mmsArtExt: string;
 
     //Locals
-    artExt: string
-    artifacts: any[]
+    artExt: string;
+    artifacts: any[];
 
-    static $inject: string[] = [...Transclusion.$inject, 'URLService']
+    static $inject: string[] = [...Transclusion.$inject, 'URLService'];
 
     constructor(
         $q: VeQService,
@@ -91,32 +92,32 @@ export class TranscludeArtController extends Transclusion implements ITransclusi
             extensionSvc,
             buttonBarSvc,
             imageSvc
-        )
-        this.cfType = 'doc'
-        this.cfTitle = 'Documentation'
-        this.cfKind = 'Text'
-        this.checkCircular = true
+        );
+        this.cfType = 'doc';
+        this.cfTitle = 'Documentation';
+        this.cfKind = 'Text';
+        this.checkCircular = true;
     }
 
     $onInit(): void {
-        super.$onInit()
+        super.$onInit();
 
-        this.artExt = this.mmsArtExt
+        this.artExt = this.mmsArtExt;
 
         this.$element.on('click', (e) => {
-            if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element)
+            if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element);
 
-            e.stopPropagation()
-        })
+            e.stopPropagation();
+        });
     }
 
     public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
-        const artifacts = this.element._artifacts
+        const artifacts = this.element._artifacts;
         if (artifacts !== undefined) {
-            const allExt = artifacts.map((a) => a.extension)
-            let includeExt = allExt
+            const allExt = artifacts.map((a) => a.extension);
+            let includeExt = allExt;
             if (this.artExt !== '' || this.artExt !== undefined) {
-                includeExt = this.artExt.split(',').filter((a) => allExt.includes(a))
+                includeExt = this.artExt.split(',').filter((a) => allExt.includes(a));
             }
             const reqOb = {
                 elementId: this.mmsElementId,
@@ -124,7 +125,7 @@ export class TranscludeArtController extends Transclusion implements ITransclusi
                 refId: this.refId,
                 commitId: this.commitId,
                 //includeRecentVersionElement: true,
-            }
+            };
             this.artifacts = artifacts
                 .filter((a) => includeExt.includes(a.extension))
                 .map((a) => {
@@ -132,13 +133,13 @@ export class TranscludeArtController extends Transclusion implements ITransclusi
                         url: this.urlSvc.getArtifactURL(reqOb, a.extension),
                         image: a.mimetype.indexOf('image') > -1,
                         ext: a.extension,
-                    }
-                })
+                    };
+                });
         }
         const result =
-            '<div ng-repeat="artifact in $ctrl.artifacts"><img ng-if="artifact.image" ng-src="{{artifact.url}}"></img><a ng-if="!artifact.image" ng-href="{{artifact.url}}">{{$ctrl.element.name}} - {{artifact.ext}}</a></div>'
-        return this.$q.resolve(result)
-    }
+            '<div ng-repeat="artifact in $ctrl.artifacts"><img ng-if="artifact.image" ng-src="{{artifact.url}}"></img><a ng-if="!artifact.image" ng-href="{{artifact.url}}">{{$ctrl.element.name}} - {{artifact.ext}}</a></div>';
+        return this.$q.resolve(result);
+    };
 }
 
 export const TranscludeArtComponent: ITransclusionComponentOptions = {
@@ -161,6 +162,6 @@ export const TranscludeArtComponent: ITransclusionComponentOptions = {
         mmsViewPresentationElemCtrl: '?^viewPe',
     },
     controller: TranscludeArtController,
-}
+};
 
-veComponents.component(TranscludeArtComponent.selector, TranscludeArtComponent)
+veComponents.component(TranscludeArtComponent.selector, TranscludeArtComponent);

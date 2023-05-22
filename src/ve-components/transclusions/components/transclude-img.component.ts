@@ -1,15 +1,16 @@
-import { ExtensionService, ComponentService } from '@ve-components/services'
-import { Transclusion, ITransclusion } from '@ve-components/transclusions'
-import { ButtonBarService } from '@ve-core/button-bar'
-import { EditorService } from '@ve-core/editor'
-import { UtilsService, MathService, ImageService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
-import { ElementService, URLService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ExtensionService, ComponentService } from '@ve-components/services';
+import { Transclusion, ITransclusion } from '@ve-components/transclusions';
+import { ButtonBarService } from '@ve-core/button-bar';
+import { EditorService } from '@ve-core/editor';
+import { ImageService } from '@ve-core/image';
+import { UtilsService, MathService } from '@ve-utils/application';
+import { EditService, EventService } from '@ve-utils/core';
+import { ElementService, URLService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 
 /**
  * @ngdoc component
@@ -47,12 +48,13 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  */
 export class TranscludeImgController extends Transclusion implements ITransclusion {
     //Locals
-    includeExt = ['svg', 'png']
-    svg: { url: string; image: boolean; ext: string }[]
-    png: { url: string; image: boolean; ext: string }[]
-    artifacts: { url: string; image: boolean; ext: string }[]
+    includeExt = ['svg', 'png'];
+    svg: { url: string; image: boolean; ext: string }[];
+    png: { url: string; image: boolean; ext: string }[];
+    artifacts: { url: string; image: boolean; ext: string }[];
+    showZoom: boolean;
 
-    static $inject: string[] = [...Transclusion.$inject, 'URLService']
+    static $inject: string[] = [...Transclusion.$inject, 'URLService'];
 
     constructor(
         $q: VeQService,
@@ -90,24 +92,31 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
             extensionSvc,
             buttonBarSvc,
             imageSvc
-        )
-        this.cfType = 'doc'
-        this.cfTitle = 'Documentation'
-        this.cfKind = 'Text'
-        this.checkCircular = true
+        );
+        this.cfType = 'doc';
+        this.cfTitle = 'Documentation';
+        this.cfKind = 'Text';
+        this.checkCircular = true;
     }
 
     $onInit(): void {
-        super.$onInit()
+        super.$onInit();
+        this.showZoom = false;
         this.$element.on('click', (e) => {
-            if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element)
+            if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element);
 
-            e.stopPropagation()
-        })
+            e.stopPropagation();
+        });
+        this.$element.on('mouseover', (e) => {
+            this.showZoom = true;
+        });
+        this.$element.on('mouseleave', (e) => {
+            this.showZoom = false;
+        });
     }
 
     public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
-        const artifacts = this.element._artifacts
+        const artifacts = this.element._artifacts;
         if (artifacts !== undefined) {
             const reqOb = {
                 elementId: this.mmsElementId,
@@ -115,7 +124,7 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
                 refId: this.refId,
                 commitId: this.commitId,
                 //includeRecentVersionElement: true,
-            }
+            };
             this.artifacts = artifacts
                 .filter((a) => this.includeExt.includes(a.extension))
                 .map((a) => {
@@ -123,15 +132,25 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
                         url: this.urlSvc.getArtifactURL(reqOb, a.extension),
                         image: a.mimetype.indexOf('image') > -1,
                         ext: a.extension,
-                    }
-                })
-            this.svg = this.artifacts.filter((a) => a.ext === 'svg')
+                    };
+                });
+            this.svg = this.artifacts.filter((a) => a.ext === 'svg');
             //this.png = this.artifacts.filter((a) => a.ext === 'png')
         }
-        const result =
-            '<img class="mms-svg" ng-src="{{$ctrl.svg[0].url}}" alt="{{$ctrl.element.name}}"/>' +
-            '<!--<img class="mms-png" ng-src="{{$ctrl.png[0].url}}"  alt="{{$ctrl.element.name}}"/>-->'
-        return this.$q.resolve(result)
+        const result = `
+                <div ng-mouseover="showZoom=true" ng-mouseleave="showZoom=false" ng-init="showZoom=false">
+                <img class="zoom-img mms-svg" ng-src="{{$ctrl.svg[0].url}}" alt="{{$ctrl.element.name}}"/>
+                <!--<img class="mms-png" ng-src="{{$ctrl.png[0].url}}"  alt="{{$ctrl.element.name}}"/>-->
+                <a ng-show="showZoom" ng-click="$ctrl.openZoom($ctrl.svg[0].url)" class="no-print">
+                  <i class="zoom-icon fa-solid fa-magnifying-glass-plus"></i>
+                </a>
+                </div>
+            `;
+        return this.$q.resolve(result);
+    };
+
+    private openZoom(src: string): void {
+        this.imageSvc.zoomImg(src);
     }
 }
 
@@ -154,6 +173,6 @@ export const TranscludeImgComponent: VeComponentOptions = {
         mmsViewPresentationElemCtrl: '?^viewPe',
     },
     controller: TranscludeImgController,
-}
+};
 
-veComponents.component(TranscludeImgComponent.selector, TranscludeImgComponent)
+veComponents.component(TranscludeImgComponent.selector, TranscludeImgComponent);

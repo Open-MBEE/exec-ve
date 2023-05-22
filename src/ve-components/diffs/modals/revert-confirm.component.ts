@@ -1,40 +1,40 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { Commit, CompareData } from '@ve-components/diffs'
-import { EventService } from '@ve-utils/core'
-import { ElementService } from '@ve-utils/mms-api-client'
+import { Commit, CompareData } from '@ve-components/diffs';
+import { EventService } from '@ve-utils/core';
+import { ElementService } from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions } from '@ve-types/angular'
-import {ConstraintObject, ElementObject, ElementsRequest, ElementTaggedValueObject, SlotObject} from '@ve-types/mms'
-import { VeModalController, VeModalInstanceService } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular';
+import { ConstraintObject, ElementObject, ElementsRequest, ElementTaggedValueObject, SlotObject } from '@ve-types/mms';
+import { VeModalController, VeModalInstanceService } from '@ve-types/view-editor';
 
 export interface RevertConfirmResolve {
-    reqOb: ElementsRequest<string>
-    revertData: CompareData
+    reqOb: ElementsRequest<string>;
+    revertData: CompareData;
 }
 
 export interface RevertConfirmResolveFn {
-    reqOb(): ElementsRequest<string>
+    reqOb(): ElementsRequest<string>;
     revertData(): {
-        baseCommit: Commit
-        compareCommit: Commit
-        element: ElementObject
-    }
+        baseCommit: Commit;
+        compareCommit: Commit;
+        element: ElementObject;
+    };
 }
 
 class RevertConfirmController implements VeModalController {
     //bindings
-    public modalInstance: VeModalInstanceService<void>
-    public resolve: RevertConfirmResolve
+    public modalInstance: VeModalInstanceService<void>;
+    public resolve: RevertConfirmResolve;
 
-    public oking
-    revertData: CompareData
-    reqOb: ElementsRequest<string>
-    element: ElementObject
+    public oking;
+    revertData: CompareData;
+    reqOb: ElementsRequest<string>;
+    element: ElementObject;
 
-    static $inject = ['growl', 'ElementService', 'EventService']
+    static $inject = ['growl', 'ElementService', 'EventService'];
 
     constructor(
         private growl: angular.growl.IGrowlService,
@@ -43,26 +43,26 @@ class RevertConfirmController implements VeModalController {
     ) {}
 
     $onInit(): void {
-        this.revertData = this.resolve.revertData
-        this.reqOb = this.resolve.reqOb
+        this.revertData = this.resolve.revertData;
+        this.reqOb = this.resolve.reqOb;
         this.elementSvc.getElement(this.reqOb).then((el) => {
-            this.element = el
-        })
+            this.element = el;
+        });
     }
 
     ok(): void {
         if (this.oking) {
-            this.growl.info('Please wait...')
-            return
+            this.growl.info('Please wait...');
+            return;
         }
-        this.oking = true
+        this.oking = true;
 
-        const reqOb = _.cloneDeep(this.reqOb)
-        reqOb.refId = this.revertData.baseCommit.ref.id
+        const reqOb = _.cloneDeep(this.reqOb);
+        reqOb.refId = this.revertData.baseCommit.ref.id;
         reqOb.commitId =
             typeof this.revertData.baseCommit.commitSelected === 'string'
                 ? this.revertData.baseCommit.commitSelected
-                : this.revertData.baseCommit.commitSelected.id
+                : this.revertData.baseCommit.commitSelected.id;
         this.elementSvc
             .getElement(reqOb, 2, false)
             .then(
@@ -74,17 +74,19 @@ class RevertConfirmController implements VeModalController {
                         documentation: targetOb.documentation,
                         _projectId: this.reqOb.projectId,
                         _refId: this.reqOb.refId,
-                    }
+                    };
                     if (revertOb.type === 'Property' || revertOb.type === 'Port') {
-                        revertOb.defaultValue = _.cloneDeep(targetOb.defaultValue)
+                        revertOb.defaultValue = _.cloneDeep(targetOb.defaultValue);
                     } else if (revertOb.type === 'ElementTaggedValue') {
-                        (revertOb as ElementTaggedValueObject).valueIds = _.cloneDeep((targetOb as ElementTaggedValueObject).valueIds)
+                        (revertOb as ElementTaggedValueObject).valueIds = _.cloneDeep(
+                            (targetOb as ElementTaggedValueObject).valueIds
+                        );
                     } else if (revertOb.type === 'Slot' || revertOb.type.endsWith('TaggedValue')) {
-                        ;(revertOb as SlotObject).value = _.cloneDeep((targetOb as SlotObject).value)
+                        (revertOb as SlotObject).value = _.cloneDeep((targetOb as SlotObject).value);
                     } else if (revertOb.type === 'Constraint' && revertOb.specification) {
-                        ;(revertOb as ConstraintObject).specification = _.cloneDeep(
+                        (revertOb as ConstraintObject).specification = _.cloneDeep(
                             (targetOb as ConstraintObject).specification
-                        )
+                        );
                     }
 
                     this.elementSvc.updateElement(revertOb).then(
@@ -92,25 +94,25 @@ class RevertConfirmController implements VeModalController {
                             const data = {
                                 element: element,
                                 continueEdit: false,
-                            }
-                            this.eventSvc.$broadcast('element.updated', data)
-                            this.modalInstance.close()
+                            };
+                            this.eventSvc.$broadcast('element.updated', data);
+                            this.modalInstance.close();
                         },
                         (reason) => {
-                            this.growl.error('Revert not completed - Update Error: ' + reason.message)
+                            this.growl.error('Revert not completed - Update Error: ' + reason.message);
                         }
-                    )
+                    );
                 },
                 (reason) => {
-                    this.growl.error('Revert not completed - Error: Target Version not found')
+                    this.growl.error('Revert not completed - Error: Target Version not found');
                 }
             )
             .finally(() => {
-                this.oking = false
-            })
+                this.oking = false;
+            });
     }
     cancel(): void {
-        this.modalInstance.dismiss()
+        this.modalInstance.dismiss();
     }
 }
 
@@ -133,23 +135,23 @@ const RevertConfirmComponent: VeComponentOptions = {
     <h3>Preview Element</h3>
     <div class="element-preview-box">
         <h1 class="prop element-title">
-            <view-cf mms-cf-type="name" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
+            <mms-cf mms-cf-type="name" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></mms-cf>
         </h1>
         <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
         <p class="doc-text">
-            <view-cf mms-cf-type="doc" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
+            <mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></mms-cf>
         </p>
         <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.endsWith('TaggedValue')">
         <h2 class="prop-title">Property Value</h2>
         <span class="prop">
-            <view-cf mms-cf-type="val" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
+            <mms-cf mms-cf-type="val" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></mms-cf>
         </span></div>
     </div>
 </div>
 
 <div class="modal-footer">
     <button class="btn btn-warning " ng-click="$ctrl.ok()">Revert</button>
-    <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
 </div>
   
 `,
@@ -158,6 +160,6 @@ const RevertConfirmComponent: VeComponentOptions = {
         resolve: '<',
     },
     controller: RevertConfirmController,
-}
+};
 
-veComponents.component(RevertConfirmComponent.selector, RevertConfirmComponent)
+veComponents.component(RevertConfirmComponent.selector, RevertConfirmComponent);

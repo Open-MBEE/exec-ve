@@ -1,18 +1,18 @@
-import { ViewHtmlService, Presentation, PresentationService } from '@ve-components/presentations'
-import { ComponentService, ExtensionService } from '@ve-components/services'
-import { ButtonBarService } from '@ve-core/button-bar'
-import { ImageService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ViewHtmlService, Presentation, PresentationService } from '@ve-components/presentations';
+import { ComponentService, ExtensionService } from '@ve-components/services';
+import { ButtonBarService } from '@ve-core/button-bar';
+import { ImageService } from '@ve-core/image';
+import { EventService } from '@ve-utils/core';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VePromise, VeQService } from '@ve-types/angular'
-import { IPresentationComponentOptions } from '@ve-types/components/presentation'
-import { PresentTextObject } from '@ve-types/mms'
+import { VePromise, VeQService } from '@ve-types/angular';
+import { IPresentationComponentOptions } from '@ve-types/components/presentation';
+import { PresentTextObject } from '@ve-types/mms';
 
 class PresentParagraph extends Presentation implements angular.IComponentController {
-    static $inject = Presentation.$inject
+    static $inject = Presentation.$inject;
     constructor(
         $q: VeQService,
         $element: JQuery<HTMLElement>,
@@ -42,12 +42,12 @@ class PresentParagraph extends Presentation implements angular.IComponentControl
             imageSvc,
             buttonBarSvc,
             extensionSvc
-        )
+        );
     }
 
     protected getContent = (): VePromise<string, string> => {
-        return this.$q.resolve(this.viewHtmlSvc.makeHtmlPara(this.peObject as PresentTextObject))
-    }
+        return this.$q.resolve(this.viewHtmlSvc.makeHtmlPara(this.peObject as PresentTextObject));
+    };
 }
 
 const PresentParagraphComponent: IPresentationComponentOptions = {
@@ -59,6 +59,6 @@ const PresentParagraphComponent: IPresentationComponentOptions = {
         peNumber: '<',
     },
     controller: PresentParagraph,
-}
+};
 
-veComponents.component(PresentParagraphComponent.selector, PresentParagraphComponent)
+veComponents.component(PresentParagraphComponent.selector, PresentParagraphComponent);

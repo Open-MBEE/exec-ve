@@ -1,8 +1,8 @@
-import { PresentationLite } from '@ve-components/presentations'
+import { PresentationLite } from '@ve-components/presentations';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { IPresentationComponentOptions } from '@ve-types/components/presentation'
+import { IPresentationComponentOptions } from '@ve-types/components/presentation';
 
 const PresentSectionComponent: IPresentationComponentOptions = {
     selector: 'presentSection',
@@ -14,12 +14,12 @@ const PresentSectionComponent: IPresentationComponentOptions = {
         mmsRefId: '@',
         mmsCommitId: '@',
     },
-    template: `<view-cf mms-cf-type="section" mms-element-id="{{$ctrl.instanceSpec.id}}"></view-cf>`,
+    template: `<mms-cf mms-cf-type="section" mms-element-id="{{$ctrl.instanceSpec.id}}"></mms-cf>`,
     controller: PresentationLite,
     require: {
         mmsViewCtrl: '?^^view',
         mmsViewPresentationElemCtrl: '?^^viewPe',
     },
-}
+};
 
-veComponents.component(PresentSectionComponent.selector, PresentSectionComponent)
+veComponents.component(PresentSectionComponent.selector, PresentSectionComponent);

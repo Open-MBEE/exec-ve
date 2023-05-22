@@ -1,11 +1,11 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { MergeConfirmResolveFn } from '@ve-components/diffs'
-import { ComponentService } from '@ve-components/services'
-import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools'
-import { ToolbarService } from '@ve-core/toolbar'
-import { ApplicationService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { MergeConfirmResolveFn } from '@ve-components/diffs';
+import { ComponentService } from '@ve-components/services';
+import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools';
+import { ToolbarService } from '@ve-core/toolbar';
+import { ApplicationService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
 import {
     ApiService,
     ElementService,
@@ -13,13 +13,13 @@ import {
     ProjectService,
     URLService,
     ViewService,
-} from '@ve-utils/mms-api-client'
+} from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import { RefObject } from '@ve-types/mms'
-import { VeModalService } from '@ve-types/view-editor'
+import { VeComponentOptions, VeQService } from '@ve-types/angular';
+import { RefObject } from '@ve-types/mms';
+import { VeModalService } from '@ve-types/view-editor';
 
 /**
  * @ngdoc component
@@ -49,16 +49,16 @@ import { VeModalService } from '@ve-types/view-editor'
  */
 class SpecRefListController extends SpecTool implements ISpecTool {
     //Locals
-    isLoading: boolean = true
-    refs: RefObject[]
-    showMerge: boolean
-    runCleared: boolean
-    docEditable: boolean
-    docName: string
-    private isDoc: boolean
-    srcRefOb: RefObject
+    isLoading: boolean = true;
+    refs: RefObject[];
+    showMerge: boolean;
+    runCleared: boolean;
+    docEditable: boolean;
+    docName: string;
+    private isDoc: boolean;
+    srcRefOb: RefObject;
 
-    static $inject = [...SpecTool.$inject, '$uibModal']
+    static $inject = [...SpecTool.$inject, '$uibModal'];
 
     constructor(
         $q: VeQService,
@@ -94,70 +94,70 @@ class SpecRefListController extends SpecTool implements ISpecTool {
             eventSvc,
             specSvc,
             toolbarSvc
-        )
-        this.specType = _.kebabCase(SpecRefListComponent.selector)
-        this.specTitle = 'Branch/Tag List'
+        );
+        this.specType = _.kebabCase(SpecRefListComponent.selector);
+        this.specTitle = 'Branch/Tag List';
     }
 
     $onInit(): void {
-        super.$onInit()
-        this.showMerge = this.uRLSvc.getMmsServer().indexOf('opencae.jpl.nasa.gov') == -1
-        this.runCleared = true
-        this.docEditable = false
+        super.$onInit();
+        this.showMerge = this.uRLSvc.getMmsServer().indexOf('opencae.jpl.nasa.gov') == -1;
+        this.runCleared = true;
+        this.docEditable = false;
 
         this.projectSvc
             .getRefs(this.projectId)
             .then(
                 (refs) => {
-                    this.refs = refs
+                    this.refs = refs;
                 },
                 (reason) => {
-                    this.growl.error('Error getting refs: ' + reason.message)
+                    this.growl.error('Error getting refs: ' + reason.message);
                 }
             )
             .finally(() => {
-                this.isLoading = false
-            })
+                this.isLoading = false;
+            });
     }
     //Callback function for document change
     public initCallback = (): void => {
-        if (this.document) this.docName = this.document.name
+        if (this.document) this.docName = this.document.name;
         if (!this.apiSvc.isDocument(this.element)) {
-            this.isDoc = false
-            return
+            this.isDoc = false;
+            return;
         } else {
-            this.isDoc = true
+            this.isDoc = true;
         }
 
         this.docEditable =
             this.specApi.refType != 'Tag' &&
-            this.permissionsSvc.hasBranchEditPermission(this.specApi.projectId, this.specApi.refId)
-    }
+            this.permissionsSvc.hasBranchEditPermission(this.specApi.projectId, this.specApi.refId);
+    };
 
     public docMergeAction = (srcRef: RefObject): void => {
-        this.srcRefOb = srcRef
+        this.srcRefOb = srcRef;
 
         const instance = this.$uibModal.open<MergeConfirmResolveFn, void>({
             resolve: {
                 getDocName: (): string => {
-                    if (this.document) return this.document.name
-                    return '(Not Found)'
+                    if (this.document) return this.document.name;
+                    return '(Not Found)';
                 },
                 getSrcRefOb: (): RefObject => {
-                    return this.srcRefOb
+                    return this.srcRefOb;
                 },
             },
             component: 'mergeConfirmModal',
-        })
+        });
         instance.result.then(
             () => {
                 // TODO: do anything here?
             },
             () => {
-                this.growl.error('Unable to Merge')
+                this.growl.error('Unable to Merge');
             }
-        )
-    }
+        );
+    };
 }
 
 const SpecRefListComponent: VeComponentOptions = {
@@ -184,12 +184,12 @@ const SpecRefListComponent: VeComponentOptions = {
             <td class="ve-secondary-text">{{tag._created | date:'M/d/yy h:mm a'}}</td>
             <td ng-if="isDoc && docEditable && showMerge">
                 <div class="btn-group" uib-dropdown is-open="status.isopen">
-                    <button type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled" title="Tag actions">
+                    <button type="button" class="btn btn-secondary" uib-dropdown-toggle ng-disabled="disabled" title="Tag actions">
                         <i class="fa fa-ellipsis-v"></i>
                     </button>
                     <ul class="dropdown-menu pull-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
                         <li role="menuitem" style="padding:10px;">
-                            <button class="btn btn-default btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(tag)">
+                            <button class="btn btn-secondary btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(tag)">
                                 Pull In<i ng-show="!$ctrl.runCleared" class="fa fa-spin fa-spinner"></i>
                             </button> to this document on current branch
                         </li>
@@ -217,12 +217,12 @@ const SpecRefListComponent: VeComponentOptions = {
             <td class="ve-secondary-text">{{branch._created | date:'M/d/yy h:mm a'}}</td>
             <td ng-if="isDoc && docEditable && showMerge">
                 <div class="btn-group" uib-dropdown is-open="status.isopen">
-                    <button type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled" title="Branch actions">
+                    <button type="button" class="btn btn-secondary" uib-dropdown-toggle ng-disabled="disabled" title="Branch actions">
                         <i class="fa fa-ellipsis-v"></i>
                     </button>
                     <ul class="dropdown-menu pull-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
                         <li role="menuitem" style="padding:10px;">
-                            <button class="btn btn-default btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(branch)">
+                            <button class="btn btn-secondary btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(branch)">
                                 Pull In<i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
                             </button> to this document on current branch
                         </li>
@@ -239,6 +239,6 @@ const SpecRefListComponent: VeComponentOptions = {
         mmsRefs: '<',
     },
     controller: SpecRefListController,
-}
+};
 
-veComponents.component(SpecRefListComponent.selector, SpecRefListComponent)
+veComponents.component(SpecRefListComponent.selector, SpecRefListComponent);
