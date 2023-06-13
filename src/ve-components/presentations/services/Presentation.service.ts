@@ -6,6 +6,7 @@ import { veComponents } from '@ve-components';
 import { InsertResolveFn } from '@ve-types/components';
 import { ElementObject, InstanceSpecObject, InstanceValueObject } from '@ve-types/mms';
 import { VeModalService } from '@ve-types/view-editor';
+import { EventService } from "@ve-utils/core";
 
 export class PresentationService {
     private revertData: {
@@ -17,13 +18,14 @@ export class PresentationService {
         element: object;
     };
 
-    static $inject = ['$timeout', '$uibModal', 'growl', 'ViewService'];
+    static $inject = ['$timeout', '$uibModal', 'growl', 'ViewService', 'EventService'];
 
     constructor(
         private $timeout: angular.ITimeoutService,
         private $uibModal: VeModalService,
         private growl: angular.growl.IGrowlService,
-        private viewSvc: ViewService
+        private viewSvc: ViewService,
+        private eventSvc: EventService
     ) {}
 
     public checkForDuplicateInstances(operand: InstanceValueObject[]): InstanceValueObject[] {
@@ -84,6 +86,8 @@ export class PresentationService {
         });
         instance.result.then(
             (data) => {
+                //send event to tree
+                this.eventSvc.$broadcast<ElementObject>('view.reordered', viewOrSectionOb);
                 if (data.type !== 'InstanceSpecification' || this.viewSvc.isSection(data)) {
                     return; //do not open editor for existing pes added or if pe/owner is a section
                 }

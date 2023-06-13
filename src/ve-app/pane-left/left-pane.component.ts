@@ -174,17 +174,25 @@ class LeftPaneController implements angular.IComponentController {
                     search: undefined,
                 });
             }),
-            this.eventSvc.$on<InstanceSpecObject>('presentation.deleted', (data) => {
-                this.treeSvc.getBranch(data).then(
-                    (branch) => {
-                        this.treeSvc.removeBranch(branch).catch((reason) => {
-                            this.growl.error(TreeService.treeError(reason));
-                        });
-                    },
-                    () => {
-                        this.growl.error('Deleted branch not found');
+            this.eventSvc.$on<ElementObject>('view.reordered', (viewOrSection) => {
+                this.treeSvc.getBranch(viewOrSection).then((b) => {
+                    const old = b.children;
+                    const newChildren = [];
+                    let viewBranch = b;
+                    for (const c of old) {
+                        if (c.type === 'view') {
+                            newChildren.push(c);
+                        }
                     }
-                );
+                    if (b.type === 'section') {
+                        viewBranch = this.treeSvc.viewId2node[b.viewId];
+                        if (!viewBranch) {
+                            viewBranch = b;
+                        }
+                    }
+                    b.children = newChildren;
+                    this.treeSvc.addSectionElements(viewOrSection, viewBranch, b, false);
+                })
             })
         );
         /*

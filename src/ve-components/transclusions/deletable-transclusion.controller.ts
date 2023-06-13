@@ -103,7 +103,7 @@ export class DeletableTransclusion extends Transclusion {
                 this.viewSvc.removeElementFromViewOrSection(reqOb, instanceVal).then(
                     () => {
                         // Broadcast message to TreeCtrl:
-                        this.eventSvc.$broadcast('presentation.deleted', instanceSpec);
+                        this.eventSvc.$broadcast('view.reordered', viewOrSec);
 
                         this.eventSvc.$broadcast('content-reorder.refresh');
 

@@ -335,7 +335,7 @@ export class TreeService {
 
     public removeBranch = (branch: TreeBranch): VePromise<void, unknown> => {
         this._removeBranch(branch, false);
-        return this.$q.resolve();
+        return this._onTreeDataChange();
     };
 
     /**

@@ -219,20 +219,6 @@ class TreesController implements IComponentController {
                     }
                 }
                 data.$event.stopPropagation();
-            }),
-            this.eventSvc.$on<InstanceSpecObject>('presentation.deleted', (data) => {
-                this.treeSvc.getBranch(data).then(
-                    (branch) => {
-                        if (branch) {
-                            this.treeSvc.removeBranch(branch).catch((reason) => {
-                                this.growl.error(TreeService.treeError(reason));
-                            });
-                        }
-                    },
-                    (reason) => {
-                        this.growl.error(TreeService.treeError(reason));
-                    }
-                );
             })
         );
     }

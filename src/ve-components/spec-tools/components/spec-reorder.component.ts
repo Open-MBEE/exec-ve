@@ -131,6 +131,7 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                         const saved = elements.filter((val) => val.id === this.view.id);
                         if (saved.length > 0) {
                             this.eventSvc.$broadcast('element.updated', { element: saved[0] });
+                            this.eventSvc.$broadcast('view.reordered', saved[0]);
                         }
                         this.eventSvc.$broadcast('spec-reorder.saved', this.view.id);
                         this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
