@@ -213,7 +213,7 @@ Save CSV</button></div>
                 const css = choice.customization
                     ? choice.customCSS
                     : this.utilsSvc.getPrintCss(choice.model.htmlTotf, choice.model.landscape, choice.meta);
-                result.toe = choice[2] ? '' : result.toe;
+                result.toe = choice.model.htmlTotf ? '' : result.toe;
                 if (mode === 1) {
                     const popupWin = this.$window.open(
                         'about:blank',
@@ -251,8 +251,8 @@ Save CSV</button></div>
                         this.growl.error('Popup Window Failed to open. Allow popups and try again');
                     }
                 } else {
-                    result.tof = choice[1] ? result.tof + result.toe : '';
-                    result.tot = choice[1] ? result.tot : '';
+                    result.tof = choice.model.genTotf ? result.tof + result.toe : '';
+                    result.tot = choice.model.genTotf ? result.tot : '';
                     const htmlArr = [
                         '<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">',
                         css,

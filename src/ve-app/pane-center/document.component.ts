@@ -257,7 +257,9 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                         break;
 
                     case 'refresh-numbering':
-                        //TODO
+                        this.fullDocumentApi.loadRemainingViews(() => {
+                            this.utilsSvc.makeTablesAndFiguresTOC(this.treeSvc.getFirstBranch(), angular.element('#print-div'), true, false);
+                        });
                         break;
                 }
             })

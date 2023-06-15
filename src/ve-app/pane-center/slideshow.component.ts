@@ -232,7 +232,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                     this.appUtilsSvc.tableToCsv(angular.element('#print-div'), false);
                     return;
                 } else if (data.clicked === 'refresh-numbering') {
-                    // TODO
+                    this.utilsSvc.makeTablesAndFiguresTOC(this.treeSvc.getFirstBranch(), angular.element('#print-div'), true, false);
                     return;
                 }
             })

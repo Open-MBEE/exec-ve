@@ -117,10 +117,6 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
     };
 
     public resolve = (data: RefObject): void => {
-        this.growl.success(this.type + ' is being created');
-        if (this.type === 'Tag') {
-            this.growl.info('Please wait for a completion email prior to viewing of the tag.');
-        }
         this.insertApi.resolve(data);
     };
 }

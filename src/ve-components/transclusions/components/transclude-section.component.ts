@@ -154,7 +154,7 @@ export const TranscludeSectionComponent: VeComponentOptions = {
             </div>
         </div>
         <div ng-class="{'panel-body' : $ctrl.isEditing}">
-            <add-pe-menu mms-view="$ctrl.section" index="-1" class="add-pe-button-container no-print"></add-pe-menu>
+            <add-pe-menu mms-view="$ctrl.element" index="-1" class="add-pe-button-container no-print"></add-pe-menu>
             <div ng-repeat="instanceVal in $ctrl.element.specification.operand track by instanceVal.instanceId">
                 <view-pe mms-instance-val="instanceVal" mms-parent-section="$ctrl.element"></view-pe>
                 <add-pe-menu mms-view="$ctrl.element" index="$index" class="add-pe-button-container no-print"></add-pe-menu>

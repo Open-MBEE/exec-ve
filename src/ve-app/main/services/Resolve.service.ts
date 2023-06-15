@@ -294,15 +294,7 @@ export class ResolveService {
                                     id: eid,
                                     name: name,
                                     type: 'Class',
-                                },
-                                {
-                                    _projectId: params.projectId,
-                                    _refId: params.refId,
-                                    id: eid + '_asi',
-                                    name: ' ',
-                                    type: 'InstanceSpecification',
-                                    ownerId: eid,
-                                },
+                                }
                             ])
                             .then(
                                 (data) => {

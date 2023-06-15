@@ -169,7 +169,6 @@ export class Insertion<
     };
 
     public insertResolve = (data: U, type: string): void => {
-        this.growl.success(this.type + ' is being ' + type);
         this.success(data);
         this.insertApi.resolve(data);
     };

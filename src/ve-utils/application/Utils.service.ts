@@ -192,7 +192,7 @@ export class UtilsService {
             ob.figureCount++;
             prefix = 'Figure ' + veNumber + '. ';
             const capFig = el.find('figure > figcaption');
-            name = capFig.text();
+            name = capFig.text().trim();
             if (name !== '' && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === '') {
@@ -533,7 +533,7 @@ p, div {widows: 2; orphans: 2;}
 8. Signature Box
 `;
         for (let i = 1; i < 10; i++) {
-            ret += `.h${i} {bookmark-level: ${i};}
+            ret += `.h${i} {-prince-bookmark-level: ${i};}
 `;
         }
         if (htmlFlag) {
