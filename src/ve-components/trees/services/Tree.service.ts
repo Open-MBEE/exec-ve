@@ -931,7 +931,7 @@ export class TreeService {
                                             if (!document._groupId || document._groupId == this.treeApi.projectId) {
                                                 treeData.push({
                                                     label: document.name,
-                                                    type: 'view',
+                                                    type: this.treeApi.refType ===  'Branch' ? 'view' : 'snapshot',
                                                     data: document,
                                                     children: [],
                                                 });
