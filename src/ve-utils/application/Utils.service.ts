@@ -529,11 +529,9 @@ p, div {widows: 2; orphans: 2;}
 ------------------------------------------------------------------*/
 @page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}
 
-/*------------------------------------------------------------------
-8. Signature Box
 `;
         for (let i = 1; i < 10; i++) {
-            ret += `.h${i} {-prince-bookmark-level: ${i};}
+            ret += `.bm-level-${i} {bookmark-level: ${i};}
 `;
         }
         if (htmlFlag) {

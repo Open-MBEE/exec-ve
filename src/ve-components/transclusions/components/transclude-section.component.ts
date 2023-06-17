@@ -46,7 +46,7 @@ export class TranscludeSectionController extends DeletableTransclusion implement
     showNumbering: boolean;
     noCompile: boolean = true;
     //Locals
-
+    level: number = 0;
     static $inject = [...DeletableTransclusion.$inject, 'PresentationService', 'RootScopeService'];
 
     constructor(
@@ -129,6 +129,9 @@ export class TranscludeSectionController extends DeletableTransclusion implement
                 this.growl.warning('There are duplicates in this section, duplicates ignored!');
             }
         }
+        if (this.element._veNumber) {
+            this.level = this.element._veNumber.split('.').length;
+        }
         const deferred = this.$q.defer<string>();
         deferred.reject({ status: 200 }); //don't recompile
         return deferred.promise;
@@ -140,7 +143,7 @@ export const TranscludeSectionComponent: VeComponentOptions = {
     template: `
  <div ng-if="$ctrl.element.specification">
     <div ng-show="!$ctrl.isEditing">
-        <h1 class="section-title h{{$ctrl.level}}">
+        <h1 class="section-title bm-level-{{$ctrl.level}}">
             <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.element._veNumber}}</span> {{$ctrl.element.name}}
         </h1>
     </div>
