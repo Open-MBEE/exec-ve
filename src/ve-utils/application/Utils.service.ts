@@ -272,7 +272,7 @@ export class UtilsService {
         if (type === 'figure') {
             prefix = 'Figure ' + veNumber + '. ';
             const capFig = el.find('figure > figcaption');
-            name = capFig.text();
+            name = capFig.text().trim();
             if (name !== '' && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === '') {
@@ -402,8 +402,8 @@ export class UtilsService {
      * @returns {void} nothing
      */
     public convertViewLinks(printElement: JQuery<HTMLElement>): void {
-        printElement.find('mms-view-link').each((index) => {
-            const $this = $(this);
+        printElement.find('mms-view-link').each((index, el) => {
+            const $this = $(el);
             let elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
             if (!elementId) {
                 return;
