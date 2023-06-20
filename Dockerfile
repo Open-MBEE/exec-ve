@@ -14,9 +14,11 @@ FROM node:16-alpine as builder
 ENV VE_ENV 'example'
 
 WORKDIR /opt/mbee/ve
-COPY . /opt/mbee/ve
+COPY ./ /opt/mbee/ve
 
 # Configures git to use https:// instead of git://
+RUN apk add --update git
+RUN apk add --update openssh
 RUN git config --global url."https://".insteadOf git://
 
 # Install dependencies

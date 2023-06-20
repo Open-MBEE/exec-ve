@@ -97,6 +97,6 @@
     "ui-router-visualizer": "3",
     "uuid": "^9.0.0",
     "vdom-to-html": "^2.3.1",
-    "virtual-dom": "https://github.com/chhaymenghong/virtual-dom.git#master"
+    "virtual-dom": "git+https://github.com/chhaymenghong/virtual-dom.git#master"
   }
 }
