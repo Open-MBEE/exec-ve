@@ -292,7 +292,7 @@ export class EditorController implements IComponentController {
                 this.uRLSvc.getPutArtifactsURL({
                     projectId: this.mmsProjectId,
                     refId: this.mmsRefId,
-                    elementId: this.apiSvc.createUniqueId().replace('MMS', '_hidden_image'),
+                    elementId: '_hidden_image_' + this.apiSvc.createUniqueId(),
                 }),
                 true
             );
