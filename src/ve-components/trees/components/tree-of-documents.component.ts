@@ -85,8 +85,10 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
                         <i ng-hide="row.branch.loading" class="indented tree-icon {{row.typeIcon}}" ></i>
                         <i ng-show="row.branch.loading" class="indented tree-icon fa-solid fa-spinner fa-spin"></i>
                         <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
+                        <!-- favs don't survive reload
                         <i ng-show="showFavs && row.branch.favorite" class="fa-solid fa-star" ng-click="$ctrl.toggleFavorite($event, row.branch)"></i>
                         <i ng-show="showFavs && !row.branch.favorite" class="fa-regular fa-star" ng-click="$ctrl.toggleFavorite($event, row.branch)"></i>
+                        -->
                     </div>
                 </div>
             </div>

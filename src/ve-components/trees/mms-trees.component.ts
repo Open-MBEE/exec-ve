@@ -541,10 +541,12 @@ const TreesComponent: VeComponentOptions = {
 
 <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
     <div class="tree-view" style="display:table;">
+        <!--
         <div class="container-fluid">
             <h4 class="tree-view-title">{{$ctrl.currentTitle}}</h4>
         </div>
         <hr class="tree-title-divider">
+        -->
         <div id="trees" class="container-fluid">
         </div>
         <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>

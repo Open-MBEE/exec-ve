@@ -229,7 +229,7 @@ const SpecInspectorComponent: VeComponentOptions = {
             <h2 class="prop-title">Location</h2>
             <span class="prop">{{$ctrl.specApi.qualifiedName}}</span>
             <h2 class="prop-title">ID&nbsp;
-                <button ng-click="$ctrl.copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default" uib-tooltip="Copy ID">
+                <button id="spec-element-id-copy" ng-click="$ctrl.copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default" uib-tooltip="Copy ID">
                     <i class="fa fa-copy"></i>
                 </button>
             </h2>

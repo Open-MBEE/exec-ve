@@ -4,7 +4,9 @@
 /*************************
   Styles for the View Editor right pane
 *************************/
-
+#spec-element-id-copy {
+  padding: 2px;
+}
 .pane-right {
   > .pane-right {
     @include globals.box-shadow(-1px 0 1px 0 rgba(0, 0, 0, 0.2));

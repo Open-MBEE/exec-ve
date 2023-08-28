@@ -125,6 +125,12 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
                     this.historyVer = 'latest';
                     this.compareCommit.history = data;
                     this.compareCommit.commitSelected = this.compareCommit.history[0];
+                    for (let history of data) {
+                        if (history.id === this.element._commitId) {
+                            this.compareCommit.commitSelected = history;
+                            break;
+                        }
+                    }
                     this.baseCommit.history = data;
                     if (data.length > 1) {
                         this.baseCommit.commitSelected = this.compareCommit.history[1];
