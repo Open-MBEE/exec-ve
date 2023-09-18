@@ -14,7 +14,7 @@ import { veCore } from '@ve-core';
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
-    ElementObject,
+    ElementObject, ElementsRequest,
     MountObject,
     ProjectObject,
     QueryObject,
@@ -129,10 +129,10 @@ export class SearchController implements angular.IComponentController {
             id: 'id',
             label: 'ID',
         },
-        {
+        /*{
             id: 'type',
             label: 'Metatype',
-        },
+        },*/
     ];
 
     public operatorList = ['And', 'Or', 'And Not'];
@@ -212,7 +212,7 @@ export class SearchController implements angular.IComponentController {
         //ensure project mounts object is cached
         // Function used to get string value of metatype names for advanced search
 
-        this.getMetaTypes();
+        //this.getMetaTypes(); //no way to make custom elastic query
 
         this.multiselectEvent = {
             onItemSelect: (ob): void => {
@@ -274,17 +274,21 @@ export class SearchController implements angular.IComponentController {
             // filter out results that have type = to Property and Slot
             // for Property check that ownerId is same as the class id
             if (elem.type === 'Class' || elem.type === 'Component') {
-                const reqOb = {
+                const reqOb: ElementsRequest<string> = {
                     elementId: elem.id,
                     projectId: elem._projectId,
                     refId: elem._refId,
-                    depth: 2,
                 };
-                this.elementSvc.getOwnedElements(reqOb, 2).then(
-                    (data: ElementObject[]) => {
+                const query = {
+                    params: {
+                        ownerId: elem.id,
+                    },
+                };
+                this.elementSvc.search<ElementObject>(reqOb, query).then(
+                    (data) => {
                         const properties: ElementObject[] = [];
                         //TODO might not be elements
-                        data.forEach((elt) => {
+                        data.elements.forEach((elt) => {
                             if (this.valueSvc.isValue(elt)) properties.push(elt);
                         });
                         elem._properties = properties;
@@ -534,6 +538,7 @@ export class SearchController implements angular.IComponentController {
                     } else if (elements.length > 0) {
                         this.searchResults = elements;
                     }
+                    //this.handleChange(this.searchResults); //might make it too slow
                     this.combineRelatedViews();
                     this.currentPage = page;
                     this._applyFiltersAndPaginate();
@@ -644,13 +649,23 @@ export class SearchController implements angular.IComponentController {
             for (const type of this.fieldTypeList) {
                 if (type.id !== 'all') {
                     const queryOb: QueryObject = { params: {} };
-                    queryOb.params[type.id] = query.searchText;
+                    if (type.id === 'value') {
+                        queryObs.push({params: {'value.value': query.searchText}});
+                        queryOb.params['defaultValue.value'] = query.searchText;
+                    } else {
+                        queryOb.params[type.id] = query.searchText;
+                    }
                     queryObs.push(queryOb);
                 }
             }
         } else {
             const queryOb: QueryObject = { params: {} };
-            queryOb.params[query.searchField.id] = query.searchText;
+            if (query.searchField.id === 'value') {
+                queryObs.push({params: {'value.value': query.searchText}});
+                queryOb.params['defaultValue.value'] = query.searchText;
+            } else {
+                queryOb.params[query.searchField.id] = query.searchText;
+            }
             queryObs.push(queryOb);
         }
 
@@ -785,7 +800,7 @@ const SearchComponent: VeComponentOptions = {
             </form>
             <div>
                 <input type="checkbox" ng-model="$ctrl.docsviews.selected"> Search for Views and Documents
-                <a class="pull-right" ng-click="$ctrl.advanceSearch = !$ctrl.advanceSearch">Advanced Search</a>
+                <!--<a class="pull-right" ng-click="$ctrl.advanceSearch = !$ctrl.advanceSearch">Advanced Search</a>-->
             </div>
         </div>
 

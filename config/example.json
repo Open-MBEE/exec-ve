@@ -2,7 +2,7 @@
   "apiUrl": "http://localhost:8080",
   "printUrl": "http://localhost:8081/convert",
   "basePath": "",
-  "enableDebug": true,
+  "enableDebug": false,
   "customLabels": {
     "pi": "PROPRIETARY: Proprietary Information",
     "export_ctrl": "EXPORT WARNING: No export controlled documents allowed on this server",
