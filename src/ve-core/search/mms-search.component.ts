@@ -1,54 +1,54 @@
-import { StateService } from '@uirouter/angularjs'
-import _ from 'lodash'
+import { StateService } from '@uirouter/angularjs';
+import _ from 'lodash';
 
-import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
-import { veCoreEvents } from '@ve-core/events'
-import { search_default_buttons } from '@ve-core/search/mms-search-buttons.config'
-import { UtilsService } from '@ve-utils/application'
-import { CacheService, EventService } from '@ve-utils/core'
-import { ElementService, ProjectService, ViewService, ValueService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
+import { veCoreEvents } from '@ve-core/events';
+import { search_default_buttons } from '@ve-core/search/mms-search-buttons.config';
+import { UtilsService } from '@ve-utils/application';
+import { CacheService, EventService } from '@ve-utils/core';
+import { ElementService, ProjectService, ViewService, ValueService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veCore } from '@ve-core'
+import { veCore } from '@ve-core';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
-    ElementObject,
+    ElementObject, ElementsRequest,
     MountObject,
     ProjectObject,
     QueryObject,
     RequestObject,
     SearchResponse,
     ViewObject,
-} from '@ve-types/mms'
-import { VeSearchOptions } from '@ve-types/view-editor'
+} from '@ve-types/mms';
+import { VeSearchOptions } from '@ve-types/view-editor';
 
 export interface SearchQuery {
-    searchText: string
-    selectedSearchMetatypes: any[]
-    searchField: SearchField
-    from?: number
-    size?: number
+    searchText: string;
+    selectedSearchMetatypes: any[];
+    searchField: SearchField;
+    from?: number;
+    size?: number;
 }
 
 export interface AdvancedSearchQuery extends SearchQuery {
-    operator: string
+    operator: string;
 }
 
 export interface SearchField {
-    id: string
-    label: string
+    id: string;
+    label: string;
 }
 
 export interface SearchFilter {
-    appliedStereotypeIds?: string[]
-    classifierIds?: string[]
+    appliedStereotypeIds?: string[];
+    classifierIds?: string[];
 }
 
 export interface SearchObject extends ViewObject {
-    allRelatedDocuments?: ViewObject[]
-    remainingRelatedDocuments?: ViewObject[]
+    allRelatedDocuments?: ViewObject[];
+    remainingRelatedDocuments?: ViewObject[];
 }
 
 /**
@@ -61,19 +61,19 @@ export interface SearchObject extends ViewObject {
  *
  */
 export class SearchController implements angular.IComponentController {
-    private mmsOptions: VeSearchOptions<ElementObject>
-    private mmsProjectId: string
-    private mmsRefId: string
-    private embedded: boolean
+    private mmsOptions: VeSearchOptions<ElementObject>;
+    private mmsProjectId: string;
+    private mmsRefId: string;
+    private embedded: boolean;
 
     //Search Results
-    private metatypeSearch: string
-    protected searchResults: ElementObject[] = []
-    protected baseSearchResults: ElementObject[] = []
-    protected filteredSearchResults: ElementObject[] = []
-    protected showFilterOptions: boolean
-    protected searchLoading: boolean = false
-    protected firstSearch: boolean = true
+    private metatypeSearch: string;
+    protected searchResults: ElementObject[] = [];
+    protected baseSearchResults: ElementObject[] = [];
+    protected filteredSearchResults: ElementObject[] = [];
+    protected showFilterOptions: boolean;
+    protected searchLoading: boolean = false;
+    protected firstSearch: boolean = true;
     protected mainSearch: SearchQuery = {
         searchText: '',
         searchField: {
@@ -81,31 +81,31 @@ export class SearchController implements angular.IComponentController {
             label: 'All Fields',
         },
         selectedSearchMetatypes: [],
-    }
+    };
     protected docsviews: { selected: boolean } = {
         selected: false,
-    }
-    private emptyDocTxt: string
-    protected refId: string
+    };
+    private emptyDocTxt: string;
+    protected refId: string;
     // Search result settings
-    protected activeFilter: any[] = []
+    protected activeFilter: any[] = [];
 
     // Pagination settings
-    protected totalResults: number = 0
-    protected paginationCache: { [key: number]: ElementObject[] } = {}
-    private maxPages: number
-    protected currentPage: number = 0
-    protected itemsPerPage: number = 10
+    protected totalResults: number = 0;
+    protected paginationCache: { [key: number]: ElementObject[] } = {};
+    private maxPages: number;
+    protected currentPage: number = 0;
+    protected itemsPerPage: number = 10;
     // Advanced search settings
-    protected advanceSearch: boolean = false
-    protected advancedSearchResults: boolean
-    protected advanceSearchRows: AdvancedSearchQuery[] = []
-    protected stringQuery = this.mainSearch.searchText
+    protected advanceSearch: boolean = false;
+    protected advancedSearchResults: boolean;
+    protected advanceSearchRows: AdvancedSearchQuery[] = [];
+    protected stringQuery = this.mainSearch.searchText;
 
     // View property settings
-    protected showSearchResultProps = false
-    protected switchText = 'More'
-    protected limitForProps = 6
+    protected showSearchResultProps = false;
+    protected switchText = 'More';
+    protected limitForProps = 6;
 
     // Set search options
     public fieldTypeList: SearchField[] = [
@@ -129,13 +129,13 @@ export class SearchController implements angular.IComponentController {
             id: 'id',
             label: 'ID',
         },
-        {
+        /*{
             id: 'type',
             label: 'Metatype',
-        },
-    ]
+        },*/
+    ];
 
-    public operatorList = ['And', 'Or', 'And Not']
+    public operatorList = ['And', 'Or', 'And Not'];
 
     // settings for multiselect metatype dropdown
     public metatypeSettings = {
@@ -146,20 +146,20 @@ export class SearchController implements angular.IComponentController {
         showCheckAll: false,
         smartButtonMaxItems: 10,
         buttonClasses: '',
-    }
+    };
 
     // event handler for multiselect metatype dropdown
     public multiselectEvent: {
-        onItemSelect(ob): void
-        onItemDeselect(ob): void
-        onDeselectAll(ob): void
-    }
+        onItemSelect(ob): void;
+        onItemDeselect(ob): void;
+        onDeselectAll(ob): void;
+    };
 
-    bbId: string
-    bbApi: ButtonBarApi
-    private filterList: QueryObject[] = []
+    bbId: string;
+    bbApi: ButtonBarApi;
+    private filterList: QueryObject[] = [];
 
-    private schema = 'cameo'
+    private schema = 'cameo';
 
     static $inject = [
         '$q',
@@ -176,7 +176,7 @@ export class SearchController implements angular.IComponentController {
         'ValueService',
         'SchemaService',
         'ButtonBarService',
-    ]
+    ];
 
     constructor(
         private $q: VeQService,
@@ -196,98 +196,102 @@ export class SearchController implements angular.IComponentController {
     ) {}
 
     $onInit(): void {
-        this.showFilterOptions = !this.mmsOptions.hideFilterOptions
+        this.showFilterOptions = !this.mmsOptions.hideFilterOptions;
         if (this.showFilterOptions) {
-            this.bbId = this.buttonBarSvc.generateBarId('mms-search')
-            this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, search_default_buttons)
+            this.bbId = this.buttonBarSvc.generateBarId('mms-search');
+            this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, search_default_buttons);
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
-                this.bbApi.toggleButton(data.clicked)
-                this.filterSearchResults(this.buttonBarSvc.getButtonDefinition(data.clicked).type)
-            })
+                this.bbApi.toggleButton(data.clicked);
+                this.filterSearchResults(this.buttonBarSvc.getButtonDefinition(data.clicked).type);
+            });
         }
-        this.refId = this.mmsRefId ? this.mmsRefId : 'master'
+        this.refId = this.mmsRefId ? this.mmsRefId : 'master';
 
         // Set functions
-        void this.projectSvc.getProjectMounts(this.mmsProjectId, this.refId)
+        void this.projectSvc.getProjectMounts(this.mmsProjectId, this.refId);
         //ensure project mounts object is cached
         // Function used to get string value of metatype names for advanced search
 
-        this.getMetaTypes()
+        //this.getMetaTypes(); //no way to make custom elastic query
 
         this.multiselectEvent = {
             onItemSelect: (ob): void => {
                 void this.$timeout(() => {
-                    this.stringQueryUpdate()
-                }, 500)
+                    this.stringQueryUpdate();
+                }, 500);
             },
             onItemDeselect: (ob): void => {
                 void this.$timeout(() => {
-                    this.stringQueryUpdate()
-                }, 500)
+                    this.stringQueryUpdate();
+                }, 500);
             },
             onDeselectAll: (ob): void => {
                 void this.$timeout(() => {
-                    this.stringQueryUpdate()
-                }, 500)
+                    this.stringQueryUpdate();
+                }, 500);
             },
-        }
+        };
 
-        this.addAdvanceSearchRow() // Second row created by default
+        this.addAdvanceSearchRow(); // Second row created by default
 
         // Set options
         if (this.mmsOptions.searchResult) {
-            const data1 = this.mmsOptions.searchResult
-            this.searchResults = data1
-            this.paginationCache[0] = data1
+            const data1 = this.mmsOptions.searchResult;
+            this.searchResults = data1;
+            this.paginationCache[0] = data1;
         }
         if (this.mmsOptions.searchField) {
             for (const field of this.fieldTypeList) {
                 if (this.mmsOptions.searchField === field.label || this.mmsOptions.searchField === field.id) {
-                    this.mainSearch.searchField = field
-                    break
+                    this.mainSearch.searchField = field;
+                    break;
                 }
             }
         }
         if (this.mmsOptions.searchInput) {
-            this.mainSearch.searchText = this.mmsOptions.searchInput
-            this.newSearch(this.mainSearch)
+            this.mainSearch.searchText = this.mmsOptions.searchInput;
+            this.newSearch(this.mainSearch);
         }
         if (this.mmsOptions.itemsPerPage) {
-            this.itemsPerPage = this.mmsOptions.itemsPerPage
+            this.itemsPerPage = this.mmsOptions.itemsPerPage;
         }
         if (this.mmsOptions.emptyDocTxt) {
-            this.emptyDocTxt = this.mmsOptions.emptyDocTxt
+            this.emptyDocTxt = this.mmsOptions.emptyDocTxt;
         }
     }
 
     handleChange = (newVal: ElementObject[]): void => {
-        if (!newVal) return
+        if (!newVal) return;
         if (!this.mmsOptions.getProperties) {
-            return
+            return;
         }
         newVal.forEach((elem) => {
             if (elem._properties) {
-                return
+                return;
             }
             // mms does not return properties will need to make a call for the results whose type is Class
             // Call this.elementSvc.getOwnedElements with depth of 2
             // filter out results that have type = to Property and Slot
             // for Property check that ownerId is same as the class id
             if (elem.type === 'Class' || elem.type === 'Component') {
-                const reqOb = {
+                const reqOb: ElementsRequest<string> = {
                     elementId: elem.id,
                     projectId: elem._projectId,
                     refId: elem._refId,
-                    depth: 2,
-                }
-                this.elementSvc.getOwnedElements(reqOb, 2).then(
-                    (data: ElementObject[]) => {
-                        const properties: ElementObject[] = []
+                };
+                const query = {
+                    params: {
+                        ownerId: elem.id,
+                    },
+                };
+                this.elementSvc.search<ElementObject>(reqOb, query).then(
+                    (data) => {
+                        const properties: ElementObject[] = [];
                         //TODO might not be elements
-                        data.forEach((elt) => {
-                            if (this.valueSvc.isValue(elt)) properties.push(elt)
-                        })
-                        elem._properties = properties
+                        data.elements.forEach((elt) => {
+                            if (this.valueSvc.isValue(elt)) properties.push(elt);
+                        });
+                        elem._properties = properties;
                         // OLD CODE - splits into 3cols
                         // if (elem._properties && elem._properties[0]) {
                         //     var properties2 = [];
@@ -301,55 +305,55 @@ export class SearchController implements angular.IComponentController {
                         // }
                     },
                     (reason) => {
-                        this.growl.error(reason.message)
+                        this.growl.error(reason.message);
                     }
-                )
+                );
             }
-        })
-    }
+        });
+    };
 
     bbInit = (api: ButtonBarApi): void => {
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-document'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-paragraph'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-table'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-image'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-equation'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-comment'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-section'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-view'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-req'))
-    }
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-document'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-paragraph'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-table'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-image'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-equation'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-comment'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-section'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-view'));
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-req'));
+    };
 
     public qualifiedNameFormatter = (qualifiedName: string): string => {
         if (qualifiedName) {
-            const parts = qualifiedName.split('/')
-            let result = qualifiedName
+            const parts = qualifiedName.split('/');
+            let result = qualifiedName;
             if (parts.length > 7) {
-                result = parts.slice(0, 4).join('/') + '/.../' + parts.slice(parts.length - 3, parts.length).join('/')
+                result = parts.slice(0, 4).join('/') + '/.../' + parts.slice(parts.length - 3, parts.length).join('/');
             }
-            return result
+            return result;
         }
-    }
+    };
 
     public expandQualifiedName = ($event: JQuery.ClickEvent, qualifiedName: string): void => {
-        ;($event.currentTarget as HTMLElement).innerHTML = qualifiedName
-    }
+        ($event.currentTarget as HTMLElement).innerHTML = qualifiedName;
+    };
 
     public showMoreRelatedViews = (element: SearchObject): void => {
-        element.remainingRelatedDocuments = element.allRelatedDocuments.slice(3, element.allRelatedDocuments.length)
-    }
+        element.remainingRelatedDocuments = element.allRelatedDocuments.slice(3, element.allRelatedDocuments.length);
+    };
 
     public closeSearch = (): void => {
         if (this.mmsOptions.closeCallback) {
-            this.mmsOptions.closeCallback()
+            this.mmsOptions.closeCallback();
         } else {
-            void this.$state.go('main.project.ref.portal', { search: null, field: null }, { reload: true })
+            void this.$state.go('main.project.ref.portal', { search: null, field: null }, { reload: true });
         }
-    }
+    };
 
     public advancedSearchHandler = (): void => {
         /* TODO: Reimplement Advanced Search */
-    }
+    };
 
     // Get metatypes for dropdown options
     public getMetaTypes = (): void => {
@@ -363,50 +367,50 @@ export class SearchController implements angular.IComponentController {
         //     }).finally(() => {
         //   scope.metatypeSearch = "";
         // });
-        this.advancedSearchHandler()
-    }
+        this.advancedSearchHandler();
+    };
 
     public getMetatypeSelection = (id: string): string => {
-        const mainElement = angular.element(id)
-        return mainElement.find('div').attr('value')
-    }
+        const mainElement = angular.element(id);
+        return mainElement.find('div').attr('value');
+    };
 
     public getTypeClass = (element: ElementObject): string => {
         // Get Type
-        return this.utilsSvc.getElementTypeClass(element, this.viewSvc.getElementType(element))
-    }
+        return this.utilsSvc.getElementTypeClass(element, this.viewSvc.getElementType(element));
+    };
 
     // Filter options
     public getActiveFilterClass = (item: unknown[]): boolean => {
         if (!this.activeFilter.length) {
-            return false
+            return false;
         }
-        return _.includes(this.activeFilter, item)
-    }
+        return _.includes(this.activeFilter, item);
+    };
 
     public filterSearchResults = (type: string): void => {
-        const tempArr = _.clone(this.activeFilter)
+        const tempArr = _.clone(this.activeFilter);
         if (_.includes(this.activeFilter, type)) {
-            _.pull(this.activeFilter, type)
+            _.pull(this.activeFilter, type);
         } else {
-            this.activeFilter.push(type)
+            this.activeFilter.push(type);
         }
-        this._applyFiltersAndPaginate()
-    }
+        this._applyFiltersAndPaginate();
+    };
 
     private _applyFiltersAndPaginate = (): void => {
         if (!this.activeFilter.length) {
-            this.filteredSearchResults = this.searchResults
+            this.filteredSearchResults = this.searchResults;
         } else {
             this.filteredSearchResults = _.filter(this.baseSearchResults, (item) => {
-                return _.includes(this.activeFilter, this.viewSvc.getElementType(item))
-            })
+                return _.includes(this.activeFilter, this.viewSvc.getElementType(item));
+            });
         }
-        this.maxPages = Math.ceil(this.filteredSearchResults.length / this.itemsPerPage)
+        this.maxPages = Math.ceil(this.filteredSearchResults.length / this.itemsPerPage);
         for (const pg of [...Array(this.maxPages).keys()]) {
-            this.paginationCache[pg] = this.searchResults.slice(pg * this.itemsPerPage, (pg + 1) * this.itemsPerPage)
+            this.paginationCache[pg] = this.searchResults.slice(pg * this.itemsPerPage, (pg + 1) * this.itemsPerPage);
         }
-    }
+    };
 
     // var findRefineOptions = (results) => {
     //     var presentationElements = _.map(results, this.viewSvc.getElementType);
@@ -419,13 +423,13 @@ export class SearchController implements angular.IComponentController {
      * Updates advanced search main query input
      */
     public stringQueryUpdate = (): void => {
-        const rowLength = this.advanceSearchRows.length
-        this.stringQuery = Array(rowLength + 1).join('(')
-        this.stringQuery += this.mainSearch.searchField.label + ':'
+        const rowLength = this.advanceSearchRows.length;
+        this.stringQuery = Array(rowLength + 1).join('(');
+        this.stringQuery += this.mainSearch.searchField.label + ':';
         if (this.mainSearch.searchField.id === 'metatype') {
-            this.stringQuery += this.getMetatypeSelection('#searchMetatypeSelectAdvance')
+            this.stringQuery += this.getMetatypeSelection('#searchMetatypeSelectAdvance');
         } else {
-            this.stringQuery += this.mainSearch.searchText
+            this.stringQuery += this.mainSearch.searchText;
         }
         for (let i = 0; i < rowLength; i++) {
             this.stringQuery +=
@@ -433,14 +437,14 @@ export class SearchController implements angular.IComponentController {
                 this.advanceSearchRows[i].operator.toUpperCase() +
                 ' ' +
                 this.advanceSearchRows[i].searchField.label +
-                ':'
+                ':';
             if (this.advanceSearchRows[i].searchField.id === 'metatype') {
-                this.stringQuery += this.getMetatypeSelection('#searchMetatypeSelect-' + i.toString()) + ')'
+                this.stringQuery += this.getMetatypeSelection('#searchMetatypeSelect-' + i.toString()) + ')';
             } else {
-                this.stringQuery += this.advanceSearchRows[i].searchText + ')'
+                this.stringQuery += this.advanceSearchRows[i].searchText + ')';
             }
         }
-    }
+    };
 
     /**
      * @name veCore.directive:mmsSearch#addAdvanceSearchRow
@@ -455,9 +459,9 @@ export class SearchController implements angular.IComponentController {
             },
             searchText: '',
             selectedSearchMetatypes: [],
-        })
-        this.stringQueryUpdate()
-    }
+        });
+        this.stringQueryUpdate();
+    };
     /**
      * @name veCore.directive:mmsSearch#removeRowAdvanceSearch
      * Removes selected row and updates advanced search main query input
@@ -465,22 +469,22 @@ export class SearchController implements angular.IComponentController {
      * @param {object} row advanced search row
      */
     public removeRowAdvanceSearch = (row: AdvancedSearchQuery): void => {
-        this.advanceSearchRows = _.without(this.advanceSearchRows, row)
-        this.stringQueryUpdate()
-    }
+        this.advanceSearchRows = _.without(this.advanceSearchRows, row);
+        this.stringQueryUpdate();
+    };
 
     public modifyAdvanceSearch = (): void => {
-        this.advanceSearch = !this.advanceSearch
-        this.advancedSearchResults = !this.advancedSearchResults
-    }
+        this.advanceSearch = !this.advanceSearch;
+        this.advancedSearchResults = !this.advancedSearchResults;
+    };
 
     public pageChanged = (): void => {
         if (this.paginationCache[this.currentPage]) {
-            this.baseSearchResults = this.paginationCache[this.currentPage]
+            this.baseSearchResults = this.paginationCache[this.currentPage];
         } else {
-            this.search(this.mainSearch, this.currentPage, this.itemsPerPage)
+            this.search(this.mainSearch, this.currentPage, this.itemsPerPage);
         }
-    }
+    };
 
     /**
      * @name veCore.directive:mmsSearch#search
@@ -492,14 +496,14 @@ export class SearchController implements angular.IComponentController {
      * @param {number} numItems number of items to return per page
      */
     public search = (query: SearchQuery, page: number, numItems: number): void => {
-        this.searchLoading = true
+        this.searchLoading = true;
         if (!this.embedded) {
             void this.$state.go('.', {
                 search: query.searchText,
                 field: query.searchField.id,
-            })
+            });
         }
-        const queryObs: QueryObject[] = this.buildQuery(query)
+        const queryObs: QueryObject[] = this.buildQuery(query);
         // for (const queryOb of queryObs) {
         //     queryOb.from = page * numItems + page
         //     queryOb.size = numItems
@@ -507,67 +511,68 @@ export class SearchController implements angular.IComponentController {
         const reqOb: RequestObject = {
             projectId: this.mmsProjectId,
             refId: this.refId,
-        }
-        const promises: VePromise<SearchResponse<ElementObject>, SearchResponse<ElementObject>>[] = []
+        };
+        const promises: VePromise<SearchResponse<ElementObject>, SearchResponse<ElementObject>>[] = [];
         for (const queryOb of queryObs) {
-            promises.push(this._performSearch(reqOb, queryOb))
+            promises.push(this._performSearch(reqOb, queryOb));
         }
 
         this.$q
             .allSettled<SearchResponse<ElementObject>>(promises)
             .then(
                 (data) => {
-                    const elements: ElementObject[] = []
-                    this.searchResults = []
-                    this.totalResults = 0
+                    const elements: ElementObject[] = [];
+                    this.searchResults = [];
+                    this.totalResults = 0;
                     for (const d of data) {
-                        elements.push(...d.value.elements)
-                        this.totalResults = this.totalResults + d.value.total
+                        elements.push(...d.value.elements);
+                        this.totalResults = this.totalResults + d.value.total;
                     }
                     if (this.mmsOptions.filterCallback) {
-                        const results = this.mmsOptions.filterCallback(elements)
+                        const results = this.mmsOptions.filterCallback(elements);
                         if (results) {
-                            this.searchResults = results
+                            this.searchResults = results;
                         } else {
-                            this.searchResults = []
+                            this.searchResults = [];
                         }
                     } else if (elements.length > 0) {
-                        this.searchResults = elements
+                        this.searchResults = elements;
                     }
-                    this.combineRelatedViews()
-                    this.currentPage = page
-                    this._applyFiltersAndPaginate()
-                    this.baseSearchResults = this.paginationCache[page]
+                    //this.handleChange(this.searchResults); //might make it too slow
+                    this.combineRelatedViews();
+                    this.currentPage = page;
+                    this._applyFiltersAndPaginate();
+                    this.baseSearchResults = this.paginationCache[page];
                     if (this.advanceSearch) {
                         // scope.advanceSearch = !scope.advanceSearch;
-                        this.advancedSearchResults = true
+                        this.advancedSearchResults = true;
                     }
 
                     // scope.refineOptions = findRefineOptions(baseSearchResults);
                 },
                 (reason) => {
-                    this.growl.error('Search Error: ' + reason.message)
+                    this.growl.error('Search Error: ' + reason.message);
                 }
             )
             .finally(() => {
-                this.searchLoading = false
-                this.firstSearch = false
-            })
-    }
+                this.searchLoading = false;
+                this.firstSearch = false;
+            });
+    };
 
     private _performSearch(
         reqOb: RequestObject,
         queryOb: QueryObject
     ): VePromise<SearchResponse<ElementObject>, SearchResponse<ElementObject>> {
-        return this.elementSvc.search<ElementObject>(reqOb, queryOb)
+        return this.elementSvc.search<ElementObject>(reqOb, queryOb);
     }
 
     public newSearch = (query: SearchQuery): void => {
-        this.searchResults.length = 0
-        this.searchLoading = true
-        this.paginationCache = {}
-        this.search(query, 0, this.itemsPerPage)
-    }
+        this.searchResults.length = 0;
+        this.searchLoading = true;
+        this.paginationCache = {};
+        this.search(query, 0, this.itemsPerPage);
+    };
 
     /**
      * @name veCore.directive:mmsSearch#getProjectMountsQuery
@@ -579,29 +584,29 @@ export class SearchController implements angular.IComponentController {
      * @return {object} Elastic query JSON object with list of project mounts
      */
     getProjectMountsQuery = (): VePromise<MountObject[]> => {
-        const deferred: angular.IDeferred<MountObject[]> = this.$q.defer()
-        const projList: MountObject[] = []
+        const deferred: angular.IDeferred<MountObject[]> = this.$q.defer();
+        const projList: MountObject[] = [];
 
-        const mountCacheKey = ['project-mounts', this.mmsProjectId, this.refId]
+        const mountCacheKey = ['project-mounts', this.mmsProjectId, this.refId];
         if (this.cacheSvc.exists(mountCacheKey)) {
-            const project = this.cacheSvc.get<MountObject>(mountCacheKey)
-            this.getAllMountsAsArray(project, projList)
-            deferred.resolve(projList)
+            const project = this.cacheSvc.get<MountObject>(mountCacheKey);
+            this.getAllMountsAsArray(project, projList);
+            deferred.resolve(projList);
         } else {
             // Get project element data to gather mounted project list
             this.projectSvc.getProjectMounts(this.mmsProjectId, this.refId).then(
                 (project) => {
-                    this.getAllMountsAsArray(project, projList)
-                    deferred.resolve(projList)
+                    this.getAllMountsAsArray(project, projList);
+                    deferred.resolve(projList);
                 },
                 (reason) => {
-                    this.growl.error('Problem getting Project Mounts:' + reason.message)
-                    deferred.resolve(projList)
+                    this.growl.error('Problem getting Project Mounts:' + reason.message);
+                    deferred.resolve(projList);
                 }
-            )
+            );
         }
-        return deferred.promise
-    }
+        return deferred.promise;
+    };
 
     /**
      * @name veCore.directive:mmsSearch#getAllMountsAsArray
@@ -610,20 +615,20 @@ export class SearchController implements angular.IComponentController {
      *
      */
     public getAllMountsAsArray = (project: ProjectObject, projectsList: ProjectObject[]): void => {
-        projectsList.push(project)
-        const mounts = (project as MountObject)._mounts
+        projectsList.push(project);
+        const mounts = (project as MountObject)._mounts;
         if (Array.isArray(mounts) && mounts.length !== 0) {
             for (let i = 0; i < mounts.length; i++) {
                 if (mounts[i]._mounts) {
-                    this.getAllMountsAsArray(mounts[i], projectsList)
+                    this.getAllMountsAsArray(mounts[i], projectsList);
                 }
             }
         }
-    }
+    };
 
     public buildSearchClause = (query): void => {
         /*TODO*/
-    }
+    };
 
     /**
      * @name veCore.directive:mmsSearch#buildQuery
@@ -635,37 +640,47 @@ export class SearchController implements angular.IComponentController {
     public buildQuery = (query: SearchQuery): QueryObject[] => {
         // Set project and mounted projects filter
         //var projectList = this.getProjectMountsQuery()
-        const filterTerms: { [key: string]: string[] } = {}
-        const filterQueries: QueryObject[] = []
-        const queryObs: QueryObject[] = []
-        this.filterList = []
+        const filterTerms: { [key: string]: string[] } = {};
+        const filterQueries: QueryObject[] = [];
+        const queryObs: QueryObject[] = [];
+        this.filterList = [];
 
         if (query.searchField.id === 'all') {
             for (const type of this.fieldTypeList) {
                 if (type.id !== 'all') {
-                    const queryOb: QueryObject = { params: {} }
-                    queryOb.params[type.id] = query.searchText
-                    queryObs.push(queryOb)
+                    const queryOb: QueryObject = { params: {} };
+                    if (type.id === 'value') {
+                        queryObs.push({params: {'value.value': query.searchText}});
+                        queryOb.params['defaultValue.value'] = query.searchText;
+                    } else {
+                        queryOb.params[type.id] = query.searchText;
+                    }
+                    queryObs.push(queryOb);
                 }
             }
         } else {
-            const queryOb: QueryObject = { params: {} }
-            queryOb.params[query.searchField.id] = query.searchText
-            queryObs.push(queryOb)
+            const queryOb: QueryObject = { params: {} };
+            if (query.searchField.id === 'value') {
+                queryObs.push({params: {'value.value': query.searchText}});
+                queryOb.params['defaultValue.value'] = query.searchText;
+            } else {
+                queryOb.params[query.searchField.id] = query.searchText;
+            }
+            queryObs.push(queryOb);
         }
 
         if (this.mmsOptions.filterQueryList) {
             for (const filterQuery of this.mmsOptions.filterQueryList) {
                 for (const [term, list] of Object.entries(filterQuery())) {
                     if (!filterTerms[term]) {
-                        filterTerms[term] = []
+                        filterTerms[term] = [];
                     }
 
                     filterTerms[term].push(
                         ...list.filter((value) => {
-                            return filterTerms[term].includes(value)
+                            return filterTerms[term].includes(value);
                         })
-                    )
+                    );
                 }
             }
         }
@@ -674,17 +689,17 @@ export class SearchController implements angular.IComponentController {
                 this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
                 this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
                 ...this.schemaSvc.getSchema<string[]>('OTHER_VIEW_SID', this.schema),
-            ]
+            ];
             /*If the filter list already contain the view id's do not add them a second time since filtering is done
             client side */
             if (!filterTerms.appliedStereotypeIds) {
-                filterTerms.appliedStereotypeIds = []
+                filterTerms.appliedStereotypeIds = [];
             }
             filterTerms.appliedStereotypeIds.push(
                 ...stereoIds.filter((value) => {
-                    return !filterTerms.appliedStereotypeIds.includes(value)
+                    return !filterTerms.appliedStereotypeIds.includes(value);
                 })
-            )
+            );
         }
 
         if (Object.entries(filterTerms).length > 0) {
@@ -692,24 +707,24 @@ export class SearchController implements angular.IComponentController {
                 for (const [term, list] of Object.entries(filterTerms)) {
                     if (list.length > 0) {
                         for (const sid of list) {
-                            const newOb = _.cloneDeep(queryOb)
-                            newOb.params[term] = sid
-                            filterQueries.push(newOb)
+                            const newOb = _.cloneDeep(queryOb);
+                            newOb.params[term] = sid;
+                            filterQueries.push(newOb);
                         }
                     }
                 }
             }
         }
-        if (filterQueries.length > 0) return filterQueries
-        else return queryObs
-    }
+        if (filterQueries.length > 0) return filterQueries;
+        else return queryObs;
+    };
 
     private combineRelatedViews = (): void => {
         this.searchResults.forEach((element: ViewObject) => {
             const allRelatedDocuments: {
-                relatedDocument: ViewObject
-                relatedView: ViewObject
-            }[] = []
+                relatedDocument: ViewObject;
+                relatedView: ViewObject;
+            }[] = [];
             if (element._relatedDocuments) {
                 element._relatedDocuments.forEach((relatedDoc: ViewObject) => {
                     if (relatedDoc._parentViews) {
@@ -717,21 +732,21 @@ export class SearchController implements angular.IComponentController {
                             allRelatedDocuments.push({
                                 relatedDocument: relatedDoc,
                                 relatedView: parentView,
-                            })
-                        })
+                            });
+                        });
                     }
-                })
+                });
             }
-            element.allRelatedDocuments = allRelatedDocuments
-            element.someRelatedDocuments = allRelatedDocuments.slice(0, 3)
-        })
-    }
+            element.allRelatedDocuments = allRelatedDocuments;
+            element.someRelatedDocuments = allRelatedDocuments.slice(0, 3);
+        });
+    };
 
     public userResultClick = (elem: ElementObject, property: string): void => {
         if (this.mmsOptions.callback) {
-            this.mmsOptions.callback(elem, property)
+            this.mmsOptions.callback(elem, property);
         }
-    }
+    };
 
     public userRelatedClick = (
         event: JQuery.ClickEvent,
@@ -739,13 +754,13 @@ export class SearchController implements angular.IComponentController {
         view: ViewObject,
         elem: ElementObject
     ): void => {
-        event.preventDefault()
-        event.stopPropagation()
-        if (this.mmsOptions.relatedCallback) this.mmsOptions.relatedCallback(doc, view, elem)
-    }
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.mmsOptions.relatedCallback) this.mmsOptions.relatedCallback(doc, view, elem);
+    };
 
     private toggleDocs(): void {
-        this.docsviews.selected = !this.docsviews.selected
+        this.docsviews.selected = !this.docsviews.selected;
     }
 }
 const SearchComponent: VeComponentOptions = {
@@ -785,7 +800,7 @@ const SearchComponent: VeComponentOptions = {
             </form>
             <div>
                 <input type="checkbox" ng-model="$ctrl.docsviews.selected"> Search for Views and Documents
-                <a class="pull-right" ng-click="$ctrl.advanceSearch = !$ctrl.advanceSearch">Advanced Search</a>
+                <!--<a class="pull-right" ng-click="$ctrl.advanceSearch = !$ctrl.advanceSearch">Advanced Search</a>-->
             </div>
         </div>
 
@@ -962,6 +977,6 @@ const SearchComponent: VeComponentOptions = {
         embedded: '<',
     },
     controller: SearchController,
-}
+};
 
-veCore.component(SearchComponent.selector, SearchComponent)
+veCore.component(SearchComponent.selector, SearchComponent);

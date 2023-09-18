@@ -1,5 +1,5 @@
-import { IButtonBarButton } from '@ve-core/button-bar'
-import { IToolBarButton } from '@ve-core/toolbar'
+import { IButtonBarButton } from '@ve-core/button-bar';
+import { IToolBarButton } from '@ve-core/toolbar';
 
 export const left_default_toolbar: IToolBarButton[] = [
     {
@@ -63,9 +63,9 @@ export const left_default_toolbar: IToolBarButton[] = [
         spinner: false,
         enabledFor: ['**.present.**'],
     },
-]
+];
 
-export const left_dynamic_toolbar: IToolBarButton[] = []
+export const left_dynamic_toolbar: IToolBarButton[] = [];
 
 export const left_default_buttons: IButtonBarButton[] = [
     {
@@ -187,4 +187,4 @@ export const left_default_buttons: IButtonBarButton[] = [
         },
         enabledFor: ['**.present.**'],
     },
-]
+];

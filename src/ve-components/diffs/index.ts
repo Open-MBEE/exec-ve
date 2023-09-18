@@ -1,10 +1,10 @@
 // Services
-import './services/DiffMerge.service'
+import './services/DiffMerge.service';
 
-export * from './services/DiffMerge.service'
+export * from './services/DiffMerge.service';
 //Components
-import './components'
+import './components';
 //Modals
-import './modals'
+import './modals';
 
-export * from './modals'
+export * from './modals';

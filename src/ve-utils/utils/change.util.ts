@@ -1,8 +1,8 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { EventService } from '@ve-utils/core'
+import { EventService } from '@ve-utils/core';
 
-import { VeQService } from '@ve-types/angular'
+import { VeQService } from '@ve-types/angular';
 
 /**
  * @name onChangesCallback
@@ -17,7 +17,7 @@ import { VeQService } from '@ve-types/angular'
  *      }
  *
  */
-export type onChangesCallback<T, U = void> = (newVal?: T, oldVal?: T, firstChange?: boolean) => U
+export type onChangesCallback<T, U = void> = (newVal?: T, oldVal?: T, firstChange?: boolean) => U;
 
 /**
  * @name change.utils#handleChange:
@@ -48,23 +48,23 @@ export function handleChange<T>(
     ignoreFirst?: boolean
 ): void {
     if (watch === '') {
-        return callback()
+        return callback();
     } else if (changesObj[watch]) {
         if (ignoreFirst && changesObj[watch].isFirstChange()) {
-            return
+            return;
         }
-        const newVal: T = changesObj[watch].currentValue as T
-        const oldVal: T = changesObj[watch].previousValue as T
-        const firstChange = changesObj[watch].isFirstChange()
-        callback(newVal, oldVal, firstChange)
+        const newVal: T = changesObj[watch].currentValue as T;
+        const oldVal: T = changesObj[watch].previousValue as T;
+        const firstChange = changesObj[watch].isFirstChange();
+        callback(newVal, oldVal, firstChange);
     }
-    return
+    return;
 }
 
 interface EventWatcher {
-    $q: VeQService
-    eventSvc: EventService
-    subs: Rx.IDisposable[]
+    $q: VeQService;
+    eventSvc: EventService;
+    subs: Rx.IDisposable[];
 }
 
 export function watchChangeEvent<T>(
@@ -79,15 +79,15 @@ export function watchChangeEvent<T>(
                 currentValue: data,
                 previousValue: _.cloneDeep($ctrl[name] as T),
                 isFirstChange: () => {
-                    return typeof $ctrl[name] === 'undefined'
+                    return typeof $ctrl[name] === 'undefined';
                 },
-            }
+            };
             if (data !== $ctrl[name]) {
                 if (update) {
-                    $ctrl[name] = data
+                    $ctrl[name] = data;
                 }
-                changeAction(change.currentValue, change.previousValue, change.isFirstChange())
+                changeAction(change.currentValue, change.previousValue, change.isFirstChange());
             }
         })
-    )
+    );
 }

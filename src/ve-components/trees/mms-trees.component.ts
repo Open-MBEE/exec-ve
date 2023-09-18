@@ -1,25 +1,25 @@
-import angular, { IComponentController } from 'angular'
-import _ from 'lodash'
-import Rx from 'rx-lite'
+import angular, { IComponentController } from 'angular';
+import _ from 'lodash';
+import Rx from 'rx-lite';
 
-import { veAppEvents } from '@ve-app/events'
-import { InsertViewData } from '@ve-components/insertions/components/insert-view.component'
-import { ExtensionService } from '@ve-components/services'
-import { TreeService } from '@ve-components/trees/services/Tree.service'
-import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
-import { veCoreEvents } from '@ve-core/events'
-import { IToolBarButton, ToolbarService } from '@ve-core/toolbar'
-import { RootScopeService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { ApiService, PermissionsService, ViewService } from '@ve-utils/mms-api-client'
+import { veAppEvents } from '@ve-app/events';
+import { InsertViewData } from '@ve-components/insertions/components/insert-view.component';
+import { ExtensionService } from '@ve-components/services';
+import { TreeService } from '@ve-components/trees/services/Tree.service';
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
+import { veCoreEvents } from '@ve-core/events';
+import { IToolBarButton, ToolbarService } from '@ve-core/toolbar';
+import { RootScopeService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
+import { ApiService, PermissionsService, ViewService } from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
-import { InsertResolveFn } from '@ve-types/components'
-import { ElementObject, InstanceSpecObject, ViewObject } from '@ve-types/mms'
-import { TreeBranch } from '@ve-types/tree'
-import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { InsertResolveFn } from '@ve-types/components';
+import { ElementObject, InstanceSpecObject, ViewObject } from '@ve-types/mms';
+import { TreeBranch } from '@ve-types/tree';
+import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
 /**
  * @ngdoc directive
@@ -90,35 +90,35 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 class TreesController implements IComponentController {
     //Bindings
-    toolbarId: string = 'toolbar'
-    buttonId: string
+    toolbarId: string = 'toolbar';
+    buttonId: string;
 
     //Local
-    documentId: string
-    viewId: string
-    projectId: string
-    refId: string
-    commitId: string
+    documentId: string;
+    viewId: string;
+    projectId: string;
+    refId: string;
+    commitId: string;
 
-    subs: Rx.IDisposable[]
+    subs: Rx.IDisposable[];
 
-    currentTree: string
-    currentTitle: string
+    currentTree: string;
+    currentTitle: string;
     show: {
-        [key: string]: { tree: boolean; pe: boolean }
-    } = {}
+        [key: string]: { tree: boolean; pe: boolean };
+    } = {};
 
-    protected errorType: string
+    protected errorType: string;
 
-    private insertData: InsertViewData
+    private insertData: InsertViewData;
 
-    public filterInputPlaceholder: string
-    public treeSearch: string
-    private spin: boolean = true
+    public filterInputPlaceholder: string;
+    public treeSearch: string;
+    private spin: boolean = true;
 
-    protected $trees: JQuery
+    protected $trees: JQuery;
 
-    bbApi: ButtonBarApi
+    bbApi: ButtonBarApi;
 
     static $inject = [
         '$compile',
@@ -138,7 +138,7 @@ class TreesController implements IComponentController {
         'TreeService',
         'ExtensionService',
         'ButtonBarService',
-    ]
+    ];
 
     constructor(
         private $compile: angular.ICompileService,
@@ -161,10 +161,10 @@ class TreesController implements IComponentController {
     ) {}
 
     $onInit(): void {
-        this.eventSvc.$init(this)
+        this.eventSvc.$init(this);
 
-        this.buttonId = this.buttonId ? this.buttonId : 'tree-button-bar'
-        this.toolbarId = this.toolbarId ? this.toolbarId : 'toolbar'
+        this.buttonId = this.buttonId ? this.buttonId : 'tree-button-bar';
+        this.toolbarId = this.toolbarId ? this.toolbarId : 'toolbar';
 
         // Initialize button-bar event listeners
         this.subs.push(
@@ -174,124 +174,110 @@ class TreesController implements IComponentController {
                         case 'tree-expand': {
                             this.treeSvc.expandAll().then(
                                 () => {
-                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree)
+                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree);
                                 },
                                 (reason) => {
-                                    this.growl.error(TreeService.treeError(reason))
+                                    this.growl.error(TreeService.treeError(reason));
                                 }
-                            )
-                            break
+                            );
+                            break;
                         }
                         case 'tree-collapse': {
                             this.treeSvc.collapseAll().then(
                                 () => {
-                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree)
+                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree);
                                 },
                                 (reason) => {
-                                    this.growl.error(TreeService.treeError(reason))
+                                    this.growl.error(TreeService.treeError(reason));
                                 }
-                            )
-                            break
+                            );
+                            break;
                         }
                         case 'tree-add-document': {
                             this.insert('Document').catch((reason) => {
-                                this.growl.error(reason.message)
-                            })
-                            break
+                                this.growl.error(reason.message);
+                            });
+                            break;
                         }
                         case 'tree-add-view': {
                             this.insert('View').catch((reason) => {
-                                this.growl.error(reason.message)
-                            })
-                            break
+                                this.growl.error(reason.message);
+                            });
+                            break;
                         }
 
                         case 'tree-add-group': {
                             this.insert('Group').catch((reason) => {
-                                this.growl.error(reason.message)
-                            })
-                            break
+                                this.growl.error(reason.message);
+                            });
+                            break;
                         }
                         case 'tree-show-pe': {
-                            this.show[_.camelCase(this.currentTree)].pe = !this.show[_.camelCase(this.currentTree)].pe
-                            break
+                            this.show[_.camelCase(this.currentTree)].pe = !this.show[_.camelCase(this.currentTree)].pe;
+                            break;
                         }
                     }
                 }
-                data.$event.stopPropagation()
-            }),
-            this.eventSvc.$on<InstanceSpecObject>('presentation.deleted', (data) => {
-                this.treeSvc.getBranch(data).then(
-                    (branch) => {
-                        if (branch) {
-                            this.treeSvc.removeBranch(branch).catch((reason) => {
-                                this.growl.error(TreeService.treeError(reason))
-                            })
-                        }
-                    },
-                    (reason) => {
-                        this.growl.error(TreeService.treeError(reason))
-                    }
-                )
+                data.$event.stopPropagation();
             })
-        )
+        );
     }
 
     $onDestroy(): void {
-        this.eventSvc.$destroy(this.subs)
+        this.eventSvc.$destroy(this.subs);
     }
 
     $postLink(): void {
-        this.$trees = $('#trees')
+        this.$trees = $('#trees');
 
         //Listen for Toolbar Clicked Subject
-        this.subs.push(this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, this.changeTree))
+        this.subs.push(this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, this.changeTree));
     }
 
     insert(itemType: string): VePromise<void, string> {
-        const deferred = this.$q.defer<void>()
+        const deferred = this.$q.defer<void>();
         this.insertData = {
             insertType: 'view',
             type: itemType,
             newViewAggr: 'shared',
             parentBranch: null,
             seenViewIds: this.treeSvc.seenViewIds,
-        }
-        const branch = this.treeSvc.getSelectedBranch()
+        };
+        const branch = this.treeSvc.getSelectedBranch();
         if (itemType === 'Document') {
             this.addDocument(branch).then(
                 (result) => {
-                    this.insertModal(result)
-                    deferred.resolve()
+                    this.insertModal(result);
+                    deferred.resolve();
                 },
                 (reason: VePromiseReason<string>) => {
-                    deferred.reject(reason)
+                    deferred.reject(reason);
                 }
-            )
+            );
         } else if (itemType === 'Group') {
             this.addGroup(branch).then(
                 (result) => {
-                    this.insertModal(result)
-                    deferred.resolve()
+                    this.insertModal(result);
+                    deferred.resolve();
                 },
                 (reason: VePromiseReason<string>) => {
-                    deferred.reject(reason)
+                    deferred.reject(reason);
                 }
-            )
+            );
         } else if (itemType === 'View') {
             this.addView(branch).then(
                 (result) => {
-                    this.insertModal(result)
-                    deferred.resolve()
+                    this.insertModal(result);
+                    deferred.resolve();
                 },
                 (reason: VePromiseReason<string>) => {
-                    deferred.reject(reason)
+                    deferred.reject(reason);
                 }
-            )
+            );
         } else {
-            deferred.reject('Add Item of Type ' + itemType + ' is not supported')
+            deferred.reject('Add Item of Type ' + itemType + ' is not supported');
         }
-        return deferred.promise
+        return deferred.promise;
     }
 
     insertModal = (branchType: string): void => {
@@ -299,24 +285,24 @@ class TreesController implements IComponentController {
             component: 'insertElementModal',
             resolve: {
                 getInsertData: () => {
-                    return this.insertData
+                    return this.insertData;
                 },
                 getProjectId: () => {
-                    return this.treeSvc.treeApi.projectId
+                    return this.treeSvc.treeApi.projectId;
                 },
                 getRefId: () => {
-                    return this.treeSvc.treeApi.refId
+                    return this.treeSvc.treeApi.refId;
                 },
                 getOrgId: () => {
-                    return this.treeSvc.treeApi.orgId
+                    return this.treeSvc.treeApi.orgId;
                 },
             },
-        }
-        const instance = this.$uibModal.open<InsertResolveFn<InsertViewData>, ElementObject>(settings)
+        };
+        const instance = this.$uibModal.open<InsertResolveFn<InsertViewData>, ElementObject>(settings);
         instance.result.then(
             (result) => {
                 if (!this.rootScopeSvc.veEditMode()) {
-                    this.eventSvc.$broadcast('show-edits', true)
+                    this.eventSvc.$broadcast('show-edits', true);
                 }
                 const newbranch: TreeBranch = {
                     label: result.name,
@@ -324,35 +310,35 @@ class TreesController implements IComponentController {
                     data: result,
                     children: [],
                     aggr: '',
-                }
-                const top = this.insertData.type === 'Group'
+                };
+                const top = this.insertData.type === 'Group';
                 const addToFullDocView = (node: TreeBranch, curSection: string, prevSysml: string): string => {
-                    let lastChild = prevSysml
+                    let lastChild = prevSysml;
                     if (node.children) {
-                        let num = 1
+                        let num = 1;
                         for (let i = 0; i < node.children.length; i++) {
-                            const cNode = node.children[i]
+                            const cNode = node.children[i];
                             const data: veAppEvents.viewAddedData = {
                                 vId: cNode.data.id,
                                 curSec: `${curSection}.${num}`,
                                 prevSibId: lastChild,
-                            }
-                            this.eventSvc.$broadcast('view.added', data)
-                            lastChild = addToFullDocView(cNode, `${curSection}.${num}`, cNode.data.id)
-                            num = num + 1
+                            };
+                            this.eventSvc.$broadcast('view.added', data);
+                            lastChild = addToFullDocView(cNode, `${curSection}.${num}`, cNode.data.id);
+                            num = num + 1;
                         }
                     }
-                    return lastChild
-                }
+                    return lastChild;
+                };
                 this.treeSvc.addBranch(this.insertData.parentBranch, newbranch, top).then(
                     () => {
                         if (this.insertData.type === 'View') {
-                            this.treeSvc.viewId2node[result.id] = newbranch
-                            this.treeSvc.seenViewIds[result.id] = newbranch
-                            newbranch.aggr = this.insertData.newViewAggr
+                            this.treeSvc.viewId2node[result.id] = newbranch;
+                            this.treeSvc.seenViewIds[result.id] = newbranch;
+                            newbranch.aggr = this.insertData.newViewAggr;
                             const curNum =
                                 this.insertData.parentBranch.children[this.insertData.parentBranch.children.length - 1]
-                                    .data._veNumber
+                                    .data._veNumber;
                             this.treeSvc
                                 .getPrevBranch(newbranch, ['view'])
                                 .then(
@@ -372,28 +358,28 @@ class TreesController implements IComponentController {
                                                 (node) => {
                                                     // handle full doc mode
                                                     if (this.rootScopeSvc.veFullDocMode()) {
-                                                        addToFullDocView(node as TreeBranch, curNum, newbranch.data.id)
+                                                        addToFullDocView(node as TreeBranch, curNum, newbranch.data.id);
                                                     }
-                                                    this.addViewSectionsRecursivelyForNode(node as TreeBranch)
+                                                    this.addViewSectionsRecursivelyForNode(node as TreeBranch);
                                                 },
                                                 (reason) => {
                                                     this.growl.error(
                                                         'Error processing new child views: ' + reason.message
-                                                    )
+                                                    );
                                                 }
-                                            )
+                                            );
                                         if (!this.rootScopeSvc.veFullDocMode()) {
                                             this.eventSvc.$broadcast<veAppEvents.viewAddedData>('view.added', {
                                                 vId: result.id,
                                                 curSec: curNum,
                                                 prevSibId: prevBranch.data.id,
-                                            })
+                                            });
                                         } else {
                                             this.eventSvc.$broadcast<veAppEvents.viewAddedData>('view.added', {
                                                 vId: result.id,
                                                 curSec: curNum,
                                                 prevSibId: prevBranch.data.id,
-                                            })
+                                            });
                                         }
                                     },
                                     (reason) => {
@@ -402,151 +388,151 @@ class TreesController implements IComponentController {
                                                 vId: result.id,
                                                 curSec: curNum,
                                                 prevSibId: this.insertData.parentBranch.data.id,
-                                            })
+                                            });
                                         } else {
-                                            this.growl.error('Error adding item to tree: ' + reason.message)
+                                            this.growl.error('Error adding item to tree: ' + reason.message);
                                         }
                                     }
                                 )
                                 .finally(() => {
-                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree)
-                                })
+                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree);
+                                });
                         } else {
-                            this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree)
+                            this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree);
                         }
                     },
                     (reason) => {
-                        this.growl.error(TreeService.treeError(reason))
+                        this.growl.error(TreeService.treeError(reason));
                     }
-                )
+                );
             },
             (reason) => {
                 if (reason && reason.status !== 444) {
-                    this.growl.warning(`Error adding View: ${reason.message}`)
+                    this.growl.warning(`Error adding View: ${reason.message}`);
                 } else {
                     this.growl.info('View Insert Cancelled', {
                         ttl: 1000,
-                    })
+                    });
                 }
             }
-        )
-    }
+        );
+    };
 
     addDocument(branch: TreeBranch): VePromise<string, string> {
         if (!branch) {
-            this.insertData.parentBranch = null
-            branch = null
+            this.insertData.parentBranch = null;
+            branch = null;
         } else if (branch.type !== 'group') {
             return this.$q.reject({
                 message: 'Select a group to add document under',
-            })
+            });
         } else {
-            this.insertData.parentBranch = branch
+            this.insertData.parentBranch = branch;
         }
-        return this.$q.resolve('view')
+        return this.$q.resolve('view');
     }
 
     addGroup(branch: TreeBranch): VePromise<string, string> {
         if (branch && branch.type === 'group') {
-            this.insertData.parentBranch = branch
+            this.insertData.parentBranch = branch;
         } else if (branch && branch.type !== 'group') {
             return this.$q.reject({
                 message: 'Select a group to add group under',
-            })
+            });
         } else {
-            this.insertData.parentBranch = null
+            this.insertData.parentBranch = null;
             // Always create group at root level if the selected branch is not a group branch
-            branch = null
+            branch = null;
         }
-        return this.$q.resolve('group')
+        return this.$q.resolve('group');
     }
 
     addView(branch: TreeBranch): VePromise<string, string> {
         if (!branch) {
             return this.$q.reject({
                 message: 'Add View Error: Select parent view first',
-            })
+            });
         } else if (branch.type === 'section') {
             return this.$q.reject({
                 message: 'Add View Error: Cannot add a child view to a section',
-            })
+            });
         } else if (branch.aggr === 'none') {
             return this.$q.reject({
                 message: 'Add View Error: Cannot add a child view to a non-owned and non-shared view.',
-            })
+            });
         }
-        this.insertData.parentBranch = branch
-        return this.$q.resolve('view')
+        this.insertData.parentBranch = branch;
+        return this.$q.resolve('view');
     }
 
     addViewSections = (view: ViewObject): void => {
-        const node = this.treeSvc.viewId2node[view.id]
+        const node = this.treeSvc.viewId2node[view.id];
         this.treeSvc.addSectionElements(view, node, node).catch((reason) => {
-            this.growl.error('Error adding view sections:' + reason.message)
-        })
-    }
+            this.growl.error('Error adding view sections:' + reason.message);
+        });
+    };
 
     addViewSectionsRecursivelyForNode = (node: TreeBranch): void => {
-        this.addViewSections(node.data)
+        this.addViewSections(node.data);
         for (let i = 0; i < node.children.length; i++) {
             if (node.children[i].type === 'view') {
-                this.addViewSectionsRecursivelyForNode(node.children[i])
+                this.addViewSectionsRecursivelyForNode(node.children[i]);
             }
         }
-    }
+    };
 
     userClicksPane = (): void => {
         this.treeSvc.selectBranch().catch((reason) => {
-            this.growl.error(TreeService.treeError(reason))
-        })
-    }
+            this.growl.error(TreeService.treeError(reason));
+        });
+    };
 
     private changeTree = (data: { id: string; category?: string; title?: string }): void => {
         if (!this.currentTree) {
-            this.currentTree = ''
+            this.currentTree = '';
         }
         if (this.currentTree !== data.id) {
             if (this.currentTree !== '') {
-                this.show[_.camelCase(this.currentTree)].tree = false
+                this.show[_.camelCase(this.currentTree)].tree = false;
             }
-            this.currentTree = data.id
-            const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(data.id)
+            this.currentTree = data.id;
+            const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(data.id);
 
             if (!data.category) {
-                data.category = inspect.category
+                data.category = inspect.category;
             }
 
-            this.currentTitle = data.title ? data.title : inspect.tooltip
+            this.currentTitle = data.title ? data.title : inspect.tooltip;
 
             if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
-                this.startTree(data.id)
-                this.show[_.camelCase(data.id)] = { tree: true, pe: false }
+                this.startTree(data.id);
+                this.show[_.camelCase(data.id)] = { tree: true, pe: false };
             } else {
-                this.eventSvc.$broadcast(TreeService.events.RELOAD, data.id)
-                this.show[_.camelCase(data.id)].tree = true
+                this.eventSvc.$broadcast(TreeService.events.RELOAD, data.id);
+                this.show[_.camelCase(data.id)].tree = true;
             }
         }
-    }
+    };
 
     private startTree = (id: string): void => {
-        const tag = this.extensionSvc.getTagByType('treeOf', id)
-        const treeId: string = _.camelCase(id)
-        const newTree: JQuery = $(`<div id="${treeId}" ng-show="$ctrl.show.${treeId}.tree"></div>`)
+        const tag = this.extensionSvc.getTagByType('treeOf', id);
+        const treeId: string = _.camelCase(id);
+        const newTree: JQuery = $(`<div id="${treeId}" ng-show="$ctrl.show.${treeId}.tree"></div>`);
         if (tag === 'extensionError') {
-            this.errorType = this.currentTree.replace('tree-of-', '')
+            this.errorType = this.currentTree.replace('tree-of-', '');
             newTree.append(
                 '<extension-error type="$ctrl.errorType" mms-element-id="$ctrl.mmsElementId" kind="Tree"></extension-error>'
-            )
+            );
         } else {
             newTree.append(
                 `<${tag} show-pe="$ctrl.show.${treeId}.pe" toolbar-id="${this.toolbarId}" button-id="${this.buttonId}"}></${tag}>`
-            )
+            );
         }
 
-        this.$trees.append(newTree)
+        this.$trees.append(newTree);
 
-        this.$compile(newTree)(this.$scope)
-    }
+        this.$compile(newTree)(this.$scope);
+    };
 }
 
 const TreesComponent: VeComponentOptions = {
@@ -555,10 +541,12 @@ const TreesComponent: VeComponentOptions = {
 
 <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
     <div class="tree-view" style="display:table;">
+        <!--
         <div class="container-fluid">
             <h4 class="tree-view-title">{{$ctrl.currentTitle}}</h4>
         </div>
         <hr class="tree-title-divider">
+        -->
         <div id="trees" class="container-fluid">
         </div>
         <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>
@@ -570,6 +558,6 @@ const TreesComponent: VeComponentOptions = {
         buttonId: '@',
     },
     controller: TreesController,
-}
+};
 
-veComponents.component(TreesComponent.selector, TreesComponent)
+veComponents.component(TreesComponent.selector, TreesComponent);

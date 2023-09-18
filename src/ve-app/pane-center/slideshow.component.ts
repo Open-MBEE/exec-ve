@@ -1,19 +1,19 @@
-import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirouter/angularjs'
-import { Transition } from '@uirouter/core'
+import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirouter/angularjs';
+import { Transition } from '@uirouter/core';
 
-import { AppUtilsService, ResolveService } from '@ve-app/main/services'
-import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config'
-import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
-import { TreeService } from '@ve-components/trees'
-import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
-import { veCoreEvents } from '@ve-core/events'
-import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { PermissionsService, URLService, ViewApi } from '@ve-utils/mms-api-client'
+import { AppUtilsService, ResolveService } from '@ve-app/main/services';
+import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config';
+import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
+import { TreeService } from '@ve-components/trees';
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
+import { veCoreEvents } from '@ve-core/events';
+import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
+import { PermissionsService, URLService, ViewApi } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
     ElementObject,
@@ -22,7 +22,7 @@ import {
     ProjectObject,
     RefObject,
     ViewObject,
-} from '@ve-types/mms'
+} from '@ve-types/mms';
 
 /**
  * Note: This controller is intended for navigating between 'views' and 'sections' only. If you wish to navigate between
@@ -30,38 +30,38 @@ import {
  */
 class SlideshowController implements angular.IComponentController, Ng1Controller {
     //Bindings
-    mmsParams: ParamsObject
-    mmsProject: ProjectObject
-    mmsRef: RefObject
-    mmsGroup: GroupObject
-    mmsDocument: DocumentObject
-    mmsView: ViewObject
+    mmsParams: ParamsObject;
+    mmsProject: ProjectObject;
+    mmsRef: RefObject;
+    mmsGroup: GroupObject;
+    mmsDocument: DocumentObject;
+    mmsView: ViewObject;
 
-    subs: Rx.IDisposable[]
-    vidLink: boolean
-    viewContentLoading: boolean
-    init: boolean = false
+    subs: Rx.IDisposable[];
+    vidLink: boolean;
+    viewContentLoading: boolean;
+    init: boolean = false;
 
-    public bbApi: ButtonBarApi
-    bbId = 'view-ctrl'
-    bars: string[] = []
+    public bbApi: ButtonBarApi;
+    bbId = 'view-ctrl';
+    bars: string[] = [];
     comments: {
-        count: number
-        lastCommented: string
-        lastCommentedBy: string
-        map: object
+        count: number;
+        lastCommented: string;
+        lastCommentedBy: string;
+        map: object;
     } = {
         count: 0,
         lastCommented: null,
         lastCommentedBy: '',
         map: {},
-    }
-    dynamicPopover: { templateUrl: string; title: string }
-    shortUrl: string
-    viewApi: ViewApi
-    number: string
-    private viewId: string
-    private params: ParamsObject
+    };
+    dynamicPopover: { templateUrl: string; title: string };
+    shortUrl: string;
+    viewApi: ViewApi;
+    number: string;
+    private viewId: string;
+    private params: ParamsObject;
 
     static $inject = [
         '$q',
@@ -86,7 +86,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         'TreeService',
         'EventService',
         'ButtonBarService',
-    ]
+    ];
 
     constructor(
         public $q: VeQService,
@@ -114,24 +114,24 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
     ) {}
 
     $onInit(): void {
-        this.params = this.mmsParams
-        this.rootScopeSvc.veFullDocMode(false)
-        this.rootScopeSvc.veHideLeft(false)
-        this.rootScopeSvc.veHideRight(false)
-        this.eventSvc.$init(this)
+        this.params = this.mmsParams;
+        this.rootScopeSvc.veFullDocMode(false);
+        this.rootScopeSvc.veHideLeft(false);
+        this.rootScopeSvc.veHideRight(false);
+        this.eventSvc.$init(this);
 
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons)
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons);
 
         //Init/Reset Tree Updated Subject
-        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
+        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false);
 
         this.subs.push(
             this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VEVIEWCONTENTLOADING, (newValue) => {
-                this.viewContentLoading = newValue
+                this.viewContentLoading = newValue;
             })
-        )
+        );
 
-        this.initView()
+        this.initView();
 
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
@@ -139,114 +139,135 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                     this.bbApi.toggleButton(
                         'show-comments',
                         this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn())
-                    )
-                    return
+                    );
+                    return;
                 } else if (data.clicked === 'show-numbering') {
                     this.bbApi.toggleButton(
                         'show-numbering',
                         this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
-                    )
-                    return
+                    );
+                    return;
                 } else if (data.clicked === 'show-elements') {
                     this.bbApi.toggleButton(
                         'show-elements',
                         this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn())
-                    )
+                    );
                     if (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) {
-                        this.bbApi.toggleButton('show-edits', false)
-                        this.rootScopeSvc.veEditMode(false)
+                        this.bbApi.toggleButton('show-edits', false);
+                        this.rootScopeSvc.veEditMode(false);
                     }
-                    return
+                    return;
                 } else if (data.clicked === 'show-edits') {
-                    this.bbApi.toggleButton('show-edits', this.rootScopeSvc.veEditMode(!this.rootScopeSvc.veEditMode()))
+                    this.bbApi.toggleButton(
+                        'show-edits',
+                        this.rootScopeSvc.veEditMode(!this.rootScopeSvc.veEditMode())
+                    );
                     if (this.rootScopeSvc.veElementsOn() !== this.rootScopeSvc.veEditMode()) {
-                        this.bbApi.toggleButton('show-elements', this.rootScopeSvc.veEditMode())
-                        this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode())
+                        this.bbApi.toggleButton('show-elements', this.rootScopeSvc.veEditMode());
+                        this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode());
                     }
-                    return
+                    return;
                 } else if (data.clicked === 'center-previous') {
                     this.treeSvc.getPrevBranch(this.treeSvc.getSelectedBranch(), ['view', 'section']).then(
                         (prev) => {
-                            this.bbApi.toggleButtonSpinner('center-previous')
+                            this.bbApi.toggleButtonSpinner('center-previous');
                             this.treeSvc.selectBranch(prev).catch((reason) => {
-                                this.growl.error(TreeService.treeError(reason))
-                            })
-                            this.bbApi.toggleButtonSpinner('center-previous')
+                                this.growl.error(TreeService.treeError(reason));
+                            });
+                            this.bbApi.toggleButtonSpinner('center-previous');
                         },
                         (reason) => {
-                            if (reason.status === 200) this.growl.info(reason.message)
-                            else this.growl.error(reason.message)
+                            if (reason.status === 200) this.growl.info(reason.message);
+                            else this.growl.error(reason.message);
                         }
-                    )
-                    return
+                    );
+                    return;
                 } else if (data.clicked === 'center-next') {
                     this.treeSvc.getNextBranch(this.treeSvc.getSelectedBranch(), ['view', 'section']).then(
                         (next) => {
-                            this.bbApi.toggleButtonSpinner('center-next')
+                            this.bbApi.toggleButtonSpinner('center-next');
                             this.treeSvc.selectBranch(next).catch((reason) => {
-                                this.growl.error(TreeService.treeError(reason))
-                            })
-                            this.bbApi.toggleButtonSpinner('center-next')
+                                this.growl.error(TreeService.treeError(reason));
+                            });
+                            this.bbApi.toggleButtonSpinner('center-next');
                         },
                         (reason) => {
-                            if (reason.status === 200) this.growl.info(reason.message)
-                            else this.growl.error(reason.message)
+                            if (reason.status === 200) this.growl.info(reason.message);
+                            else this.growl.error(reason.message);
                         }
-                    )
-                    return
+                    );
+                    return;
                 } else if (data.clicked === 'convert-pdf') {
-                    if (this.isPageLoading()) return
-                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 3)
-                    return
+                    if (this.isPageLoading()) return;
+                    void this.appUtilsSvc.printModal(
+                        angular.element('#print-div'),
+                        this.mmsView,
+                        this.mmsRef,
+                        false,
+                        3
+                    );
+                    return;
                 } else if (data.clicked === 'print') {
-                    if (this.isPageLoading()) return
-                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 1)
-                    return
+                    if (this.isPageLoading()) return;
+                    void this.appUtilsSvc.printModal(
+                        angular.element('#print-div'),
+                        this.mmsView,
+                        this.mmsRef,
+                        false,
+                        1
+                    );
+                    return;
                 } else if (data.clicked === 'word') {
-                    if (this.isPageLoading()) return
-                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 2)
-                    return
+                    if (this.isPageLoading()) return;
+                    void this.appUtilsSvc.printModal(
+                        angular.element('#print-div'),
+                        this.mmsView,
+                        this.mmsRef,
+                        false,
+                        2
+                    );
+                    return;
                 } else if (data.clicked === 'tabletocsv') {
-                    if (this.isPageLoading()) return
-                    this.appUtilsSvc.tableToCsv(angular.element('#print-div'), false)
-                    return
+                    if (this.isPageLoading()) return;
+                    this.appUtilsSvc.tableToCsv(angular.element('#print-div'), false);
+                    return;
                 } else if (data.clicked === 'refresh-numbering') {
-                    // TODO
-                    return
+                    this.utilsSvc.makeTablesAndFiguresTOC(this.treeSvc.getFirstBranch(), angular.element('#print-div'), true, false);
+                    return;
                 }
             })
-        )
+        );
     }
 
     uiOnParamsChanged(newValues: ParamsObject, $transition$: Transition): void {
         if (newValues.viewId && newValues.viewId !== this.params.viewId)
-            this.initView($transition$.params() as ParamsObject)
+            this.initView($transition$.params() as ParamsObject);
     }
     uiCanExit(transition: Transition): HookResult {
         //Do nothing
     }
 
     initView = (params?: ParamsObject): void => {
-        this.rootScopeSvc.veViewContentLoading(true)
+        this.rootScopeSvc.veViewContentLoading(true);
 
         if (params) {
-            this.params = params
-            this.viewId = params.viewId
+            this.params = params;
+            this.viewId = params.viewId;
         } else if (this.mmsDocument || this.mmsView) {
-            this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
+            this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id;
         } else {
-            return
+            return;
         }
 
-        this.rootScopeSvc.veViewContentLoading(false)
+        this.rootScopeSvc.veViewContentLoading(false);
 
-        this.vidLink = false //whether to have go to document link
+        this.vidLink = false; //whether to have go to document link
         if (
             this.$state.includes('main.project.ref.portal.preview') &&
             this.mmsDocument &&
             this.mmsDocument.id.indexOf('_cover') < 0
         ) {
-            this.vidLink = true
+            this.vidLink = true;
         }
 
         this.shortUrl = this.shortUrlSvc.getShortUrl({
@@ -255,7 +276,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
             viewId: this.params.viewId && !this.params.documentId.endsWith('_cover') ? this.params.viewId : '',
             projectId: this.params.projectId,
             refId: this.params.refId,
-        })
+        });
 
         if (this.$state.includes('main.project.ref')) {
             const data = {
@@ -266,52 +287,52 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                 refId: this.mmsRef.id,
                 refType: this.mmsRef.type,
                 refresh: this.$uiRouterGlobals.transition.from().name === '',
-            }
-            this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data)
+            };
+            this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data);
         }
 
-        this.contentWindowSvc.toggleLeftPane(false)
+        this.contentWindowSvc.toggleLeftPane(false);
 
-        this.rootScopeSvc.veNumberingOn(true)
+        this.rootScopeSvc.veNumberingOn(true);
 
         // Share URL button settings
-        this.dynamicPopover = this.shortUrlSvc.dynamicPopover
+        this.dynamicPopover = this.shortUrlSvc.dynamicPopover;
 
         this.viewApi = {
             elementClicked: this.elementClicked,
             elementTranscluded: this.elementTranscluded,
-        }
-    }
+        };
+    };
 
     $onDestroy(): void {
-        this.eventSvc.$destroy(this.subs)
-        this.buttonBarSvc.destroy(this.bbId)
+        this.eventSvc.$destroy(this.subs);
+        this.buttonBarSvc.destroy(this.bbId);
     }
 
     public bbInit = (api: ButtonBarApi): void => {
         if (this.mmsRef.type === 'Branch') {
-            api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
+            api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'));
             api.setPermission(
                 'show-edits',
                 this.permissionsSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id)
-            )
-            api.toggleButton('show-edits', this.rootScopeSvc.veEditMode())
+            );
+            api.toggleButton('show-edits', this.rootScopeSvc.veEditMode());
             this.hotkeys.bindTo(this.$scope).add({
                 combo: 'alt+d',
                 description: 'toggle edit mode',
                 callback: () => {
                     this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
                         clicked: 'show-edits',
-                    })
+                    });
                 },
-            })
+            });
         }
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'))
-        api.toggleButton('show-elements', this.rootScopeSvc.veElementsOn())
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
-        api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn())
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
-        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn())
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'));
+        api.toggleButton('show-elements', this.rootScopeSvc.veElementsOn());
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'));
+        api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn());
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'));
+        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn());
 
         // Set hotkeys for toolbar
         this.hotkeys
@@ -322,7 +343,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                 callback: () => {
                     this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
                         clicked: 'show-comments',
-                    })
+                    });
                 },
             })
             .add({
@@ -331,16 +352,16 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                 callback: () => {
                     this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
                         clicked: 'show-elements',
-                    })
+                    });
                 },
-            })
+            });
 
         if (this.$state.includes('**.present.**')) {
-            api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'))
-            api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
-            api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
-            api.addButton(this.buttonBarSvc.getButtonBarButton('center-previous'))
-            api.addButton(this.buttonBarSvc.getButtonBarButton('center-next'))
+            api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'));
+            api.addButton(this.buttonBarSvc.getButtonBarButton('print'));
+            api.addButton(this.buttonBarSvc.getButtonBarButton('export'));
+            api.addButton(this.buttonBarSvc.getButtonBarButton('center-previous'));
+            api.addButton(this.buttonBarSvc.getButtonBarButton('center-next'));
             // Set hotkeys for toolbar
             this.hotkeys
                 .bindTo(this.$scope)
@@ -350,7 +371,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                     callback: () => {
                         this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
                             clicked: 'center-next',
-                        })
+                        });
                     },
                 })
                 .add({
@@ -359,35 +380,35 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                     callback: () => {
                         this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
                             clicked: 'center-previous',
-                        })
+                        });
                     },
-                })
+                });
         } else {
-            api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
+            api.addButton(this.buttonBarSvc.getButtonBarButton('export'));
         }
-    }
+    };
 
     public copyToClipboard = ($event: JQuery.ClickEvent): void => {
         this.shortUrlSvc.copyToClipboard(this.$element, $event).then(
             () => {
-                this.growl.info('Copied to clipboard!', { ttl: 2000 })
+                this.growl.info('Copied to clipboard!', { ttl: 2000 });
             },
             (err) => {
-                this.growl.error('Unable to copy: ' + err.message)
+                this.growl.error('Unable to copy: ' + err.message);
             }
-        )
-    }
+        );
+    };
 
     public elementTranscluded = (elementOb: ElementObject, type): void => {
         if (type === 'Comment' && !this.comments.map.hasOwnProperty(elementOb.id)) {
-            this.comments.map[elementOb.id] = elementOb
-            this.comments.count++
+            this.comments.map[elementOb.id] = elementOb;
+            this.comments.count++;
             if (elementOb._modified > this.comments.lastCommented) {
-                this.comments.lastCommented = elementOb._modified
-                this.comments.lastCommentedBy = elementOb._modifier
+                this.comments.lastCommented = elementOb._modified;
+                this.comments.lastCommentedBy = elementOb._modifier;
             }
         }
-    }
+    };
 
     public elementClicked = (elementOb: ElementObject): void => {
         const data = {
@@ -396,17 +417,17 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
             projectId: elementOb._projectId,
             refId: elementOb._refId,
             commitId: 'latest',
-        }
-        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
-    }
+        };
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
+    };
 
     public isPageLoading = (): boolean => {
         if (this.$element.find('.isLoading').length > 0) {
-            this.growl.warning('Still loading!')
-            return true
+            this.growl.warning('Still loading!');
+            return true;
         }
-        return false
-    }
+        return false;
+    };
 }
 
 /* Controllers */
@@ -464,6 +485,6 @@ const SlideshowComponent: VeComponentOptions = {
         mmsView: '<',
     },
     controller: SlideshowController,
-}
+};
 
-veApp.component(SlideshowComponent.selector, SlideshowComponent)
+veApp.component(SlideshowComponent.selector, SlideshowComponent);

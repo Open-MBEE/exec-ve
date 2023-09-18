@@ -1,13 +1,13 @@
-import { URLService } from '@ve-utils/mms-api-client'
+import { URLService } from '@ve-utils/mms-api-client';
 
-import { veUtils } from '@ve-utils'
+import { veUtils } from '@ve-utils';
 
-import { VePromise, VeQService } from '@ve-types/angular'
-import { PermissionsObject, PermissionsResponse, ProjectObject, RefObject } from '@ve-types/mms'
+import { VePromise, VeQService } from '@ve-types/angular';
+import { PermissionsObject, PermissionsResponse, ProjectObject, RefObject } from '@ve-types/mms';
 
 export interface PermissionCache {
-    project: { [id: string]: boolean }
-    ref: { [id: string]: boolean }
+    project: { [id: string]: boolean };
+    ref: { [id: string]: boolean };
 }
 
 /**
@@ -20,9 +20,9 @@ export interface PermissionCache {
  * * This utility service handles permissions inquiries
  */
 export class PermissionsService {
-    private permissions: PermissionCache = { project: {}, ref: {} }
+    private permissions: PermissionCache = { project: {}, ref: {} };
 
-    static $inject = ['$q', '$http', 'URLService']
+    static $inject = ['$q', '$http', 'URLService'];
 
     constructor(private $q: VeQService, private $http: angular.IHttpService, private uRLSvc: URLService) {}
 
@@ -30,13 +30,15 @@ export class PermissionsService {
         projectOb: ProjectObject,
         refOb: RefObject
     ): VePromise<PermissionCache, PermissionsResponse> {
-        const url = this.uRLSvc.getPermissionsLookupURL()
+        const url = this.uRLSvc.getPermissionsLookupURL();
 
-        const deferred = this.$q.defer<PermissionCache>()
-        if (this.permissions.project[projectOb.id] !== undefined &&
-            this.permissions.ref[projectOb.id + '/' + refOb.id] !== undefined) {
-            deferred.resolve(this.permissions)
-            return deferred.promise
+        const deferred = this.$q.defer<PermissionCache>();
+        if (
+            this.permissions.project[projectOb.id] !== undefined &&
+            this.permissions.ref[projectOb.id + '/' + refOb.id] !== undefined
+        ) {
+            deferred.resolve(this.permissions);
+            return deferred.promise;
         }
         this.$http
             .put<PermissionsResponse>(url, {
@@ -56,39 +58,39 @@ export class PermissionsService {
             })
             .then(
                 (response) => {
-                    const data: PermissionsObject[] = response.data.lookups
+                    const data: PermissionsObject[] = response.data.lookups;
                     if (Array.isArray(data) && data.length > 0) {
                         data.forEach((d) => {
                             if (d.type == 'PROJECT') {
-                                this.permissions.project[d.projectId] = d.hasPrivilege
+                                this.permissions.project[d.projectId] = d.hasPrivilege;
                             } else {
-                                this.permissions.ref[d.projectId + '/' + d.refId] = d.hasPrivilege
+                                this.permissions.ref[d.projectId + '/' + d.refId] = d.hasPrivilege;
                             }
-                        })
-                        deferred.resolve(this.permissions)
+                        });
+                        deferred.resolve(this.permissions);
                     } else {
                         deferred.reject({
                             status: 500,
                             data: '',
                             message: 'Server Error: empty response',
-                        })
+                        });
                     }
                 },
                 (response: angular.IHttpResponse<PermissionsResponse>) => {
-                    deferred.reject(this.uRLSvc.handleHttpStatus(response))
+                    deferred.reject(this.uRLSvc.handleHttpStatus(response));
                 }
-            )
+            );
 
-        return deferred.promise
+        return deferred.promise;
     }
 
     public hasProjectEditPermission = (projectId: string): boolean => {
-        return this.permissions.project[projectId]
-    }
+        return this.permissions.project[projectId];
+    };
 
     public hasBranchEditPermission = (projectId: string, refId: string): boolean => {
-        return this.permissions.ref[projectId + '/' + refId]
-    }
+        return this.permissions.ref[projectId + '/' + refId];
+    };
 }
 
-veUtils.service('PermissionsService', PermissionsService)
+veUtils.service('PermissionsService', PermissionsService);

@@ -1,11 +1,11 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { ComponentService } from '@ve-components/services'
-import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools'
-import { veCoreEvents } from '@ve-core/events'
-import { ToolbarService } from '@ve-core/toolbar'
-import { ApplicationService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { ComponentService } from '@ve-components/services';
+import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools';
+import { veCoreEvents } from '@ve-core/events';
+import { ToolbarService } from '@ve-core/toolbar';
+import { ApplicationService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
 import {
     PermissionsService,
     URLService,
@@ -13,11 +13,11 @@ import {
     ViewService,
     ProjectService,
     ApiService,
-} from '@ve-utils/mms-api-client'
+} from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VePromisesResponse, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VePromisesResponse, VeQService } from '@ve-types/angular';
 import {
     ElementObject,
     ElementsRequest,
@@ -26,7 +26,7 @@ import {
     PresentationReference,
     ViewInstanceSpec,
     ViewObject,
-} from '@ve-types/mms'
+} from '@ve-types/mms';
 
 /**
  * @ngdoc directive
@@ -43,14 +43,14 @@ import {
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 class SpecReorderController extends SpecTool implements ISpecTool {
-    private treeOptions: object
+    private treeOptions: object;
 
-    private elementReferenceTree: PresentationReference[] = []
-    private originalElementReferenceTree: PresentationReference[] = []
-    public view: ViewObject | ViewInstanceSpec
-    reorderable: boolean
+    private elementReferenceTree: PresentationReference[] = [];
+    private originalElementReferenceTree: PresentationReference[] = [];
+    public view: ViewObject | ViewInstanceSpec;
+    reorderable: boolean;
 
-    viewSaving: boolean
+    viewSaving: boolean;
 
     constructor(
         $q: VeQService,
@@ -85,92 +85,93 @@ class SpecReorderController extends SpecTool implements ISpecTool {
             eventSvc,
             specSvc,
             toolbarSvc
-        )
-        this.specType = _.kebabCase(SpecReorderComponent.selector)
-        this.specTitle = 'Reorder Spec'
+        );
+        this.specType = _.kebabCase(SpecReorderComponent.selector);
+        this.specTitle = 'Reorder Spec';
     }
 
     $onInit(): void {
-        super.$onInit()
+        super.$onInit();
         this.treeOptions = {
             accept: (sourceNodeScope: SpecTool, destNodeScope: SpecTool, destIndex: number): boolean => {
-                if (sourceNodeScope.element.isOpaque) return false
-                if (destNodeScope.$element.hasClass('root')) return true
-                return !!this.viewSvc.isSection(destNodeScope.element as ViewInstanceSpec)
+                if (sourceNodeScope.element.isOpaque) return false;
+                if (destNodeScope.$element.hasClass('root')) return true;
+                return !!this.viewSvc.isSection(destNodeScope.element as ViewInstanceSpec);
             },
-        }
+        };
         this.subs.push(
             this.eventSvc.$on('spec-reorder.save', () => {
                 if (this.viewSaving) {
-                    this.growl.info('Please Wait...')
-                    return
+                    this.growl.info('Please Wait...');
+                    return;
                 }
-                this.viewSaving = true
+                this.viewSaving = true;
                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                     (api) => {
-                        api.toggleButtonSpinner('spec-reorder.save')
+                        api.toggleButtonSpinner('spec-reorder.save');
                     },
                     (reason) => {
-                        this.growl.error(ToolbarService.error(reason))
+                        this.growl.error(ToolbarService.error(reason));
                     }
-                )
+                );
                 this.treeSave().then(
                     (elements) => {
-                        this.viewSaving = false
+                        this.viewSaving = false;
                         //this.refresh()
                         //TODO reset orig
-                        this.growl.success('Save Successful')
+                        this.growl.success('Save Successful');
                         this.toolbarSvc.waitForApi(this.toolbarId).then(
                             (api) => {
-                                api.toggleButtonSpinner('spec-reorder.save')
+                                api.toggleButtonSpinner('spec-reorder.save');
                             },
                             (reason) => {
-                                this.growl.error(ToolbarService.error(reason))
+                                this.growl.error(ToolbarService.error(reason));
                             }
-                        )
-                        const saved = elements.filter((val) => val.id === this.view.id)
+                        );
+                        const saved = elements.filter((val) => val.id === this.view.id);
                         if (saved.length > 0) {
-                            this.eventSvc.$broadcast('element.updated', { element: saved[0] })
+                            this.eventSvc.$broadcast('element.updated', { element: saved[0] });
+                            this.eventSvc.$broadcast('view.reordered', saved[0]);
                         }
-                        this.eventSvc.$broadcast('spec-reorder.saved', this.view.id)
+                        this.eventSvc.$broadcast('spec-reorder.saved', this.view.id);
                         this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
                             id: 'spec-inspector',
-                        })
+                        });
                     },
                     (response) => {
-                        this.refresh()
-                        this.viewSaving = false
-                        const reason = response.data.failedRequests[0]
-                        this.growl.error(reason.message)
+                        this.refresh();
+                        this.viewSaving = false;
+                        const reason = response.data.failedRequests[0];
+                        this.growl.error(reason.message);
                         this.toolbarSvc.waitForApi(this.toolbarId).then(
                             (api) => {
-                                api.toggleButtonSpinner('spec-reorder.save')
+                                api.toggleButtonSpinner('spec-reorder.save');
                             },
                             (reason) => {
-                                this.growl.error(ToolbarService.error(reason))
+                                this.growl.error(ToolbarService.error(reason));
                             }
-                        )
+                        );
                     }
-                )
+                );
             })
-        )
+        );
         this.subs.push(
             this.eventSvc.$on('spec-reorder.cancel', () => {
-                this.revert()
+                this.revert();
             })
-        )
+        );
     }
 
     initCallback = (): void => {
         if (this.apiSvc.isView(this.specSvc.getView()) || this.viewSvc.isSection(this.specSvc.getView())) {
-            this.view = this.specSvc.getView()
-            this.reorderable = true
-            this.refresh()
+            this.view = this.specSvc.getView();
+            this.reorderable = true;
+            this.refresh();
         }
-    }
+    };
 
     treeSave(): VePromise<ElementObject[], VePromisesResponse<ElementObject>> {
-        const elementObsToUpdate: ElementObject[] = []
+        const elementObsToUpdate: ElementObject[] = [];
         const updateSectionElementOrder = (elementReference: PresentationReference): void => {
             const sectionEdit: ViewInstanceSpec = {
                 id: elementReference.instanceId,
@@ -179,33 +180,33 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                 _refId: elementReference.instanceSpecification._refId,
                 type: elementReference.instanceSpecification.type,
                 specification: _.cloneDeep(elementReference.instanceSpecification.specification),
-            }
+            };
             //sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
-            const operand: InstanceValueObject[] = (sectionEdit.specification.operand = [])
+            const operand: InstanceValueObject[] = (sectionEdit.specification.operand = []);
 
             if (!elementReference.instanceSpecification.specification) {
-                this.growl.error('Malformed Reference Tree; Aborting')
+                this.growl.error('Malformed Reference Tree; Aborting');
             }
             const origOperand = (
                 elementReference.instanceSpecification.specification as ExpressionObject<InstanceValueObject>
-            ).operand
+            ).operand;
             elementReference.sectionElements.forEach((sectionElement, index) => {
-                operand.push(sectionElement.instanceVal)
-                if (sectionElement.sectionElements.length > 0) updateSectionElementOrder(sectionElement)
-            })
+                operand.push(sectionElement.instanceVal);
+                if (sectionElement.sectionElements.length > 0) updateSectionElementOrder(sectionElement);
+            });
 
             if (!_.isEqual(operand, origOperand)) {
-                elementObsToUpdate.push(sectionEdit)
+                elementObsToUpdate.push(sectionEdit);
             }
-        }
+        };
 
-        const deferred = this.$q.defer<ElementObject[]>()
+        const deferred = this.$q.defer<ElementObject[]>();
         if (this.elementReferenceTree.length === 0) {
             deferred.reject({
                 type: 'error',
                 message: 'View specs were not initialized properly or is empty.',
-            })
-            return deferred.promise
+            });
+            return deferred.promise;
         }
         const viewEdit: ViewInstanceSpec | ViewObject = {
             id: this.view.id,
@@ -213,33 +214,33 @@ class SpecReorderController extends SpecTool implements ISpecTool {
             _projectId: this.view._projectId,
             _refId: this.view._refId,
             type: this.view.type,
-        }
+        };
         if (this.view._contents) {
-            viewEdit._contents = _.cloneDeep(this.view._contents)
+            viewEdit._contents = _.cloneDeep(this.view._contents);
         }
         if (this.view.specification) {
-            viewEdit.specification = _.cloneDeep((this.view as ViewInstanceSpec).specification)
+            viewEdit.specification = _.cloneDeep((this.view as ViewInstanceSpec).specification);
         }
-        const specs: ExpressionObject = viewEdit._contents || viewEdit.specification
-        const origSpecs: ExpressionObject = this.view._contents || this.view.specification
+        const specs: ExpressionObject = viewEdit._contents || viewEdit.specification;
+        const origSpecs: ExpressionObject = this.view._contents || this.view.specification;
         // Update the View edit object on Save
         if (specs.operand) {
-            specs.operand = []
+            specs.operand = [];
             this.elementReferenceTree.forEach((elementRef) => {
-                specs.operand.push(elementRef.instanceVal)
-            })
+                specs.operand.push(elementRef.instanceVal);
+            });
             if (specs && !_.isEqual(specs.operand, origSpecs.operand)) {
-                elementObsToUpdate.push(viewEdit)
+                elementObsToUpdate.push(viewEdit);
             }
         }
         // Recurse
         this.elementReferenceTree.forEach((elementReference) => {
             if (elementReference.sectionElements && elementReference.sectionElements.length > 0) {
-                updateSectionElementOrder(elementReference)
+                updateSectionElementOrder(elementReference);
             }
-        })
+        });
 
-        return this.elementSvc.updateElements(elementObsToUpdate, false)
+        return this.elementSvc.updateElements(elementObsToUpdate, false);
     }
 
     revert = (): void => {
@@ -250,29 +251,29 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                 key === 'presentationElement' ||
                 key === 'instanceVal'
             )
-                return value
-            return undefined
-        }) as PresentationReference[]
-    }
+                return value;
+            return undefined;
+        }) as PresentationReference[];
+    };
 
     refresh = () => {
-        let contents: ExpressionObject<InstanceValueObject> = null
+        let contents: ExpressionObject<InstanceValueObject> = null;
         if (this.view._contents) {
-            contents = (this.view as ViewObject)._contents
+            contents = (this.view as ViewObject)._contents;
         }
         if (this.view.specification) {
-            contents = (this.view as ViewInstanceSpec).specification
+            contents = (this.view as ViewInstanceSpec).specification;
         }
         const reqOb: ElementsRequest<string> = {
             elementId: this.specSvc.specApi.elementId,
             projectId: this.specSvc.specApi.projectId,
             refId: this.specSvc.specApi.refId,
             commitId: this.specSvc.specApi.commitId,
-        }
+        };
         if (contents) {
             this.viewSvc.getElementReferenceTree(reqOb, contents).then(
                 (elementReferenceTree) => {
-                    this.elementReferenceTree = elementReferenceTree
+                    this.elementReferenceTree = elementReferenceTree;
                     this.originalElementReferenceTree = _.cloneDeepWith(elementReferenceTree, (value: unknown, key) => {
                         if (
                             key === 'instanceId' ||
@@ -280,20 +281,20 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                             key === 'presentationElement' ||
                             key === 'instanceVal'
                         )
-                            return value
-                        return undefined
-                    }) as PresentationReference[]
+                            return value;
+                        return undefined;
+                    }) as PresentationReference[];
                 },
                 (reason) => {
-                    this.elementReferenceTree = []
-                    this.originalElementReferenceTree = []
+                    this.elementReferenceTree = [];
+                    this.originalElementReferenceTree = [];
                 }
-            )
+            );
         } else {
-            this.elementReferenceTree = []
-            this.originalElementReferenceTree = []
+            this.elementReferenceTree = [];
+            this.originalElementReferenceTree = [];
         }
-    }
+    };
 }
 
 const SpecReorderComponent: VeComponentOptions = {
@@ -331,6 +332,6 @@ const SpecReorderComponent: VeComponentOptions = {
         mmsCommitId: '@',
     },
     controller: SpecReorderController,
-}
+};
 
-veComponents.component(SpecReorderComponent.selector, SpecReorderComponent)
+veComponents.component(SpecReorderComponent.selector, SpecReorderComponent);

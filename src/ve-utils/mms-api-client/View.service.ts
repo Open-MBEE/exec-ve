@@ -1,15 +1,15 @@
-import { IQResolveReject } from 'angular'
-import _ from 'lodash'
+import { IQResolveReject } from 'angular';
+import _ from 'lodash';
 
-import { CacheService } from '@ve-utils/core'
-import { ElementService, URLService, ApiService } from '@ve-utils/mms-api-client'
-import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
-import { SchemaService } from '@ve-utils/model-schema'
-import { Class, Expression, InstanceSpec, Package, ValueSpec } from '@ve-utils/utils'
+import { CacheService } from '@ve-utils/core';
+import { ElementService, URLService, ApiService } from '@ve-utils/mms-api-client';
+import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
+import { SchemaService } from '@ve-utils/model-schema';
+import { Class, Expression, InstanceSpec, Package, ValueSpec } from '@ve-utils/utils';
 
-import { veUtils } from '@ve-utils'
+import { veUtils } from '@ve-utils';
 
-import { VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
     ElementObject,
@@ -35,32 +35,32 @@ import {
     ElementsResponse,
     GenericResponse,
     BasicResponse,
-} from '@ve-types/mms'
-import { TreeBranch, View2NodeMap } from '@ve-types/tree'
+} from '@ve-types/mms';
+import { TreeBranch, View2NodeMap } from '@ve-types/tree';
 
 export interface ViewData {
-    id: string
-    api: ViewApi
-    number?: string
-    topLevel?: boolean
-    first?: boolean
-    data?: ViewObject
+    id: string;
+    api: ViewApi;
+    number?: string;
+    topLevel?: boolean;
+    first?: boolean;
+    data?: ViewObject;
 }
 
 export interface ViewApi {
-    elementClicked(elementOb: ElementObject): void
-    elementTranscluded(elementOb: ElementObject, type: string): void
+    elementClicked(elementOb: ElementObject): void;
+    elementTranscluded(elementOb: ElementObject, type: string): void;
 }
 
 export interface DocumentMetadata {
-    numberingDepth: number
-    numberingSeparator: string
-    'top-left'?: string
-    top?: string
-    'top-right'?: string
-    'bottom-left'?: string
-    bottom?: string
-    'bottom-right'?: string
+    numberingDepth: number;
+    numberingSeparator: string;
+    'top-left'?: string;
+    top?: string;
+    'top-right'?: string;
+    'bottom-left'?: string;
+    bottom?: string;
+    'bottom-right'?: string;
 }
 
 /**
@@ -78,9 +78,9 @@ export interface DocumentMetadata {
  *
  */
 export class ViewService extends BaseApiService {
-    private schema: string = 'cameo'
+    private schema: string = 'cameo';
 
-    static $inject = ['$q', '$http', 'URLService', 'ElementService', 'ApiService', 'CacheService', 'SchemaService']
+    static $inject = ['$q', '$http', 'URLService', 'ElementService', 'ApiService', 'CacheService', 'SchemaService'];
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
@@ -90,7 +90,7 @@ export class ViewService extends BaseApiService {
         private cacheSvc: CacheService,
         private schemaSvc: SchemaService
     ) {
-        super()
+        super();
     }
 
     /**
@@ -102,86 +102,86 @@ export class ViewService extends BaseApiService {
      */
     public downgradeDocument(elementOb: ViewObject): VePromise<ViewObject, VePromisesResponse<ViewObject>> {
         return new this.$q<ViewObject, VePromisesResponse<ViewObject>>((resolve, reject) => {
-            const clone = _.cloneDeep(elementOb)
-            clone.appliedStereotypeIds = [this.schemaSvc.getSchema('VIEW_SID', this.schema)]
+            const clone = _.cloneDeep(elementOb);
+            clone.appliedStereotypeIds = [this.schemaSvc.getSchema('VIEW_SID', this.schema)];
             this.elementSvc.updateElements([clone], false).then(
                 (data) => {
-                    const cacheKey = ['documents', elementOb._projectId, elementOb._refId]
-                    let index = -1
-                    const projectDocs: ViewObject[] = this.cacheSvc.get<ViewObject[]>(cacheKey)
+                    const cacheKey = ['documents', elementOb._projectId, elementOb._refId];
+                    let index = -1;
+                    const projectDocs: ViewObject[] = this.cacheSvc.get<ViewObject[]>(cacheKey);
                     if (projectDocs) {
                         for (let i = 0; i < projectDocs.length; i++) {
                             if (projectDocs[i].id === elementOb.id) {
-                                index = i
-                                break
+                                index = i;
+                                break;
                             }
                         }
                         if (index >= 0) {
-                            projectDocs.splice(index, 1)
+                            projectDocs.splice(index, 1);
                         }
                     }
                     return resolve(
                         data.filter((returnOb) => {
-                            return returnOb.id === elementOb.id
+                            return returnOb.id === elementOb.id;
                         })[0]
-                    )
+                    );
                 },
                 (reason) => {
-                    return reject(reason)
+                    return reject(reason);
                 }
-            )
-        })
+            );
+        });
     }
 
     public getAllViews(reqOb: RequestObject, update?: boolean): VePromise<ViewObject[]> {
-        const key = this.apiSvc.makeCacheKey(reqOb, '', false, 'views')
-        const inProgKey = key.join('-')
+        const key = this.apiSvc.makeCacheKey(reqOb, '', false, 'views');
+        const inProgKey = key.join('-');
         if (!this._isInProgress(inProgKey)) {
             this._addInProgress<ViewObject>(
                 inProgKey,
                 new this.$q((resolve, reject) => {
-                    const cached = this.cacheSvc.get<ViewObject[]>(key)
+                    const cached = this.cacheSvc.get<ViewObject[]>(key);
                     if (cached && !update) {
-                        resolve(cached)
-                        this._removeInProgress(inProgKey)
+                        resolve(cached);
+                        this._removeInProgress(inProgKey);
                     } else {
-                        const searchTerms: VePromise<SearchResponse<ViewObject>, SearchResponse<ViewObject>>[] = []
+                        const searchTerms: VePromise<SearchResponse<ViewObject>, SearchResponse<ViewObject>>[] = [];
                         const stereoIds = [
                             this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
                             this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
                             ...this.schemaSvc.getSchema<string[]>('OTHER_VIEW_SID', this.schema),
-                        ]
+                        ];
                         stereoIds.forEach((stId) => {
                             searchTerms.push(
                                 this.elementSvc.search<ViewObject>(reqOb, {
                                     params: { appliedStereotypeIds: stId },
                                 })
-                            )
-                        })
+                            );
+                        });
                         this.$q
                             .all(searchTerms)
                             .then(
                                 (results) => {
-                                    let viewKeys = {}
+                                    let viewKeys = {};
 
                                     results.forEach((result) => {
-                                        viewKeys = _(viewKeys).merge(_.keyBy(result.elements, 'id'))
-                                    })
-                                    const views = _(viewKeys).values().value() as ViewObject[]
-                                    resolve(this.cacheSvc.put(key, views))
+                                        viewKeys = _(viewKeys).merge(_.keyBy(result.elements, 'id'));
+                                    });
+                                    const views = _(viewKeys).values().value() as ViewObject[];
+                                    resolve(this.cacheSvc.put(key, views));
                                 },
                                 (reason: VePromiseReason<ElementsResponse<ViewObject>>) => {
-                                    reject(reason)
+                                    reject(reason);
                                 }
                             )
                             .finally(() => {
-                                this._removeInProgress(inProgKey)
-                            })
+                                this._removeInProgress(inProgKey);
+                            });
                     }
                 })
-            )
+            );
         }
-        return this._getInProgress(inProgKey) as VePromise<ViewObject[]>
+        return this._getInProgress(inProgKey) as VePromise<ViewObject[]>;
     }
 
     /**
@@ -201,46 +201,46 @@ export class ViewService extends BaseApiService {
         weight: number,
         update?: boolean
     ): VePromise<ElementObject[]> {
-        this.apiSvc.normalize(reqOb)
-        const key = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'viewElements').join('-')
+        this.apiSvc.normalize(reqOb);
+        const key = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'viewElements').join('-');
         if (this._isInProgress(key)) {
-            return this._getInProgress(key) as VePromise<ElementObject[]>
+            return this._getInProgress(key) as VePromise<ElementObject[]>;
         }
-        const cached = this.cacheSvc.get<ElementObject[]>(key)
+        const cached = this.cacheSvc.get<ElementObject[]>(key);
         if (cached && !update) {
-            return this.$q.resolve(cached)
+            return this.$q.resolve(cached);
         }
         this._addInProgress<ElementObject>(
             key,
             new this.$q((resolve, reject) => {
                 this.elementSvc.getElement(reqOb, weight, update).then(
                     (viewOrInstance: ViewObject | ViewInstanceSpec) => {
-                        const toGet: string[] = []
-                        let results: ElementObject[] = []
+                        const toGet: string[] = [];
+                        let results: ElementObject[] = [];
                         if (viewOrInstance.type === 'Class') {
-                            const view: ViewObject = viewOrInstance as ViewObject
+                            const view: ViewObject = viewOrInstance as ViewObject;
                             if (view._displayedElementIds) {
-                                const displayed: string[] = view._displayedElementIds
+                                const displayed: string[] = view._displayedElementIds;
                                 if (Array.isArray(displayed) && displayed.length > 0) {
-                                    toGet.push(...displayed)
+                                    toGet.push(...displayed);
                                 }
                             }
                             if (view._contents && view._contents.operand) {
-                                const contents = view._contents.operand
+                                const contents = view._contents.operand;
                                 for (let i = 0; i < contents.length; i++) {
                                     if (contents[i] && contents[i].instanceId) {
-                                        toGet.push(contents[i].instanceId)
+                                        toGet.push(contents[i].instanceId);
                                     }
                                 }
                             }
                         } else if (viewOrInstance.type === 'InstanceSpecification') {
-                            const view = viewOrInstance as ViewInstanceSpec
+                            const view = viewOrInstance as ViewInstanceSpec;
                             if (view.specification) {
                                 if (view.specification.operand) {
-                                    const specContents = view.specification.operand as InstanceValueObject[]
+                                    const specContents = view.specification.operand as InstanceValueObject[];
                                     for (let j = 0; j < specContents.length; j++) {
                                         if (specContents[j] && specContents[j].instanceId) {
-                                            toGet.push(specContents[j].instanceId)
+                                            toGet.push(specContents[j].instanceId);
                                         }
                                     }
                                 }
@@ -252,51 +252,51 @@ export class ViewService extends BaseApiService {
                                 ) {
                                     const tableJson: PresentTableObject = JSON.parse(
                                         view.specification.value
-                                    ) as PresentTableObject
+                                    ) as PresentTableObject;
                                     if (tableJson.body) {
-                                        toGet.push(...this.collectTableSources(tableJson))
+                                        toGet.push(...this.collectTableSources(tableJson));
                                     }
                                 }
                             }
                         }
 
-                        const toGetReqOb: ElementsRequest<string[]> = Object.assign(reqOb, { elementId: toGet })
+                        const toGetReqOb: ElementsRequest<string[]> = Object.assign(reqOb, { elementId: toGet });
                         this.elementSvc
                             .getElements(toGetReqOb, weight, update)
                             .then((data) => {
-                                results = data
+                                results = data;
                             })
                             .finally(() => {
-                                this.cacheSvc.put(key, results)
-                                this._removeInProgress(key)
-                                resolve(results)
-                            })
+                                this.cacheSvc.put(key, results);
+                                this._removeInProgress(key);
+                                resolve(results);
+                            });
                     },
                     (reason) => {
-                        this._removeInProgress(key)
-                        reject(reason)
+                        this._removeInProgress(key);
+                        reject(reason);
                     }
-                )
+                );
             })
-        )
-        return this._getInProgress(key) as VePromise<ElementObject[]>
+        );
+        return this._getInProgress(key) as VePromise<ElementObject[]>;
     }
 
     public collectTableSources(table: PresentTableObject): string[] {
-        const sources: string[] = []
-        const body = table.body
+        const sources: string[] = [];
+        const body = table.body;
         body.forEach((row) => {
             row.forEach((cell) => {
                 cell.content.forEach((thing) => {
                     if (thing.type === 'Table' && thing.body) {
-                        sources.push(...this.collectTableSources(thing as PresentTableObject))
+                        sources.push(...this.collectTableSources(thing as PresentTableObject));
                     } else if (thing.type === 'Paragraph' && thing.source) {
-                        sources.push((thing as PresentTextObject).source)
+                        sources.push((thing as PresentTextObject).source);
                     }
-                })
-            })
-        })
-        return sources
+                });
+            });
+        });
+        return sources;
     }
 
     /**
@@ -330,26 +330,26 @@ export class ViewService extends BaseApiService {
         ) => void,
         seen?: { [key: string]: ViewObject }
     ): VePromise<TreeBranch | string[], unknown> {
-        let seenViews = seen
-        if (!seenViews) seenViews = {}
+        let seenViews = seen;
+        if (!seenViews) seenViews = {};
         return new this.$q<TreeBranch | string[]>((resolve, reject) => {
-            const curItem: TreeBranch | string[] = curItemFunc(v, aggr, propId)
-            seenViews[v.id] = v
-            const childIds: string[] = []
-            const childAggrs: string[] = []
-            const childPropIds: string[] = []
+            const curItem: TreeBranch | string[] = curItemFunc(v, aggr, propId);
+            seenViews[v.id] = v;
+            const childIds: string[] = [];
+            const childAggrs: string[] = [];
+            const childPropIds: string[] = [];
             if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
                 if (!Array.isArray(curItem) && curItem.loading) {
-                    curItem.loading = false
+                    curItem.loading = false;
                 }
-                resolve(curItem)
-                return
+                resolve(curItem);
+                return;
             }
             for (let i = 0; i < v._childViews.length; i++) {
-                if (seenViews[v._childViews[i].id]) continue
-                childIds.push(v._childViews[i].id)
-                childAggrs.push(v._childViews[i].aggregation)
-                childPropIds.push(v._childViews[i].propertyId)
+                if (seenViews[v._childViews[i].id]) continue;
+                childIds.push(v._childViews[i].id);
+                childAggrs.push(v._childViews[i].aggregation);
+                childPropIds.push(v._childViews[i].propertyId);
             }
             this.elementSvc
                 .getElements(
@@ -361,15 +361,15 @@ export class ViewService extends BaseApiService {
                     2
                 )
                 .then((childViews: ViewObject[]) => {
-                    const mapping: { [id: string]: ViewObject } = {}
+                    const mapping: { [id: string]: ViewObject } = {};
                     for (let i = 0; i < childViews.length; i++) {
-                        mapping[childViews[i].id] = childViews[i]
+                        mapping[childViews[i].id] = childViews[i];
                     }
-                    const childPromises: VePromise<string[] | TreeBranch, unknown>[] = []
-                    const childNodes: (string[] | TreeBranch)[] = []
-                    const processedChildViews: ViewObject[] = []
+                    const childPromises: VePromise<string[] | TreeBranch, unknown>[] = [];
+                    const childNodes: (string[] | TreeBranch)[] = [];
+                    const processedChildViews: ViewObject[] = [];
                     for (let i = 0; i < childIds.length; i++) {
-                        const child = mapping[childIds[i]]
+                        const child = mapping[childIds[i]];
                         if (child && this.apiSvc.isView(child)) {
                             //what if not found??
                             childPromises.push(
@@ -384,26 +384,26 @@ export class ViewService extends BaseApiService {
                                     childrenFunc,
                                     seenViews
                                 )
-                            )
-                            childNodes.push(curItemFunc(child, childAggrs[i], childPropIds[i]))
+                            );
+                            childNodes.push(curItemFunc(child, childAggrs[i], childPropIds[i]));
                             processedChildViews.push({
                                 id: child.id,
                                 _projectId: child._projectId,
                                 _refId: child._refId,
                                 aggregation: childAggrs[i],
                                 propertyId: childPropIds[i],
-                            })
+                            });
                         }
                     }
-                    v._childViews = processedChildViews
+                    v._childViews = processedChildViews;
                     if (childrenFunc) {
-                        childrenFunc(curItem, childNodes, reject)
+                        childrenFunc(curItem, childNodes, reject);
                     }
                     this.$q.all(childPromises).then(() => {
-                        resolve(curItem)
-                    }, reject)
-                }, reject)
-        })
+                        resolve(curItem);
+                    }, reject);
+                }, reject);
+        });
     }
 
     /**
@@ -416,7 +416,7 @@ export class ViewService extends BaseApiService {
      * @returns {Promise} The promise would be resolved with updated parent view object
      */
     public addViewToParentView(reqOb: ViewCreationRequest): VePromise<ViewObject> {
-        this.apiSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb);
         return new this.$q<ViewObject>((resolve, reject) => {
             this.elementSvc
                 .getElement(
@@ -436,10 +436,10 @@ export class ViewService extends BaseApiService {
                             id: data.id,
                             _childViews: [],
                             type: data.type,
-                        }
-                        clone._childViews = []
+                        };
+                        clone._childViews = [];
                         if (data._childViews) {
-                            clone._childViews.push(..._.cloneDeep(data._childViews))
+                            clone._childViews.push(..._.cloneDeep(data._childViews));
                         }
                         clone._childViews.push({
                             id: reqOb.viewId,
@@ -447,21 +447,21 @@ export class ViewService extends BaseApiService {
                             _projectId: data._projectId,
                             _refId: data._refId,
                             type: data.type,
-                        })
+                        });
                         this.elementSvc.updateElement(clone, true).then(
                             (data2) => {
-                                resolve(data2)
+                                resolve(data2);
                             },
                             (reason) => {
-                                reject(reason)
+                                reject(reason);
                             }
-                        )
+                        );
                     },
                     (reason) => {
-                        reject(reason)
+                        reject(reason);
                     }
-                )
-        })
+                );
+        });
     }
 
     /**
@@ -472,7 +472,7 @@ export class ViewService extends BaseApiService {
      * @returns {IPromise<ViewObject>} The promise would be resolved with updated parent View object
      */
     public removeViewFromParentView(reqOb: ViewsRequest): VePromise<ViewObject> {
-        this.apiSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb);
         return new this.$q<ViewObject>((resolve, reject) => {
             this.elementSvc
                 .getElement(
@@ -494,30 +494,30 @@ export class ViewService extends BaseApiService {
                                 id: data.id,
                                 type: data.type,
                                 _childViews: _.cloneDeep(data._childViews),
-                            }
+                            };
                             for (let i = 0; i < clone._childViews.length; i++) {
                                 if (clone._childViews[i].id === reqOb.viewId) {
-                                    clone._childViews.splice(i, 1)
-                                    break
+                                    clone._childViews.splice(i, 1);
+                                    break;
                                 }
                             }
                             this.elementSvc.updateElement(clone, true).then(
                                 (data2) => {
-                                    resolve(data2)
+                                    resolve(data2);
                                 },
                                 (reason) => {
-                                    reject(reason)
+                                    reject(reason);
                                 }
-                            )
+                            );
                         } else {
-                            resolve(data)
+                            resolve(data);
                         }
                     },
                     (reason) => {
-                        reject(reason)
+                        reject(reason);
                     }
-                )
-        })
+                );
+        });
     }
 
     /**
@@ -537,7 +537,7 @@ export class ViewService extends BaseApiService {
         instanceValOb: InstanceValueObject,
         addPeIndex: number
     ): VePromise<ViewObject> {
-        this.apiSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb);
         return new this.$q<ViewObject>((resolve, reject) => {
             this.elementSvc
                 .getElement(
@@ -555,20 +555,20 @@ export class ViewService extends BaseApiService {
                             _refId: data._refId,
                             type: data.type,
                             id: data.id,
-                        }
-                        let key = '_contents'
+                        };
+                        let key = '_contents';
                         if (this.isSection(data)) {
-                            key = 'specification'
+                            key = 'specification';
                         }
-                        const keyValue: ValueObject = data[key] as ValueObject
-                        let cloneValue: ValueObject
+                        const keyValue: ValueObject = data[key] as ValueObject;
+                        let cloneValue: ValueObject;
                         if (keyValue) {
-                            cloneValue = _.cloneDeep(keyValue)
+                            cloneValue = _.cloneDeep(keyValue);
                             if (!cloneValue.id || !cloneValue.ownerId) {
                                 cloneValue.id = this.isSection(data)
                                     ? this.apiSvc.createUniqueId()
-                                    : data.id + '_vc_expression'
-                                cloneValue.ownerId = this.isSection(data) ? data.id : data.id + '_vc'
+                                    : data.id + '_vc_expression';
+                                cloneValue.ownerId = this.isSection(data) ? data.id : data.id + '_vc';
                             }
                         } else {
                             cloneValue = new Expression({
@@ -578,39 +578,39 @@ export class ViewService extends BaseApiService {
                                 _projectId: data._projectId,
                                 _refId: data._refId,
                                 ownerId: this.isSection(data) ? data.id : data.id + '_vc',
-                            })
+                            });
                         }
-                        instanceValOb.ownerId = cloneValue.id
+                        instanceValOb.ownerId = cloneValue.id;
                         if (!instanceValOb.id) {
-                            instanceValOb.id = this.apiSvc.createUniqueId()
+                            instanceValOb.id = this.apiSvc.createUniqueId();
                         }
                         if (addPeIndex >= -1)
                             (cloneValue as ExpressionObject<InstanceValueObject>).operand.splice(
                                 addPeIndex + 1,
                                 0,
                                 new ValueSpec(instanceValOb)
-                            )
+                            );
                         else {
-                            ;(cloneValue as ExpressionObject<InstanceValueObject>).operand.push(
+                            (cloneValue as ExpressionObject<InstanceValueObject>).operand.push(
                                 new ValueSpec(instanceValOb)
-                            )
+                            );
                         }
 
-                        clone[key] = cloneValue
+                        clone[key] = cloneValue;
                         this.elementSvc.updateElement(clone, false).then(
                             (data2) => {
-                                resolve(data2)
+                                resolve(data2);
                             },
                             (reason) => {
-                                reject(reason)
+                                reject(reason);
                             }
-                        )
+                        );
                     },
                     (reason) => {
-                        reject(reason)
+                        reject(reason);
                     }
-                )
-        })
+                );
+        });
     }
 
     /**
@@ -625,7 +625,7 @@ export class ViewService extends BaseApiService {
         reqOb: ElementsRequest<string>,
         instanceVal?: InstanceValueObject
     ): VePromise<ViewObject> {
-        this.apiSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb);
         return new this.$q<ViewObject>((resolve, reject) => {
             if (instanceVal) {
                 this.elementSvc.getElement(reqOb, 2).then(
@@ -636,20 +636,20 @@ export class ViewService extends BaseApiService {
                             type: data.type,
                             //_modified: data._modified,
                             id: data.id,
-                        }
-                        let key = '_contents'
+                        };
+                        let key = '_contents';
                         if (this.isSection(data)) {
-                            key = 'specification'
+                            key = 'specification';
                         }
-                        const keyValue = data[key] as ValueObject
-                        let cloneValue: ValueObject
+                        const keyValue = data[key] as ValueObject;
+                        let cloneValue: ValueObject;
                         if (keyValue) {
-                            cloneValue = _.cloneDeep(keyValue)
+                            cloneValue = _.cloneDeep(keyValue);
                             if (!cloneValue.id || !cloneValue.ownerId) {
                                 cloneValue.id = this.isSection(data)
                                     ? this.apiSvc.createUniqueId()
-                                    : data.id + '_vc_expression'
-                                cloneValue.ownerId = this.isSection(data) ? data.id : data.id + '_vc'
+                                    : data.id + '_vc_expression';
+                                cloneValue.ownerId = this.isSection(data) ? data.id : data.id + '_vc';
                             }
                         } else {
                             cloneValue = new Expression({
@@ -659,34 +659,34 @@ export class ViewService extends BaseApiService {
                                 _projectId: data._projectId,
                                 _refId: data._refId,
                                 ownerId: this.isSection(data) ? data.id : data.id + '_vc',
-                            })
+                            });
                         }
                         if (cloneValue && cloneValue.operand) {
                             const operands: InstanceValueObject[] = (keyValue as ExpressionObject<InstanceValueObject>)
-                                .operand
+                                .operand;
                             for (let i = 0; i < operands.length; i++) {
                                 if (instanceVal.instanceId === operands[i].instanceId) {
-                                    ;(cloneValue as ExpressionObject<InstanceValueObject>).operand.splice(i, 1)
-                                    break
+                                    (cloneValue as ExpressionObject<InstanceValueObject>).operand.splice(i, 1);
+                                    break;
                                 }
                             }
                         }
-                        clone[key] = cloneValue
+                        clone[key] = cloneValue;
                         this.elementSvc.updateElement(clone, false).then(
                             (data2) => {
-                                resolve(data2)
+                                resolve(data2);
                             },
                             (reason) => {
-                                reject(reason)
+                                reject(reason);
                             }
-                        )
+                        );
                     },
                     (reason) => {
-                        reject(reason)
+                        reject(reason);
                     }
-                )
+                );
             }
-        })
+        });
     }
 
     /**
@@ -705,23 +705,23 @@ export class ViewService extends BaseApiService {
         name: string,
         addPeIndex: number
     ): VePromise<ValueObject> {
-        let newInstanceId = this.apiSvc.createUniqueId()
-        newInstanceId = '_hidden_' + newInstanceId + '_pei'
+        let newInstanceId = this.apiSvc.createUniqueId();
+        newInstanceId = '_hidden_' + newInstanceId + '_pei';
         return new this.$q<ViewObject>((resolve, reject) => {
             const realType: string = this.schemaSvc.getValue(
                 'TYPE_TO_CLASSIFIER_TYPE',
                 type,
                 this.schema,
                 viewOrSectionOb.id
-            )
-            let jsonType = realType
-            if (type === 'Comment' || type === 'Paragraph') jsonType = type
+            );
+            let jsonType = realType;
+            if (type === 'Comment' || type === 'Paragraph') jsonType = type;
             const instanceSpecSpec = {
                 type: jsonType,
                 sourceType: 'reference',
                 source: newInstanceId,
                 sourceProperty: 'documentation',
-            }
+            };
             let instanceSpec: InstanceSpecObject = {
                 id: newInstanceId,
                 ownerId: 'view_instances_bin_' + viewOrSectionOb._projectId,
@@ -742,8 +742,8 @@ export class ViewService extends BaseApiService {
                     _refId: viewOrSectionOb._refId,
                 }),
                 appliedStereotypeIds: [],
-            }
-            instanceSpec = new InstanceSpec(instanceSpec)
+            };
+            instanceSpec = new InstanceSpec(instanceSpec);
             if (type === 'Section') {
                 //newData = newDataSInstance = null;
                 instanceSpec.specification = new ValueSpec({
@@ -753,20 +753,20 @@ export class ViewService extends BaseApiService {
                     id: this.apiSvc.createUniqueId(),
                     _projectId: viewOrSectionOb._projectId,
                     _refId: viewOrSectionOb._refId,
-                })
+                });
             }
             let clone: ElementObject = {
                 _projectId: viewOrSectionOb._projectId,
                 id: viewOrSectionOb.id,
                 _refId: viewOrSectionOb._refId,
                 type: viewOrSectionOb.type,
-            }
-            let key = '_contents'
+            };
+            let key = '_contents';
             if (this.isSection(viewOrSectionOb)) {
-                key = 'specification'
+                key = 'specification';
             }
-            const keyValue: ValueObject = viewOrSectionOb[key] as ValueObject
-            let cloneValue: ValueObject
+            const keyValue: ValueObject = viewOrSectionOb[key] as ValueObject;
+            let cloneValue: ValueObject;
             if (!keyValue) {
                 cloneValue = new ValueSpec({
                     operand: [],
@@ -777,20 +777,20 @@ export class ViewService extends BaseApiService {
                     _projectId: viewOrSectionOb._projectId,
                     _refId: viewOrSectionOb._refId,
                     ownerId: this.isSection(viewOrSectionOb) ? viewOrSectionOb.id : viewOrSectionOb.id + '_vc',
-                })
+                });
             } else {
-                cloneValue = _.cloneDeep(keyValue)
+                cloneValue = _.cloneDeep(keyValue);
                 if (!cloneValue.id || !cloneValue.ownerId) {
                     cloneValue.id = this.isSection(viewOrSectionOb)
                         ? this.apiSvc.createUniqueId()
-                        : viewOrSectionOb.id + '_vc_expression'
+                        : viewOrSectionOb.id + '_vc_expression';
                     cloneValue.ownerId = this.isSection(viewOrSectionOb)
                         ? viewOrSectionOb.id
-                        : viewOrSectionOb.id + '_vc'
+                        : viewOrSectionOb.id + '_vc';
                 }
             }
             if (addPeIndex >= -1) {
-                ;(cloneValue as ExpressionObject<InstanceValueObject>).operand.splice(
+                (cloneValue as ExpressionObject<InstanceValueObject>).operand.splice(
                     addPeIndex + 1,
                     0,
                     new ValueSpec({
@@ -801,9 +801,9 @@ export class ViewService extends BaseApiService {
                         _projectId: viewOrSectionOb._projectId,
                         _refId: viewOrSectionOb._refId,
                     })
-                )
+                );
             } else {
-                ;(cloneValue as ExpressionObject<InstanceValueObject>).operand.push(
+                (cloneValue as ExpressionObject<InstanceValueObject>).operand.push(
                     new ValueSpec({
                         instanceId: newInstanceId,
                         type: 'InstanceValue',
@@ -812,11 +812,11 @@ export class ViewService extends BaseApiService {
                         _projectId: viewOrSectionOb._projectId,
                         _refId: viewOrSectionOb._refId,
                     })
-                )
+                );
             }
-            clone[key] = cloneValue
-            clone = this.elementSvc.fillInElement(clone)
-            const toCreate: ElementObject[] = [instanceSpec, clone]
+            clone[key] = cloneValue;
+            clone = this.elementSvc.fillInElement(clone);
+            const toCreate: ElementObject[] = [instanceSpec, clone];
             /*
         if (newData && newDataSInstance) {
             toCreate.push(newData);
@@ -828,22 +828,22 @@ export class ViewService extends BaseApiService {
                 refId: viewOrSectionOb._refId,
                 elements: toCreate,
                 elementId: '',
-            }
+            };
             this.elementSvc.createElements(reqOb).then(
                 (data) => {
                     for (let i = 0; i < data.length; i++) {
-                        const elem = data[i]
+                        const elem = data[i];
                         if (elem.id === newInstanceId) {
-                            resolve(elem)
-                            return
+                            resolve(elem);
+                            return;
                         }
                     }
                 },
                 (reason) => {
-                    reject(reason)
+                    reject(reason);
                 }
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -863,9 +863,9 @@ export class ViewService extends BaseApiService {
      */
     public createView(ownerOb: ViewObject, viewOb: ViewObject, peDoc?: string): VePromise<ViewObject> {
         return new this.$q<ViewObject>((resolve, reject) => {
-            const newViewId: string = viewOb.id && viewOb.id !== '' ? viewOb.id : this.apiSvc.createUniqueId()
-            const newInstanceId = '_hidden_' + this.apiSvc.createUniqueId() + '_pei'
-            const untitledName = viewOb.isDoc ? 'Untitled Document' : 'Untitled View'
+            const newViewId: string = viewOb.id && viewOb.id !== '' ? viewOb.id : this.apiSvc.createUniqueId();
+            const newInstanceId = '_hidden_' + this.apiSvc.createUniqueId() + '_pei';
+            const untitledName = viewOb.isDoc ? 'Untitled Document' : 'Untitled View';
             const view = new Class({
                 id: newViewId,
                 _projectId: viewOb._projectId,
@@ -898,22 +898,22 @@ export class ViewService extends BaseApiService {
                         ? this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema)
                         : this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
                 ],
-            })
+            });
             let parentView: ViewObject = {
                 _projectId: '',
                 _refId: '',
                 id: '',
                 type: 'Class',
-            }
+            };
             if (ownerOb && (ownerOb._childViews || this.apiSvc.isView(ownerOb))) {
                 parentView = Object.assign(parentView, {
                     _projectId: ownerOb._projectId,
                     _refId: ownerOb._refId,
                     id: ownerOb.id,
-                })
-                parentView._childViews = []
+                });
+                parentView._childViews = [];
                 if (ownerOb._childViews) {
-                    parentView._childViews.push(..._.cloneDeep(ownerOb._childViews))
+                    parentView._childViews.push(..._.cloneDeep(ownerOb._childViews));
                 }
                 parentView._childViews.push({
                     id: newViewId,
@@ -921,14 +921,14 @@ export class ViewService extends BaseApiService {
                     _refId: ownerOb._refId,
                     aggregation: 'composite',
                     type: 'Class',
-                })
+                });
             }
             const peSpec: PresentationInstanceObject = {
                 type: 'Paragraph',
                 sourceType: 'reference',
                 source: newViewId,
                 sourceProperty: 'documentation',
-            }
+            };
             const pe = new InstanceSpec({
                 id: newInstanceId,
                 _projectId: viewOb._projectId,
@@ -946,11 +946,11 @@ export class ViewService extends BaseApiService {
                     _refId: viewOb._refId,
                 }),
                 appliedStereotypeIds: [],
-            })
-            const toCreate: ElementObject[] = [pe, view]
+            });
+            const toCreate: ElementObject[] = [pe, view];
             if (parentView.id !== '') {
-                const parentViewClass: ElementObject = this.elementSvc.fillInElement(parentView)
-                toCreate.push(parentViewClass)
+                const parentViewClass: ElementObject = this.elementSvc.fillInElement(parentView);
+                toCreate.push(parentViewClass);
             }
             const reqOb = {
                 projectId: ownerOb._projectId,
@@ -958,20 +958,20 @@ export class ViewService extends BaseApiService {
                 elements: toCreate,
                 returnChildViews: true,
                 elementId: '',
-            }
+            };
             this.elementSvc.createElements(reqOb).then(
                 (data) => {
                     data.forEach((elem) => {
                         if (elem.id === newViewId) {
-                            resolve(elem)
+                            resolve(elem);
                         }
-                    })
+                    });
                 },
                 (reason) => {
-                    reject(reason)
+                    reject(reason);
                 }
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -986,27 +986,27 @@ export class ViewService extends BaseApiService {
      */
     public createDocument(ownerOb: ViewObject, docOb: ViewObject): VePromise<ViewObject> {
         return new this.$q<ViewObject>((resolve, reject) => {
-            docOb.isDoc = true
+            docOb.isDoc = true;
             this.createView(ownerOb, docOb).then(
                 (data2: DocumentObject) => {
                     if (ownerOb && ownerOb.id.indexOf('holding_bin') < 0) {
-                        data2._groupId = ownerOb.id
+                        data2._groupId = ownerOb.id;
                     }
-                    const cacheKey = ['documents', ownerOb._projectId, ownerOb._refId]
-                    const cachedView: ViewObject[] = this.cacheSvc.get(cacheKey, true)
+                    const cacheKey = ['documents', ownerOb._projectId, ownerOb._refId];
+                    const cachedView: ViewObject[] = this.cacheSvc.get(cacheKey, true);
                     if (cachedView) {
                         cachedView.forEach((document: DocumentObject, index) => {
-                            if (document.id === data2.id) delete cachedView[index]
-                        })
-                        cachedView.push(data2)
+                            if (document.id === data2.id) delete cachedView[index];
+                        });
+                        cachedView.push(data2);
                     }
-                    resolve(data2)
+                    resolve(data2);
                 },
                 (reason) => {
-                    reject(reason)
+                    reject(reason);
                 }
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -1026,7 +1026,7 @@ export class ViewService extends BaseApiService {
      */
     public createGroup(name: string, ownerOb: ViewObject): VePromise<GroupObject> {
         return new this.$q<GroupObject>((resolve, reject) => {
-            const PACKAGE_ID = this.apiSvc.createUniqueId()
+            const PACKAGE_ID = this.apiSvc.createUniqueId();
             // Our Group package element
             const group: GroupObject = new Package({
                 id: PACKAGE_ID,
@@ -1037,38 +1037,38 @@ export class ViewService extends BaseApiService {
                 ownerId: ownerOb.id,
                 _isGroup: true,
                 appliedStereotypeIds: [this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)],
-            })
-            const toCreate = [group]
+            });
+            const toCreate = [group];
             const reqOb = {
                 projectId: ownerOb._projectId,
                 refId: ownerOb._refId,
                 elements: toCreate,
                 elementId: '',
-            }
+            };
             this.elementSvc.createElements(reqOb).then(
                 (data) => {
-                    const cacheKey = ['groups', ownerOb._projectId, ownerOb._refId]
-                    const groupObj = _.find(data, { id: PACKAGE_ID }) as GroupObject
+                    const cacheKey = ['groups', ownerOb._projectId, ownerOb._refId];
+                    const groupObj = _.find(data, { id: PACKAGE_ID });
                     if (groupObj) {
-                        groupObj._parentId = ownerOb.id.indexOf('holding') != -1 ? null : ownerOb.id
+                        groupObj._parentId = ownerOb.id.indexOf('holding') != -1 ? null : ownerOb.id;
                         if (this.cacheSvc.exists(cacheKey)) {
-                            this.cacheSvc.get<ElementObject[]>(cacheKey).push(groupObj)
+                            this.cacheSvc.get<ElementObject[]>(cacheKey).push(groupObj);
                         }
-                        this.cacheSvc.put(['group', groupObj.projectId, groupObj.refId, groupObj.id], groupObj, true)
-                        resolve(groupObj)
+                        this.cacheSvc.put(['group', groupObj.projectId, groupObj.refId, groupObj.id], groupObj, true);
+                        resolve(groupObj);
                     } else {
                         reject({
                             status: 500,
                             message: 'Failed to create group',
-                        })
+                        });
                     }
                 },
                 (reason) => {
-                    console.log('POST failed:', reason)
-                    reject(reason)
+                    console.log('POST failed:', reason);
+                    reject(reason);
                 }
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -1088,43 +1088,43 @@ export class ViewService extends BaseApiService {
                 _refId: packageOb._refId,
                 appliedStereotypeIds: [],
                 classifierIds: null,
-            }
+            };
 
-            updatedPackage._isGroup = false
+            updatedPackage._isGroup = false;
             _.remove(packageOb.appliedStereotypeIds, (id: string): boolean => {
-                return id === this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)
-            })
+                return id === this.schemaSvc.getSchema('GROUP_ST_ID', this.schema);
+            });
 
             if (packageOb.appliedStereotypeIds.length === 0) {
-                updatedPackage.appliedStereotypeIds = packageOb.appliedStereotypeIds
+                updatedPackage.appliedStereotypeIds = packageOb.appliedStereotypeIds;
             }
-            const toUpdate = [updatedPackage]
+            const toUpdate = [updatedPackage];
             this.elementSvc.updateElements<PackageObject>(toUpdate, false).then(
                 (data) => {
                     // remove this group for cache
-                    const cacheKey = ['groups', packageOb._projectId, packageOb._refId]
-                    const groups: ElementObject[] = this.cacheSvc.get<PackageObject[]>(cacheKey, true) || []
+                    const cacheKey = ['groups', packageOb._projectId, packageOb._refId];
+                    const groups: ElementObject[] = this.cacheSvc.get<PackageObject[]>(cacheKey, true) || [];
                     _.remove(groups, (group: PackageObject) => {
-                        return group.id === packageOb.id
-                    })
+                        return group.id === packageOb.id;
+                    });
                     data.forEach((elOb: ElementObject) => {
                         if (elOb.id === updatedPackage.id) {
-                            resolve(elOb)
+                            resolve(elOb);
                         }
-                    })
+                    });
                 },
                 (reason) => {
                     if (reason.data.failedRequests) {
-                        reject(reason.data.failedRequests[0])
+                        reject(reason.data.failedRequests[0]);
                     } else {
                         reject({
                             status: 400,
                             message: 'Something went wrong. Please try your action again',
-                        })
+                        });
                     }
                 }
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -1141,40 +1141,40 @@ export class ViewService extends BaseApiService {
         weight?: number,
         refresh?: boolean
     ): VePromise<DocumentObject[], GenericResponse<DocumentObject>> {
-        this.apiSvc.normalize(reqOb)
-        const url = this.uRLSvc.getProjectDocumentsURL(reqOb)
-        const cacheKey = ['documents', reqOb.projectId, reqOb.refId]
-        const inProgKey = cacheKey.join('-')
+        this.apiSvc.normalize(reqOb);
+        const url = this.uRLSvc.getProjectDocumentsURL(reqOb);
+        const cacheKey = ['documents', reqOb.projectId, reqOb.refId];
+        const inProgKey = cacheKey.join('-');
         if (!this._isInProgress(inProgKey)) {
             this._addInProgress(
                 inProgKey,
                 new this.$q<DocumentObject[], GenericResponse<DocumentObject>>((resolve, reject) => {
                     if (this.cacheSvc.exists(cacheKey) && !refresh) {
-                        resolve(this.cacheSvc.get(cacheKey))
-                        this._removeInProgress(inProgKey)
+                        resolve(this.cacheSvc.get(cacheKey));
+                        this._removeInProgress(inProgKey);
                     } else {
                         if (refresh === undefined) {
-                            refresh = false
+                            refresh = false;
                         }
                         this.elementSvc
                             .getGenericElements(url, reqOb, 'documents', weight, refresh)
                             .then(
                                 (data) => {
-                                    this.cacheSvc.put(cacheKey, data, false)
-                                    resolve(this.cacheSvc.get<DocumentObject[]>(cacheKey))
+                                    this.cacheSvc.put(cacheKey, data, false);
+                                    resolve(this.cacheSvc.get<DocumentObject[]>(cacheKey));
                                 },
                                 (reason) => {
-                                    reject(reason)
+                                    reject(reason);
                                 }
                             )
                             .finally(() => {
-                                this._removeInProgress(inProgKey)
-                            })
+                                this._removeInProgress(inProgKey);
+                            });
                     }
                 })
-            )
+            );
         }
-        return this._getInProgress(inProgKey) as VePromise<DocumentObject[], GenericResponse<DocumentObject>>
+        return this._getInProgress(inProgKey) as VePromise<DocumentObject[], GenericResponse<DocumentObject>>;
     }
 
     /**
@@ -1191,35 +1191,35 @@ export class ViewService extends BaseApiService {
         weight: number,
         refresh?: boolean
     ): VePromise<DocumentObject> {
-        const cacheKey = this.elementSvc.getRequestKey(reqOb, reqOb.elementId)
-        const inProgKey = cacheKey.join('-')
+        const cacheKey = this.elementSvc.getRequestKey(reqOb, reqOb.elementId);
+        const inProgKey = cacheKey.join('-');
         if (!this._isInProgress(inProgKey)) {
             this._addInProgress(
                 inProgKey,
                 new this.$q<DocumentObject>((resolve, reject) => {
-                    const cached = this.cacheSvc.get<DocumentObject>(cacheKey)
+                    const cached = this.cacheSvc.get<DocumentObject>(cacheKey);
                     if (cached && !refresh) {
-                        resolve(cached)
-                        this._removeInProgress(inProgKey)
+                        resolve(cached);
+                        this._removeInProgress(inProgKey);
                     }
                     this.getProjectDocuments(reqOb, weight, refresh)
                         .then(
                             (result: DocumentObject[]) => {
                                 const documentOb = result.filter((resultOb) => {
-                                    return resultOb.id === reqOb.elementId
-                                })[0]
-                                this.cacheSvc.put(cacheKey, documentOb, true)
-                                resolve(this.cacheSvc.get<DocumentObject>(cacheKey))
+                                    return resultOb.id === reqOb.elementId;
+                                })[0];
+                                this.cacheSvc.put(cacheKey, documentOb, true);
+                                resolve(this.cacheSvc.get<DocumentObject>(cacheKey));
                             },
                             (reason) => {
-                                reject({ message: reason.message, status: reason.status })
+                                reject({ message: reason.message, status: reason.status });
                             }
                         )
-                        .finally(() => this._removeInProgress(inProgKey))
+                        .finally(() => this._removeInProgress(inProgKey));
                 })
-            )
+            );
         }
-        return this._getInProgress(inProgKey) as VePromise<DocumentObject>
+        return this._getInProgress(inProgKey) as VePromise<DocumentObject>;
     }
 
     /**
@@ -1233,31 +1233,31 @@ export class ViewService extends BaseApiService {
     public getPresentationInstanceObject = (
         instanceSpec: InstanceSpecObject
     ): PresentationInstanceObject | InstanceSpecObject => {
-        const instanceSpecSpec: ValueObject = instanceSpec.specification
+        const instanceSpecSpec: ValueObject = instanceSpec.specification;
         if (!instanceSpecSpec) {
             return {
                 type: 'Paragraph',
                 sourceType: 'text',
                 text: '',
-            }
+            };
         }
-        const type = instanceSpecSpec.type
+        const type = instanceSpecSpec.type;
 
         if (type === 'LiteralString') {
             // If it is an Opaque List, Paragraph, Table, Image, List:
-            const jsonString = (instanceSpecSpec as LiteralObject<string>).value
-            return JSON.parse(jsonString) as PresentationInstanceObject
+            const jsonString = (instanceSpecSpec as LiteralObject<string>).value;
+            return JSON.parse(jsonString) as PresentationInstanceObject;
         } else if (type === 'Expression') {
             // If it is a Opaque Section, or a Expression:
             // If it is a Opaque Section then we want the instanceSpec:
             if (this.isSection(instanceSpec)) {
-                return instanceSpec
+                return instanceSpec;
             } else {
                 //??
-                return instanceSpecSpec
+                return instanceSpecSpec;
             }
         }
-    }
+    };
 
     /**
      * @name ViewService#getElementReferenceTree
@@ -1283,11 +1283,11 @@ export class ViewService extends BaseApiService {
         contents: ExpressionObject<InstanceValueObject>,
         weight?: number
     ): VePromise<PresentationReference[], GenericResponse<PresentationReference>> {
-        const promises: VePromise<PresentationReference, BasicResponse<PresentationReference>>[] = []
+        const promises: VePromise<PresentationReference, BasicResponse<PresentationReference>>[] = [];
         for (let i = 0; i < contents.operand.length; i++) {
-            promises.push(this.getElementReference(reqOb, contents.operand[i], weight))
+            promises.push(this.getElementReference(reqOb, contents.operand[i], weight));
         }
-        return this.$q.all(promises)
+        return this.$q.all(promises);
     }
 
     public getElementReference(
@@ -1301,37 +1301,37 @@ export class ViewService extends BaseApiService {
                 sectionElements: [],
                 instanceVal: instanceVal,
                 isOpaque: false,
-            }
+            };
 
-            const req = _.cloneDeep(reqOb)
-            req.elementId = instanceVal.instanceId
+            const req = _.cloneDeep(reqOb);
+            req.elementId = instanceVal.instanceId;
             this.elementSvc.getElement<ViewInstanceSpec>(req, weight).then(
                 (instanceSpecification) => {
-                    presentationRef.instanceSpecification = instanceSpecification
+                    presentationRef.instanceSpecification = instanceSpecification;
                     presentationRef.isOpaque =
                         instanceSpecification.classifierIds &&
                         instanceSpecification.classifierIds.length > 0 &&
                         this.schemaSvc
                             .getMap<string[]>('OPAQUE_CLASSIFIERS', this.schema)
-                            .indexOf(instanceSpecification.classifierIds[0]) >= 0
-                    presentationRef.presentationElement = this.getPresentationInstanceObject(instanceSpecification)
+                            .indexOf(instanceSpecification.classifierIds[0]) >= 0;
+                    presentationRef.presentationElement = this.getPresentationInstanceObject(instanceSpecification);
                     if (this.isSection(instanceSpecification)) {
                         this.getElementReferenceTree(req, instanceSpecification.specification).then(
                             (sectionElementReferenceTree) => {
-                                presentationRef.sectionElements = sectionElementReferenceTree
-                                resolve(presentationRef)
+                                presentationRef.sectionElements = sectionElementReferenceTree;
+                                resolve(presentationRef);
                             },
                             (reason) => {
-                                reject(reason)
+                                reject(reason);
                             }
-                        )
-                    } else resolve(presentationRef)
+                        );
+                    } else resolve(presentationRef);
                 },
                 (reason) => {
-                    reject({ status: reason.status, message: reason.message })
+                    reject({ status: reason.status, message: reason.message });
                 }
-            )
-        })
+            );
+        });
     }
 
     /**
@@ -1349,8 +1349,8 @@ export class ViewService extends BaseApiService {
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Section', this.schema, instanceSpec.id) ||
                 instanceSpec.classifierIds[0] ===
                     this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'SectionT', this.schema, instanceSpec.id))
-        )
-    }
+        );
+    };
 
     public isTable = (instanceSpec: InstanceSpecObject): boolean => {
         return (
@@ -1360,8 +1360,8 @@ export class ViewService extends BaseApiService {
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Table', this.schema, instanceSpec.id) ||
                 instanceSpec.classifierIds[0] ===
                     this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'TableT', this.schema, instanceSpec.id))
-        )
-    }
+        );
+    };
 
     public isFigure = (instanceSpec: InstanceSpecObject): boolean => {
         return (
@@ -1375,8 +1375,8 @@ export class ViewService extends BaseApiService {
                     this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Figure', this.schema, instanceSpec.id) ||
                 instanceSpec.classifierIds[0] ===
                     this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'FigureT', this.schema, instanceSpec.id))
-        )
-    }
+        );
+    };
 
     public isEquation = (instanceSpec: InstanceSpecObject): boolean => {
         return (
@@ -1384,27 +1384,27 @@ export class ViewService extends BaseApiService {
             instanceSpec.classifierIds.length > 0 &&
             instanceSpec.classifierIds[0] ===
                 this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Equation', this.schema, instanceSpec.id)
-        )
-    }
+        );
+    };
 
     public getTreeType = (instanceSpec: ViewInstanceSpec): string => {
-        if (this.isSection(instanceSpec)) return 'section'
+        if (this.isSection(instanceSpec)) return 'section';
         if (
             instanceSpec.specification &&
             instanceSpec.specification.value &&
             typeof instanceSpec.specification.value === 'string' &&
             (JSON.parse(instanceSpec.specification.value) as PresentationInstanceObject).excludeFromList
         ) {
-            return 'none'
+            return 'none';
         }
-        if (this.isTable(instanceSpec)) return 'table'
-        if (this.isFigure(instanceSpec)) return 'figure'
-        if (this.isEquation(instanceSpec)) return 'equation'
-        let result = 'none'
+        if (this.isTable(instanceSpec)) return 'table';
+        if (this.isFigure(instanceSpec)) return 'figure';
+        if (this.isEquation(instanceSpec)) return 'equation';
+        let result = 'none';
         if (instanceSpec.classifierIds && instanceSpec.classifierIds.length > 0) {
             const peSids = this.schemaSvc.getSchema<{
-                [peType: string]: string
-            }>('TYPE_TO_CLASSIFIER_ID', this.schema)
+                [peType: string]: string;
+            }>('TYPE_TO_CLASSIFIER_ID', this.schema);
 
             for (const peType of Object.keys(peSids)) {
                 if (
@@ -1412,43 +1412,43 @@ export class ViewService extends BaseApiService {
                     instanceSpec.classifierIds.length > 0 &&
                     instanceSpec.classifierIds.includes(peSids[peType])
                 ) {
-                    result = peType.toLowerCase()
-                    break
+                    result = peType.toLowerCase();
+                    break;
                 }
             }
         }
 
-        return result
-    }
+        return result;
+    };
 
     public processSlotStrings(values: LiteralObject<unknown>[]): string[] {
-        const res: string[] = []
+        const res: string[] = [];
         if (!values || values.length === 0) {
-            return res
+            return res;
         }
         values.forEach((value) => {
-            if (value.type !== 'LiteralString' || !value.value) return
-            res.push(value.value as string)
-        })
-        return res
+            if (value.type !== 'LiteralString' || !value.value) return;
+            res.push(value.value as string);
+        });
+        return res;
     }
 
     public processSlotIntegers(values: LiteralObject<unknown>[]): number[] {
-        const res: number[] = []
+        const res: number[] = [];
         if (!values || values.length === 0) {
-            return res
+            return res;
         }
         values.forEach((value) => {
             if (Number.isInteger(value.value)) {
-                res.push(value.value as number)
+                res.push(value.value as number);
             } else if (typeof value.value === 'string') {
-                const val = parseInt(value.value)
+                const val = parseInt(value.value);
                 if (!isNaN(val)) {
-                    res.push(val)
+                    res.push(val);
                 }
             }
-        })
-        return res
+        });
+        return res;
     }
 
     /**
@@ -1465,7 +1465,7 @@ export class ViewService extends BaseApiService {
             const metadata: DocumentMetadata = {
                 numberingDepth: 0,
                 numberingSeparator: '.',
-            }
+            };
             const elementIds = [
                 `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'Header', this.schema)}`, //header
                 `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'Footer', this.schema)}`, //footer
@@ -1475,51 +1475,51 @@ export class ViewService extends BaseApiService {
                     this.schema
                 )}`, //numbering depth
                 `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'NumSep', this.schema)}`, //numbering separator
-            ]
+            ];
             const metaReqOb: ElementsRequest<string[]> = Object.assign(reqOb, {
                 elementId: elementIds,
-            })
+            });
             this.elementSvc
                 .getElements<SlotObject>(metaReqOb, weight)
                 .then(
                     (data) => {
                         if (data.length === 0) {
-                            return
+                            return;
                         }
                         for (let i = 0; i < data.length; i++) {
-                            const prop = data[i]
-                            const feature: string = prop.definingFeatureId ? prop.definingFeatureId : null
-                            const value: LiteralObject<unknown>[] = prop.value ? prop.value : null
+                            const prop = data[i];
+                            const feature: string = prop.definingFeatureId ? prop.definingFeatureId : null;
+                            const value: LiteralObject<unknown>[] = prop.value ? prop.value : null;
                             if (!feature || !value || !Array.isArray(value)) {
-                                continue
+                                continue;
                             }
-                            let result: string[] | number[] = []
+                            let result: string[] | number[] = [];
                             if (feature === this.schemaSvc.getValue('DOCUMENT_IDS', 'Header', this.schema, prop.id)) {
                                 //header
-                                result = this.processSlotStrings(value)
-                                metadata.top = result.length > 0 ? result[0] : ''
-                                metadata['top-left'] = result.length > 1 ? result[1] : ''
-                                metadata['top-right'] = result.length > 2 ? result[2] : ''
+                                result = this.processSlotStrings(value);
+                                metadata.top = result.length > 0 ? result[0] : '';
+                                metadata['top-left'] = result.length > 1 ? result[1] : '';
+                                metadata['top-right'] = result.length > 2 ? result[2] : '';
                             } else if (
                                 feature == this.schemaSvc.getValue('DOCUMENT_IDS', 'Footer', this.schema, prop.id)
                             ) {
                                 //footer
-                                result = this.processSlotStrings(value)
-                                metadata.bottom = result.length > 0 ? result[0] : ''
-                                metadata['bottom-left'] = result.length > 1 ? result[1] : ''
-                                metadata['bottom-right'] = result.length > 2 ? result[2] : ''
+                                result = this.processSlotStrings(value);
+                                metadata.bottom = result.length > 0 ? result[0] : '';
+                                metadata['bottom-left'] = result.length > 1 ? result[1] : '';
+                                metadata['bottom-right'] = result.length > 2 ? result[2] : '';
                             } else if (
                                 feature == this.schemaSvc.getValue('DOCUMENT_IDS', 'NumDepth', this.schema, prop.id)
                             ) {
                                 //depth
-                                result = this.processSlotIntegers(value)
-                                metadata.numberingDepth = result.length > 0 ? result[0] : 0
+                                result = this.processSlotIntegers(value);
+                                metadata.numberingDepth = result.length > 0 ? result[0] : 0;
                             } else if (
                                 feature == this.schemaSvc.getValue('DOCUMENT_IDS', 'NumSep', this.schema, prop.id)
                             ) {
                                 //separator
-                                result = this.processSlotStrings(value)
-                                metadata.numberingSeparator = result.length > 0 ? result[0] : '.'
+                                result = this.processSlotStrings(value);
+                                metadata.numberingSeparator = result.length > 0 ? result[0] : '.';
                             }
                         }
                     },
@@ -1528,63 +1528,63 @@ export class ViewService extends BaseApiService {
                     }
                 )
                 .finally(() => {
-                    resolve(metadata)
-                })
-        })
+                    resolve(metadata);
+                });
+        });
     }
 
     public getPresentationElementType = (instanceSpec: ViewInstanceSpec): string => {
         if (instanceSpec.type === 'InstanceSpecification') {
             if (this.isSection(instanceSpec)) {
-                return 'Section'
+                return 'Section';
             } else if (this.isTable(instanceSpec)) {
-                return 'Table'
+                return 'Table';
             } else if (this.isFigure(instanceSpec)) {
-                return 'Image'
+                return 'Image';
             } else if (this.isEquation(instanceSpec)) {
-                return 'Equation'
+                return 'Equation';
             } else if (instanceSpec.specification && instanceSpec.specification.value) {
                 return (
                     JSON.parse(
                         (instanceSpec.specification as LiteralObject<string>).value
                     ) as PresentationInstanceObject
-                ).type
+                ).type;
             }
         }
-        return
-    }
+        return;
+    };
 
     public isGroup(ob: InstanceSpecObject | GroupObject): boolean {
-        if (ob._isGroup) return (ob as GroupObject)._isGroup
+        if (ob._isGroup) return (ob as GroupObject)._isGroup;
         else {
             return (
                 ob.appliedStereotypeIds !== undefined &&
                 ob.appliedStereotypeIds.length > 0 &&
                 ob.appliedStereotypeIds[0] === this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)
-            )
+            );
         }
     }
 
     public getElementType = (element: ElementObject): string => {
         // Get Type
-        let elementType = ''
+        let elementType = '';
         if (this.apiSvc.isRequirement(element)) {
-            elementType = 'Requirement'
+            elementType = 'Requirement';
         } else if (this.apiSvc.isDocument(element)) {
-            elementType = 'Document'
+            elementType = 'Document';
         } else if (this.apiSvc.isView(element)) {
-            elementType = 'View'
+            elementType = 'View';
         } else if (this.isGroup(element)) {
-            elementType = 'Group'
+            elementType = 'Group';
         } else {
-            elementType = this.getPresentationElementType(element)
+            elementType = this.getPresentationElementType(element);
         }
-        return elementType
-    }
+        return elementType;
+    };
 
     public reset = (): void => {
-        this.inProgress = {}
-    }
+        this.inProgress = {};
+    };
 }
 
-veUtils.service('ViewService', ViewService)
+veUtils.service('ViewService', ViewService);

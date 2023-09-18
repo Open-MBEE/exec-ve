@@ -1,5 +1,5 @@
 /**
- * Plugin for inserting cross reference elements into the CKEditor editing area.
+ * Plugin for inserting cross-reference elements into the CKEditor editing area.
  */
 
 // Register the plugin within the editor.
@@ -28,7 +28,7 @@ CKEDITOR.plugins.add('mmscf', {
             upcast: (element) => {
                 // Return "true" (that element needs to converted to a mmscf widget)
                 // for all <mms-transclude-doc> elements.
-                return element.name === 'mms-cf'
+                return element.name === 'mms-cf' && element.attributes['mms-cf-type'] !== 'com'
             },
         })
     },

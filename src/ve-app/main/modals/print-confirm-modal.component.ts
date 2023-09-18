@@ -1,40 +1,40 @@
-import angular from 'angular'
-import _ from 'lodash'
+import angular from 'angular';
+import _ from 'lodash';
 
-import { AppUtilsService, DocumentStructure } from '@ve-app/main/services'
-import { UtilsService } from '@ve-utils/application'
-import { EditService } from '@ve-utils/core'
-import { ElementService, ViewService, DocumentMetadata, ProjectService } from '@ve-utils/mms-api-client'
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+import { AppUtilsService, DocumentStructure } from '@ve-app/main/services';
+import { UtilsService } from '@ve-utils/application';
+import { EditService } from '@ve-utils/core';
+import { ElementService, ViewService, DocumentMetadata, ProjectService } from '@ve-utils/mms-api-client';
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
-import { veApp } from '@ve-app'
+import { veApp } from '@ve-app';
 
-import { VePromise } from '@ve-types/angular'
-import { CommitObject, CommitResponse, RefObject, ViewObject } from '@ve-types/mms'
-import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
+import { VePromise } from '@ve-types/angular';
+import { CommitObject, CommitResponse, RefObject, ViewObject } from '@ve-types/mms';
+import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
 
 interface PrintModalResolve extends VeModalResolve {
-    print: JQLite
-    refOb: RefObject
-    viewOrDocOb: ViewObject
-    isDoc: boolean
-    mode: number
+    print: JQLite;
+    refOb: RefObject;
+    viewOrDocOb: ViewObject;
+    isDoc: boolean;
+    mode: number;
 }
 
 export interface PrintModalResolveFn extends VeModalResolveFn {
-    print(): JQLite
-    refOb(): RefObject
-    viewOrDocOb(): ViewObject
-    isDoc(): boolean
-    mode(): number
+    print(): JQLite;
+    refOb(): RefObject;
+    viewOrDocOb(): ViewObject;
+    isDoc(): boolean;
+    mode(): number;
 }
 
 export interface PrintConfirmResult {
-    status: string
-    customization?: boolean
-    meta?: DocumentMetadata
-    model?: { genTotf: boolean; landscape: boolean; htmlTotf: boolean }
-    customCSS?: string
+    status: string;
+    customization?: boolean;
+    meta?: DocumentMetadata;
+    model?: { genTotf: boolean; landscape: boolean; htmlTotf: boolean };
+    customCSS?: string;
 }
 
 class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResult> implements VeModalController {
@@ -48,29 +48,29 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
         'ElementService',
         'ProjectService',
         'AppUtilsService',
-    ]
+    ];
 
-    protected resolve: PrintModalResolve
+    protected resolve: PrintModalResolve;
 
-    private refOb: RefObject
-    type: string
-    mode: number
-    action: string
-    viewOrDocOb: ViewObject
-    printElement: JQLite
-    label: string
-    meta: DocumentMetadata
+    private refOb: RefObject;
+    type: string;
+    mode: number;
+    action: string;
+    viewOrDocOb: ViewObject;
+    printElement: JQLite;
+    label: string;
+    meta: DocumentMetadata;
     customizeDoc: {
-        useCustomStyle: boolean
-        customCSS: string
-    }
-    hasError: boolean
-    isDoc: boolean
-    elementSaving: boolean
-    unsaved: boolean
-    docOption: boolean
-    model: { genTotf: boolean; landscape: boolean; htmlTotf: boolean }
-    previewResult: DocumentStructure
+        useCustomStyle: boolean;
+        customCSS: string;
+    };
+    hasError: boolean;
+    isDoc: boolean;
+    elementSaving: boolean;
+    unsaved: boolean;
+    docOption: boolean;
+    model: { genTotf: boolean; landscape: boolean; htmlTotf: boolean };
+    previewResult: DocumentStructure;
 
     constructor(
         private $filter: angular.IFilterService,
@@ -83,36 +83,36 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
         private projectSvc: ProjectService,
         private appUtilsSvc: AppUtilsService
     ) {
-        super()
+        super();
     }
 
     $onInit(): void {
-        this.refOb = this.resolve.refOb
-        this.isDoc = this.resolve.isDoc
-        this.type = this.isDoc ? 'DOCUMENT' : 'VIEW'
-        this.mode = this.resolve.mode
-        this.viewOrDocOb = this.resolve.viewOrDocOb
-        this.printElement = this.resolve.print
-        this.action = this.mode === 1 ? 'print' : this.mode === 3 ? 'Generate PDF' : 'Generate word'
-        this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : ''
-        this.customizeDoc = { useCustomStyle: false, customCSS: '' }
+        this.refOb = this.resolve.refOb;
+        this.isDoc = this.resolve.isDoc;
+        this.type = this.isDoc ? 'DOCUMENT' : 'VIEW';
+        this.mode = this.resolve.mode;
+        this.viewOrDocOb = this.resolve.viewOrDocOb;
+        this.printElement = this.resolve.print;
+        this.action = this.mode === 1 ? 'print' : this.mode === 3 ? 'Generate PDF' : 'Generate word';
+        this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : '';
+        this.customizeDoc = { useCustomStyle: false, customCSS: '' };
 
         if (this.printElement.find('.ve-error').length > 0) {
-            this.hasError = true
+            this.hasError = true;
         }
 
         if (this.isDoc) {
             // If _printCss, use to set doc css for export/print
-            this.customizeDoc.useCustomStyle = false
+            this.customizeDoc.useCustomStyle = false;
             if (this.viewOrDocOb._printCss) {
                 // If _printCss, show tab for custom css
-                this.customizeDoc.useCustomStyle = true
-                this.customizeDoc.customCSS = this.viewOrDocOb._printCss
+                this.customizeDoc.useCustomStyle = true;
+                this.customizeDoc.customCSS = this.viewOrDocOb._printCss;
             } else {
                 this.customizeDoc.customCSS = this.utilsSvc.getPrintCss(false, false, {
                     numberingDepth: 0,
                     numberingSeparator: '.',
-                })
+                });
             }
 
             // Get/Set document header/footer for PDF generation
@@ -125,7 +125,7 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
                 'bottom-left': 'loading...',
                 bottom: 'loading...',
                 'bottom-right': 'loading...',
-            }
+            };
             this.viewSvc
                 .getDocumentMetadata(
                     {
@@ -137,33 +137,33 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
                 )
                 .then(
                     (metadata: DocumentMetadata) => {
-                        let displayTime = 'latest'
-                        let promise: VePromise<CommitObject | CommitObject[], CommitResponse>
+                        let displayTime = 'latest';
+                        let promise: VePromise<CommitObject | CommitObject[], CommitResponse>;
                         if (this.refOb.parentCommitId) {
                             promise = this.projectSvc.getCommit(
                                 this.refOb._projectId,
                                 this.refOb.id,
                                 this.refOb.parentCommitId
-                            )
+                            );
                         } else {
-                            promise = this.projectSvc.getCommits(this.refOb.id, this.refOb._projectId, null, 1)
+                            promise = this.projectSvc.getCommits(this.refOb.id, this.refOb._projectId, null, 1);
                         }
 
                         promise
                             .then(
                                 (result) => {
-                                    let commit: CommitObject
+                                    let commit: CommitObject;
                                     if (Array.isArray(result)) {
-                                        commit = result[0]
+                                        commit = result[0];
                                     } else {
-                                        commit = result
+                                        commit = result;
                                     }
-                                    displayTime = this.$filter('date')(commit._created, 'M/d/yy h:mm a')
+                                    displayTime = this.$filter('date')(commit._created, 'M/d/yy h:mm a');
                                 },
                                 (reason) => {
                                     this.growl.error(
                                         'Warning: RefOb parent commit does not exist; Defaulting to current time'
-                                    )
+                                    );
                                 }
                             )
                             .finally(() => {
@@ -176,16 +176,16 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
                                     'top-right': '',
                                     'bottom-left': '',
                                     'bottom-right': 'counter(page)',
-                                }
-                                this.meta = Object.assign(metadata, defaultMetadata)
+                                };
+                                this.meta = Object.assign(metadata, defaultMetadata);
                                 if (this.refOb && this.refOb.type === 'Tag') {
-                                    this.meta['top-right'] = this.meta['top-right'] + ' ' + this.refOb.name
+                                    this.meta['top-right'] = this.meta['top-right'] + ' ' + this.refOb.name;
                                 }
                                 if (displayTime === 'latest') {
-                                    displayTime = this.$filter('date')(new Date(), 'M/d/yy h:mm a')
+                                    displayTime = this.$filter('date')(new Date(), 'M/d/yy h:mm a');
                                 }
-                                this.meta['top-right'] = this.meta['top-right'] + ' ' + displayTime
-                            })
+                                this.meta['top-right'] = this.meta['top-right'] + ' ' + displayTime;
+                            });
                     },
                     (reason) => {
                         this.meta['top-left'] =
@@ -193,64 +193,64 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
                             this.meta['top-right'] =
                             this.meta['bottom-left'] =
                             this.meta.bottom =
-                                ''
-                        this.meta['bottom-right'] = 'counter(page)'
+                                '';
+                        this.meta['bottom-right'] = 'counter(page)';
                     }
-                )
+                );
         }
-        this.unsaved = this.autosaveSvc.getAll() && !_.isEmpty(this.autosaveSvc.getAll())
-        this.docOption = !this.isDoc && (this.mode === 3 || this.mode === 2)
-        this.model = { genTotf: false, landscape: false, htmlTotf: false }
+        this.unsaved = this.autosaveSvc.getAll() && !_.isEmpty(this.autosaveSvc.getAll());
+        this.docOption = !this.isDoc && (this.mode === 3 || this.mode === 2);
+        this.model = { genTotf: false, landscape: false, htmlTotf: false };
     }
 
     public saveStyleUpdate(): void {
         // To only update _printCss, create new ob with doc info
-        this.elementSaving = true
+        this.elementSaving = true;
         const docOb = {
             id: this.viewOrDocOb.id,
             _projectId: this.viewOrDocOb._projectId,
             _refId: this.viewOrDocOb._refId,
             _printCss: this.customizeDoc.customCSS,
-        }
+        };
         this.elementSvc.updateElement(docOb).then(
             () => {
-                this.elementSaving = false
-                this.growl.success('Save Successful')
+                this.elementSaving = false;
+                this.growl.success('Save Successful');
             },
             () => {
-                this.elementSaving = false
-                this.growl.warning('Save was not complete. Please try again.')
+                this.elementSaving = false;
+                this.growl.warning('Save was not complete. Please try again.');
             }
-        )
+        );
     }
     public preview(): void {
         if (!this.previewResult) {
-            this.previewResult = this.appUtilsSvc.printOrGenerate(this.viewOrDocOb, 3, true, true, false)
-            this.previewResult.tof = this.previewResult.tof + this.previewResult.toe
+            this.previewResult = this.appUtilsSvc.printOrGenerate(this.viewOrDocOb, 3, true, true, false);
+            this.previewResult.tof = this.previewResult.tof + this.previewResult.toe;
         }
-        const result = this.previewResult
+        const result = this.previewResult;
         const htmlArr = [
             '<html><head><title>' + this.viewOrDocOb.name + '</title><style type="text/css">',
             this.customizeDoc.customCSS,
             '</style></head><body style="overflow: auto">',
             result.cover,
-        ]
-        if (result.toc != '') htmlArr.push(result.toc)
-        if (result.tot != '' && this.model.genTotf) htmlArr.push(result.tot)
-        if (result.tof != '' && this.model.genTotf) htmlArr.push(result.tof)
-        htmlArr.push(result.contents, '</body></html>')
-        const htmlString = htmlArr.join('')
+        ];
+        if (result.toc != '') htmlArr.push(result.toc);
+        if (result.tot != '' && this.model.genTotf) htmlArr.push(result.tot);
+        if (result.tof != '' && this.model.genTotf) htmlArr.push(result.tof);
+        htmlArr.push(result.contents, '</body></html>');
+        const htmlString = htmlArr.join('');
         const popupWin: Window | null = this.$window.open(
             'about:blank',
             '_blank',
             'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1'
-        )
+        );
         if (popupWin) {
-            popupWin.document.open()
-            popupWin.document.write(htmlString)
-            popupWin.document.close()
+            popupWin.document.open();
+            popupWin.document.write(htmlString);
+            popupWin.document.close();
         } else {
-            this.growl.error('Popup Window Failed to open. Allow popups and try again')
+            this.growl.error('Popup Window Failed to open. Allow popups and try again');
         }
     }
     public print(): void {
@@ -260,14 +260,14 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
             meta: this.meta,
             customization: this.customizeDoc.useCustomStyle,
             customCSS: this.customizeDoc.useCustomStyle ? this.customizeDoc.customCSS : null,
-        }
-        this.modalInstance.close(result)
+        };
+        this.modalInstance.close(result);
     }
     public fulldoc(): void {
-        this.modalInstance.close({ status: 'fulldoc' })
+        this.modalInstance.close({ status: 'fulldoc' });
     }
     public cancel(): void {
-        this.modalInstance.dismiss()
+        this.modalInstance.dismiss();
     }
 }
 
@@ -391,6 +391,6 @@ const PrintConfirmModalComponent: VeModalComponent = {
         resolve: '<',
     },
     controller: PrintConfirmModalController,
-}
+};
 
-veApp.component(PrintConfirmModalComponent.selector, PrintConfirmModalComponent)
+veApp.component(PrintConfirmModalComponent.selector, PrintConfirmModalComponent);

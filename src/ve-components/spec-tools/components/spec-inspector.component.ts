@@ -1,10 +1,10 @@
-import _ from 'lodash'
+import _ from 'lodash';
 
-import { ComponentService } from '@ve-components/services'
-import { SpecService, ISpecTool, SpecTool } from '@ve-components/spec-tools'
-import { ToolbarService } from '@ve-core/toolbar'
-import { ApplicationService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { ComponentService } from '@ve-components/services';
+import { SpecService, ISpecTool, SpecTool } from '@ve-components/spec-tools';
+import { ToolbarService } from '@ve-core/toolbar';
+import { ApplicationService } from '@ve-utils/application';
+import { EventService } from '@ve-utils/core';
 import {
     ProjectService,
     URLService,
@@ -12,11 +12,11 @@ import {
     PermissionsService,
     ElementService,
     ApiService,
-} from '@ve-utils/mms-api-client'
+} from '@ve-utils/mms-api-client';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular';
 
 /**
  * @ngdoc directive
@@ -87,7 +87,7 @@ import { VeComponentOptions, VeQService } from '@ve-types/angular'
  */
 
 class SpecInspectorController extends SpecTool implements ISpecTool {
-    static $inject = SpecTool.$inject
+    static $inject = SpecTool.$inject;
 
     constructor(
         $q: VeQService,
@@ -122,16 +122,16 @@ class SpecInspectorController extends SpecTool implements ISpecTool {
             eventSvc,
             specSvc,
             toolbarSvc
-        )
+        );
 
-        this.specType = _.kebabCase(SpecInspectorComponent.selector)
-        this.specTitle = 'Preview Element'
+        this.specType = _.kebabCase(SpecInspectorComponent.selector);
+        this.specTitle = 'Preview Element';
     }
 
     protected initCallback = (): void => {
-        this.specSvc.setEditing(false)
-        this.specSvc.toggleSave(this.toolbarId)
-    }
+        this.specSvc.setEditing(false);
+        this.specSvc.toggleSave(this.toolbarId);
+    };
 }
 
 const SpecInspectorComponent: VeComponentOptions = {
@@ -229,7 +229,7 @@ const SpecInspectorComponent: VeComponentOptions = {
             <h2 class="prop-title">Location</h2>
             <span class="prop">{{$ctrl.specApi.qualifiedName}}</span>
             <h2 class="prop-title">ID&nbsp;
-                <button ng-click="$ctrl.copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default" uib-tooltip="Copy ID">
+                <button id="spec-element-id-copy" ng-click="$ctrl.copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default" uib-tooltip="Copy ID">
                     <i class="fa fa-copy"></i>
                 </button>
             </h2>
@@ -262,6 +262,6 @@ const SpecInspectorComponent: VeComponentOptions = {
         mmsDisplayOldSpec: '<?',
     },
     controller: SpecInspectorController,
-}
+};
 
-veComponents.component(SpecInspectorComponent.selector, SpecInspectorComponent)
+veComponents.component(SpecInspectorComponent.selector, SpecInspectorComponent);

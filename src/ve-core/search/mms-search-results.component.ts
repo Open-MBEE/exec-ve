@@ -1,20 +1,20 @@
-import { IComponentController } from 'angular'
+import { IComponentController } from 'angular';
 
-import { SearchController } from '@ve-core/search'
+import { SearchController } from '@ve-core/search';
 
-import { veCore } from '@ve-core'
+import { veCore } from '@ve-core';
 
-import { VeComponentOptions } from '@ve-types/angular'
-import { ElementObject } from '@ve-types/mms'
+import { VeComponentOptions } from '@ve-types/angular';
+import { ElementObject } from '@ve-types/mms';
 
 export class MmsSearchResultsController implements IComponentController {
     //Parent Controllers
-    private $search: SearchController
+    private $search: SearchController;
 
     //Bindings
-    private elem: ElementObject
+    private elem: ElementObject;
 
-    $onChanges
+    $onChanges;
 }
 const MmsSearchResultsComponent: VeComponentOptions = {
     selector: 'mmsSearchResults',
@@ -88,11 +88,12 @@ const MmsSearchResultsComponent: VeComponentOptions = {
     <table>
         <tr ng-repeat="property in $ctrl.elem._properties | limitTo : limitForProps">
             <td>
-                {{property.name}}<span ng-if="property.type === 'Slot'"><transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" no-click="true"></transclude-name></span>: 
+                {{property.name}}<span ng-if="property.type === 'Slot'"><transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" no-click="true"></transclude-name></span>
+                                 <span ng-if="property.type.includes('TaggedValue')"><transclude-name mms-element-id="{{property.tagDefinitionId}}" mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" no-click="true"></transclude-name></span>: 
             </td>
             <td>
                 <a ng-click="$ctrl.$search.userResultClick(property, 'val')">{{property.defaultValue.value | limitTo:300}}
-                    <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value | limitTo:4">
+                    <span ng-if="property.type.includes('TaggedValue')" ng-repeat="val in property.value | limitTo:4">
                         <span ng-bind-html="val.value | limitTo:300"></span>
                         <span ng-bind-html="val.body[0] | limitTo:300"></span>
                         <span ng-if="!val.value && !val.body[0]">Default Value</span>
@@ -148,6 +149,6 @@ const MmsSearchResultsComponent: VeComponentOptions = {
 </div>
     `,
     controller: MmsSearchResultsController,
-}
+};
 
-veCore.component(MmsSearchResultsComponent.selector, MmsSearchResultsComponent)
+veCore.component(MmsSearchResultsComponent.selector, MmsSearchResultsComponent);

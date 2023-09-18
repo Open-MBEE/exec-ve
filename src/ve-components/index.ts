@@ -9,30 +9,30 @@
 // import '@ve-core'
 
 //Module Main
-import './ve-components.module'
+import './ve-components.module';
 
-import './services'
+import './services';
 
-import './components'
+import './components';
 
 // Extensions
-import './trees'
-import './diffs'
-import './presentations'
-import './transclusions'
-import './spec-tools'
-import './insertions'
+import './trees';
+import './diffs';
+import './presentations';
+import './transclusions';
+import './spec-tools';
+import './insertions';
 
-export * from './ve-components.module'
+export * from './ve-components.module';
 
-import '../ve-extensions'
-import { ElementObject } from '@ve-types/mms'
+import '../ve-extensions';
+import { ElementObject } from '@ve-types/mms';
 
-export default 've-components'
+export default 've-components';
 
 export interface PropertySpec {
-    options?: ElementObject[]
-    isEnumeration?: boolean
-    isSlot?: boolean
-    isTaggedValue?: boolean
+    options?: ElementObject[];
+    isEnumeration?: boolean;
+    isSlot?: boolean;
+    isTaggedValue?: boolean;
 }

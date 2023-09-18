@@ -1,28 +1,28 @@
-import { Insertion, InsertionService } from '@ve-components/insertions'
-import { EditorService } from '@ve-core/editor'
-import { SearchFilter } from '@ve-core/search/mms-search.component'
-import { ApplicationService, UtilsService } from '@ve-utils/application'
-import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
+import { Insertion, InsertionService } from '@ve-components/insertions';
+import { EditorService } from '@ve-core/editor';
+import { SearchFilter } from '@ve-core/search/mms-search.component';
+import { ApplicationService, UtilsService } from '@ve-utils/application';
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
+import { SchemaService } from '@ve-utils/model-schema';
 
-import { veComponents } from '@ve-components'
+import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { InsertData } from '@ve-types/components'
-import { ViewObject } from '@ve-types/mms'
-import { TreeBranch } from '@ve-types/tree'
-import { VeModalService } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
+import { InsertData } from '@ve-types/components';
+import { ViewObject } from '@ve-types/mms';
+import { TreeBranch } from '@ve-types/tree';
+import { VeModalService } from '@ve-types/view-editor';
 
 export interface InsertViewData extends InsertData {
-    parentBranch: TreeBranch
-    seenViewIds: { [viewId: string]: TreeBranch }
-    newViewAggr?: 'composite' | 'shared'
+    parentBranch: TreeBranch;
+    seenViewIds: { [viewId: string]: TreeBranch };
+    newViewAggr?: 'composite' | 'shared';
 }
 
 class InsertViewController extends Insertion<InsertViewData> {
-    private aggr: 'composite' | 'shared' = 'composite'
+    private aggr: 'composite' | 'shared' = 'composite';
 
-    static $inject = Insertion.$inject
+    static $inject = Insertion.$inject;
 
     constructor(
         $scope: angular.IScope,
@@ -57,32 +57,32 @@ class InsertViewController extends Insertion<InsertViewData> {
             apiSvc,
             utils,
             editorSvc
-        )
+        );
     }
 
     public $onInit(): void {
-        super.$onInit()
+        super.$onInit();
         if (this.insertData.newViewAggr) {
-            this.aggr = this.insertData.newViewAggr
+            this.aggr = this.insertData.newViewAggr;
         }
         if (this.insertData.parentBranch) {
-            this.parentData = this.insertData.parentBranch.data
+            this.parentData = this.insertData.parentBranch.data;
         }
     }
 
     public insert = (data: ViewObject): VePromise<ViewObject> => {
-        const deferred = this.$q.defer<ViewObject>()
-        const view = data
-        const viewId = view.id
+        const deferred = this.$q.defer<ViewObject>();
+        const view = data;
+        const viewId = view.id;
         if (this.insertData.seenViewIds[viewId]) {
-            this.growl.error('Error: View ' + view.name + ' is already in this document.')
-            return
+            this.growl.error('Error: View ' + view.name + ' is already in this document.');
+            return;
         }
         if (this.oking) {
-            this.growl.info('Please wait...')
-            return
+            this.growl.info('Please wait...');
+            return;
         }
-        this.oking = true
+        this.oking = true;
         this.viewSvc
             .addViewToParentView({
                 parentViewId: this.parentData.id,
@@ -106,34 +106,34 @@ class InsertViewController extends Insertion<InsertViewData> {
                         )
                         .then(
                             (realView) => {
-                                deferred.resolve(realView)
+                                deferred.resolve(realView);
                             },
                             (reason) => {
-                                reason.data.elements = [view]
-                                deferred.reject(reason)
+                                reason.data.elements = [view];
+                                deferred.reject(reason);
                             }
-                        )
+                        );
                 },
                 (reason) => {
-                    this.growl.error(`View Add Error: ${reason.message}`)
+                    this.growl.error(`View Add Error: ${reason.message}`);
                 }
-            )
-        return deferred.promise
-    }
+            );
+        return deferred.promise;
+    };
 
     public last = (): void => {
-        this.growl.success('View Added')
-    }
+        this.growl.success('View Added');
+    };
 
     public queryFilter = (): SearchFilter => {
-        const filters: SearchFilter = {}
+        const filters: SearchFilter = {};
         filters.appliedStereotypeIds = [
             this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
             this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
             ...this.schemaSvc.getSchema<string[]>('OTHER_VIEW_SID', this.schema),
-        ]
-        return filters
-    }
+        ];
+        return filters;
+    };
 
     public create = (): VePromise<ViewObject> => {
         if (this.type === 'Document') {
@@ -151,7 +151,7 @@ class InsertViewController extends Insertion<InsertViewData> {
                     _refId: this.refId,
                     type: 'Class',
                 }
-            )
+            );
         } else if (this.type === 'View') {
             return this.viewSvc.createView(this.parentData, {
                 id: this.apiSvc.createUniqueId(),
@@ -159,20 +159,20 @@ class InsertViewController extends Insertion<InsertViewData> {
                 _projectId: this.projectId,
                 _refId: this.refId,
                 type: 'Class',
-            })
+            });
         } else if (this.type === 'Group') {
             return this.viewSvc.createGroup(this.createItem.name, {
                 _projectId: this.projectId,
                 _refId: this.refId,
                 id: this.ownerId,
-            })
+            });
         } else {
             return this.$q.reject({
                 status: 666,
                 message: 'Unsupported View Type',
-            })
+            });
         }
-    }
+    };
 }
 
 const InsertViewComponent: VeComponentOptions = {
@@ -232,8 +232,8 @@ const InsertViewComponent: VeComponentOptions = {
         mmsOrgId: '@',
     },
     controller: InsertViewController,
-}
+};
 
-veComponents.component(InsertViewComponent.selector, InsertViewComponent)
-veComponents.component('addGroup', InsertViewComponent)
-veComponents.component('addDocument', InsertViewComponent)
+veComponents.component(InsertViewComponent.selector, InsertViewComponent);
+veComponents.component('addGroup', InsertViewComponent);
+veComponents.component('addDocument', InsertViewComponent);
