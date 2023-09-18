@@ -1,0 +1,130 @@
+/* VE base styles */
+@use "src/styles/globals";
+
+/* ------------------------------------------------------------------
+[VE Table Filter Table of Contents]
+
+1. Top Level Buttons
+2. Filter
+  2.1 Layout
+  2.2 Buttons
+  2.3 Input
+  2.4 Status text
+
+------------------------------------------------------------------- */
+
+.ve-table-filter {
+  /* ------------------------------------------------------------------
+1. Top Level Buttons
+------------------------------------------------------------------- */
+  .export-csv-button.btn,
+  .filter-table-button.btn,
+  .reset-sort-button.btn,
+  .table-button {
+    margin: 30px 0 6px;
+    font-weight: 500;
+  }
+
+  /* ------------------------------------------------------------------
+2. Filter
+------------------------------------------------------------------- */
+
+  /* ------------------------------------------------------------------
+  2.1 Layout
+------------------------------------------------------------------- */
+  .ve-show-filter {
+    margin: 12px 0 4px;
+    min-width: 730px;
+  }
+
+  /* ------------------------------------------------------------------
+  2.2 Buttons
+------------------------------------------------------------------- */
+  .ve-apply-filter {
+    display: inline;
+    height: 36px;
+    padding: 0 6px;
+    margin: 0 6px;
+    box-sizing: border-box;
+    vertical-align: bottom;
+  }
+
+  .ve-reset-search {
+    background-color: globals.$ve-clear;
+    color: globals.$ve-silver-darker-1;
+    font-size: 1.2em;
+    margin-left: -1.2em;
+    padding: 0;
+    position: absolute;
+    border: 0;
+    margin-top: 0.18em;
+  }
+
+  .ve-reset-search:hover {
+    color: globals.$ve-silver-darker-2;
+  }
+
+  /* ------------------------------------------------------------------
+  2.3 Input
+------------------------------------------------------------------- */
+  .ve-filter-table-form {
+    input {
+      border-radius: 3px;
+      border: 1px solid globals.$ve-silver-darker-2;
+      height: 36px;
+      padding: 0 6px;
+      display: inline;
+      box-sizing: border-box;
+    }
+  }
+
+  /* ------------------------------------------------------------------
+  2.4 Status text
+------------------------------------------------------------------- */
+  .ve-filter-status {
+    display: block;
+    margin: 10px 0;
+    color: globals.$ve-light-text;
+  }
+}
+
+input[type="checkbox"].fixed-header-checkbox {
+  margin: 3px 0 0;
+}
+
+input[type="text"].column-input {
+  margin: 0;
+  padding: 0;
+}
+
+.table-fix-head,
+.table-fix-column {
+  table {
+    border-collapse: separate;
+
+    // https://stackoverflow.com/questions/49209548/why-css-transform-translate-leaves-border-of-table-row-where-it-was
+  }
+
+  thead,
+  th {
+    background-color: globals.$ve-silver-lighter-1;
+  }
+
+  tbody,
+  td,
+  caption {
+    background-color: globals.$white;
+  }
+}
+
+.table-fix-head {
+  overflow-y: auto;
+}
+
+.table-fix-column {
+  overflow-x: auto;
+
+  td.table-fixed-cell {
+    background-color: globals.$ve-silver-lighter-1;
+  }
+}

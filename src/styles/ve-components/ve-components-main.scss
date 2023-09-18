@@ -1,0 +1,24 @@
+/*************************
+  Main combinator file for MMS
+  stylesheets. Comforms to the
+  MMS app design guide
+*************************/
+
+/* Tom Sawyer Perspectives View customizations */
+@use "components/mms-tsp-view";
+
+/* Other customizations */
+@use "components/mms-add-pe-button";
+@use "components/mms-buttons";
+@use "components/mms-tree";
+@use "components/transclude";
+@use "components/ve-toolbar";
+@use "components/spec";
+@use "components/mms-view";
+@use "components/mms-search";
+@use "components/mms-editor";
+@use "components/mms-misc-components";
+@use "components/mms-autocomplete-modal";
+@use "components/mms-history";
+@use "components/mms-jobs";
+@use "components/mms-mention";

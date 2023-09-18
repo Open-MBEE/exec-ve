@@ -1,0 +1,59 @@
+@use "../bootstrap-variables" as bootstrap;
+@use "./mixins/vendor-prefixes" as vendor;
+@use "./mixins/clearfix";
+
+// Pager pagination
+// --------------------------------------------------
+
+.pager {
+  padding-left: 0;
+  margin: bootstrap.$line-height-computed 0;
+  list-style: none;
+  text-align: center;
+
+  @include clearfix.clearfix;
+
+  li {
+    display: inline;
+
+    > a,
+    > span {
+      display: inline-block;
+      padding: 5px 14px;
+      background-color: bootstrap.$pager-bg;
+      border: 1px solid bootstrap.$pager-border;
+      border-radius: bootstrap.$pager-border-radius;
+    }
+
+    > a:hover,
+    > a:focus {
+      text-decoration: none;
+      background-color: bootstrap.$pager-hover-bg;
+    }
+  }
+
+  .next {
+    > a,
+    > span {
+      float: right;
+    }
+  }
+
+  .previous {
+    > a,
+    > span {
+      float: left;
+    }
+  }
+
+  .disabled {
+    > a,
+    > a:hover,
+    > a:focus,
+    > span {
+      color: bootstrap.$pager-disabled-color;
+      background-color: bootstrap.$pager-bg;
+      cursor: bootstrap.$cursor-disabled;
+    }
+  }
+}

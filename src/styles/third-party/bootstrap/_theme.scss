@@ -1,0 +1,306 @@
+@use "sass:color";
+@use "../bootstrap-variables" as bootstrap;
+@use "./mixins/vendor-prefixes" as vendor;
+@use "./mixins/reset-filter";
+@use "./mixins/gradients";
+
+/*!
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ */
+
+// Load core variables and mixins
+// --------------------------------------------------
+
+@use "variables";
+@use "mixins";
+
+// Buttons
+// --------------------------------------------------
+
+// Common styles
+.btn-default,
+.btn-primary,
+.btn-success,
+.btn-info,
+.btn-warning,
+.btn-danger {
+  text-shadow: 0 -1px 0 rgb(0 0 0 / 20%);
+
+  $shadow: inset 0 1px 0 rgb(255 255 255 / 15%), 0 1px 1px rgb(0 0 0 / 7.5%);
+
+  @include vendor.box-shadow($shadow);
+
+  // Reset the shadow
+  &:active,
+  &.active {
+    @include vendor.box-shadow(inset 0 3px 5px rgba(0,0,0,0.125));
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    @include vendor.box-shadow(none);
+  }
+
+  .badge {
+    text-shadow: none;
+  }
+}
+
+// Mixin for generating new styles
+@mixin btn-styles($btn-color: #555) {
+  @include gradients.gradient-vertical($start-color: $btn-color, $end-color: darken($btn-color, 12%));
+  @include reset-filter.reset-filter; // Disable gradients for IE9 because filter bleeds through rounded corners see https://github.com/twbs/bootstrap/issues/10620
+
+  background-repeat: repeat-x;
+  border-color: color.scale($btn-color, $lightness: -14%);
+
+  &:hover,
+  &:focus {
+    background-color: color.scale($btn-color, $lightness: -12%);
+    background-position: 0 -15px;
+  }
+
+  &:active,
+  &.active {
+    background-color: color.scale($btn-color, $lightness: -12%);
+    border-color: color.scale($btn-color, $lightness: -14%);
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &.focus,
+    &:active,
+    &.active {
+      background-color: color.scale($btn-color, $lightness: -12%);
+      background-image: none;
+    }
+  }
+}
+
+// Common styles
+.btn {
+  // Remove the gradient for the pressed/active state
+  &:active,
+  &.active {
+    background-image: none;
+  }
+}
+
+// Apply the mixin to the buttons
+.btn-default {
+  @include btn-styles($btn-default-bg);
+
+  text-shadow: 0 1px 0 #fff;
+  border-color: #ccc;
+}
+.btn-primary { @include btn-styles($btn-primary-bg); }
+.btn-success { @include btn-styles($btn-success-bg); }
+.btn-info { @include btn-styles($btn-info-bg); }
+.btn-warning { @include btn-styles($btn-warning-bg); }
+.btn-danger { @include btn-styles($btn-danger-bg); }
+
+// Images
+// --------------------------------------------------
+
+.thumbnail,
+.img-thumbnail {
+  @include vendor.box-shadow(0 1px 2px rgba(0,0,0,0.075));
+}
+
+// Dropdowns
+// --------------------------------------------------
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  @include gradients.gradient-vertical($start-color: bootstrap.$dropdown-link-hover-bg, $end-color: darken(bootstrap.$dropdown-link-hover-bg, 5%));
+
+  background-color: color.scale(bootstrap.$dropdown-link-hover-bg, $lightness: -5%);
+}
+
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+  @include gradients.gradient-vertical($start-color: bootstrap.$dropdown-link-active-bg, $end-color: darken(bootstrap.$dropdown-link-active-bg, 5%));
+
+  background-color: color.scale(bootstrap.$dropdown-link-active-bg, $lightness: -5%);
+}
+
+// Navbar
+// --------------------------------------------------
+
+// Default navbar
+.navbar-default {
+  @include gradients.gradient-vertical($start-color: lighten(bootstrap.$navbar-default-bg, 10%), $end-color: bootstrap.$navbar-default-bg);
+  @include reset-filter.reset-filter;
+
+  border-radius: bootstrap.$navbar-border-radius;
+
+  $shadow: inset 0 1px 0 rgb(255 255 255 / 15%), 0 1px 5px rgb(0 0 0 / 7.5%);
+
+  @include vendor.box-shadow($shadow);
+
+  .navbar-nav > .open > a,
+  .navbar-nav > .active > a {
+    @include gradients.gradient-vertical($start-color: darken(bootstrap.$navbar-default-link-active-bg, 5%), $end-color: darken(bootstrap.$navbar-default-link-active-bg, 2%));
+    @include vendor.box-shadow(inset 0 3px 9px rgba(0,0,0,0.075));
+  }
+}
+
+.navbar-brand,
+.navbar-nav > li > a {
+  text-shadow: 0 1px 0 rgb(255 255 255 / 25%);
+}
+
+// Inverted navbar
+.navbar-inverse {
+  @include gradients.gradient-vertical($start-color: lighten(bootstrap.$navbar-inverse-bg, 10%), $end-color: bootstrap.$navbar-inverse-bg);
+  @include reset-filter.reset-filter; // Remove gradient in IE<10 to fix bug where dropdowns don't get triggered see https://github.com/twbs/issues/10257
+
+  border-radius: bootstrap.$navbar-border-radius;
+
+  .navbar-nav > .open > a,
+  .navbar-nav > .active > a {
+    @include gradients.gradient-vertical($start-color: bootstrap.$navbar-inverse-link-active-bg, $end-color: color.scale(bootstrap.$navbar-inverse-link-active-bg, $lightness: 2.5%));
+    @include vendor.box-shadow(inset 0 3px 9px rgba(0,0,0,0.25));
+  }
+
+  .navbar-brand,
+  .navbar-nav > li > a {
+    text-shadow: 0 -1px 0 rgb(0 0 0 / 25%);
+  }
+}
+
+// Undo rounded corners in static and fixed navbars
+.navbar-static-top,
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+  border-radius: 0;
+}
+
+// Fix active state of dropdown items in collapsed mode
+@media (max-width: bootstrap.$grid-float-breakpoint-max) {
+  .navbar .navbar-nav .open .dropdown-menu > .active > a {
+    &,
+    &:hover,
+    &:focus {
+      color: #fff;
+
+      @include gradients.gradient-vertical($start-color: bootstrap.$dropdown-link-active-bg, $end-color: darken(bootstrap.$dropdown-link-active-bg, 5%));
+    }
+  }
+}
+
+// Alerts
+// --------------------------------------------------
+
+// Common styles
+.alert {
+  text-shadow: 0 1px 0 rgb(255 255 255 / 20%);
+
+  $shadow: inset 0 1px 0 rgb(255 255 255 / 25%), 0 1px 2px rgb(0 0 0 / 5%);
+
+  @include vendor.box-shadow($shadow);
+}
+
+// Mixin for generating new styles
+@mixin alert-styles($color) {
+  @include gradients.gradient-vertical($start-color: $color, $end-color: color.scale($color, $lightness: -7.5%));
+
+  border-color: color.scale($color, $lightness: -15%);
+}
+
+// Apply the mixin to the alerts
+.alert-success { @include alert-styles(bootstrap.$alert-success-bg); }
+.alert-info { @include alert-styles(bootstrap.$alert-info-bg); }
+.alert-warning { @include alert-styles(bootstrap.$alert-warning-bg); }
+.alert-danger { @include alert-styles(bootstrap.$alert-danger-bg); }
+
+// Progress bars
+// --------------------------------------------------
+
+// Give the progress background some depth
+.progress {
+  @include gradient-vertical($start-color: color.scale(bootstrap.$progress-bg, $lightness: -4%), $end-color: bootstrap.$progress-bg);
+}
+
+// Mixin for generating new styles
+@mixin progress-bar-styles($color) {
+  @include gradients.gradient-vertical($start-color: $color, $end-color: darken($color, 10%));
+}
+
+// Apply the mixin to the progress bars
+.progress-bar { @include progress-bar-styles(bootstrap.$progress-bar-bg); }
+.progress-bar-success { @include progress-bar-styles(bootstrap.$progress-bar-success-bg); }
+.progress-bar-info { @include progress-bar-styles(bootstrap.$progress-bar-info-bg); }
+.progress-bar-warning { @include progress-bar-styles(bootstrap.$progress-bar-warning-bg); }
+.progress-bar-danger { @include progress-bar-styles(bootstrap.$progress-bar-danger-bg); }
+
+// Reset the striped class because our mixins don't do multiple gradients and
+// the above custom styles override the new `.progress-bar-striped` in v3.2.0.
+.progress-bar-striped {
+  @include gradients.gradient-striped;
+}
+
+// List groups
+// --------------------------------------------------
+
+.list-group {
+  border-radius: bootstrap.$border-radius-base;
+
+  @include vendor.box-shadow(0 1px 2px rgba(0,0,0,0.075));
+}
+
+.list-group-item.active,
+.list-group-item.active:hover,
+.list-group-item.active:focus {
+  text-shadow: 0 -1px 0 color.scale(bootstrap.$list-group-active-bg, $lightness: -10%);
+
+  @include gradients.gradient-vertical($start-color: bootstrap.$list-group-active-bg, $end-color: color.scale(bootstrap.$list-group-active-bg, $lightness: -7.5%));
+
+  border-color: color.scale(bootstrap.$list-group-active-border, $lightness: -7.5%);
+
+  .badge {
+    text-shadow: none;
+  }
+}
+
+// Panels
+// --------------------------------------------------
+
+// Common styles
+.panel {
+  @include vendor.box-shadow(0 1px 2px rgba(0,0,0,0.05));
+}
+
+// Mixin for generating new styles
+@mixin panel-heading-styles($color) {
+  @include gradients.gradient-vertical($start-color: $color, $end-color: darken($color, 5%));
+}
+
+// Apply the mixin to the panel headings only
+.panel-default > .panel-heading { @include panel-heading-styles(bootstrap.$panel-default-heading-bg); }
+.panel-primary > .panel-heading { @include panel-heading-styles(bootstrap.$panel-primary-heading-bg); }
+.panel-success > .panel-heading { @include panel-heading-styles(bootstrap.$panel-success-heading-bg); }
+.panel-info > .panel-heading { @include panel-heading-styles(bootstrap.$panel-info-heading-bg); }
+.panel-warning > .panel-heading { @include panel-heading-styles(bootstrap.$panel-warning-heading-bg); }
+.panel-danger > .panel-heading { @include panel-heading-styles(bootstrap.$panel-danger-heading-bg); }
+
+// Wells
+// --------------------------------------------------
+
+.well {
+  @include gradients.gradient-vertical($start-color: darken(bootstrap.$well-bg, 5%), $end-color: bootstrap.$well-bg);
+
+  border-color: color.scale(bootstrap.$well-bg, $lightness: -10%);
+
+  $shadow: inset 0 1px 3px rgb(0 0 0 / 5%), 0 1px 0 rgb(255 255 255 / 10%);
+
+  @include vendor.box-shadow($shadow);
+}

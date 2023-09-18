@@ -7,11 +7,12 @@ build
 dist
 deploy
 docs
-app/bower_components
-app/bower_components_target
+/app/*
 .sass-cache
 .idea
 PhantomJS_*
 Chrome_*
 test-results/
 angular-mms-grunt-servers.json
+venv
+.vscode

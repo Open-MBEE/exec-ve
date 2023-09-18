@@ -1,0 +1,130 @@
+@use "../bootstrap-variables" as bootstrap;
+@use "./mixins/vendor-prefixes" as vendor;
+@use "./mixins/opacity";
+@use "./mixins/reset-text";
+
+// Tooltips
+// --------------------------------------------------
+
+// Base class
+.tooltip {
+  position: absolute;
+  z-index: bootstrap.$zindex-tooltip;
+  display: block;
+
+  // Our parent element can be arbitrary since tooltips are by default inserted as a sibling of their target element.
+  // So reset our font and text properties to avoid inheriting weird values.
+  @include reset-text.reset-text;
+
+  font-size: bootstrap.$font-size-small;
+
+  @include opacity.opacity(0);
+
+  &.in { @include opacity.opacity(bootstrap.$tooltip-opacity); }
+
+  &.top {
+    margin-top: -3px;
+    padding: bootstrap.$tooltip-arrow-width 0;
+  }
+
+  &.right {
+    margin-left: 3px;
+    padding: 0 bootstrap.$tooltip-arrow-width;
+  }
+
+  &.bottom {
+    margin-top: 3px;
+    padding: bootstrap.$tooltip-arrow-width 0;
+  }
+
+  &.left {
+    margin-left: -3px;
+    padding: 0 bootstrap.$tooltip-arrow-width;
+  }
+}
+
+// Wrapper for the tooltip content
+.tooltip-inner {
+  max-width: bootstrap.$tooltip-max-width;
+  padding: 3px 8px;
+  color: bootstrap.$tooltip-color;
+  text-align: center;
+  background-color: bootstrap.$tooltip-bg;
+  border-radius: bootstrap.$border-radius-base;
+}
+
+// Arrows
+.tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+
+// Note: Deprecated .top-left, .top-right, .bottom-left, and .bottom-right as of v3.3.1
+.tooltip {
+  &.top .tooltip-arrow {
+    bottom: 0;
+    left: 50%;
+    margin-left: - bootstrap.$tooltip-arrow-width;
+    border-width: bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width 0;
+    border-top-color: bootstrap.$tooltip-arrow-color;
+  }
+
+  &.top-left .tooltip-arrow {
+    bottom: 0;
+    right: bootstrap.$tooltip-arrow-width;
+    margin-bottom: - bootstrap.$tooltip-arrow-width;
+    border-width: bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width 0;
+    border-top-color: bootstrap.$tooltip-arrow-color;
+  }
+
+  &.top-right .tooltip-arrow {
+    bottom: 0;
+    left: bootstrap.$tooltip-arrow-width;
+    margin-bottom: - bootstrap.$tooltip-arrow-width;
+    border-width: bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width 0;
+    border-top-color: bootstrap.$tooltip-arrow-color;
+  }
+
+  &.right .tooltip-arrow {
+    top: 50%;
+    left: 0;
+    margin-top: - bootstrap.$tooltip-arrow-width;
+    border-width: bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width 0;
+    border-right-color: bootstrap.$tooltip-arrow-color;
+  }
+
+  &.left .tooltip-arrow {
+    top: 50%;
+    right: 0;
+    margin-top: - bootstrap.$tooltip-arrow-width;
+    border-width: bootstrap.$tooltip-arrow-width 0 bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width;
+    border-left-color: bootstrap.$tooltip-arrow-color;
+  }
+
+  &.bottom .tooltip-arrow {
+    top: 0;
+    left: 50%;
+    margin-left: - bootstrap.$tooltip-arrow-width;
+    border-width: 0 bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width;
+    border-bottom-color: bootstrap.$tooltip-arrow-color;
+  }
+
+  &.bottom-left .tooltip-arrow {
+    top: 0;
+    right: bootstrap.$tooltip-arrow-width;
+    margin-top: - bootstrap.$tooltip-arrow-width;
+    border-width: 0 bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width;
+    border-bottom-color: bootstrap.$tooltip-arrow-color;
+  }
+
+  &.bottom-right .tooltip-arrow {
+    top: 0;
+    left: bootstrap.$tooltip-arrow-width;
+    margin-top: - bootstrap.$tooltip-arrow-width;
+    border-width: 0 bootstrap.$tooltip-arrow-width bootstrap.$tooltip-arrow-width;
+    border-bottom-color: bootstrap.$tooltip-arrow-color;
+  }
+}

@@ -1,0 +1,17 @@
+@use "sass:color";
+@use "../../bootstrap-variables" as bootstrap;
+
+// Alerts
+
+@mixin alert-variant($background, $border, $text-color) {
+  background-color: $background;
+  border-color: $border;
+  color: $text-color;
+
+  hr {
+    border-top-color: color.scale($border, $lightness: -5%);
+  }
+  .alert-link {
+    color: color.scale($text-color, $lightness: -10%);
+  }
+}

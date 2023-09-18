@@ -1,0 +1,18 @@
+/* VE base styles */
+@use "src/styles/globals";
+
+footer.footer {
+  width: 100%;
+  height: 13px;
+  border-top: 1px solid globals.$tertiary-grey;
+  font-size: 9px;
+  font-weight: globals.$default-font-weight;
+  color: rgb(64 64 64 / 70%);
+  position: absolute;
+  background-color: globals.$ve-silver-lighter-1;
+  text-align: center;
+  z-index: 10;
+  cursor: default;
+  bottom: 0;
+  padding-top: 1px;
+}

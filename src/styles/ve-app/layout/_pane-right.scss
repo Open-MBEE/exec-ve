@@ -1,0 +1,141 @@
+/* VE base styles */
+@use "src/styles/globals";
+
+/*************************
+  Styles for the View Editor right pane
+*************************/
+#spec-element-id-copy {
+  padding: 2px;
+}
+.pane-right {
+  > .pane-right {
+    @include globals.box-shadow(-1px 0 1px 0 rgba(0, 0, 0, 0.2));
+  }
+
+  &.ng-pane-orientation-horizontal {
+    .ng-pane-handle > .ng-pane-toggle {
+      @include globals.box-shadow(-2px 0 2px 0 rgba(100, 100, 100, 0.2));
+
+      margin-left: 1px;
+    }
+  }
+
+  .container-tags {
+    .tags-table {
+      font-size: 14px;
+      margin-top: 24px;
+      width: 100%;
+    }
+  }
+
+  h4.right-pane-title {
+    display: block;
+    margin: 20px 0;
+  }
+
+  .container-fluid {
+    padding: 0 14px 34px;
+  }
+
+  hr.right-title-divider {
+    margin-left: -18px;
+    margin-right: -18px;
+    border-color: globals.$ve-silver-darker-2;
+  }
+}
+
+.diff-pane-right {
+  > .pane-right {
+    @include globals.box-shadow(-1px 0 1px 0 rgba(0, 0, 0, 0.2));
+
+    z-index: 1;
+  }
+
+  &.ng-pane-orientation-horizontal {
+    .ng-pane-handle > .ng-pane-toggle {
+      @include globals.box-shadow(-2px 0 2px 0 rgba(100, 100, 100, 0.2));
+
+      margin-left: 1px;
+    }
+  }
+
+  ul.abn-tree {
+    cursor: default;
+
+    .shaft,
+    .shaft-hidden:hover {
+      background: inherit;
+
+      i {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+diff-html {
+  [class*="patcher-"] {
+    position: relative;
+  }
+
+  [class*="patcher-"]:not(td, tr) {
+    display: inline-block;
+  }
+
+  .patcher-text-insertion,
+  .patcher-text-deletion {
+    display: inline !important;
+  }
+
+  [class*="patcher-"]:not(.patcher-text-diff)::before {
+    position: absolute;
+    z-index: 1;
+    top: -8px;
+    right: -8px;
+    content: " ";
+    background-size: 16px;
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
+  }
+
+  /* Green background to additions */
+  .patcher-replace-in,
+  .patcher-attribute-replace-in,
+  .patcher-insert,
+  .patcher-text-insertion {
+    background-color: #dafde0;
+  }
+
+  /* Plus sign and green border to non textual changes */
+  .patcher-replace-in,
+  .patcher-attribute-replace-in,
+  .patcher-insert {
+    &::before {
+      background-image: url("../../../assets/insert.svg");
+    }
+
+    border: 2px dashed #abffb9;
+  }
+
+  /* Strikethrough and red background to deletions */
+  .patcher-replace-out,
+  .patcher-delete,
+  .patcher-attribute-replace-out,
+  .patcher-text-deletion {
+    background-color: #ffe3e3;
+    text-decoration: rgb(255 0 0 / 40%) line-through; /* Ignored in CSS1/CSS2 UAs */
+    text-decoration: rgb(255 0 0 / 40%) line-through; /* Ignored in CSS1/CSS2 UAs */
+  }
+
+  /* Delete icon and dotted red border to non textual deletions */
+  .patcher-replace-out,
+  .patcher-delete,
+  .patcher-attribute-replace-out {
+    &::before {
+      background-image: url("../../../assets/delete.svg");
+    }
+
+    border: 2px dashed #ffb6b6;
+  }
+}

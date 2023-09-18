@@ -1,0 +1,36 @@
+{
+  "apiUrl": "http://localhost:8080",
+  "printUrl": "http://localhost:8081/convert",
+  "basePath": "",
+  "enableDebug": false,
+  "customLabels": {
+    "pi": "PROPRIETARY: Proprietary Information",
+    "export_ctrl": "EXPORT WARNING: No export controlled documents allowed on this server",
+    "no_public_release": "Not for Public Release or Redistribution",
+    "unclassified": "CLASSIFICATION: This system is UNCLASSIFIED"
+  },
+  "loginBanner": {
+    "labels": [["unclassified"], ["pi"], ["no_public_release"]],
+    "separator": " ",
+    "background": "#0D47A1",
+    "color": "#e8e8e8"
+  },
+  "loginWarning": {
+    "message": [
+      "By accessing and using this information system, you acknowledge and consent to the following: If you are not authorized to access this system, disconnect now. Users of this system have no expectation, of privacy. By continuing, you consent to your keystrokes and data content being monitored."
+    ]
+  },
+  "banner": {
+    "labels": ["pi"]
+  },
+  "footer": {
+    "labels": ["opensource"]
+  },
+  "loginTimout": 600000,
+  "experimental": [
+    {
+      "id": "experimental-magic",
+      "name": "Content Magic"
+    }
+  ]
+}

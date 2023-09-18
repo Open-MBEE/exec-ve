@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "lib": ["es6", "dom", "ES2017.object", "ES2016.Array.Include", "es2018.promise"],
+    "mapRoot": "./",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "../dist/out-tsc",
+    "sourceMap": true,
+    "target": "es2017",
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/type-fest/index.d.ts",
+      "node_modules/flatpickr/dist/typings.d.ts"
+    ],
+    "rootDir": "src",
+    "paths": {
+      "@ve-components": ["ve-components"],
+      "@ve-components/*": ["ve-components/*"],
+      "@ve-core": ["ve-core"],
+      "@ve-core/*": ["ve-core/*"],
+      "@ve-utils": ["ve-utils"],
+      "@ve-utils/*": ["ve-utils/*"],
+      "@ve-app": ["ve-app"],
+      "@ve-app/*": ["ve-app/*"],
+      "@ve-types/*": ["ve-types/*"]
+    },
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "src/lib/ckeditor/ckeditor4.js",
+    "src/lib/html-rendered-diff/index.js",
+    "./webpack.config.ts",
+    "./webpack.dev.config.ts",
+    "types/**/*.ts"
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "module": "CommonJS",
+      "target": "es5",
+      "rootDir": "."
+    },
+    "include": [
+      "webpack.config.ts",
+      "webpack.dev.config.ts"
+    ]
+  }
+}

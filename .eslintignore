@@ -1,0 +1,3 @@
+src/lib/**/*.js
+src/ve-extensions/present-plots/*
+src/ve-extensions/ts-diagram/*
