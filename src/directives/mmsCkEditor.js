@@ -340,7 +340,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         };
         
         // Formatting editor toolbar
-        var stylesToolbar = { name: 'styles', items : ['Format','FontSize','TextColor','BGColor' ] };
+        var stylesToolbar = { name: 'styles', items : ['Styles',/*'Format',*/'FontSize','TextColor','BGColor'] };
         var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat'] };
         var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
         var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };

@@ -39,6 +39,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
     var emptyRegex = /^\s*$/;
+    var spacePeriod = />(?:\s|&nbsp;)\./g;
+    var spaceSpace = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g;
+    var spaceComma = />(?:\s|&nbsp;),/g;
 
     var mmsTranscludeCtrl = function ($scope, $rootScope) {
 
@@ -119,6 +122,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     domElement[0].innerHTML = '<span class="no-print placeholder">(no value)</span>';
                     return;
                 }
+                toCompile = toCompile.replace(spacePeriod, '>.');
+                toCompile = toCompile.replace(spaceSpace, '> ');
+                toCompile = toCompile.replace(spaceComma, '>,');
                 if (preview) {
                     domElement[0].innerHTML = '<div class="panel panel-info">'+toCompile+'</div>';
                 } else {

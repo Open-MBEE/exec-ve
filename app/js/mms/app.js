@@ -49,7 +49,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
 
     var mmsHost = window.location.protocol + '//' + window.location.host;
     URLServiceProvider.setMmsUrl(mmsHost);
-    //URLServiceProvider.setMmsUrl('https://opencae-uat.jpl.nasa.gov');
+    //URLServiceProvider.setMmsUrl('https://mms.openmbee.org');
 
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
