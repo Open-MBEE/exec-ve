@@ -1,0 +1,43 @@
+<div class="pane-right">
+    <div ng-if="documentOb">
+        <div class="container-fluid" ng-show="show.element">
+            <h4 ng-if="specApi.getEditing()" class="right-pane-title">Edit Element</h4>
+            <h4 ng-if="!specApi.getEditing()" class="right-pane-title">Preview Element</h4>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Edits ({{openEdits}}):</label>
+                    <div class="col-sm-9">
+                        <select class="form-control"
+                            ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in edits"
+                            ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <hr class="spec-title-divider">
+            <mms-spec mms-element-id="{{specInfo.id}}" mms-commit-id="{{specInfo.commitId}}"
+                mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}"
+                mms-display-old-content="specInfo.mmsDisplayOldContent" mms-spec-api="specApi"></mms-spec>
+        </div>
+    </div>
+
+    <div ng-if="documentOb">
+        <div class="container-fluid" ng-if="show.history">
+            <mms-history mms-element-id="{{specInfo.id}}" mms-ref-id="{{specInfo.refId}}"
+                mms-project-id="{{specInfo.projectId}}"></mms-history>
+        </div>
+    </div>
+
+    <div class="container-fluid container-tags" id="ve-branches-tags" ng-show="show.tags">
+        <h4 class="right-pane-title">Project Branches/Tags</h4>
+        <hr class="spec-title-divider">
+        <mms-ref-list mms-doc-id="{{documentOb.id}}" mms-project-id="{{projectOb.id}}"
+        mms-ref-id="{{refOb.id}}" mms-ref-type="{{refOb.type}}" mms-branches="branchObs" mms-tags="tagObs"></mms-ref-list>
+    </div>
+
+    <div class="container-fluid" ng-show="show.reorder">
+        <mms-view-reorder mms-element-id="{{viewOb.id}}" mms-project-id="{{viewOb._projectId}}"
+            mms-commit-id="{{viewCommitId}}" mms-order="true" mms-ref-id="{{viewOb._refId}}"
+            mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
+    </div>
+</div>

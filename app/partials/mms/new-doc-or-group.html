@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h4 class="item-type-{{itemType}}">Create new {{itemType | lowercase}}</h4>
+</div>
+
+<div class="modal-body comment-modal">
+
+    <div class="comment-modal-input">
+        <div class="form-group">
+            <label>Name:</label>
+            <input ng-if="itemType === 'Document'" class="form-control" ng-model="newDoc.name" type="text"
+                ng-keyup="$event.keyCode == 13 ? ok() : null" placeholder="Type a name for your document here" autofocus>
+            <input ng-if="itemType === 'Group'"class="form-control" ng-model="newGroup.name" type="text"
+                ng-keyup="$event.keyCode == 13 ? ok() : null" placeholder="Type a name for your group here" autofocus>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">Create <i ng-show="oking" class="fa fa-spin fa-spinner"></i>
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

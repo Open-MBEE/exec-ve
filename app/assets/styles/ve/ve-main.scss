@@ -1,0 +1,701 @@
+/*************************
+  Main combinator file for
+  View Editor stylesheets
+*************************/
+/* Variables & mixins */
+@import "base/_globals";
+@import "base/_ve-colors";
+/* Overall page design */
+@import "layout/_pane-left";
+@import "layout/_pane-center";
+@import "layout/_pane-right";
+@import "layout/_panes";
+@import "layout/_login-select";
+/* Layout directive customizations */
+@import "layout/_ve-nav";
+@import "layout/_ve-footer";
+@import "layout/_ve-no-panes";
+@import "layout/_ve-table-filter";
+@import "layout/_ve-tabs";
+@import "layout/ve-dropdowns";
+/* Third party customizations */
+@import "thirdparty/_autosave-plugin";
+
+.ng-hide {
+  display: none !important;
+}
+
+div.tooltip-inner {
+  white-space: normal;
+}
+
+.indent{
+  margin-left:24px;
+}
+
+@media print {
+  a[href]:after {
+    content: none !important;
+  }
+  img {
+    max-width: 100%;
+    page-break-inside: avoid;
+    page-break-before: auto;
+    page-break-after: auto;
+    display: block;
+  }
+  tr, td, th {
+    page-break-inside: avoid;
+  }
+  thead {
+    display: table-header-group;
+  }
+}
+
+
+/*------------------------------------------------------------------
+[Table of contents]
+
+1. Typography
+2. Global UI Elements
+  2.1 Button
+    2.1.1 Primary Button
+    2.1.2 Small Button
+  2.2 Dark Modal
+  2.4 Banners
+  2.5 Input
+    2.5.1 Light input
+    2.5.2 Minor dark input
+  2.6 Animation
+  2.7 Special Icons
+    2.7.1 Section
+3. Table filtering
+4. Modal fixes
+5. 404 bookmark
+6. Open document button
+7. Right pane
+8. Growl notification
+9. Well Customization
+10 Custom grid
+
+-------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------
+1. Typography
+-------------------------------------------------------------------*/
+
+#ve-login,
+#ve-origin-select,
+.ve-dark-modal,
+.ve-dark-dropdown-nav,
+.ve-dark-dropdown-menu {
+
+  color: white;
+  letter-spacing: .05em;
+
+  a,
+  a:hover,
+  a:visited {
+    text-decoration: none;
+    color: white;
+  }
+}
+
+.ve-secondary-text{
+  color: $ve-light-text;
+  font-size: .9em;
+}
+
+.ve-font-weight-normal{
+  font-weight: $default_font_weight;
+}
+
+.placeholder{
+  color: $ve-light-text;
+  font-style: italic; 
+  text-transform: lowercase; 
+}
+
+h4{
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/*------------------------------------------------------------------
+2. Global UI Elements
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+  2.1 Buttons
+-------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------
+    2.1.2 Small Button
+-------------------------------------------------------------------*/
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 11px;
+}
+
+.btn-copy {
+  background-color: transparent;
+  color: $ve-light-text-darker-1;
+  margin: 0 5px 5px 10px;
+  float: right;
+
+  &:hover {
+    color: $ve-silver-base;
+    background-color: $ve-teal-base;
+  }
+}
+
+
+/*------------------------------------------------------------------
+  2.2 Modals
+-------------------------------------------------------------------*/
+
+.ve-dark-modal {
+  background-color: $ve-slate-darker-2;
+
+  .modal-content {
+    background-color: $ve-slate-base;
+    border: none;
+    border-radius: 3px;
+  }
+
+  .modal-body {
+    padding: 16px 15px 30px;
+    overflow: visible;
+  }
+
+  .modal-title {
+    letter-spacing: 0.04em;
+    color: $ve-white-text-lighter-2;
+  }
+
+  /*Clearing bootstrap*/
+  .modal-header {
+    border-bottom: 1px solid $ve-slate-darker-1;
+  }
+
+  /*Clearing bootstrap*/
+  .modal-footer {
+    border-top: 1px solid $ve-slate-darker-1;
+  }
+}
+
+
+
+/*------------------------------------------------------------------
+  2.4 Banners
+-------------------------------------------------------------------*/
+
+.ve-notify-banner{
+  background-color: $ve-teal-lighter-4;
+  padding: 6px 10px;
+  border: 1px solid $ve-teal-lighter-3;
+  border-radius: 3px;
+  color: $ve-teal-base;
+  margin: 4px 10px 14px;
+}
+
+
+/*------------------------------------------------------------------
+  2.5 Input
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+    2.5.1 Light Input
+-------------------------------------------------------------------*/
+
+.ve-plain-input{
+  background-color: white;
+  padding: 2px 6px;
+  border: 1px solid $ve-silver-darker-2;
+  @include border-radius(3px);
+  margin: 2px 10px;
+  width: calc(100% - 20px);
+  font-weight: normal;
+
+  &:focus{
+    border-color: $ve-teal-lighter-2;
+    box-shadow: inset 0 1px 1px $ve-teal-lighter-3, 0 0 8px $ve-teal-lighter-3;
+  }
+}
+
+
+/*------------------------------------------------------------------
+    2.5.2 Minor dark input
+-------------------------------------------------------------------*/
+
+.ve-dark-minor-search input{
+  width: 100%;
+  border: 1px solid $ve-slate-darker-2;
+  @include border-radius(3px);
+  background-color: $ve-slate-darker-2;
+  padding: 3px 5px;
+  letter-spacing: .05em;
+
+  &:focus {
+    outline:none;
+    background-color: $ve-slate-darker-3;
+    border: 1px solid $ve-teal-base;
+  }
+}
+
+/*------------------------------------------------------------------
+  2.6 Animation
+-------------------------------------------------------------------*/
+
+// .fade-in-out.ng-hide-add,
+// .fade-in-out.ng-hide-remove {
+//   @include transition(all 0.2s linear);
+//   /* remember to add this */
+//   display: flex!important;
+//   opacity: 1;
+// }
+// .fade-in-out.ng-hide {
+//   opacity:0;
+// }
+
+// animate template - add class name to beginning
+// .ng-hide-add,
+// .ng-hide-remove {
+//   -webkit-transition:0.5s linear all;
+//   transition:0.5s linear all;
+
+//   /* remember to add this */
+//   display:block!important;
+//   opacity:1;
+// }
+// .ng-hide {
+//   opacity:0;
+// }
+
+/*------------------------------------------------------------------
+  2.7 Special Icons
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+    2.7.1 Section icon
+-------------------------------------------------------------------*/
+
+/*set pseudoclass and reset italic from <i>*/
+.section-icon::before{
+  content:"\00a7";
+  font-style: normal;
+  font-weight: bold;
+}
+
+/*display inline block to be same width in tree*/
+.section-icon{
+  display:inline-block;
+}
+
+i.section-icon{
+  line-height: 14px;
+}
+
+/*------------------------------------------------------------------
+    2.7.2 Ref icons
+-------------------------------------------------------------------*/
+
+/*add to branch labels*/
+.Branch-icon::before,
+.branch-icon::before{
+  content: "\f126";
+  font-family: FontAwesome;
+  color: $ve-silver-darker-3;
+  padding-right: 6px;
+  top: 1px;
+  position: relative;
+}
+
+/*add to tag labels*/
+.Tag-icon::before,
+.tag-icon::before{
+  content: "\f02b";
+  font-family: FontAwesome;
+  color: $ve-silver-darker-3;
+  padding-right: 6px;
+  top: 1px;
+  position: relative;
+}
+
+/*------------------------------------------------------------------
+3. Table Filtering & Sorting
+-------------------------------------------------------------------*/
+
+.tableSearch > span {
+  display: block;
+}
+
+table caption {
+  font-size: 20px;
+  text-align: left;
+  padding: 8px 0 14px;
+}
+
+.doc-table-header {
+  background-color:$ve-silver-lighter-1;
+}
+
+.filter-input {
+  margin: 0;
+  width: 100%
+}
+
+.sort-default {
+  color: $ve-silver-darker-3;
+  float: right;
+}
+
+.sort-activated {
+  color: $ve-slate-darker-2;
+  float: right;
+}
+
+.sort-default, .sort-activated {
+  margin: 5px;
+}
+
+.sort-default:hover,
+.sort-activated:hover {
+  cursor: pointer;
+}
+
+.export-csv-button::before {
+  content: "\f045";
+  font-family: FontAwesome;
+  padding: 4px 4px 4px 0;
+}
+
+.filter-table-button::before {
+  content: "\f0b0";
+  font-family: FontAwesome;
+  padding: 2px 4px;
+}
+
+.reset-sort-button::before {
+  content: "\f0e2";
+  font-family: FontAwesome;
+  padding: 2px 4px;
+}
+
+.reset-sort-fade.ng-hide {
+  opacity: 0;
+}
+
+.reset-sort-fade.ng-hide-remove,
+.reset-sort-fade.ng-hide-add {
+  display: inline-block !important;
+  transition: all linear 100ms;
+}
+
+.ve-filter-table-form .btn-sm {
+  margin: 0 4px;
+}
+
+/*------------------------------------------------------------------
+5. Modal Dialog
+-------------------------------------------------------------------*/
+
+.modal-dialog{
+  max-height: 90%;
+  position: relative;
+  overflow: auto;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.modal-content{
+  position: relative;
+  border-radius: 6px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.modal.autosave {
+ background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content.autosave {
+  width: 50%;
+  margin: auto;
+  top: 100px;
+}
+
+.modal-body{
+  .transclude-modal .transclude-modal-input {
+    width: 80%;
+    margin: 0 auto;
+  }
+}
+
+.modal-description{
+  margin-bottom:18px;
+}
+
+/*hack for overriding cut off content in dropdown modal*/
+.ve-dropdown-short-modal{
+  .modal-dialog,
+  .modal-content,
+  .modal-body{
+    overflow: visible;
+  }
+}
+
+.modal-header{
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  min-height: 52px;
+}
+
+.modal-body{
+  position: relative;
+  -webkit-box-ordinal-group: 2;
+  -webkit-order: 1;
+  order: 1;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.modal-footer{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-ordinal-group: 3;
+  -webkit-order: 2;
+  order: 2;
+  box-sizing: border-box;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 0;
+  padding-right: 8px;
+  padding-left: 16px;
+  min-height: 52px;
+  overflow: hidden;
+}
+
+/*------------------------------------------------------------------
+4. New Ref
+-------------------------------------------------------------------*/
+
+.ve-new-ref{
+
+  .commit-table{
+
+    width:calc(100% - 24px);
+    td{
+      padding:4px;
+      border:none;
+    }
+
+    tr{
+      border:1px solid #eaeaea;
+    }
+
+    tr:hover{
+      background-color:#fbfbfb;
+      font-weight:400;
+    }
+
+    tr:first-child{
+      border:none;
+      font-weight:600;
+    }
+  }
+
+  .timestamp-format{
+    margin-bottom: 10px;
+  }
+}
+
+/*------------------------------------------------------------------
+5. 404 Bookmark
+-------------------------------------------------------------------*/
+.account-wall-lg{
+  max-width:820px;
+  margin:100px auto;
+  padding:0 40px;
+
+  h1{
+    margin: 30px 0;
+    padding-bottom: 20px;
+    font-weight: 200;
+    font-size: 44px;
+  }
+
+  h4{
+    font-weight: 300;
+    font-size: 20px;
+    margin:20px 0;
+  }
+
+  .flex{
+    display: flex;
+  }
+
+  .two-thirds-flex{
+    flex:3;
+    padding:0 28px 0 0;
+  }
+  .one-third-flex{
+    flex:2;
+    padding:10px 0 0;
+  }
+}
+@media (max-width: 600px){
+  .account-wall-lg .flex{
+    flex-direction:column;
+  }
+}
+
+/*------------------------------------------------------------------
+6. Open document button styling
+-------------------------------------------------------------------*/
+
+.btn.open-document{
+  margin-left:10px;
+
+  a:visited,
+  a:hover,
+  a{
+    color:white;
+    text-decoration:none;
+  }
+}
+
+.btn.open-document::before{
+  content:"\f064";
+  font-family: FontAwesome;
+  padding-right:6px;
+}
+
+.docTitle-underlined{
+  text-decoration: underline;
+  text-decoration-color: rgb(72, 133, 189);
+}
+
+// Customize exertnal link for view open-document link
+h1 .open-document a.external-link {
+  padding-left: 0.3em;
+  font-size: 0.5em;
+}
+
+/*------------------------------------------------------------------
+7. Right pane
+-------------------------------------------------------------------*/
+
+.pane-right .container-fluid{
+  padding:0 18px 34px;
+}
+
+hr.spec-title-divider{
+  margin-left:-18px;
+  margin-right:-18px;
+  border-color:#ddd;
+}
+
+/*------------------------------------------------------------------
+7.1 Modal for revert history
+-------------------------------------------------------------------*/
+
+/* Special styling to preview element*/
+.element-preview-box{
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  background-color: $ve-silver-lighter-1;
+  border-radius: 3px;
+  border: 1px solid $ve-silver-darker-1;
+}
+
+/*Custom styling to keep labels inline with dropdowns*/
+span.inline-btn-label{
+  min-height: 28px;
+  margin: 6px 0;
+  padding: 7px 4px;
+  line-height: 13px;
+  color:$ve-light-text;
+}
+
+.fa-exclamation-triangle{
+  color: $ve-yellow-base;
+}
+
+
+/*------------------------------------------------------------------
+8. Growl notification
+-------------------------------------------------------------------*/
+.growl-container > .growl-item.ng-enter,
+.growl-container > .growl-item.ng-leave {
+  @include transition(all 0.1s linear);
+  // -webkit-transition:0.1s linear all;
+  // -moz-transition:0.1s linear all;
+  // -o-transition:0.1s linear all;
+  // transition:0.1s linear all;
+}
+
+/*------------------------------------------------------------------
+9. Well customization
+-------------------------------------------------------------------*/
+.well{
+  clear: both;
+  border: 1px solid $ve-silver-darker-1;
+  border-radius: 3px;
+  background-color: $ve-silver-lighter-1;
+  padding: 12px;
+  margin: 18px 0;
+
+  &.empty-state{
+    padding-top: 20px;
+    padding-bottom: 30px;
+  }
+}
+
+
+/*------------------------------------------------------------------
+10. Custom grids 
+-------------------------------------------------------------------*/
+
+//Grid with narrower gutter so input can be wider
+.row.narrow-gutter-row{
+  margin-left: -3px;
+  margin-right: -3px;
+
+  .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+    padding-right: 3px;
+    padding-left: 3px;
+  }
+  .ve-plain-input{
+    margin: 0;
+    width: 100%;
+  }
+}
+
+
+

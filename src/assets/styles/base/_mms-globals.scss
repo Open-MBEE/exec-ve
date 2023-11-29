@@ -1,0 +1,82 @@
+/*************************
+  Declarations
+*************************/
+
+$pane_center_text_width: 10in;
+@viewport {
+  width: device-width;
+}
+
+@include selection {
+  background-color: $light_blue !important;
+}
+
+$background_hover_transition: background-color .2s linear;
+
+a:hover {
+  cursor: pointer;
+}
+
+figure {
+  text-align: center;
+  display: inline-block;
+}
+
+figure > figcaption {
+  text-align: center;
+  display: block;
+}
+
+// Align image left
+.image-left {
+  margin-left: 0;
+}
+
+// Align image and figure right
+.image-right {
+  display: inline-block;
+  > img {
+    text-align: right;
+  }
+}
+
+img.image-right {
+  display: block;
+  margin-left: auto;
+}
+
+img.image-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+figure.image-right {
+  display: block;
+  max-width: $pane_center_text_width;
+  text-align: right;
+}
+
+// Center image and figure
+.image-center,
+figure.image-center {
+  text-align: center;
+  max-width: $pane_center_text_width;
+}
+
+table[align="right"] {
+  display: block;
+  float: none;
+  margin-left: auto;
+}
+
+table[align="left"] {
+  display: block;
+  float: none;
+}
+
+table[align="center"] {
+  display: block;
+  float: none;
+  margin: auto;
+}

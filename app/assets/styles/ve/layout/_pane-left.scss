@@ -1,0 +1,60 @@
+/*************************
+  Styles for the View Editor left pane
+*************************/
+
+$pane_left_btn_group_width: 244px;
+
+#main-pane {
+  > .west-tabs {
+    &.fa-pane-orientation-horizontal {
+      .fa-pane-handle > .fa-pane-toggle {
+        @include box-shadow(2px 0 2px 0px rgba(100, 100, 100, 0.2));
+      }
+    }
+
+    .west-tabs {
+      @include box-shadow(1px 0px 1px 0px rgba(0, 0, 0, 0.2));
+    }
+  }
+}
+
+.container-pane-left {
+  height: 100%;
+  width: 100%;
+  background: $ve-silver-lighter-1;
+
+  .pane-left {
+    width: 100%;
+    min-width: $pane_left_btn_group_width;
+
+    .pane-left-toolbar {
+      padding: 5px 4px;
+      background: $white;
+    }
+
+    .tree-options {
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      padding: 4px 5px;
+      background: $white;
+      border-top: 1px solid $ve-silver-darker-1;
+      border-bottom: 1px solid $ve-silver-darker-1;
+
+      .ve-plain-input{
+        margin: 0 2px;
+        border-color: $ve-silver-darker-1;
+      }
+
+      .btn-tools{
+        padding: 4px 6px;
+        background: transparent;
+      }
+    }
+    .fa-folder{
+      color: lighten($ve-accent, 12%);
+    }
+  }
+}

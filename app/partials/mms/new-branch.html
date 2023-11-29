@@ -1,0 +1,48 @@
+<div class="modal-header">
+    <h4 class="branch-icon">Create new branch from {{from}}</h4>
+</div>
+
+<div class="modal-body ve-new-ref">
+    <p class="modal-description">A <b>branch</b> is a copy of your project for you to work on specific tasks or sandbox ideas, without interfering with other copies.
+        <a ui-sref="project.ref.document.view({documentId: '_18_0_2_8630260_1446850132083_177552_51111', viewId: 'MMS_1453977130045_239e2aee-1243-4480-a6f8-61ff7bed700f', projectId: 'PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85', refId: 'master', search: undefined})">more</a></p>
+    <div class="form-group">
+        <label>Name</label>
+        <input class="form-control" ng-model="branch.name" type="text"
+            placeholder="Type a name for your branch here" autofocus>
+    </div>
+    <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-control" ng-model="branch.description"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Permission</label>
+        <br />
+        <input ng-model="branch.permission" value="read" type="radio"> Read
+        <br />
+        <input ng-model="branch.permission" value="write" type="radio"> Write
+    </div>
+    <div class="form-group">
+        <label>Point in History</label>
+        <form>
+            <div class="radio radio-with-label">
+                <label for="most-recent">
+                    <input id="most-recent" type="radio" name="most recent" ng-model="branch.lastCommit" ng-value="true">Most Recent
+                </label><br>
+                <label for="specify-point">
+                    <input id="specify-point" type="radio" name="specify point" ng-model="branch.lastCommit" ng-value="false">Specify a timestamp
+                </label>
+                <div class="indent ve-secondary-text timestamp-format">
+                    <i>(YYYY-MM-DDTHH:MM:SS)</i>
+                </div>
+            </div>
+            <div class="indent">
+                <input class="datetimepicker" id="branch">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">Create <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

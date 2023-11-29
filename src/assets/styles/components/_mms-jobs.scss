@@ -1,0 +1,87 @@
+#ve-jobs-table,
+#ve-branches-tags{
+
+/*------------------------------------------------------------------
+VE Jobs Table Table of contents
+
+1. Typography
+2. Icons
+3. Layout
+  3.1 Table Layout
+  3.2 Empty State Layout
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+1. Typography
+-------------------------------------------------------------------*/
+
+  h3{
+    font-size: 12px;
+    font-weight: 600;
+    color: #8d8d8d;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+
+  h4{
+    font-weight:600;
+    font-size:16px;
+  }
+
+/*------------------------------------------------------------------
+2. Icons
+-------------------------------------------------------------------*/
+
+  .failed-marker{
+    padding-right:4px;
+    color: rgb(255, 107, 107);
+  }
+
+  .in-progress-marker{
+    color:$tertiary_grey;
+    padding-right:3px;
+  }
+
+  .completed-marker{
+    padding-right:4px;
+    color: #45c29d;
+  }
+
+  .fa-pencil{
+    color:#d3d3d3;
+  }
+
+/*------------------------------------------------------------------
+3. Layout
+-------------------------------------------------------------------*/
+/*------------------------------------------------------------------
+  3.1 Table Layout
+-------------------------------------------------------------------*/
+  td{
+    padding:8px 10px;
+    border: 1px solid $tertiary_grey;
+  }
+
+  table{
+    margin-bottom:44px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+    width:100%;
+  }
+
+  thead td{
+    font-weight:bolder;
+    background-color: $quaternary_grey;
+    color:$medium_grey;
+  }
+
+  .build-details{
+    padding-left: 12px;
+  }
+
+  /*clear default margin when header is in table*/
+  td h3{
+    margin: 0;
+  }
+}
+
+

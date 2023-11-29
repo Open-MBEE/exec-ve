@@ -1,0 +1,165 @@
+{"views": [{
+    "allowedElements": [
+        "_17_0_2_3_407019f_1390507392384_798171_29256",
+        "_17_0_2_3_407019f_1390507415007_980263_29329",
+        "_17_0_2_3_407019f_1386871355202_825879_26310",
+        "_17_0_2_3_407019f_1390507334373_78013_29205",
+        "_17_0_2_3_407019f_1387309243448_48276_29113",
+        "_17_0_2_3_407019f_1390507595220_102072_29439",
+        "_17_0_2_3_407019f_1386871384972_702931_26371"
+    ],
+    "author": "dlam",
+    "contains": [
+        {
+            "source": "_17_0_2_3_407019f_1390507595220_102072_29439",
+            "sourceProperty": "documentation",
+            "sourceType": "reference",
+            "type": "Paragraph"
+        },
+        {
+            "body": [
+                [
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1386871384972_702931_26371",
+                            "sourceProperty": "name",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    },
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1386871384972_702931_26371",
+                            "sourceProperty": "documentation",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    },
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1390507334373_78013_29205",
+                            "sourceProperty": "value",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    }
+                ],
+                [
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1390507392384_798171_29256",
+                            "sourceProperty": "name",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    },
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1390507392384_798171_29256",
+                            "sourceProperty": "documentation",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    },
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1390507415007_980263_29329",
+                            "sourceProperty": "value",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    }
+                ],
+                [
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1386871355202_825879_26310",
+                            "sourceProperty": "name",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    },
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1386871355202_825879_26310",
+                            "sourceProperty": "documentation",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    },
+                    {
+                        "colspan": "1",
+                        "content": [{
+                            "source": "_17_0_2_3_407019f_1387309243448_48276_29113",
+                            "sourceProperty": "value",
+                            "sourceType": "reference",
+                            "type": "Paragraph"
+                        }],
+                        "rowspan": "1"
+                    }
+                ]
+            ],
+            "header": [[
+                {
+                    "colspan": "1",
+                    "content": [{
+                        "sourceType": "text",
+                        "text": "<p>Name<\/p>",
+                        "type": "Paragraph"
+                    }],
+                    "rowspan": "1"
+                },
+                {
+                    "colspan": "1",
+                    "content": [{
+                        "sourceType": "text",
+                        "text": "<p>Documentation yay<\/p>",
+                        "type": "Paragraph"
+                    }],
+                    "rowspan": "1"
+                },
+                {
+                    "colspan": "1",
+                    "content": [{
+                        "sourceType": "text",
+                        "text": "<p>Mass<\/p>",
+                        "type": "Paragraph"
+                    }],
+                    "rowspan": "1"
+                }
+            ]],
+            "style": "normal",
+            "title": "",
+            "type": "Table"
+        }
+    ],
+    "displayedElements": [
+        "_17_0_2_3_407019f_1390507392384_798171_29256",
+        "_17_0_2_3_407019f_1390507415007_980263_29329",
+        "_17_0_2_3_407019f_1386871355202_825879_26310",
+        "_17_0_2_3_407019f_1390507334373_78013_29205",
+        "_17_0_2_3_407019f_1387309243448_48276_29113",
+        "_17_0_2_3_407019f_1390507595220_102072_29439",
+        "_17_0_2_3_407019f_1386871384972_702931_26371"
+    ],
+    "editable": true,
+    "id": "_17_0_2_3_407019f_1390507595220_102072_29439",
+    "lastModified": "2014-02-10T11:45:04.310-08:00",
+    "qualifiedName": "/test/Test334/doc/Components"
+}]}

@@ -1,0 +1,72 @@
+mms-view {
+  .ve-view-number {
+    float: left;
+    margin-right: 10px;
+  }
+
+  .view-title, .section-title {
+    font-family: $light-font-family-sans-serif;
+    font-weight: $light_font_weight;
+    font-size: 35px;
+    margin-top: 20px;
+    margin-bottom: 15px;
+  }
+
+  // Keep title the same size as reading 
+  .view-title, .section-title {
+    .form-control{
+      height: inherit;
+      font-size: inherit;
+    }
+  }
+
+  &.editing {
+    mms-view-section {
+      display: block;
+      border: 2px solid $ve-silver-darker-1;
+      @include transition(border, .5s);
+      @include border-radius(5px);
+    }
+  }
+  &.outline:not(.editing) {
+    mms-view-section {
+      display: block;
+      border: 2px solid white;
+    }
+  }
+
+  table {
+    @extend .table-condensed;
+    @extend .table-bordered;
+    p {
+      margin: 0px 0px 5px;
+    }
+  }
+
+  .add-pe-button-container, .last-modified {
+    //opacity: 0;
+    display: block;
+    visibility: hidden;
+  }
+
+  .read-width {
+    p, h1, h2, h3, h4, h5, h6, ol, ul { //figure, img, table, div
+      max-width: $pane_center_text_width;
+    }
+  }
+}
+
+mms-view.editing,
+mms-view.outline {
+  .last-modified {
+    //opacity: 1;
+    visibility: visible;
+  }
+}
+
+mms-view.editing {
+  .add-pe-button-container {
+    //opacity: 1;
+    visibility: visible;
+  }
+}

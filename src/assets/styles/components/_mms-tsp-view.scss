@@ -1,0 +1,253 @@
+/* A search box. */
+
+// .tsSearchContainingToolbarPanel table.tsSearchBox {
+//   background-color: #FFFFFF;
+//   border: 1px solid #b0b09e;
+// @include border-radius(15px);
+  // border-radius: 15px;
+  // padding: 2px;
+//   width: 180px !important; //Note: This should be set as !important when we define the element. Size should be set from Designer.
+// }
+
+.tsSearchContainingToolbarPanel table {
+  border: none;
+}
+
+table.tsSearchContainingToolbarPanel {
+  border: none;
+}
+
+table.tsSearchBox {
+  border: 1px solid silver;
+  border-radius: 15px;
+  -webkit-border-radius: 15px;
+  padding: 2px;
+  -moz-border-radius: 15px;
+  border-collapse: unset;
+}
+
+// .tsSearchBox img {
+//   height: 14px;
+//   width: 14px;
+//   max-width: none;
+// }
+
+// /* An input element within a search box. */
+
+// input[type="text"].tsSearchBoxInput {
+//   font-size: 85%;
+//   font-weight: normal;
+// border: 0px solid #000000;
+//   outline: none;
+//   width: 100%;
+//   height: 14px;
+//   background-color: transparent;
+// }
+
+// /* A watermark within a search box input element. */
+
+// input[type="text"].tsSearchBoxInput-watermark {
+//   font-size: 85%;
+//   font-weight: normal;
+//   border: 0px solid #000000;
+//   width: 100%;
+//   height: 14px;
+//   background-color: transparent;
+//   color: DarkGray;
+// }
+
+// .tsToolBarItem img {
+//   max-width: none;
+// }
+
+// .tsToolBar-horizontal .tsToolBarSeparator {
+//   border-right: 0;
+// }
+
+// .tsToolBar-horizontal td.tsToolBarSeparator {
+//   width: 1px;
+//   // padding: 0px;
+//   border-right: 1px solid #c6c6c6;
+//   // background: white;
+// }
+
+// .tsToolBar-vertical td.tsToolBarSeparator {
+//   height: 1px;
+//   // padding: 0px;
+//   border-bottom: 1px solid #c6c6c6;
+//   // background: white;
+// }
+
+td.tsToolbarItem {
+  padding: 2px;
+}
+
+// table.tsToolbarWidget {
+//   border: 0px;
+//   margin: 0em;
+//   padding: 0px;
+//   border-collapse: separate;
+// }
+
+// .tsToolbarWidget table {
+//   border: 0px;
+//   margin: 0em;
+//   padding: 0px;
+//   border-collapse: separate;
+// }
+
+// .tsToolbarWidget table>tbody>tr>td {
+//   border: 1px;
+//   margin: 0em;
+//   padding: 0px;
+//   border-collapse: separate;
+//   border-style: solid;
+//   border-color: #cccc9922;
+//   background: #ebebd6;
+// }
+
+.tsNavigationControl tbody>tr>td {
+//   border: 1px;
+//   margin: 0em;
+//   padding: 1px;
+  border-collapse: collapse;
+  border-style: none;
+}
+
+// .tsNavigationControl tbody {
+//   border-style: none;
+// }
+
+// table.tsNavigationControl {
+//   border-style: none;
+// }
+
+// table.tsNavigationControlZoomPanel {
+//   border-style: none;
+// }
+
+table.tsSearchBox tbody>tr>td {
+  border: 0px;
+  margin: 0em;
+  padding: 0px;
+  border-collapse: separate;
+//   background: transparent;
+//   // 	border-radius: 15px;
+//   // 	-moz-border-radius: 15px;
+//   // 	-webkit-border-radius: 15px;
+//   // 	padding: 2px;
+}
+
+.tsToolBar-horizontal table {
+  border-spacing: 2px;
+  border-collapse: separate;
+}
+
+// .tsTree table>tbody>tr>td {
+//   border: 1px;
+//   margin: 0em;
+//   padding: 0px;
+//   border-collapse: collapse;
+//   border-style: none;
+// }
+
+// .tsTree table {
+//   border: 1px;
+//   margin: 0em;
+//   padding: 0px;
+//   border-collapse: collapse;
+//   border-style: none;
+// }
+
+// .tsToolbarWidget {
+//   margin: 0;
+// }
+
+// table.tsSearchContainingToolbarPanel {
+//   width: 100% !important;
+// }
+
+// .tsTableView table {
+//   width: 100% !important;
+//   margin: 0;
+// }
+
+// .tsSearchContainingToolbarPanel table {
+//   width: 100% !important;
+// }
+
+// table.tsSearchResultTable {
+//   margin: 0 !important;
+//   width: 100% !important;
+// }
+
+// table.tsSearchResultTable tbody>tr>td {
+//   padding: 0 !important;
+// }
+
+// .gwt-MenuBarPopup div>table {
+//   margin: 0;
+// }
+
+// .tsMenuBarItem table {
+//   margin: 0;
+//   border: #fff;
+// }
+
+// .tsMenuBarItem table>tbody>tr>td {
+//   padding: 2px;
+//   border: #fff;
+//   vertical-align: middle;
+// }
+
+// .tsMenuBarItem {
+//   padding: 2px !important;
+// }
+
+// .gwt-MenuBarPopup div>table>tbody>tr>td {
+//   padding: 0;
+//   border: #fff;
+// }
+
+// .gwt-MenuBar table {
+//   padding: 0;
+//   border: #fff;
+// }
+
+// .tsDialogBox table {
+//   margin: 0;
+// }
+
+// .tsDialogBox div>table>tbody>tr>td {
+//   padding: 0;
+//   margin: 0;
+// }
+
+// td.tsCaptionText {
+//   padding: 0;
+//   border: 0;
+// }
+
+// .tsDialogPanel legend {
+//   margin: 0;
+//   width: auto;
+//   border-bottom: 0;
+// }
+
+// .tsDialogBox table>tbody>tr>td {
+//   padding: 2px;
+//   border-top: 0;
+// }
+
+// .tsDialogBox select.gwt-ListBox {
+//   height: 15px !important;
+//   font-size: 10px;
+// }
+
+// .tsDialogBox input.gwt-TextBox {
+//   height: 15px !important;
+// }
+
+// .tsDialogBox label {
+//   margin: 0;
+// }

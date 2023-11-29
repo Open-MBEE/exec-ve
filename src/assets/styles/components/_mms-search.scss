@@ -1,0 +1,349 @@
+.mms-search {
+  position: relative;
+
+/*------------------------------------------------------------------
+
+1. Layout
+2. Forms (can move most of this to main)
+3. Results styles
+4. Empty state
+5. Small Modals
+
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+1. Layout
+-------------------------------------------------------------------*/
+
+  .search-header {
+     background: $white;
+     padding-bottom: 250px;
+     font-size: 14px;
+
+    /*Border with shadow added when search results >= 0*/
+    &.searchresults {
+      border-bottom: 1px solid $ve-silver-darker-1;
+      box-shadow: 0 4px 4px -4px rgba(0,0,0,.1);
+      padding-bottom: 0;
+    }
+
+    .close-button-container {
+      position: absolute;
+      top: .5em;
+      right: 2em;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    .close-button {
+      position: fixed;
+      font-size: 1.5em;
+      color: $tertiary_grey;
+    }
+  }
+
+  /*Spacing for count of results at top of results*/
+  .results-count {
+    padding: 20px 42px;
+    background: $ve-silver-lighter-2;
+    font-size: 14px;
+    border-bottom: 1px solid $ve-silver-darker-1;
+  }
+
+  .results-filter {
+    padding-left: 20px;
+  }
+
+  /*Spaceing for next and previous at bottom of results*/
+  .search-nav {
+    padding: 38px 38px 60px;
+  }
+
+  .mms-search-input {
+    max-width: 1200px;
+    padding: 30px 36px 30px 42px;
+    position: relative;
+
+    /*Navigatiom back to basic search input, with a left back arrow*/
+    .search-nav-back {
+      position: absolute;
+      top: 0;
+
+      a {
+        display: inline-block;
+        margin: 15px 0;
+
+        .fa-arrow-left {
+          padding-right: 4px;
+        }
+      }
+    }
+
+    /*Navigatiom to advanced search input*/
+    .advanced-query {
+      margin-bottom: 18px;
+    }
+    .advanced-views-docs {
+      padding-top: 22px;
+    }
+  }
+
+/*------------------------------------------------------------------
+2. Forms
+-------------------------------------------------------------------*/
+
+  .form-inline {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center; /* Safari 7.0+ */
+    align-items: center;
+
+    .form-group,
+    .btn {
+      margin: 7px 3px;
+      line-height: 16px;
+    }
+    .form-group {
+      width: 100%;
+    }
+    /*fixed width of medium content so that vertical rhythym is consistent*/
+    .fixed-content-m {
+      width: 150px;
+      flex: none;
+    }
+    /*fixed width of small content*/
+    .fixed-content-s {
+      width: 90px;
+      flex: none;
+    }
+    .ve-light-dropdown {
+      margin: 0;
+    }
+    h3 {
+      display: inline-block;
+      font-weight: 500;
+      font-size: 18px;
+      margin: 0 3px 0 0;
+    }
+    input {
+      min-height: 30px;
+      @include border-radius(2px);
+      border: 1px solid $tertiary_grey;
+      padding: 3px 5px;
+    }
+  }
+
+  .search-input {
+    width: 100%;
+
+    /*feedback for advanced search where user cannot edit*/
+    &.disabled-input {
+      font-size: 14px;
+      padding: 4px 8px;
+      line-height: 13px;
+      border: none;
+      border-radius: 2px !important;
+      letter-spacing: .04em;
+      background-color: #f4f4f4;
+      min-height: 30px;
+    }
+    &.disabled-input-container {
+      margin-right: 8px;
+    }
+  }
+
+/*------------------------------------------------------------------
+3. Results styles
+-------------------------------------------------------------------*/
+
+  .search-results {
+    max-width: 1200px;
+  }
+
+  /*Search result wrapper*/
+  .elem-wrapper {
+    padding: 44px 0;
+    margin: 0 42px;
+    border-bottom: 1px solid $ve-silver-darker-1;
+
+    .elem-name {
+      font-size: 20px;
+      font-weight: 500;
+    }
+    .elem-qualified-name {
+      font-size: 14px;
+      font-style: italic;
+      color: $medium_grey;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    .elem-documentation {
+      color: $ve-link !important;
+      table {
+        @extend .content-table;
+      }
+    }
+    .elem-properties-wrapper {
+      /*Table styling so values are aligned right and properties are aligned left*/
+      table {
+        margin-bottom: 0;
+        color: $ve-light-text;
+      }
+      table > tbody > tr > td {
+        border-top: none;
+        padding: 2px 1px;
+
+        /*Float property name right for better readability*/
+        &:first-child {
+          float: right;
+          text-align: right;
+        }
+      }
+    }
+
+    .show-more-container {
+      margin-top: 10px;
+      .show-more-btn {
+        position: relative;
+        padding-left: 17px;
+        &::after{
+          content:"\f0d7";
+          font-family: $icon-font-name;
+        }
+        &::before{
+          content: "...";
+          font-size: 16px;
+          color: $tertiary_grey;
+          position: absolute;
+          top: -19px;
+        }
+      }
+    }
+
+    /* Add a grey border to the left of documentation since the preview can get spread out*/
+    .elem-documentation-wrapper{
+      .elem-documentation{
+        border-left: 4px solid $ve-silver-base;
+        padding-left: 14px;
+      }
+    }
+
+    /*Indent cross referenceable content so it pops out*/
+    .elem-properties,
+    .elem-specification,
+    .elem-documentation,
+    .elem-properties-wrapper > table > tbody > tr > td:first-child {
+      padding-left: 18px;
+    }
+    .ellipses {
+      color: $brand_base;
+    }
+    .elem-updated-wrapper {
+      color: $medium_grey;
+      font-size: 14px;
+      margin-top:10px;
+    }
+  }
+
+  .ve-search-filter{
+    padding-bottom: 10px;
+
+    .label-for-filter{
+      font-weight: 600;
+      letter-spacing: .12em;
+    }
+  }
+
+  .ve-btn-group-default {
+    @include button-variant($ve-light-text, $white, $ve-silver-darker-2);
+    text-transform: initial;
+    letter-spacing: normal;
+    line-height: 1.6;
+    font-weight: normal;
+    .fa {
+      padding-right: 4px;
+      font-size: 16px;
+    }
+  }
+  .btn-group {
+    .ve-btn-group-default.active, .ve-btn-group-default:active {
+      color: #f0f0f0;
+      background-color: $brand_base;
+      border-color: darken($brand_base,10%);
+    }
+  }
+
+  /*Add light colored presentation element icons to the left of the title*/
+  .search-results{
+    .item-type-View,
+    .item-type-Document,
+    .item-type-Group,
+    .pe-type-Paragraph,
+    .pe-type-ParagraphT,
+    .pe-type-Section,
+    .pe-type-SectionT,
+    .pe-type-Text,
+    .pe-type-TextT,
+    .pe-type-Table,
+    .pe-type-TableT,
+    .pe-type-Image,
+    .pe-type-ImageT,
+    .pe-type-Equation,
+    .pe-type-Comment{
+
+      position:relative;
+
+      &::before{
+        color: $ve-silver-darker-3;
+        right: 0;
+        padding: 0;
+        position: absolute;
+        top: -.1em;
+        font-size: 15px;
+        padding-right: 6px;
+      }
+    }
+  }
+
+/*------------------------------------------------------------------
+4. Empty state
+-------------------------------------------------------------------*/
+
+  // No results styles
+  .container-no-results {
+    color: $medium_grey;
+    min-height: 250px;
+
+    h3 {
+      font-weight: 500;
+      margin: 60px auto;
+      width: 290px;
+    }
+  }
+}
+
+/*------------------------------------------------------------------
+5. Small modals
+-------------------------------------------------------------------*/
+
+.modal-body {
+  .mms-search {
+    font-size: 16px;
+
+    .mms-search-input,
+    .results-count {
+      padding-left: 22px;
+      padding-right: 22px;
+    }
+    .elem-wrapper {
+      margin-left: 22px;
+      margin-right: 22px;
+    }
+  }
+}
+

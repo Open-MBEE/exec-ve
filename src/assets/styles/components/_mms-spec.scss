@@ -1,0 +1,178 @@
+.pane-right,
+.revert-spec {
+  h1.prop,
+  h1.prop > .form-control {
+    font-size: 26px;
+    margin: 30px 0 0;
+    height: inherit;
+    width: 100%;
+    font-weight: $default_font_weight;
+  }
+
+  h1.prop {
+    width: 100%;
+    word-wrap: break-word;
+
+    /*Make presentation element icons smaller and to the top of the name*/
+
+    .item-type-View,
+    .item-type-Document,
+    .item-type-Group,
+    .pe-type-Paragraph,
+    .pe-type-ParagraphT,
+    .pe-type-Section,
+    .pe-type-SectionT,
+    .pe-type-Text,
+    .pe-type-TextT,
+    .pe-type-Table,
+    .pe-type-TableT,
+    .pe-type-Image,
+    .pe-type-ImageT,
+    .pe-type-Equation,
+    .pe-type-Comment{
+
+      &::before{
+        color: $ve-silver-darker-3;
+        font-size: .6em;
+        top: -.3em;
+        padding-right: 6px;
+        position: relative;
+      }
+    }
+  }
+
+  h2.prop-title{
+    padding-top: 24px;
+  }
+
+  span.prop {
+    font-size: 16px;
+    margin-bottom: 20px;
+    margin-top: 2px;
+    word-wrap: break-word;
+    display: block;
+  }
+
+  h1.element-title {
+    word-wrap: break-word;
+  }
+
+  .doc-text {
+    font-family: $font-family-sans-serif;
+    
+    /* Add border to left to delineate*/
+    padding-left: 8px;
+    border-left: 4px solid $ve-silver-base;
+    max-width: $default-line-length;
+    margin-top: 2px;
+    //min-width: 15em;
+  }
+
+  h2.spec-view-doc-heading, h2.spec-view-value-heading, h2.spec-view-type-heading {
+    margin-top: 16px;
+  }
+
+  table {
+    @extend .content-table;
+  }
+
+  mms-spec {
+    mms-transclude-doc {
+      cursor: auto;
+    }
+  }
+}
+
+/*------------------------------------------------------------------
+Styles that apply to both the spec
+-------------------------------------------------------------------*/
+
+.mms-search,
+.pane-right,
+.revert-spec{
+  .elem-wrapper label,
+  .prop-title,
+  .visibility-toggle{
+    font-size: 12px;
+    font-weight: bold;
+    margin: 8px 0px 0 0;
+    letter-spacing: .04em;
+    text-decoration: none;
+    color: $ve-light-text;
+  }
+
+  .visibility-toggle{
+    list-style: none;
+    margin: 12px 0 0 -14px;
+
+    td{
+      line-height: 2.6em;
+      position: relative;
+    }
+
+    //Show more content caret
+    a{
+
+      //show more content caret
+      &:after{
+        content:"\f078";
+        font-family: $icon-font-name;
+        font-size: 10px;
+        padding: 0 2px;
+      }
+
+      //Show less content caret
+      &.active::after{
+        content:"\f077";
+        font-family: $icon-font-name;
+      }
+
+      //Add ellipses to list before "show more"
+      &:not(.active):before{
+        content: "...";
+        font-size: 16px;
+        color: $tertiary_grey;
+        position: absolute;
+        top: -1em;
+      }
+    }
+  }
+
+  /*Light grey boxes for metatype styling*/
+  .elem-type{
+    letter-spacing: .06em;
+    margin-right: 6px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    margin: 3px;
+    display:inline-block;
+    font-size: 12px;
+    background: $highlight_grey;
+    @include border-radius(3px);
+    color: $ve-light-text-darker-1;
+    font-weight: 500;
+    //border: 1px solid $ve-silver-darker-1;
+  }
+
+  /*pull in metatype wrapper to compensate for padding*/
+  .elem-type-wrapper {
+    margin-left: -3px;
+  }
+
+  /*Specific styling for last updated*/
+  .elem-updated-wrapper {
+    color: $medium_grey;
+    font-size: 14px;
+    display: block;
+  }
+
+  /*File icon for documents and views*/
+  .elem-related-docs-wrapper mms-view-link a::before {
+    content: "\f15b";
+    font-family: $icon-font-name;
+    padding: 0 4px 0 0;
+    font-size: .75em;
+    position: relative;
+    top: -.1em;
+  }
+}

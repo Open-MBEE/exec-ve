@@ -1,0 +1,34 @@
+<script type="text/ng-template" id="customTemplate.html">
+    <a class="itemContainer" ng-switch="match.model.type">
+        <span ng-switch-when="name" class="nameContainer">
+            <div class="leftItem">
+                <i class="icon" ng-class="match.model.iconClass"></i>
+                <span> name </span>
+                <span id="{{match.model.id + match.model.type}}" class="matchName mentionMatch" ng-bind-html="match.model.name | underlineMatch:query"></span>
+                <br>
+            </div>
+            <div class="rightItem">
+                <span class="elementType">{{match.model.elementType}}</span>
+                <span>last mod {{match.model.editTime}} by
+                    <span class="editor">{{match.model.editor}}</span>
+                </span>
+            </div>
+        </span>
+        <span ng-switch-when="doc" class="contentContainer">
+            <span> documentation </span>
+            <span id="{{match.model.id + match.model.type}}" class="content mentionMatch">{{match.model.documentation}}</span>
+        </span>
+        <div ng-switch-when="val" class="contentContainer" ng-if="match.model.type === 'val'">
+            <span> value </span>
+            <span id="{{match.model.id + match.model.type}}" class="content mentionMatch">{{match.model.value}}</span>
+        </div>
+    </a>
+</script>
+
+<div class="mmsMention" id={{mmsMentionId}}>
+    <input style="display:none;" mms-mention-intercept mms-mention-intercept-value="mmsMentionValue"
+           uib-typeahead="mentionItem as mentionItem.name for mentionItem in fastCfListing | filter:{name: $viewValue} | limitTo:10"
+           typeahead-template-url="customTemplate.html" typeahead-on-select='selectMentionItem($item, $model)'
+           ng-model="selected" class="autocomplete-modal-typeahead form-control"
+           placeholder="Type an element name to Cf" autofocus/>
+</div>

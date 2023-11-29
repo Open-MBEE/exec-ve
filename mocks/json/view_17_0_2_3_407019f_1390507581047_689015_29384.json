@@ -1,0 +1,15 @@
+{"views": [{
+    "allowedElements": ["_17_0_2_3_407019f_1390507581047_689015_29384"],
+    "author": "dlam",
+    "contains": [{
+        "source": "_17_0_2_3_407019f_1390507581047_689015_29384",
+        "sourceProperty": "documentation",
+        "sourceType": "reference",
+        "type": "Paragraph"
+    }],
+    "displayedElements": ["_17_0_2_3_407019f_1390507581047_689015_29384"],
+    "editable": true,
+    "id": "_17_0_2_3_407019f_1390507581047_689015_29384",
+    "lastModified": "2014-02-10T11:45:05.390-08:00",
+    "qualifiedName": "/test/Test334/doc/Spacecraft Doc"
+}]}

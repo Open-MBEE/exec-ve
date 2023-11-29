@@ -1,0 +1,107 @@
+- request:
+    url: ^/products$
+  response:
+    status: 200
+    headers: 
+      content-type: application/json
+    latency: 500
+    file: mocks/json/product_17_0_2_3_407019f_1390507581047_689015_29384.json
+
+- request:
+    url: ^/products/_17_0_2_3_407019f_1390507581047_689015_29384$
+  response:
+    status: 200
+    headers: 
+      content-type: application/json
+    latency: 500
+    file: mocks/json/product_17_0_2_3_407019f_1390507581047_689015_29384.json
+
+- request:
+    url: ^/products/_17_0_2_3_407019f_1390507581047_689015_29384/views$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    file: mocks/json/product_17_0_2_3_407019f_1390507581047_689015_29384_views.json
+
+- request:
+    url: ^/views/_17_0_2_3_407019f_1390507581047_689015_29384$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    file: mocks/json/view_17_0_2_3_407019f_1390507581047_689015_29384.json
+
+- request:
+    url: ^/views/_17_0_2_3_407019f_1386871350559_140692_26286$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    file: mocks/json/view_17_0_2_3_407019f_1386871350559_140692_26286.json
+
+- request:
+    url: ^/views/_17_0_2_3_407019f_1390507595220_102072_29439$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    file: mocks/json/view_17_0_2_3_407019f_1390507595220_102072_29439.json
+
+- request:
+    url: ^/views/_17_0_2_3_407019f_1390507581047_689015_29384/elements$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    file: mocks/json/view_17_0_2_3_407019f_1390507581047_689015_29384_elements.json
+
+- request:
+    url: ^/views/_17_0_2_3_407019f_1386871350559_140692_26286/elements$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    file: mocks/json/view_17_0_2_3_407019f_1386871350559_140692_26286_elements.json
+
+- request:
+    url: ^/views/_17_0_2_3_407019f_1390507595220_102072_29439/elements$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    file: mocks/json/view_17_0_2_3_407019f_1390507595220_102072_29439_elements.json
+
+- request:
+    url: ^/elements/_17_0_2_3_407019f_1390507581047_689015_29384/comments$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    body: '{"elements": []}'
+
+- request:
+    url: ^/elements/_17_0_2_3_407019f_1386871350559_140692_26286/comments$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    body: '{"elements": []}'
+
+- request:
+    url: ^/elements/_17_0_2_3_407019f_1390507595220_102072_29439/comments$
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+    latency: 500
+    body: '{"elements": []}'

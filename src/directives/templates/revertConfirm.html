@@ -1,0 +1,34 @@
+<div class="modal-header">
+    <h4>Revert element documentation, name, and value</h4>
+</div>
+
+<div class="modal-body revert-dialogue">
+    <p>Revert documentation, name, and value of this element from 
+    <b>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b> on {{compareCommit.ref.type}}: <b>{{compareCommit.ref.name}}</b>
+    to 
+    <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b>
+    on {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>.</p>
+    <p>This will create a new version under your user name on <b>{{compareCommit.ref.name}}.</b></p>
+    <p>Cross reference contents will NOT be reverted.</p>
+
+    <h3>Preview Element</h3>
+    <div class="element-preview-box">
+        <h1 class="prop element-title">
+            <mms-cf mms-cf-type="name" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.id}}" mms-commit-id="{{baseCommit.commitSelected.id}}"></mms-cf>
+        </h1>
+        <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
+        <p ng-show="!showDocHTML" class="doc-text">
+            <mms-cf mms-cf-type="doc" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.id}}" mms-commit-id="{{baseCommit.commitSelected.id}}"></mms-cf>
+        </p>
+        <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
+        <h2 class="prop-title">Property Value</h2>
+        <span class="prop">
+            <mms-cf mms-cf-type="val" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.id}}" mms-commit-id="{{baseCommit.commitSelected.id}}"></mms-cf>
+        </span></div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-warning " ng-click="ok()">Revert</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

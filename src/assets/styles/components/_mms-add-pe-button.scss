@@ -1,0 +1,125 @@
+// /*************************
+//   Button styling for adding PEs
+//   inline box for dropdowns
+// *************************/
+.mms-add-pe-button {
+
+/*take PE button out of document flow and put to left of content*/
+  position: absolute;
+  margin-top: -18px;
+  left: 0;
+
+  /*** Add PE dropdown ***/
+
+  /*Border radius and color to match dropdown*/
+  a.dropdown-toggle{
+    @include border-radius(4px 0 0 4px);
+    border: 1px solid transparent;
+    color: $tertiary-grey;
+  }
+
+  //Padding, font size, and line height match for the toggle and dropdown
+  a.dropdown-toggle,
+  .dropdown-menu a{
+    padding: 8px;
+    font-size: 14px;
+    text-align: center;
+
+    /*light grey button labels*/
+    span{
+      display: block;
+      font-size: 12px;
+      color: $ve-light-text;
+      line-height: 18px;
+      letter-spacing: .03em;
+    }
+  }
+
+  /*Special line-height so icons align*/
+  .dropdown-menu a::before,
+  a.dropdown-toggle .fa{
+    line-height: 1.5;
+    padding-right: 0;
+  }
+
+  /*Special horizontal dropdown menu */
+  .dropdown-menu {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    @include border-radius(4px);
+    border-color: darken($white, 12%);
+    @include box-shadow( 6px 6px 12px rgba(0,0,0,.175));
+
+    /*line to indicate where the presentation element will be added
+    &::after{
+      background-image: url(../assets/location-feedback-inline.svg);
+      content: ' ';
+      background-size: 70px 4px;
+      height: 4px;
+      width: 70px;
+      background-repeat: no-repeat;
+      position: absolute;
+      right: -70px;
+      top: 13px;
+    }*/
+
+    /*Horizontal menu that should be more consistent across browsers*/
+    li{
+      display: inline-block;
+      a{
+        padding: 11px 0;
+        min-width: 62px;
+      }
+    }
+  }
+
+  /*When hovering over the whole menu, set opacity to block*/
+  .open > .dropdown-menu,
+  .dropdown-toggle:hover + .dropdown-menu,
+  span:hover .dropdown-menu{
+    display: block;
+    margin-top: -11.5px;
+  }
+
+  /*When hovering over button or opening toggle, darken text and background to show activated*/
+  span:hover a.dropdown-toggle,
+  .open > a.dropdown-toggle,
+  .open > a.dropdown-toggle:hover{
+    background-color: darken($white, 10%);
+    border-color: darken($white, 12%);
+    color: darken($tertiary-grey, 42%);
+  }
+
+
+}
+@media (max-width: 640px) {
+  .mms-add-pe-button {
+    span.icon-title {
+      display: none;
+    }
+  }
+}
+/* For section PEs, put the add button back into the document flow so that containment is clear*/
+mms-view-section .mms-add-pe-button {
+  position: relative;
+  margin-top: 0;
+}
+
+.add-pe-button-container hr {
+  visibility: hidden;
+  border: none;
+  border-top: 3px dotted $ve-active;
+  height: 0px;
+  margin: 0px;
+}
+//.add-pe-button-container:hover hr {
+//  visibility: visible; //maybe toggle visibility with js for hover and click?
+//}
+
+mms-view-section .add-pe-button-container hr {
+  left: 31px;
+  bottom: 18px;
+  position: relative;
+  width: calc(100% - 31px);
+}

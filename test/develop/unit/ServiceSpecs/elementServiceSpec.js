@@ -823,7 +823,7 @@ describe('Service: ElementService', function() {
 			}
 			var mainBoolQuery =[];
 			mainBoolQuery.push(mainQuery, projectTermsOb);
-			var queryOb = { //assuming searchField is 'all'
+			var queryOb = { //assuming searchType is 'all'
 				"sort" : [
 					"_score",
 					{ "_modified" : {"order" : "desc"}}
