@@ -1,0 +1,58 @@
+﻿kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: mbee-ve
+  namespace: openmbee
+  uid: 22fa24dd-6fec-41ab-91b2-d0579105d0c5
+  resourceVersion: '945743259'
+  creationTimestamp: '2023-09-25T20:47:52Z'
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: route.openshift.io/v1
+      time: '2023-09-25T20:47:52Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          'f:host': {}
+          'f:port':
+            .: {}
+            'f:targetPort': {}
+          'f:tls':
+            .: {}
+            'f:termination': {}
+          'f:to':
+            'f:kind': {}
+            'f:name': {}
+            'f:weight': {}
+          'f:wildcardPolicy': {}
+    - manager: openshift-router
+      operation: Update
+      apiVersion: route.openshift.io/v1
+      time: '2023-09-25T20:47:52Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:ingress': {}
+      subresource: status
+spec:
+  host: mbee.navair.navy.mil
+  to:
+    kind: Service
+    name: openmbee-ve-svc
+    weight: 100
+  port:
+    targetPort: openmbee-ve
+  tls:
+    termination: edge
+  wildcardPolicy: None
+status:
+  ingress:
+    - host: mbee.navair.navy.mil
+      routerName: default
+      conditions:
+        - type: Admitted
+          status: 'True'
+          lastTransitionTime: '2023-09-25T20:50:14Z'
+      wildcardPolicy: None
+      routerCanonicalHostname: router-default.apps.arena-workspace.navair.navy.mil

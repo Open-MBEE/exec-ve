@@ -1,0 +1,239 @@
+/* Stylesheet for transclusion-related elements */
+mms-transclude-doc,
+mms-transclude-val > span,
+mms-transclude-name > span,
+mms-transclude-val > p,
+mms-transclude-com,
+mms-transclude-img {
+  cursor: pointer;
+  border-color: transparent;
+}
+
+mms-view {
+  //set display inline for nested transcluded paragraphs and first p in table cells
+  //to prevent unwanted newlines and excessive spacing in table cells
+  mms-cf mms-cf{
+    mms-transclude-doc {
+      > p:first-child {
+        display: inline;
+      }
+    }
+  }
+  table td mms-transclude-doc {
+    > p:first-child, > div:first-child {
+      display: inline;
+    }
+  }
+}
+
+mms-view.outline,
+mms-view.editing {
+
+ /* Transclusions borders when editing mode */
+  mms-transclude-doc,
+  mms-transclude-name > span,
+  mms-transclude-val > span,
+  mms-transclude-val > p {
+    @include transition(border .3s);
+    @include border-radius(5px);
+    border: 2px solid $ve-silver-darker-1;
+    cursor: pointer;
+
+    // do we want this animation ?
+    &:hover{
+      border-color: $tertiary_grey;
+    }
+  }
+
+  mms-transclude-doc, mms-transclude-com {
+    display: block;
+
+    .panel {
+      margin: 0px;
+    }
+  }
+}
+
+
+/* comments */
+mms-view mms-transclude-com,
+mms-view.editing mms-transclude-com {
+  @include border-radius(5px);
+  background-color: lighten($yellow, 10%);
+  border: 2px solid darken($yellow, 10%);
+  padding: 2px;
+  display: block
+}
+
+mms-view:not(.editing):not(.outline) {
+  .placeholder {
+    visibility: hidden;
+  }
+  
+  mms-view-para > mms-cf > mms-transclude-doc,
+  mms-view-list-t > mms-cf > mms-transclude-doc,
+  mms-view-table-t > mms-cf > mms-transclude-doc,
+  mms-view-figure > mms-cf > mms-transclude-doc,
+  mms-view-equation > mms-cf > mms-transclude-doc,
+  mms-view-section {
+    border: 2px solid white;
+    display: block;
+  }
+
+  .view-title mms-transclude-name > span {
+    border: 2px solid white;
+  }
+}
+
+mms-view:not(.reviewing) mms-transclude-com {
+  display: none;
+}
+
+/*Add a name label that is hidden by default*/
+mms-transclude-name .input-group > .input-group-addon.transclude-name-label{
+  position: absolute;
+  top: -1.8em;
+  display: table;
+  opacity: 0;
+  border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+  visibility: 0;
+  opacity: 0;
+  @include transition(all .3s);
+}
+
+/*Label becomes visible on hover*/
+mms-transclude-name:hover .input-group > .input-group-addon.transclude-name-label{
+  visibility: 1;
+  opacity: 1;
+}
+
+/*------------------------------------------------------------------
+Element not found styling
+-------------------------------------------------------------------*/
+
+.mms-error{
+  background: $ve-warning-orange-light;
+  background: repeating-linear-gradient(45deg, $white, $white 10px,$ve-warning-orange-light 10px,$ve-warning-orange-light 20px);
+  color: $black;
+  border: none;
+  padding-left: 11px;
+}
+
+.mms-error::before{
+  content: "\f071";
+  font-family: fontAwesome;
+  margin-left: -14px;
+  color: $ve-warning-orange;
+  font-size: 12px;
+  position: absolute;
+}
+
+.mms-error:hover{
+  background: repeating-linear-gradient(45deg, $white, $white 10px,darken($ve-warning-orange-light, 10%) 10px,darken($ve-warning-orange-light, 10%) 20px);
+}
+
+.pane-right .prop.mms-error {
+  margin-top: 10px;
+}
+
+.mms-png {
+  display: none;
+}
+
+figcaption, .mms-equation-caption, caption {
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+mms-transclude-img img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.no-padding-panel {
+  padding: 0px;
+}
+
+.item-type-View,
+.item-type-Document,
+.item-type-Group,
+.pe-type-Paragraph,
+.pe-type-ParagraphT,
+.pe-type-Text,
+.pe-type-TextT,
+.pe-type-Table,
+.pe-type-TableT,
+.pe-type-Image,
+.pe-type-ImageT,
+.pe-type-Equation,
+.pe-type-Comment{
+  &::before{
+    font-family: $icon-font-name;
+    padding-right: 4px;
+  }
+}
+
+.item-type-Document::before,
+.item-type-View::before{
+  content: "\f15b";
+}
+.item-type-Group::before{
+  content: "\f07b";
+  color: lighten($ve-accent, 20%);
+}
+.pe-type-Paragraph::before,
+.pe-type-ParagraphT::before,
+.pe-type-Text::before,
+.pe-type-TextT::before{
+  content: "\f1dd";
+}
+.pe-type-Table::before,
+.pe-type-TableT::before{
+  content: "\f0ce";
+}
+.pe-type-Image::before,
+.pe-type-ImageT::before{
+  content: "\f03e";
+}
+.pe-type-Equation::before{
+  content: "\f12b";
+}
+.pe-type-Comment::before{
+  content: "\f0e5";
+}
+
+/*set pseudoclass and reset italic from <i>*/
+.pe-type-Section::before, .pe-type-SectionT::before{
+  content:"\00a7";
+  font-style: normal;
+  font-weight: bold;
+  padding-right: 4px;
+}
+
+//Make font weight of panel headings more readable
+.panel-heading{
+  line-height: 22px;
+  padding: 4px 8px;
+  h3{
+    font-weight: $default_font_weight;
+    color: $ve-light-text-darker-1;
+    line-height: 28px;
+  }
+}
+
+// Transclude edit panel buttons
+.transclude-panel-toolbar {
+  .btn-tools {
+    @include button-variant($base_grey, $quaternary_grey, $quaternary_grey);
+    &:not(.dropdown-toggle) .fa {
+      padding-right: 0;
+    }
+    .caret{
+      opacity: .4;
+    }
+  }
+}

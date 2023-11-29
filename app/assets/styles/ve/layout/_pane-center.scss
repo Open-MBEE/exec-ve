@@ -1,0 +1,166 @@
+/*************************
+  Styles for the View Editor center pane
+*************************/
+
+$pane_center_btn_group_width: 340px;
+$pane_center_toolbar: $pane_center_btn_group_width + 150px;
+
+/* start of fullDoc page styles */
+body.fullDoc {
+  text-rendering: optimizeLegibility;
+  overflow: scroll;
+  font-family: "Times New Roman", Serif;
+}
+
+tr {
+  page-break-inside: avoid !important;
+}
+
+.pane-center .container-fluid{
+  padding-left: 31px;
+  padding-right:25px;
+}
+/* end of fullDoc page styles */
+
+.clickable:hover {
+  cursor: pointer;
+  background-color: $light_blue;
+}
+
+/*Overriding default from fa-pane-scroller that results in double scroll bar*/
+.center-view .center-view{
+  overflow: hidden;
+}
+
+.pane-center {
+  margin-right: -11px;
+  font-size: 16px;
+
+  .pane-center {
+    margin-right: 0;
+    padding-bottom: 30px;
+  }
+
+  .pane-center-spinner {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+  }
+
+  .pane-center-toolbar {
+    padding: 5px 10px;
+    min-width: $pane_center_toolbar;
+  }
+
+  .pane-center-btn-group {
+    float: right;
+    // padding: 5px 10px;
+    min-width: $pane_center_btn_group_width;
+
+    .bordered-button-bar {
+      float: right;
+    }
+  }
+
+  .pane-center-inner {
+    margin-top: 10px;
+  }
+}
+
+
+.container-tree-reorder {
+  margin-bottom: 24px;
+
+  /*Float reorder buttons to the right */
+  .btn-tree-reorder-save {
+    float: right;
+    margin-top: 24px;
+    margin-right: 8px;
+  }
+
+  .angular-ui-tree-handle {
+    font-family: $font-family-sans-serif;
+    color: $ve-slate-base;
+    padding: 4px 6px;
+    border-radius: 2px;
+    font-weight: bold;
+    @include transition($background_easeout_transition);
+  
+    &.grab {
+      cursor: move;
+      cursor: -moz-move;
+      cursor: -webkit-move;
+    }
+
+    &.no-grab {
+      font-weight: initial;
+      color: $ve-light-text;
+      cursor: default;
+      &:hover {
+        background-color:transparent;
+      }
+    }
+
+    &:hover{
+      background-color: $ve-silver-lighter-0;
+    }
+  }
+
+  .angular-ui-tree-placeholder {
+    margin:0;
+    min-height:0;
+  }
+
+  /*Add blue dotted line to visual feedback of where the item will be placed*/
+  .angular-ui-tree-placeholder:before{
+    background-image: url(../assets/location-feedback.svg);
+    content: ' ';
+    background-size: 70px 30px;
+    height: 30px;
+    width: 70px;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 4px;
+  }
+}
+
+
+/* styling for doclib link to the right of the button bar*/
+
+.doclib-link {
+  margin: 0 4px;
+  float: left;
+  .btn-tools{
+    color: $ve-light-text;
+  }
+
+  img{
+    padding-right:5px;
+    top: -1px;
+    position: relative;
+  }
+}
+
+.fa-folder {
+  color: lighten($ve-accent, 12%);
+}
+
+.group-reorder-container .highlighted {
+  background-color: darken($ve-active, 4%);
+  color: white;
+
+  /*lighten folder against dark blue background*/
+  .fa-folder{
+    color: lighten($ve-accent, 24%);
+  }
+}
+
+
+.active-editor {
+  box-shadow: 0 0 0 3px rgba(101, 182,255,0.47);
+}
+
+/* Overwrite angularjs bootstrap's popuover so that the popover's container expands with its content */
+.popover {
+  max-width: none;
+}

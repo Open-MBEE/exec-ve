@@ -1,0 +1,50 @@
+// /*************************
+//   Button variables that make Bootstrap
+//   conform to the MMS app design guide
+// *************************/
+
+.btn {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: .14em;
+  font-size: 12px;
+
+  .fa {
+    font-size: 14px;
+  }
+}
+
+.btn-secondary {
+  @include button-variant($brand_base, $white, $white);
+}
+
+// Toolbar button style
+.btn-tools {
+  @include button-variant($base_grey, $white, $white);
+
+  .fa {
+    padding-right: 4px;
+    font-size: 16px;
+  }
+
+  &:not(.dropdown-toggle) .fa {
+    padding-right: 0;
+  }
+
+  .caret{
+    opacity: .4;
+  }
+
+  &.print,
+  &.refresh-numbering{
+    margin-left: 12px;
+  }
+}
+
+// Pull center button dropdowns to the right
+.pane-center mms-button-bar {
+  .dropdown-menu {
+    right: 0;
+    left: auto;
+  }
+}

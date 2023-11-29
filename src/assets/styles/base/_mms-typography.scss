@@ -1,0 +1,21 @@
+/*************************
+  Typography for MMS that correspond to
+  the MMS app design guide
+*************************/
+
+/* Sizings */
+$font-size-base: 16px;
+
+/* Families */
+$font-family-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$light-font-family-sans-serif: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$icon-font-name: "FontAwesome";
+
+/* Weights */
+$light_font_weight: 200;
+$default_font_weight: 400;
+$bold_font_weight: 700;
+$headings-font-weight: $light_font_weight;
+
+$headings-line-height: 1.18;
+$default-line-length: 33em;

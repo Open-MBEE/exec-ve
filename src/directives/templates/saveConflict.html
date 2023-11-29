@@ -1,0 +1,16 @@
+<div class="modal-header"><h4>Conflict!</h4></div>
+<div class="modal-body">
+    <p>This element has been updated on the server since the last read
+        and your save is rejected!</p>
+    <hr/>
+    <h6>Latest</h6>
+    <mms-spec mms-type="element" mms-element="latest" no-edit="true"></mms-spec>
+    <hr/>
+    <p> Do you want to discard your edits and update to the latest or force an overwrite?</p>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-warning" ng-click="ok()">Discard Edits</button>
+    <button class="btn btn-warning" ng-click="force()">Force Save</button>
+    <!--<button class="btn btn-sm btn-primary" ng-click="merge()">Try Merge Edits</button>-->
+    <button class="btn btn-default" ng-click="cancel()">Cancel (Do nothing)</button>
+</div>

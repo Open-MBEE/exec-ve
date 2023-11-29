@@ -1,0 +1,71 @@
+<nav class="project-level-header navbar navbar-inverse navbar-fixed-top block" role="navigation">
+    <div class="btn-group ve-dark-dropdown-nav pull-left" uib-dropdown keyboard-nav>
+        <button type="button" class="dropdown-toggle" ng-click="updateProjectChecked()" uib-dropdown-toggle>
+            <span class="label-dropdown">Project:&nbsp;</span><span class="selected-dropdown">{{ currentProject }}</span>
+            <span><i class="fa fa-caret-down" aria-hidden="true"></i></span>
+        </button>
+        <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
+            <li ng-repeat="project in projects | orderBy: 'name'" ng-click="updateProject(project)"
+                ng-class="{'checked-list-item': project.name === currentProject}">
+                <a ng-href="{{getHrefForProject(project);}}"> {{ project.name }} </a>
+            </li>
+        </ul>
+    </div>
+    <div class="breadcrumbs">
+        <ul>
+            <li ng-style="truncateStyle">
+                <a class="back-to-proj" ui-sref="project.ref({refId: branch.id? branch.id : 'master', search: undefined})" ui-sref-opts="{reload:true}"
+                    uib-tooltip="{{ currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
+                    <i class="fa fa-home" aria-hidden="true"></i>
+                </a>
+            </li>
+            <li ng-style="truncateStyle" ng-show="!isRefsView()" ng-repeat="breadcrumb in breadcrumbs track by $index">
+                <span> &#8250;</span>
+                <a ui-sref="{{ breadcrumb.link }}" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
+                    <i ng-class="{'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true"></i>{{ breadcrumb.name }}
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div ng-show="!isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 15px">
+        <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="outsideClick">
+            <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                <span class="label-dropdown">{{ currentRef.type }}:</span>
+                <span class="selected-dropdown">{{ currentRef.name }}</span>
+                <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu pull-right list-with-selected-item list-with-button list-with-tabs" uib-dropdown-menu role="menu"
+                aria-labelledby="task-selection-button">
+                <li class="button-item">
+                    <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches/Tags
+                    </button>
+                </li>
+                <li class="button-item">
+                    <form class="ve-dark-minor-search">
+                        <input placeholder="Filter branches/tags" ng-model="refFilter">
+                    </form>
+                </li>
+                <uib-tabset active="active" type="tabs" justified="false">
+                    <uib-tab index="0" classes="tab-item" heading="Branches">
+                        <li ng-repeat="branch in branches | orderBy:'name' | filter:{name:refFilter} " ng-click="updateBranch(branch)"
+                            ng-class="{'checked-list-item': branch.name === currentBranch, 'branch-disabled': branch.status == 'creating'}"
+                            is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
+                            tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">
+                            <a ng-href="{{getHrefForBranch(branch);}}" ng-style="{display: 'block'}"> {{ branch.name }} </a>
+                        </li>
+                    </uib-tab>
+                    <uib-tab index="1" classes="tab-item" heading="Tags">
+                        <li ng-if="tags.length" ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="updateTag(tag)"
+                            ng-class="{'checked-list-item': tag.name === currentTag, 'branch-disabled': tag.status == 'creating'}"
+                            is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
+                            tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">
+                            <a ng-href="{{getHrefForTag(tag);}}" ng-style="{display: 'block'}"> {{ tag.name }} </a>
+                        </li>
+                        <li ng-if="!tags.length" class="ve-secondary">No Tags</li>
+                    </uib-tab>
+                </uib-tabset>
+            </ul>
+        </div>
+    </div>
+</nav>

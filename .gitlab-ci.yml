@@ -1,0 +1,86 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  SELECTOR: "openmbee-ve"
+  TAG: "latest"
+  ENVIRONMENT: "dev"
+  OC_PROJECT: $OC_DEV_NAMESPACE
+  OC_TOKEN: $OC_DEV_TOKEN
+  OC_URL: $OC_PIPELINE_URL
+
+
+stages:
+  - build
+  - deploy
+
+build:
+  image: registry-cli-docker.wseasttest.navair.navy.mil:5001/docker:20.10.1
+  services:
+  - name: docker:20.10.1-dind
+    command: 
+      - /bin/sh
+      - -c
+      - apk update && apk add ca-certificates wget && wget --no-check-certificate -r -np -nd -R "index.html*" https://wcf-serve.apps.arena-workspace.navair.navy.mil/wcf/latest/crt/ -P /usr/local/share/ca-certificates && update-ca-certificates --fresh > /dev/null && dockerd-entrypoint.sh --insecure-registry=registry-cli-docker.wseasttest.navair.navy.mil:5000 --insecure-registry=registry-cli-docker.wseasttest.navair.navy.mil:5001 --debug || exit
+  stage: build
+  tags:
+    - dind
+    - rhel
+    - edmz
+  before_script:
+    - echo $CI_COMMIT_REF_NAME
+    - |
+      if echo $CI_COMMIT_REF_NAME | grep -E [[:digit:]]+.[[:digit:]]+.[[:digit:]]+;     
+      then
+          TAG=$CI_COMMIT_REF_NAME
+      else
+          TAG="latest"
+      fi
+    - apk -U upgrade
+    - docker info
+  script:
+    - docker login -u $NEXUS_USERNAME -p $NEXUS_PASSWORD registry-cli-docker.wseasttest.navair.navy.mil:5000
+    - docker login -u $NEXUS_USERNAME -p $NEXUS_PASSWORD registry-cli-docker.wseasttest.navair.navy.mil:5001
+    - docker build -f $DOCKERFILE_PATH --build-arg NEXUS_USERNAME=$NEXUS_USERNAME --build-arg NEXUS_PASSWORD=$NEXUS_PASSWORD -t registry-cli-docker.wseasttest.navair.navy.mil:5000/$NEXUS_NAMESPACE/$SELECTOR:$TAG .
+    - docker push registry-cli-docker.wseasttest.navair.navy.mil:5000/$NEXUS_NAMESPACE/$SELECTOR:$TAG
+
+deploy:
+  image: openshift/origin-cli:v3.11
+  stage: deploy
+  tags:
+    - edmz
+    - dind
+    - rhel
+  before_script:
+    - |
+      if [[ "$CI_COMMIT_REF_NAME" =~ [[:digit:]]+.[[:digit:]]+.[[:digit:]]+-RC[[:digit:]]+-SNAPSHOT ]]
+      then
+          TAG=$CI_COMMIT_REF_NAME
+          OC_PROJECT=$OC_STAGE_NAMESPACE
+          OC_TOKEN=$OC_STAGE_TOKEN
+      elif [[ "$CI_COMMIT_REF_NAME" =~ [[:digit:]]+.[[:digit:]]+.[[:digit:]]+.[[:digit:]]+-FINAL ]]     
+      then
+          TAG=$CI_COMMIT_REF_NAME
+          OC_PROJECT=$OC_PROD_NAMESPACE
+          OC_URL=$OC_PROD_URL
+          OC_TOKEN=$OC_PROD_TOKEN
+      else
+          TAG="latest"
+      fi
+  script:
+    - echo $OC_URL
+    - oc login $OC_URL --token=$OC_TOKEN --insecure-skip-tls-verify
+    - oc project $OC_PROJECT
+    - |
+      OC_PATCH_STATUS=$(oc patch deploymentconfig openmbee-ve -p "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"$SELECTOR\",\"image\": \"registry-cli-docker.wseasttest.navair.navy.mil:5000/$NEXUS_NAMESPACE/$SELECTOR:$TAG\"}]}}}}")
+    - echo $OC_PATCH_STATUS
+    - |
+      if [[ "$OC_PATCH_STATUS" == *"not patched" ]]; then
+       oc rollout latest dc/$SELECTOR
+       oc rollout status dc/$SELECTOR
+      fi
+    - oc logout
+
+# Security scanning for ip adddresss and secret values
+# include:
+#   - template: Security/Secret-Detection.gitlab-ci.yml
+

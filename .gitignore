@@ -7,12 +7,18 @@ build
 dist
 deploy
 docs
-/app/*
+app/bower_components
+app/bower_components_target
 .sass-cache
 .idea
 PhantomJS_*
 Chrome_*
 test-results/
 angular-mms-grunt-servers.json
-venv
-.vscode
+
+# paths I added
+/node_modules/*
+package-lock.json
+yarn.lock.json
+Dockerfile.test
+build.log

@@ -1,0 +1,24 @@
+<div class="modal-header">
+    <h4>Insert a comment</h4>
+</div>
+
+<div class="modal-body comment-modal">
+    <div class="comment-modal-input">
+        <div class="form-group">
+            <label>Title</label>
+            <input class="form-control" ng-model="comment.name" type="text"
+                   placeholder="Type a title for your comment here" autofocus>
+        </div>
+        <div class="form-group">
+            <label>Comment</label>
+            <textarea class="form-control" rows="3" ng-model="comment.documentation" 
+                placeholder="Type your comment here" ng-keyup="$event.keyCode == 13 ? ok(comment) : null"></textarea>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok(comment)">Create <i ng-show="oking" class="fa fa-spin fa-spinner"></i>
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

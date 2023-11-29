@@ -6,7 +6,7 @@ describe('ProjectService', function () {
 	var ProjectServiceObj;
 	var mockQ, mockURLService, mockCacheService, mockApplicationService;
 	var $httpBackend, $window;
-	var org = {};
+	var org = {}; 
 	var orgs = {};
 	var ref = {};
 	var refs = {};
@@ -354,12 +354,12 @@ describe('ProjectService', function () {
 		});
 	});
 
-	describe('Method diff-merge: do not need to test', function () {
+	describe('Method diff: do not need to test', function () { 
 	});
 
-	describe('Method merge: do not need to test', function () {
+	describe('Method merge: do not need to test', function () { 
 	});
 
-	describe('Method reset: do not need to test', function () {
+	describe('Method reset: do not need to test', function () { 
 	});
 });

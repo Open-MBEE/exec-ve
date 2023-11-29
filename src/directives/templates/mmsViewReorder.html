@@ -1,0 +1,25 @@
+<!-- Nested node template -->
+<script type="text/ng-template" id="nodes_renderer2.html">
+    <div ui-tree-handle data-nodrag="{{element.isOpaque ? 'true' : 'false'}}"
+         ng-class="{ 'grab' : !element.isOpaque, 'no-grab': element.isOpaque }"
+         title="{{element.isOpaque ? 'Docgen element is not reorderable' : ''}}">
+        
+         {{element.presentationElement.type === 'InstanceSpecification' ? 'Section' : element.presentationElement.type}} : {{element.instanceSpecification.name}}
+    </div>
+    <ol ui-tree-nodes ng-model="element.sectionElements">
+        <li ng-repeat="element in element.sectionElements" ui-tree-node ng-include="'nodes_renderer2.html'">
+        </li>
+    </ol>
+</script>
+<div class="container-tree-reorder">
+    <h4 class="right-pane-title">Reorder contents</h4>
+    <hr class="spec-title-divider">
+    <div ng-show="!elementReferenceTree || elementReferenceTree.length == 0">View contents loading or unavailable
+    </div>
+    <div ng-show="elementReferenceTree && elementReferenceTree.length > 0"><b>Bold</b> view contents are reorderable</div>
+    <div class="well" ui-tree="treeOptions">
+        <ol ui-tree-nodes class="root" ng-model="elementReferenceTree">
+            <li ng-repeat="element in elementReferenceTree" ui-tree-node ng-include="'nodes_renderer2.html'"></li>
+        </ol>
+    </div>
+</div>

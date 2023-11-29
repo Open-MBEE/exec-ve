@@ -1,0 +1,245 @@
+/*************************
+  Styles to override autosave plugin
+*************************/
+
+/*------------------------------------------------------------------
+[Table of contents]
+
+1. Dialogue styling
+  1.1 Compare versions prompt modal
+  1.2 Diff modal
+2. Save success message
+3. Firefox table overflow fix
+4. Flip buttons so they match the direction of the diff
+
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+1. Dialogue styling
+-------------------------------------------------------------------*/
+
+/*Background color*/
+.cke_dialog_background_cover{
+  background:rgba(0,0,0,0.5) !important;
+  background-color:black !important;
+  opacity: 0.5 !important;
+}
+
+.autosave{
+
+  /*Dialog title consistent with VE styles*/
+  .cke_dialog_title{
+    -moz-user-select: none;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+    background: white !important;
+    margin: 0;
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: .02em;
+    font-weight: 600;
+    color: #535353;
+    padding: 15px !important;
+    border-bottom: 1px solid #e5e5e5 !important;
+    border-radius: 6px 6px 0 0 !important;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+  }
+
+  /*Make Dialog body consistent*/
+  .cke_dialog_body{
+    border-radius:6px !important;
+    outline:none !important;
+  }
+
+  /*Base button consistent with VE styles*/
+  .cke_dialog_ui_button{
+    font-weight: 600;
+    letter-spacing: .14em;
+    font-size: 12px;
+    @include transition($background_easeout_transition);
+    border: none !important;
+    text-transform: uppercase;
+    border-radius:3px;
+    box-shadow:none;
+    padding: 7px 12px !important;
+    text-shadow:none !important;
+  }
+
+  /*Make tertiary button consistent with VE styles */
+  .cke_dialog_ui_button.cke_dialog_ui_button_cancel{
+    color: $ve-light-text !important;
+    background:$ve-silver-base !important; 
+    &:hover{
+      background-color:$ve-silver-darker-2 !important;
+      color:$ve-light-text-darker-1 !important;
+    }
+  }
+
+  /*Make primary button consistent with VE*/
+  .cke_dialog_ui_button.cke_dialog_ui_button_ok.cke_dialog_autosave_ok{
+    background: $ve-teal-base !important;
+    color:white !important; 
+    &:hover{
+      background-color: $ve-teal-darker-1 !important;
+      border: none;
+    }
+  }
+
+
+  /*------------------------------------------------------------------
+      1.1 Compare versions prompt modal
+  -------------------------------------------------------------------*/
+
+  .cke_dialog_footer{
+    box-sizing: border-box;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: end;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+    margin-bottom: 0;
+    padding-right: 8px;
+    padding-left: 16px;
+    overflow: hidden;
+    padding: 15px;
+    padding-right: 15px;
+    padding-left: 15px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5 !important;
+    background:white !important;
+    border-radius: 0 0 6px 6px !important;
+    outline:none !important;
+    padding: 15px !important;
+  }
+
+  .cke_dialog_footer_buttons{
+    margin:0 !important;
+  }
+
+  /*------------------------------------------------------------------
+      1.1 Compare versions prompt modal
+  -------------------------------------------------------------------*/
+
+  /*Should be minimum modal width at desktop and 100% on smaller screens*/
+  #autosaveModal .modal-content.autosave{
+    width: calc(100% - 20px);
+  }
+
+  @media (min-width: 768px){
+    #autosaveModal .modal-content.autosave{
+      width: 600px;
+    }
+  }
+
+
+  /*------------------------------------------------------------------
+      1.2 Diff modal
+  -------------------------------------------------------------------*/
+
+  /*Radio options should be next to each other, not spread out horizontally */
+  .cke_dialog_contents_body{
+    .cke_dialog_ui_hbox_first,
+    .cke_dialog_ui_hbox_last{
+      float:left !important;
+    }
+  }
+
+  /* Set width to 100% when there is no initial content*/
+  table.diff{
+    width: 100%;
+    box-sizing: border-box;
+
+    .insert{
+      background-color: #dafde0 !important;
+    }
+
+    .delete{
+      background-color: #ffe3e3;
+      text-decoration: rgba(255,0,0,.4) line-through;
+      -webkit-text-decoration: rgba(255,0,0,.4) line-through;
+    }
+
+    td,
+    th{
+      padding: .4em .4em;
+
+    }
+
+    th {
+      font-weight: bold;
+    }
+
+  }
+
+  /* Hide credits for plugin author*/
+  table.diff th.author{
+    display:none;
+  }
+
+  .cke_dialog_contents_body .cke_dialog_ui_vbox_child{
+    table.diff tbody th{
+      background-color:white !important;
+    }
+  }
+}
+
+/*------------------------------------------------------------------
+2. Save success message
+-------------------------------------------------------------------*/
+
+/* Remove green coloring from suggess message and minimize*/
+.cke_notification.cke_notification_success{
+  display:none !important;
+}
+
+/*------------------------------------------------------------------
+3. Firefox table overflow fix
+-------------------------------------------------------------------*/
+
+table.diff{
+  /* Set table layout to fixed so it doesn't adjust to long strings.*/
+  table-layout: fixed !important;
+  width: 100% !important;
+  word-wrap: break-word;
+
+  /* Fix the width of the first numbering column*/
+  tr > th:first-child{
+    width: 20px;
+  }
+
+  /* Fix the width of the second numbering column in the case of the inline diff view*/
+  &.inlinediff{
+    tr > th:nth-child(2){
+      width: 20px;
+    }  
+  }
+
+  /*fix the width of the third numbering column in the case of the side by side diff view*/
+  &:not(.inlinediff){
+    tr > th:nth-child(3){
+      width: 20px;
+    }
+  }
+}
+
+
+/*------------------------------------------------------------------
+4. Flip buttons so they match the direction of the diff
+-------------------------------------------------------------------*/
+
+.autosave{
+  .cke_dialog_ui_hbox.cke_dialog_footer_buttons{
+    tr{
+      display: block;
+      float: left;
+    }
+
+    td:first-child{
+      float: right;
+      margin-left: 10px;
+    }
+  }
+}
+

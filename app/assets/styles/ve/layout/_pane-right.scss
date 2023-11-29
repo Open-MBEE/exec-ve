@@ -1,0 +1,121 @@
+/*************************
+  Styles for the View Editor right pane
+*************************/
+
+.pane-right {
+  > .pane-right {
+    @include box-shadow(-1px 0px 1px 0px rgba(0, 0, 0, 0.2));
+  }
+
+  &.fa-pane-orientation-horizontal {
+    .fa-pane-handle > .fa-pane-toggle {
+      @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.2));
+      margin-left: 1px;
+    }
+  }
+
+  .container-tags {
+    .tags-table {
+      font-size: 14px;
+      margin-top: 24px;
+      width: 100%;
+    }
+  }
+
+  h4.right-pane-title{
+    display: block;
+    margin: 20px 0;
+  }
+
+  .container-fluid{
+    padding:0 14px 34px;
+  }
+
+  hr.spec-title-divider{
+    margin-left:-18px;
+    margin-right:-18px;
+    border-color: $ve-silver-darker-2;
+  }
+}
+
+.diff-pane-right {
+  > .pane-right {
+    @include box-shadow(-1px 0px 1px 0px rgba(0, 0, 0, 0.2));
+    z-index: 1;
+  }
+
+  &.fa-pane-orientation-horizontal {
+    .fa-pane-handle > .fa-pane-toggle {
+      @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.2));
+      margin-left: 1px;
+    }
+  }
+
+  ul.abn-tree {
+    cursor: default;
+
+    .shaft,
+    .shaft-hidden:hover {
+      background: inherit;
+
+      i {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.htmlDiff {
+
+  [class*="patcher-"] {
+    position: relative;
+  }
+
+  [class*="patcher-"]:not(td):not(tr) {
+    display: inline-block;
+  }
+
+  .patcher-text-insertion, .patcher-text-deletion {
+    display: inline !important;
+  }
+
+  [class*="patcher-"]:not(.patcher-text-diff)::before {
+    position: absolute;
+    z-index: 1;
+    top: -8px;
+    right: -8px;
+    content: ' ';
+    background-size: 16px;
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
+  }
+
+  /*Green background to additions*/
+  .patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {
+    background-color: #dafde0;
+  }
+
+  /*Plus sign and green border to non textual changes*/
+  .patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert {
+    &::before{
+      background-image: url(../assets/insert.svg);
+    }
+    border: 2px dashed #abffb9;
+  }
+
+  /*Strikethrough and red background to deletions*/
+  .patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {
+    background-color: #ffe3e3;
+    text-decoration: rgba(255, 0, 0, 0.4) line-through; /* Ignored in CSS1/CSS2 UAs */
+    -webkit-text-decoration: rgba(255, 0, 0, 0.4) line-through; /* Ignored in CSS1/CSS2 UAs */
+  }
+
+  /*Delete icon and dotted red border to non textual deletions*/
+  .patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out {
+    &::before{
+      background-image: url(../assets/delete.svg);
+    }
+    border: 2px dashed #ffb6b6;
+  }
+}

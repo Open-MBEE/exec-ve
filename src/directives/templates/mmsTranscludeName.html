@@ -1,0 +1,9 @@
+<form class="input-group" ng-submit="save($event)">
+    <input type="text" class="form-control" ng-model="edit.name" aria-describedby="basic-addon2">
+	<span class="input-group-addon transclude-name-label">Name</span>
+    <span class="input-group-addon" ng-click="save($event)" title="Save">
+        <i ng-if="!elementSaving" class="fa fa-save"></i>
+        <i ng-if="elementSaving" class="fa fa-spinner fa-spin"></i>
+    </span>
+    <span class="input-group-addon" ng-click="cancel($event)"><i class="fa fa-times" title="Cancel"></i></span>
+</form>

@@ -1,0 +1,43 @@
+.cke {
+  min-width: 300px;
+}
+
+/** Additional style for ckeditor custom dropdown **/
+.mmsExtraFormat .cke_combo_button, .mmsExtraFeature .cke_combo_button {
+  width: 30px;
+}
+
+.mmsExtraFormat .cke_combo_open, .mmsExtraFeature .cke_combo_open {
+  margin-left: 3px !important;
+}
+
+.mmsExtraFormat a.cke_combo_button .cke_combo_inlinelabel,
+.mmsExtraFeature a.cke_combo_button .cke_combo_inlinelabel {
+  width: 17%;
+  height: 25px;
+  display: inline-block;
+}
+.mmsExtraFormat a.cke_combo_button .cke_combo_inlinelabel {
+  background: url('../assets/format-dropdown.png') no-repeat center !important;
+  background-size: 16px !important;
+}
+
+.mmsExtraFeature a.cke_combo_button .cke_combo_inlinelabel {
+  background: url('../assets/mmsplus.png') no-repeat center !important;
+  background-size: 14px !important;
+}
+
+.cke_button.cke_button__mmscomment:after {
+  border-right: 0 !important;
+}
+
+.cke_combopanel {
+  -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  -moz-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  border-radius: 4px;
+}
+
+.cke_combopanel__mmsextraformat {
+  height: 120px !important;
+}

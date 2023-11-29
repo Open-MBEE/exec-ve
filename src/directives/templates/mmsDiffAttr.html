@@ -1,0 +1,7 @@
+<span ng-show="diffLoading">
+    <i class="fa fa-spin fa-spinner"></i>
+</span>
+<span ng-hide="diffLoading">
+    <span class="text-info" ng-if="message"><i class="fa fa-info-circle"></i>{{message}}</span>
+    <mms-html-diff ng-if="baseElementHtml != undefined && comparedElementHtml != undefined" mms-base-html="baseElementHtml" mms-compared-html="comparedElementHtml" mms-diff-finish="diffFinish"></mms-html-diff>
+</span>

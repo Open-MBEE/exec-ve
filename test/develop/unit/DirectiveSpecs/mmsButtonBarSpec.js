@@ -23,7 +23,7 @@ describe('Directive: mmsButtonBar', function() {
 	it('should test the mmsButtonBar Directive', function() {
 		scope.bbApi = $rootScope.mmsBbApi;
 		scope.buttons = $rootScope.buttons;
-		element = angular.element('<button-bar-component buttons="buttons" mms-bb-api="bbApi"></button-bar-component>');
+		element = angular.element('<mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>');
 		$compile(element)(scope);
 		scope.$apply();
 	});

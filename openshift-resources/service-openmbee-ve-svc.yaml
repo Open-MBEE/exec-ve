@@ -1,0 +1,51 @@
+﻿kind: Service
+apiVersion: v1
+metadata:
+  name: openmbee-ve-svc
+  namespace: openmbee
+  uid: 52741a91-5a2d-459a-8ea7-96fa13ac328f
+  resourceVersion: '936991153'
+  creationTimestamp: '2023-08-31T18:02:11Z'
+  annotations:
+    description: Exposes and load balances the application pods
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: v1
+      time: '2023-08-31T18:02:11Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:description': {}
+        'f:spec':
+          'f:internalTrafficPolicy': {}
+          'f:ports':
+            .: {}
+            'k:{"port":8080,"protocol":"TCP"}':
+              .: {}
+              'f:name': {}
+              'f:port': {}
+              'f:protocol': {}
+              'f:targetPort': {}
+          'f:selector': {}
+          'f:sessionAffinity': {}
+          'f:type': {}
+spec:
+  clusterIP: <openshift_ip>  ipFamilies:
+    - IPv4
+  ports:
+    - name: openmbee-ve
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - <openshift_ip>  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: openmbee-ve
+status:
+  loadBalancer: {}

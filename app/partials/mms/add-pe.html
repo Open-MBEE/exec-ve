@@ -1,0 +1,38 @@
+<!-- TODO: This is almost the same as new-view.html.  Should be combined if possible -->
+
+<div class="modal-header">
+    <h4 class="pe-type-{{presentationElemType}}">Add {{presentationElemType | lowercase}}</h4>
+</div>
+
+<div class="modal-body">
+    <div class="ve-light-tabs modal-top-tabs">
+        <ul class="nav nav-tabs" ng-show="presentationElemType != 'Comment'">
+            <li class="uib-tab nav-item tab-item" ng-class="{'active': createForm}">
+                <a class="nav-link" ng-click="createForm = true"><i class="fa fa-plus"></i>Create New</a>
+            </li>
+            <li class="uib-tab nav-item tab-item" ng-class="{'active': !createForm}">
+                <a class="nav-link" ng-click="createForm = false"><i class="fa fa-search"></i>Search for existing</a>
+            </li>
+        </ul>
+    </div>
+
+    <div ng-show="createForm">
+        <div class="form-group">
+            <label>Name (optional):</label>
+            <input class="form-control" ng-model="newPe.name" ng-keyup="$event.keyCode == 13 ? ok() : null" type="text" placeholder="Type a name for your {{presentationElemType}} here"
+                autofocus>
+        </div>
+    </div>
+
+    <div ng-show="!createForm">
+        <p>Begin by searching for the {{presentationElemType | lowercase}}, then click its name or documentation to add the {{presentationElemType | lowercase}}.</p>
+        <mms-search mms-options="searchOptions" mms-project-id="{{viewOrSectionOb._projectId}}" mms-ref-id="{{viewOrSectionOb._refId}}"></mms-search>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-show="createForm" ng-click="ok()">Create
+        <i ng-show="oking" class="fa fa-spin fa-spinner"></i>
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

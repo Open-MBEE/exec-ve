@@ -1,0 +1,16 @@
+<div ng-if="presentationElemLoading" class="fa fa-spinner fa-spin"></div>
+<div id="{{instanceSpec.id}}" ng-if="!presentationElemLoading" ng-switch on="presentationElem.type">
+    <mms-view-para class="read-width" data-mms-para="presentationElem" ng-switch-when="Paragraph"></mms-view-para>
+    <mms-view-table data-mms-table="presentationElem" mms-pe="instanceSpec" ng-switch-when="Table"></mms-view-table>
+    <mms-view-table-t class="read-width" data-mms-para="presentationElem" ng-switch-when="TableT"></mms-view-table-t>
+    <mms-view-list class="read-width" data-mms-list="presentationElem" ng-switch-when="List"></mms-view-list>
+    <mms-view-list-t class="read-width" data-mms-para="presentationElem" ng-switch-when="ListT"></mms-view-list-t>
+    <mms-view-img data-mms-image="presentationElem" mms-pe="instanceSpec" ng-switch-when="Image"></mms-view-img>
+    <mms-view-section data-mms-section="presentationElem" ng-switch-when="InstanceSpecification"></mms-view-section>
+    <mms-view-equation class="read-width" data-mms-para="presentationElem" ng-switch-when="Equation"></mms-view-equation>
+    <mms-view-figure class="read-width" data-mms-para="presentationElem" ng-switch-when="Figure"></mms-view-figure>
+    <mms-view-figure class="read-width" data-mms-para="presentationElem" ng-switch-when="ImageT"></mms-view-figure>
+    <mms-transclude-com class="read-width" mms-element-id="{{presentationElem.source}}" mms-project-id="{{instanceSpec._projectId}}" mms-ref-id="{{instanceSpec._refId}}" ng-switch-when="Comment"></mms-transclude-com>
+    <mms-view-plot data-mms-plot="presentationElem" ng-switch-when="Plot"></mms-view-plot>
+    <mms-ts-diagram mms-pe-id="{{instanceSpec.id}}" mms-project-id="{{instanceSpec._projectId}}" mms-ref-id="{{instanceSpec._refId}}" mms-tsp-spec="presentationElem" ng-switch-when="TomSawyerDiagram"></mms-ts-diagram>
+</div>

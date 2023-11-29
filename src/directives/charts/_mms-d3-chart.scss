@@ -1,0 +1,176 @@
+
+/**
+ * C3 Fixes
+ */
+
+ mms-view-plot figure {
+   width: 100%;
+ }
+
+.c3 text {
+	font-size: 12px;
+}
+.c3-axis text {
+	font-size: 10px;
+}
+.c3-grid {
+	.log-grid {
+		line {
+			stroke-dasharray: 1,1;
+			stroke-width: 1px;
+			stroke-opacity: .5;
+		}
+    text {
+			opacity: .5;
+	    font-size: 6px;
+		}
+	}
+}
+
+
+// @TODO: EVERYTHING BELOW NEEDS TO BE CLEANED UP OR REMOVED
+  /*.axis path,
+	.axis line{
+	  fill: none;
+	  stroke:black;
+
+	}*/
+
+	.axis text{
+	  font-family: sans-serif;
+	  font-size: 10px;
+	}
+	/*.axis .tick
+	{
+	  stroke-dasharray: 1 2;
+	}
+  */
+/*  radar */
+	body {
+  overflow: hidden;
+  margin: 0;
+  font-size: 14px;
+  font-family: "Helvetica Neue", Helvetica;
+}
+
+#chart {
+  position: absolute;
+  top: 50px;
+  left: 100px;
+}
+/*************************
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;  //aspect ratio
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+}
+*************************/
+
+/********* parallel axis *******************/
+  	.papchart .axislabel {
+       font-size: 16px !important;
+    }
+
+    .papchart .axis text {
+       font-family: sans-serif;
+	  	 font-size: 12px;
+    }
+
+
+    .papchart .axis path,
+    .papchart .axis .tick line {
+        fill: none;
+        stroke: #000;
+    }
+    /*.papchart .objectivetick line {
+      //fill: none;
+      //stroke: red;
+    }*/
+
+
+   	.papchart .axis .tick {
+	  	stroke-dasharray: none;
+	   }
+	/* Horizontal bar */
+  .ghbchart .axis path,
+	.ghbchart .axis line{
+	  fill: none;
+	  stroke:black;
+	  shape-rendering:crispEdge;
+	}
+
+	.ghbchart .axis text{
+	  font-family: sans-serif;
+	  font-size: 10px;
+	}
+	/*.axis .tick
+	{
+	  stroke-dasharray: 1 2;
+	}*/
+	text{
+	  font-family: sans-serif;
+	  font-size: 15px;
+	}
+
+/* grouped horizontal bar */
+	.ghbchart .legend {
+  fill: black;
+  font: 14px sans-serif;
+  text-anchor: start;
+  font-size: 12px;
+}
+
+.ghbchart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+
+.ghbchart .label {
+  fill: black;
+  font: 14px sans-serif;
+  text-anchor: end;
+}
+
+/*.ghbbar:hover {
+  fill: brown;
+}*/
+.obpchart .bottomShadingLabelText {
+    fill: #000;
+    font: 12px sans-serif;
+    text-anchor: start;
+  }
+.obpchart .topLeftLabel {
+    fill: #000;
+    font: 12px sans-serif;
+    text-anchor: end;
+  }
+.obpchart .leftLabel {
+    fill: #000;
+    font: 14px sans-serif;
+    text-anchor: end;
+  }
+.obpchart .bottomLabel {
+    fill: #000;
+    font: 14px sans-serif;
+    text-anchor: start;
+}
+.obpchart .axis text {
+    font: 12px sans-serif;
+}
+.obpchart .axis path,
+.obpchart .axis line {
+        fill: none;
+        stroke: #000;
+        stroke-width: 1;
+        /*shape-rendering: crispEdges;*/
+}
