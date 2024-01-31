@@ -969,7 +969,11 @@ veApp.config([
             ): IHttpInterceptor {
                 return {
                     request: (config: IRequestConfig): IRequestConfig => {
-                        config.headers = uRLSvc.getAuthorizationHeader(config.headers);
+                        if (config.url != uRLSvc.getAuthenticationUrl()) {
+                            config.headers = uRLSvc.getAuthorizationHeader(config.headers);
+                        } else {
+                            console.log("IM DOING IT MOM")
+                        }
                         if (!config.timeout) {
                             config.cancel = $q.defer();
                             config.timeout = config.cancel.promise;

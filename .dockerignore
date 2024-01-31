@@ -3,7 +3,13 @@
 !yarn.lock
 !webpack.config.ts
 !package.json
+!tsconfig.json
+!.eslintignore
+!.eslintrc
+!.prettierrc.js
+!.stylelintrc.json
+
 !src/
 !config/
-!tsconfig.json
-!lib
+!lib/
+!certs/

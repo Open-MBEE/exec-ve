@@ -1,6 +1,6 @@
 import { IQResolveReject } from 'angular';
 
-import { ApplicationService, RootScopeService } from '@ve-utils/application';
+import { ApplicationService, RootScopeService, UserSettingsObject } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
 
@@ -12,6 +12,7 @@ import {
     ElementsRequest,
     ExpressionObject,
     InstanceValueObject,
+    UsersRequest,
     ValueObject,
     ViewInstanceSpec,
     ViewObject,
@@ -43,6 +44,8 @@ export class TreeService {
 
     public treeApi: TreeApi;
     private rows: { [id: string]: TreeRow[] } = {};
+
+    private userSettings: UserSettingsObject;
 
     treeEditable: boolean;
 
@@ -706,9 +709,16 @@ export class TreeService {
                     status: 401,
                 });
             }
-
-            this.treeData.forEach((branch) => {
-                this._addBranchData(1, [], branch, true, {});
+            let userReqOb: UsersRequest = {
+                username: this.applicationSvc.getState().user,
+                projectId: this.treeApi.projectId,
+                refId: this.treeApi.refId 
+            }
+            this.applicationSvc.getUserSettings(userReqOb).then((result) => {
+                this.userSettings = result;
+                this.treeData.forEach((branch) => {
+                    this._addBranchData(1, [], branch, true, {});
+                });
             });
 
             this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, true);
@@ -727,7 +737,12 @@ export class TreeService {
         if (!branch.uid) branch.uid = `${Math.random()}`;
         if (typeof branch.expanded === 'undefined') branch.expanded = level <= this.treeApi.expandLevel;
         branch.expandable = branch.children && branch.children.length > 0;
-        branch.favorite = false;
+        if (this.userSettings.pinned && this.userSettings.pinned.includes(branch.data.id)) {
+            branch.favorite = true;
+        } else {
+            branch.favorite = false;
+        }
+        
 
         let number = '';
         if (section) number = section.join('.');

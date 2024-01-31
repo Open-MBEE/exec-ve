@@ -1,1 +1,5 @@
-listen ${NGINX_PORT};
+server {
+    root /usr/share/nginx/html;
+    listen ${NGINX_PORT};
+}
+

@@ -151,7 +151,7 @@ export const TranscludeArtComponent: ITransclusionComponentOptions = {
         mmsCommitId: '@',
         mmsWatchId: '<',
         nonEditable: '<',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
         mmsGenerateForDiff: '<',
         mmsCallback: '&',
         mmsArtExt: '@',

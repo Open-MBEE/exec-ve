@@ -332,7 +332,7 @@ const SpecHistoryComponent: VeComponentOptions = {
 
 <hr class="right-title-divider">
 
-<div ng-if="$ctrl.ModelData.ShowDiffPrototype">
+<div ng-show="$ctrl.ModelData.ShowDiffPrototype">
     <div class="ve-notify-banner fade-in-out" ng-show="$ctrl.disableRevert">
         <span>Element does not exist on <strong>{{$ctrl.baseCommit.ref.type}}: {{$ctrl.baseCommit.ref.name}}</strong></span>
     </div>

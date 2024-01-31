@@ -1,3 +1,4 @@
 *.json
 !example.json
 !config.js
+!experimental-example.json

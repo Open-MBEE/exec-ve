@@ -149,7 +149,7 @@ export const TranscludeGroupDocsComponent: VeComponentOptions = {
         noClick: '@',
         nonEditable: '<',
         clickHandler: '&?',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
     },
     require: {
         mmsCfCrl: '?^^mmsCf',

@@ -152,7 +152,7 @@ export const TranscludeNameComponent: VeComponentOptions = {
         noClick: '@',
         nonEditable: '<',
         clickHandler: '&?',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
     },
     transclude: true,
     require: {

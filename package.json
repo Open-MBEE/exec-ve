@@ -1,6 +1,7 @@
 {
   "name": "view-editor",
   "version": "5.0.0",
+  "license":"Apache-2.0",
   "description": "View Editor Application",
   "repository": "https://github.com/Open-MBEE/ve.git",
   "main": "main.ts",
@@ -8,7 +9,6 @@
     "start": "cd dist && serve",
     "format": "prettier --write \"**/*.ts\" \"**/*.js\"",
     "lint": "DEBUG=eslint:cli-engine eslint ./src",
-    "prebuild": "yarn lint && yarn format",
     "build": "webpack --config webpack.config.ts --mode=production --bail",
     "watch": "webpack --config webpack.config.ts --mode=development --watch --progress",
     "test": "yarn prebuild && yarn build"
@@ -102,6 +102,6 @@
     "ui-router-visualizer": "3",
     "uuid": "^9.0.0",
     "vdom-to-html": "^2.3.1",
-    "virtual-dom": "git+https://github.com/chhaymenghong/virtual-dom.git#master"
+    "virtual-dom": "./lib/virtual-dom-2.1.1.tgz"
   }
 }

@@ -213,7 +213,7 @@ export const TranscludeDocComponent: VeComponentOptions = {
         mmsCommitId: '@',
         mmsWatchId: '@',
         nonEditable: '<',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
         mmsGenerateForDiff: '<',
         mmsCallback: '&',
     },

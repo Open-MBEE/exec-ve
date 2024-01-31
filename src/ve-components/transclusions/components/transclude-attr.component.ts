@@ -90,7 +90,7 @@ export class TranscludeAttrController extends Transclusion implements ITransclus
 
     public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string>();
-        let contentTemplate: string;
+        let contentTemplate: string = "";
         const ids: string[] = [];
         if (
             this.element[this.mmsAttr] ||
@@ -125,21 +125,17 @@ export class TranscludeAttrController extends Transclusion implements ITransclus
             if (ids.length > 0) {
                 ids.forEach((id) => {
                     this.attrValues.push(
-                        `<transclude-name mms-element-id="${id}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" ${
-                            this.noClick ? 'no-click="true"' : ''
-                        }}></transclude-name>`
+                        `<transclude-name mms-element-id="${id}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" ${this.noClick ? 'no-click="true"' : ''}></transclude-name>`
                     );
                 });
             }
         } else {
             this.attrValues.push(`<span class="no-print placeholder">(empty)</span>`);
         }
-        if (this.mmsCfLabel) {
-            contentTemplate = `<h2 class="prop-title">{{$ctrl.mmsAttr}}</h2>`;
-        }
 
+        contentTemplate += `${this.mmsCfLabel ? '<h4 class="prop-title">{{$ctrl.mmsAttr}}:</h4></br>' : ''}`
         this.attrValues.forEach((value, index) => {
-            const sep = index == this.attrValues.length - 1 ? '' : ', ';
+            const sep = (index == this.attrValues.length - 1) ? '' : ', ';
             contentTemplate += `${value}${this.mmsCfLabel ? '</br>' : sep}`;
         });
         deferred.resolve(contentTemplate);
@@ -158,7 +154,7 @@ export const TranscludeNameComponent: VeComponentOptions = {
         mmsRefId: '@',
         mmsCommitId: '@',
         mmsWatchId: '@',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
         noClick: '<',
     },
     transclude: true,

@@ -43,7 +43,7 @@ interface TranscludeDefaultBindings {
     mmsRefId: '@';
     mmsCommitId: '@';
     mmsWatchId: '<';
-    mmsCfLabel: '@';
+    mmsCfLabel: '<';
     mmsGenerateForDiff?: '<';
     noClick?: '<';
     nonEditable?: '<';
@@ -111,7 +111,7 @@ export class Transclusion implements ITransclusion, EditorActions {
     mmsWatchId: string;
     nonEditable: boolean;
     noClick: boolean;
-    mmsCfLabel: boolean;
+    mmsCfLabel: boolean = false;
     mmsGenerateForDiff: boolean;
     mmsCallback: () => void;
 
@@ -266,6 +266,7 @@ export class Transclusion implements ITransclusion, EditorActions {
         handleChange(onChangesObj, 'mmsElementId', this.changeAction);
         handleChange(onChangesObj, 'mmsRefId', this.changeAction);
         handleChange(onChangesObj, 'mmsCommitId', this.changeAction);
+        handleChange(onChangesObj, 'mmsCfLabel', this.changeAction);
     }
 
     $postLink(): void {

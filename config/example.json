@@ -26,11 +26,5 @@
   "footer": {
     "labels": ["opensource"]
   },
-  "loginTimout": 600000,
-  "experimental": [
-    {
-      "id": "experimental-magic",
-      "name": "Content Magic"
-    }
-  ]
+  "loginTimout": 600000
 }

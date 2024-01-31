@@ -37,7 +37,7 @@ export class CrossReferenceController implements IComponentController {
     nonEditable: boolean;
     mmsGenerateForDiff: boolean;
     mmsAttr: string;
-    mmsCfLabel: boolean;
+    mmsCfLabel: boolean = false;
 
     //Deps
     transclusionCtrl: CrossReferenceController;
@@ -110,8 +110,7 @@ export class CrossReferenceController implements IComponentController {
                         tag +
                         (this.mmsGenerateForDiff ? ' mms-generate-for-diff="$ctrl.mmsGenerateForDiff"' : '') +
                         (this.mmsAttr ? ' mms-attr={{$ctrl.mmsAttr}}' : '') +
-                        (typeof this.mmsCfLabel !== 'undefined' ? ' mms-cf-label={{$ctrl.mmsCfLabel}}' : '') +
-                        ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable"></' +
+                        ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" mms-cf-label="$ctrl.mmsCfLabel" non-editable="$ctrl.nonEditable"></' +
                         tag +
                         '>'
                 );
@@ -136,7 +135,7 @@ const MmsCfComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsGenerateForDiff: '<',
         mmsAttr: '@',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
     },
     require: {
         transclusionCtrl: '?^^mmsCf',

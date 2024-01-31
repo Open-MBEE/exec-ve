@@ -397,7 +397,7 @@ export const TranscludeValComponent: ITransclusionComponentOptions = {
         mmsCommitId: '@',
         nonEditable: '<',
         noClick: '<',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
         mmsGenerateForDiff: '<',
         mmsCallback: '&',
         mmsWatchId: '<',

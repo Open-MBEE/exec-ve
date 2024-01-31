@@ -145,7 +145,7 @@ export const TranscludeImgComponent: VeComponentOptions = {
         mmsCommitId: '@',
         mmsWatchId: '@',
         nonEditable: '<',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
         mmsGenerateForDiff: '<',
         mmsCallback: '&',
     },

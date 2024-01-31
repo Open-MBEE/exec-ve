@@ -57,13 +57,21 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
         compiler.hooks.beforeCompile.tap('Setup', (comp) => {
             const configObj: VeConfig =
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
-                require(`./config/${process.env.VE_ENV}.json`) as VeConfig
+                require(`./config/${process.env.VE_ENV ? process.env.VE_ENV : "example"}.json`) as VeConfig
 
             if (this.ran) {
                 return
             }
             this.ran = true
-            if (configObj.experimental) {
+            let extensionConfig: VeConfig = null
+            try {
+                extensionConfig =
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                require(`./config/experimental-${process.env.VE_ENV ? process.env.VE_ENV : "example"}.json`) as VeConfig
+            } catch (err) {
+                extensionConfig = configObj
+            }
+            if (extensionConfig && extensionConfig.experimental) {
                 const validExt = ['specTools', 'transclusions', 'presentations', 'insertions', 'trees']
                 fs.writeFile(
                     `${extensionsDir}/index.ts`,
@@ -74,7 +82,7 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                         }
                     }
                 )
-                for (const ext of configObj.experimental) {
+                for (const ext of extensionConfig.experimental) {
                     // if (!configObj.ran) {
                     let extPath = `./${ext.id}`
                     if (ext.path) {

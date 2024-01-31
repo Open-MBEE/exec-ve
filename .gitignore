@@ -5,7 +5,6 @@ tmp
 .DS_Store
 build
 dist
-deploy
 docs
 /app/*
 .sass-cache
@@ -16,3 +15,4 @@ test-results/
 angular-mms-grunt-servers.json
 venv
 .vscode
+certs

@@ -179,7 +179,7 @@ const SpecEditorComponent: VeComponentOptions = {
 <div ng-if="!$ctrl.noEdit && $ctrl.edit" class="editing">
 
     <h1 class="prop" ng-if="$ctrl.edit.element.name !== undefined"><input class="form-control ve-plain-input" type="text" ng-model="$ctrl.edit.element.name"></h1>
-    <span class="elem-updated-wrapper">Last modified {{$ctrl.element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email != undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier }}</b></span>
+    <span class="elem-updated-wrapper">Last modified {{$ctrl.element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email != undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier.username }}</b></span>
 
     <div ng-if="$ctrl.isValue">
         <h2 class="prop-title spec-view-value-heading">Property Value</h2>

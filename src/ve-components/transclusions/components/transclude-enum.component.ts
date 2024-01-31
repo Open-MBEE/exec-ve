@@ -254,7 +254,7 @@ export const TranscludeEnumComponent: VeComponentOptions = {
         noClick: '@',
         nonEditable: '<',
         clickHandler: '&?',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
     },
     transclude: true,
     require: {

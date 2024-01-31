@@ -131,7 +131,7 @@ export const TranscludeValueLinkComponent: ITransclusionComponentOptions = {
         mmsRefId: '@',
         mmsCommitId: '@',
         mmsWatchId: '<',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
         mmsLinkText: '@',
     },
     transclude: true,

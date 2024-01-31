@@ -123,7 +123,7 @@ const TranscludeViewComponent: VeComponentOptions = {
         mmsCommitId: '@',
         mmsWatchId: '@',
         nonEditable: '<',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
         mmsGenerateForDiff: '<',
         noTitle: '@',
     },

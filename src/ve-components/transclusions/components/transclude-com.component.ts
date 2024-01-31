@@ -132,7 +132,7 @@ export const TranscludeComComponent: ITransclusionComponentOptions = {
         mmsCommitId: '@',
         mmsWatchId: '<',
         nonEditable: '<',
-        mmsCfLabel: '@',
+        mmsCfLabel: '<',
         mmsGenerateForDiff: '<',
         mmsCallback: '&',
     },
