@@ -1,0 +1,129 @@
+# Default values for ve.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: openmbee/view-editor
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+namespaceOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+
+config:
+  # Put the external URL in the format protocol://url[:port] that your MMS server can be reached at from a browser
+  apiUrl: ""
+  # Put the external URL in the format protocol://url[:port] that your MMS print microservice can be reached at from a browser
+  printUrl: ""
+  # Any Base path at which the mms api is located at (defaults to: /)
+  basePath: ""
+  #Configure the banner that appears below the login dialog
+  loginBanner:
+    enabled: true
+  #Each top list item below is a row and then you can concatenate statements in sub-items
+    labels:
+      -
+        - unclassified
+        - pi
+        - no_public_release
+    separator: " "
+    background: "#0D47A1"
+    color: "#e8e8e8"
+  #Configure the login warning banner
+  loginWarning:
+    enabled: true
+    message:
+    - "By accessing and using this information system, you acknowledge and consent to the following: If you are not authorized to access this system, disconnect now. Users of this system have no expectation, of privacy. By continuing, you consent to your keystrokes and data content being monitored."
+  #Configure the top banner
+  banner:
+    enabled: true
+    labels:
+    - pi
+  #Configure the footer
+  footer:
+    enabled: true
+    labels:
+    - unclassified
+    
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## This section is specifically grouped to show mounting of a custom config.json file using a configmap
+env: []
+
+#volumeMounts: []
+volumeMounts:
+  - name: config-json
+    mountPath: "/usr/share/nginx/html/config/config.json"
+    subPath: config.json
+
+#volumes: []
+volumes:
+  - name: config-json
+    configMap:
+      name: ve-config-json
+      items:
+      - key: config.json
+        path: config.json
