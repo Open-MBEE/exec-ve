@@ -94,10 +94,10 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                             throw err
                         }
                     })
-                    if (!configObj.expConfig) {
+                    if (!extensionConfig.expConfig) {
                         configObj.expConfig = {}
                         for (const type of validExt) {
-                            configObj.expConfig[type] = []
+                            extensionConfig.expConfig[type] = []
                         }
                     }
                     let extConfPath = `${extensionsDir}/${ext.id}/config.json`
@@ -114,7 +114,7 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                             (extConf[extType] as VeExperimentDescriptor[]).length > 0
                         ) {
                             for (const ec of extConf[extType] as VeExperimentDescriptor[]) {
-                                ;(configObj.expConfig[extType] as VeExperimentDescriptor[]).push(ec)
+                                ;(extensionConfig.expConfig[extType] as VeExperimentDescriptor[]).push(ec)
                             }
                         }
                     }
@@ -125,6 +125,11 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
             configObj.version = `${packageJson.version}${this.mode}`
             fs.mkdirSync('./dist/config', { recursive: true })
             fs.writeFile(__dirname + '/dist/config/config.json', JSON.stringify(configObj), (err) => {
+                if (err) {
+                    throw err
+                }
+            })
+            fs.writeFile(__dirname + '/dist/config/extension.json', JSON.stringify(extensionConfig), (err) => {
                 if (err) {
                     throw err
                 }

@@ -8,4 +8,13 @@
             window.__env = Object.assign(window.__env, data)
         },
     })
+    $.ajax('config/extension.json', {
+        async: false,
+        global: false,
+        dataType: 'json',
+        success: function (data) {
+            window.__env = window.__env || {}
+            window.__env = Object.assign(window.__env, data)
+        },
+    })
 })()
