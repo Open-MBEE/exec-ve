@@ -13,6 +13,11 @@ export interface VeConfig {
     banner?: BrandingStyle;
     footer?: BrandingStyle;
     loginTimeout?: number;
+    viewLink: {
+        sectionPrefix: string;
+        appendixPrefix: string;
+        hidePrefixForSections: boolean;
+    }
     experimental?: VeExperimentDescriptor[];
     expConfig?: VeExperimentConfig;
 }

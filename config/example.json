@@ -27,6 +27,11 @@
     "labels": ["opensource"]
   },
   "loginTimout": 600000,
+  "viewLink": {
+    "sectionPrefix": "Section ",
+    "appendixPrefix": "Appendix ",
+    "hidePrefixForSections": false
+  },
   "experimental": [
     {
       "id": "experimental-magic",
