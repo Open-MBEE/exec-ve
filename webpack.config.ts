@@ -95,7 +95,7 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                         }
                     })
                     if (!extensionConfig.expConfig) {
-                        configObj.expConfig = {}
+                        extensionConfig.expConfig = {}
                         for (const type of validExt) {
                             extensionConfig.expConfig[type] = []
                         }
@@ -159,6 +159,10 @@ const config = (env: any, argv: ArgV): Configuration => ({
     },
     optimization: {
         minimize: argv.mode === 'production',
+        moduleIds: 'named',
+        splitChunks: {
+            chunks: 'all'
+        }
     },
     output: {
         path: path.resolve(__dirname, 'dist'),

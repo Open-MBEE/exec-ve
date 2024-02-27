@@ -211,7 +211,7 @@ const NavBarComponent: VeComponentOptions = {
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf" target="_blank">View Editor Help</a>
+                                <a href="https://docs.openmbee.org/projects/ve" target="_blank">View Editor Help</a>
                             </li>
                             <li>
                                 <a href="https://github.com/Open-MBEE/ve/issues" target="_blank">Report Issue</a>

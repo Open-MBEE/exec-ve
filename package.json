@@ -6,7 +6,7 @@
   "repository": "https://github.com/Open-MBEE/ve.git",
   "main": "main.ts",
   "scripts": {
-    "start": "cd dist && serve",
+    "start": "cd dist && serve -p 80",
     "format": "prettier --write \"**/*.ts\" \"**/*.js\"",
     "lint": "DEBUG=eslint:cli-engine eslint ./src",
     "build": "webpack --config webpack.config.ts --mode=production --bail",

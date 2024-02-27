@@ -63,7 +63,7 @@ export class ApiService {
     }
 
     public getVeVersion = (): string => {
-        return this.veConfig.version;
+        return this.veConfig.version ? this.veConfig.version : "ve-app";
     };
 
     /**

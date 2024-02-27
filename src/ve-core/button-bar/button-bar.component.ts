@@ -51,7 +51,7 @@ const ButtonBarComponent: VeComponentOptions = {
     controller: class ButtonBarController implements angular.IComponentController {
         // Bindings
         private buttonId: string;
-        private minSize: number = 100;
+        private minSize: number;
 
         private bbApi: ButtonBarApi;
         public init: boolean = false;
@@ -70,6 +70,7 @@ const ButtonBarComponent: VeComponentOptions = {
         ) {}
 
         $onInit(): void {
+            this.minSize = 100;
             this.buttonBarSvc.waitForApi(this.buttonId).then(
                 (api) => {
                     this.bbApi = api;
@@ -80,6 +81,7 @@ const ButtonBarComponent: VeComponentOptions = {
                     this.growl.error(reason.message);
                 }
             );
+            
         }
 
         configure = (): void => {
@@ -91,10 +93,16 @@ const ButtonBarComponent: VeComponentOptions = {
                 mutations.forEach((mutationRecord) => {
                     const size = mutationRecord.borderBoxSize;
                     const oldHeight = this.currentHeight;
+                    //console.log("WRAP");
                     this.eventSvc.$broadcast(this.bbApi.WRAP_EVENT, {
                         oldSize: oldHeight,
                         newSize: size[0].blockSize,
                     });
+                    // console.log({
+                    //     oldSize: oldHeight,
+                    //     newSize: size[0].blockSize,
+                    //     inlineSize: size[0].inlineSize
+                    // })
                     this.currentHeight = size[0].blockSize;
                     if (size[0].inlineSize <= this.minSize && !this.squished) {
                         this.squished = true;

@@ -24,6 +24,8 @@
     "paths": {
       "@ve-components": ["ve-components"],
       "@ve-components/*": ["ve-components/*"],
+      "@ve-extensions": ["ve-extensions"],
+      "@ve-extensions/*": ["ve-extensions/*"],
       "@ve-core": ["ve-core"],
       "@ve-core/*": ["ve-core/*"],
       "@ve-utils": ["ve-utils"],

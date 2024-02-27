@@ -9,7 +9,7 @@ import { AppUtilsService, FullDocumentApi, FullDocumentService } from '@ve-app/m
 import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config';
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
 import { TreeService } from '@ve-components/trees';
-import { IButtonBarButton, ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
+import { IButtonBarButton, ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
@@ -37,6 +37,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
     bars: string[];
     bbApi: ButtonBarApi;
     bbId = 'full-doc';
+    bbSize: string = '34px';
     fullDocumentApi: FullDocumentApi;
     viewContentLoading: boolean;
     buttons: IButtonBarButton[] = [];
@@ -119,7 +120,17 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         //Init/Reset Tree Updated Subject
         this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false);
 
+        //Init Toolbar and set pane height
         this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons);
+        this._setToolbarHeight();
+
+        this.subs.push(
+            this.eventSvc.$on(this.bbApi.WRAP_EVENT, (data: ButtonWrapEvent) => {
+                if (data.oldSize != data.newSize) {
+                    this._setToolbarHeight();
+                }
+            })
+        )
 
         this.view2Node[this.mmsDocument.id] = {
             label: this.mmsDocument.name,
@@ -270,6 +281,14 @@ class FullDocumentController implements IComponentController, Ng1Controller {
     $onDestroy(): void {
         this.eventSvc.$destroy(this.subs);
         this.buttonBarSvc.destroy(this.bbId);
+    }
+
+    private _setToolbarHeight(): void {
+        const barHeight = $('.pane-center-btn-group').outerHeight()
+        if (barHeight){
+            this.bbSize = barHeight.toString(10) + 'px'
+            this.$scope.$apply
+        }
     }
 
     initViews(): void {
@@ -511,7 +530,7 @@ const DocumentComponent: VeComponentOptions = {
     selector: 'document',
     template: `
     <div>
-    <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="46px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
+    <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="{{$ctrl.bbSize}}" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
         <div class="pane-center-toolbar">
             <div class="share-link">
                 <button type="button" class="btn btn-tools btn-sm share-url" uib-tooltip="Share Page" tooltip-placement="bottom" tooltip-popup-delay="100"

@@ -3,7 +3,7 @@
         {
             "name": "Spec Magic Test",
             "path": "experimental-magic",
-            "button": {
+            "toolButton": {
                 "id": "spec-magic",
                 "category": "global",
                 "icon": "fa-magic",
@@ -11,7 +11,9 @@
                 "active": true,
                 "permission": true,
                 "tooltip": "Magic!",
-                "spinner": false
+                "spinner": false,
+                "enabledFor": ["**.portal.**", "**.present.**"],
+                "disabledFor": ["main.project.ref.search"]
             }
         }
     ]

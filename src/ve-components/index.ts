@@ -25,7 +25,7 @@ import './insertions';
 
 export * from './ve-components.module';
 
-import '../ve-extensions';
+import '@ve-extensions';
 import { ElementObject } from '@ve-types/mms';
 
 export default 've-components';
