@@ -32,6 +32,7 @@
       "@ve-utils/*": ["ve-utils/*"],
       "@ve-app": ["ve-app"],
       "@ve-app/*": ["ve-app/*"],
+      "@ve-types": ["ve-types"],
       "@ve-types/*": ["ve-types/*"]
     },
     "skipLibCheck": true

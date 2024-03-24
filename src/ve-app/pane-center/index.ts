@@ -1,5 +1,7 @@
 import './services/ContentWindow.service';
 
+import './admin.component';
+import './docgen.component';
 import './document.component';
 import './slideshow.component';
 import './search.component';

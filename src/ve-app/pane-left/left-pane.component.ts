@@ -175,7 +175,7 @@ class LeftPaneController implements angular.IComponentController {
                 });
             }),
             this.eventSvc.$on<ElementObject>('view.reordered', (viewOrSection) => {
-                this.treeSvc.getBranch(viewOrSection).then((b) => {
+                this.treeSvc.getBranch<ViewObject>(viewOrSection).then((b) => {
                     const old = b.children;
                     const newChildren = [];
                     let viewBranch = b;
@@ -307,7 +307,9 @@ class LeftPaneController implements angular.IComponentController {
         const commitId = data.commitId ? data.commitId : null;
         if ((rootId && this.treeSvc.processedRoot !== rootId && rootId != '') || !this.treeApi) {
             new this.$q<string, RefsResponse>((resolve, reject) => {
-                if (
+                if (this.$state.includes('**.admin.**')) {
+                    resolve(null)
+                } else if (
                     !this.treeApi ||
                     !this.treeApi.refType ||
                     refId != this.treeApi.refId ||
@@ -334,7 +336,9 @@ class LeftPaneController implements angular.IComponentController {
                     this.treeApi.onDblClick = this.treeDblClickCallback;
 
                     this.treeSvc.treeApi = this.treeApi;
-                    this.treeSvc.treeEditable = this.permissionsSvc.hasBranchEditPermission(
+                    this.treeSvc.treeEditable = this.$state.includes('**.admin.**') 
+                    ? false 
+                    : this.permissionsSvc.hasBranchEditPermission(
                         this.mmsProject.id,
                         this.mmsRef.id
                     );
@@ -342,7 +346,7 @@ class LeftPaneController implements angular.IComponentController {
                     this.treeApi.sectionNumbering = this.$state.includes('**.present.**');
                     this.treeApi.expandLevel = this.$state.includes('**.present.**')
                         ? 3
-                        : this.$state.includes('**.portal.**')
+                        : this.$state.includes('**.portal.**') || this.$state.includes('**.admin.**')
                         ? 0
                         : 1;
                     this.treeApi.sort = !this.$state.includes('**.present.**');
@@ -522,7 +526,7 @@ class LeftPaneController implements angular.IComponentController {
         }
         this.treeSvc.getPrevBranch(branch).then(
             (prevBranch) => {
-                const type = this.viewSvc.getElementType(branch.data);
+                const type = this.viewSvc.getElementType(branch.data as ElementObject);
                 if (this.$state.includes('**.present.**')) {
                     if (type == 'Document') {
                         this.growl.warning(
@@ -530,7 +534,7 @@ class LeftPaneController implements angular.IComponentController {
                         );
                         return;
                     }
-                    if (branch.type !== 'view' || !this.apiSvc.isView(branch.data)) {
+                    if (branch.type !== 'view' || !this.apiSvc.isView(branch.data as ElementObject)) {
                         this.growl.warning(
                             'Cannot remove non-view item. To remove this item, open it in the center pane.'
                         );
@@ -539,7 +543,7 @@ class LeftPaneController implements angular.IComponentController {
                 } else {
                     if (
                         branch.type !== 'view' &&
-                        !this.apiSvc.isDocument(branch.data) &&
+                        !this.apiSvc.isDocument(branch.data as ElementObject) &&
                         (branch.type !== 'group' || branch.children.length > 0)
                     ) {
                         this.growl.warning('Cannot remove group with contents. Empty contents and try again.');
@@ -551,7 +555,7 @@ class LeftPaneController implements angular.IComponentController {
                     resolve: {
                         getType: () => {
                             let type = branch.type;
-                            if (this.apiSvc.isDocument(branch.data)) {
+                            if (this.apiSvc.isDocument(branch.data as ElementObject)) {
                                 type = 'Document';
                             }
                             return type;
@@ -565,7 +569,7 @@ class LeftPaneController implements angular.IComponentController {
                                     if (branch.type === 'view') {
                                         this.treeSvc.getParent(branch).then((parentBranch) => {
                                             if (!this.$state.includes('**.present.**')) {
-                                                this.viewSvc.downgradeDocument(branch.data).then(resolve, reject);
+                                                this.viewSvc.downgradeDocument(branch.data as ElementObject).then(resolve, reject);
                                             } else {
                                                 this.viewSvc
                                                     .removeViewFromParentView({
@@ -578,7 +582,7 @@ class LeftPaneController implements angular.IComponentController {
                                             }
                                         }, reject);
                                     } else if (branch.type === 'group') {
-                                        this.viewSvc.removeGroup(branch.data).then(resolve, reject);
+                                        this.viewSvc.removeGroup(branch.data as ElementObject).then(resolve, reject);
                                     } else {
                                         resolve();
                                     }

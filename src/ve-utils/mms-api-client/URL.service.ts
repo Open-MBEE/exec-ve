@@ -161,6 +161,10 @@ export class URLService {
         return `${this.root}/orgs/${orgId}`;
     };
 
+    getOrgPermissionsURL = (orgId: string): string => {
+        return this.addPermissions(this.getOrgURL(orgId));
+    }
+
     getOrgsURL = (): string => {
         return `${this.root}/orgs`;
     };
@@ -174,6 +178,10 @@ export class URLService {
         return `${this.root}/projects/${projectId}`;
     };
 
+    getProjectPermissionsURL = (projectId: string): string => {
+        return this.addPermissions(this.getProjectURL(projectId));
+    }
+
     getProjectMountsURL = (projectId: string, refId: string): string => {
         return `${this.root}/projects/${projectId}/refs/${refId}/mounts`;
     };
@@ -185,6 +193,10 @@ export class URLService {
     getRefURL = (projectId: string, refId: string): string => {
         return `${this.root}/projects/${projectId}/refs/${refId}`;
     };
+
+    getRefPermissionsURL = (projectId: string, refId: string): string => {
+        return this.addPermissions(this.getRefURL(projectId, refId));
+    }
 
     getCommitsURL = (projectId: string, refId: string, timestamp?: string, limit?: number): string => {
         let r = `${this.root}/projects/${projectId}/refs/${refId}/commits`;
@@ -468,6 +480,10 @@ export class URLService {
         }
         return r;
     };
+
+    private addPermissions = (url:string): string => {
+        return `${url}/permissions`
+    }
 
     private addChildViews = (url: string, add: boolean): string => {
         const r = url;

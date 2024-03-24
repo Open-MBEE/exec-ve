@@ -5,6 +5,7 @@ export * from './valuesAndInstances.d';
 export * from './views.d';
 export * from './orgsAndProjects.d';
 export * from './mms.d';
+export * from './classesAndProperties.d';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MmsObject = Record<string, any>;

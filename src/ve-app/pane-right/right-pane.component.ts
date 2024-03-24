@@ -28,6 +28,7 @@ class RightPaneController implements IComponentController {
     private mmsRoot: ElementObject;
 
     //Local Values
+    public history: string[]
 
     public subs: Rx.IDisposable[];
 

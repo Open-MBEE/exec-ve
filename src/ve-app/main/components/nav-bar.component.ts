@@ -162,6 +162,10 @@ class NavBarController implements angular.IComponentController {
             });
         }
     }
+
+    isAdmin(): boolean {
+        return this.user.admin
+    }
 }
 
 const NavBarComponent: VeComponentOptions = {
@@ -217,6 +221,9 @@ const NavBarComponent: VeComponentOptions = {
                                 <a href="https://github.com/Open-MBEE/ve/issues" target="_blank">Report Issue</a>
                             </li>
                             <li class="divider"></li>
+                            <li ng-if="$ctrl.isAdmin()">
+                                <a ng-click="$ctrl.toggleAbout()" href="">About View Editor</a>
+                            </li>
                             <li class="list-section-bottom">
                                 <a ng-click="$ctrl.toggleAbout()" href="">About View Editor</a>
                             </li>

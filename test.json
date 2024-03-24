@@ -1,0 +1,567 @@
+{
+    "excludeFromList": false,
+    "header": [
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "sourceType": "text",
+                        "text": "<p>Req't ID</p>",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "sourceType": "text",
+                        "text": "<p>Text</p>",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ]
+    ],
+    "style": "normal",
+    "body": [
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291461_147246_11955_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291461_147246_11955_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291572_211870_11961_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291572_211870_11961_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291680_290076_11967_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291680_290076_11967_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291800_186215_11973_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291800_186215_11973_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291912_371381_11979_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839291912_371381_11979_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292018_299030_11985_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292018_299030_11985_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292137_327898_11991_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292137_327898_11991_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292265_479681_11997_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292265_479681_11997_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292389_108705_12003_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292389_108705_12003_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292513_967246_12009_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292513_967246_12009_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292658_578931_12015_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292658_578931_12015_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292792_109042_12021_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292792_109042_12021_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292980_479092_12027_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839292980_479092_12027_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293152_607718_12033_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293152_607718_12033_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293285_774009_12039_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293285_774009_12039_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293434_955635_12045_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293434_955635_12045_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293584_964525_12051_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293584_964525_12051_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293733_518933_12057_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_2_71301a1_1505839293733_518933_12057_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": true,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_3_71301a1_1562876186111_814562_7848_asi-slot-_11_5EAPbeta_be00301_1147873236436_846958_2313",
+                        "type": "Paragraph"
+                    }
+                ]
+            },
+            {
+                "colspan": "1",
+                "rowspan": "1",
+                "content": [
+                    {
+                        "nonEditable": false,
+                        "sourceType": "reference",
+                        "sourceProperty": "value",
+                        "source": "_18_5_3_71301a1_1562876186111_814562_7848_asi-slot-_11_5EAPbeta_be00301_1147873226632_528960_2311",
+                        "type": "Paragraph"
+                    }
+                ]
+            }
+        ]
+    ],
+    "title": "System Requirements Table",
+    "type": "Table",
+    "showIfEmpty": false
+}

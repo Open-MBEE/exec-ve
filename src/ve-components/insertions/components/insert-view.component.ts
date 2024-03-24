@@ -14,8 +14,8 @@ import { TreeBranch } from '@ve-types/tree';
 import { VeModalService } from '@ve-types/view-editor';
 
 export interface InsertViewData extends InsertData {
-    parentBranch: TreeBranch;
-    seenViewIds: { [viewId: string]: TreeBranch };
+    parentBranch: TreeBranch<ViewObject>;
+    seenViewIds: { [viewId: string]: TreeBranch<ViewObject> };
     newViewAggr?: 'composite' | 'shared';
 }
 

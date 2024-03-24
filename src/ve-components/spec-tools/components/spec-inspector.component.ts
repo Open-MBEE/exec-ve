@@ -151,42 +151,6 @@ const SpecInspectorComponent: VeComponentOptions = {
         <h1 class="prop element-title" ng-class="{'ve-error': $ctrl.mmsDisplayOldSpec}"><span class="{{ $ctrl.elementTypeClass }}"></span>{{$ctrl.element.name}}</h1>
         <span class="elem-updated-wrapper">Last modified {{$ctrl.element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email != undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier.username }}</b></span>
 
-        <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.includes('TaggedValue')">
-            <h2 class="prop-title spec-view-value-heading">Property Value</h2>
-            <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}" non-editable="true"></transclude-val>
-            
-            <h2 class="prop-title spec-view-value-heading">Property Type</h2>
-            <span class="prop" ng-if="$ctrl.element.type === 'Property'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.typeId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.typeId)"></transclude-name></span>
-            <span class="prop" ng-if="$ctrl.element.type === 'Slot'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.definingFeatureId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.definingFeatureId)"></transclude-name></span>
-            <span class="prop" ng-if="$ctrl.element.type.includes('TaggedValue')"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.tagDefinitionId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.tagDefinitionId)"></transclude-name></span>
-        </div>
-
-        <div ng-if="$ctrl.element.type === 'Generalization' || $ctrl.element.type === 'Dependency'">
-            <h2 class="prop-title">Source</h2>
-            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._sourceIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
-            <h2 class="prop-title">Target</h2>
-            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._targetIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
-        </div>
-
-        <div ng-if="$ctrl.element.type === 'Connector'">
-            <h2 class="prop-title">Path 1</h2>
-            <span class="prop" ng-repeat="path in $ctrl.element._propertyPathIds[0]"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
-            <h2 class="prop-title">Path 2</h2>
-            <span class="prop" ng-repeat="path in $ctrl.element._propertyPathIds[1]"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
-        </div>
-
-        <div ng-if="$ctrl.element.type === 'Association'">
-            <h2 class="prop-title">Role 1</h2>
-            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.memberEndIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
-            <h2 class="prop-title">Role 2</h2>
-            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.memberEndIds[1]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
-        </div>
-
-        <div ng-if="$ctrl.element.type === 'Constraint'">
-            <h2 class="prop-title">Constraint Specification</h2>
-            <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}" non-editable="true" first="true"></transclude-val>
-        </div>
-
         <div ng-if="$ctrl.element.type === 'Diagram' && $ctrl.element._artifacts">
             <transclude-img mms-element-id="{{$ctrl.element.id}}" mms-ref-id="{{$ctrl.element._refId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-commit-id="{{$ctrl.element._commitId}}"></transclude-img>
         </div>
@@ -221,10 +185,6 @@ const SpecInspectorComponent: VeComponentOptions = {
                 </div>
             </span>
 
-            <div ng-if="$ctrl.element.type === 'InstanceSpecification'">
-                <h2 class="prop-title">Classifiers</h2>
-                <span class="prop" ng-repeat="path in element.classifierIds"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
-            </div>
 
             <h2 class="prop-title">Location</h2>
             <span class="prop">{{$ctrl.specApi.qualifiedName}}</span>
@@ -236,6 +196,67 @@ const SpecInspectorComponent: VeComponentOptions = {
             <span class="prop id" title="Copy ID">
                 <span id="spec-element-id" ng-click="$ctrl.copyToClipboard($event, '#spec-element-id')">{{$ctrl.element.id}}</span>
             </span>
+
+            <div ng-if="$ctrl.element.type === 'InstanceSpecification'">
+                <h2 class="prop-title">Classifiers</h2>
+                <span class="prop" ng-repeat="path in element.classifierIds"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></transclude-name></span>
+            </div>
+
+            <div ng-if="$ctrl.element.type === 'Class'" >
+                <h2 class="prop-title spec-view-value-heading">Attributes</h2>
+                <div ng-if="$ctrl.element.ownedAttributeIds.length > 0" class="table-responseive">
+                    <table class="table table-condensed table-hover">
+                        <thead><tr><th>Name</th><th>Type</th></tr></thead>
+                        <tbody>
+                            <tr ng-repeat="attribute in $ctrl.element.ownedAttributeIds">
+                                <td>
+                                    <transclude-name mms-watch-id="true" mms-element-id="{{attribute}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked(attribute)"></transclude-name>
+                                </td>
+                                <td>
+                                    <transclude-attr mms-watch-id="true" mms-attr="typeId" mms-element-id="{{attribute}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-cf-label="false"></transclude-attr>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.includes('TaggedValue')">
+            <h2 class="prop-title spec-view-value-heading">Property Value</h2>
+            <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}" non-editable="true"></transclude-val>
+            
+            <h2 class="prop-title spec-view-value-heading">Property Type</h2>
+            <span class="prop" ng-if="$ctrl.element.type === 'Property'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.typeId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.typeId)"></transclude-name></span>
+            <span class="prop" ng-if="$ctrl.element.type === 'Slot'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.definingFeatureId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.definingFeatureId)"></transclude-name></span>
+            <span class="prop" ng-if="$ctrl.element.type.includes('TaggedValue')"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.tagDefinitionId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.tagDefinitionId)"></transclude-name></span>
+        </div>
+
+        <div ng-if="$ctrl.element.type === 'Generalization' || $ctrl.element.type === 'Dependency'">
+            <h2 class="prop-title">Source</h2>
+            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._sourceIds[0]}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></transclude-name></span>
+            <h2 class="prop-title">Target</h2>
+            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._targetIds[0]}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></transclude-name></span>
+        </div>
+
+        <div ng-if="$ctrl.element.type === 'Connector'">
+            <h2 class="prop-title">Path 1</h2>
+            <span class="prop" ng-repeat="path in $ctrl.element._propertyPathIds[0]"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></transclude-name></span>
+            <h2 class="prop-title">Path 2</h2>
+            <span class="prop" ng-repeat="path in $ctrl.element._propertyPathIds[1]"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></transclude-name></span>
+        </div>
+
+        <div ng-if="$ctrl.element.type === 'Association'">
+            <h2 class="prop-title">Role 1</h2>
+            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.memberEndIds[0]}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></transclude-name></span>
+            <h2 class="prop-title">Role 2</h2>
+            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.memberEndIds[1]}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}"></transclude-name></span>
+        </div>
+
+        <div ng-if="$ctrl.element.type === 'Constraint'">
+            <h2 class="prop-title">Constraint Specification</h2>
+            <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}" non-editable="true" first="true"></transclude-val>
+        </div>
+
             <h2 class="prop-title">Branch/Tag</h2>
             <span class="prop">{{$ctrl.element._refId}}</span>
             <h2 class="prop-title">Project</h2>
@@ -243,9 +264,10 @@ const SpecInspectorComponent: VeComponentOptions = {
             <h2 class="prop-title">Formatted Modified Time</h2>
             <span class="prop">{{$ctrl.element._modified}}</span>
             <h2 class="prop-title">Commit</h2>
+            <span class="prop">{{$ctrl.element._commitId}}</span>
             <span class="prop" title="View raw element data">
                 <a target="_blank" rel="noopener noreferrer" ng-href="{{$ctrl.elementDataLink}}">
-                    {{$ctrl.element._commitId}}&nbsp;<i class="fa fa-external-link" aria-hidden="true"></i>
+                    <i class="fa fa-external-link" aria-hidden="true"></i>
                 </a>
             </span>
         <!-- </div> -->

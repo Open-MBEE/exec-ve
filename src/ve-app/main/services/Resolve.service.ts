@@ -16,6 +16,7 @@ import { veApp } from '@ve-app';
 
 import { VePromise, VeQService } from '@ve-types/angular';
 import {
+    AdminObject,
     CheckAuthResponse,
     DocumentObject,
     GenericResponse,
@@ -26,7 +27,7 @@ import {
     OrgsResponse,
     PackageObject,
     ParamsObject,
-    PermissionsResponse,
+    PermissionsLookupResponse,
     ProjectObject,
     ProjectsResponse,
     RefObject,
@@ -136,8 +137,9 @@ export class ResolveService {
         return promise;
     }
 
-    public getProjects(projectOb: ProjectObject, refresh?: boolean): VePromise<ProjectObject[], ProjectsResponse> {
-        const promise = this.projectSvc.getProjects(projectOb.orgId, refresh);
+    public getProjects(projectOb?: ProjectObject, refresh?: boolean): VePromise<ProjectObject[], ProjectsResponse> {
+        const orgId = projectOb ? projectOb.orgId : null
+        const promise = this.projectSvc.getProjects(orgId, refresh);
         promise.then(
             (result) => {
                 this.eventSvc.resolve('mmsProjects', result);
@@ -223,6 +225,10 @@ export class ResolveService {
             refId: params.refId,
             elementId: params.projectId + '_pm',
         });
+    }
+
+    public getServerRoot(): VePromise<AdminObject> {
+        return this.$q.resolve({ id: 'server', name: 'MMS Server'})
     }
 
     public getCoverDocument(
@@ -499,12 +505,55 @@ export class ResolveService {
         return params.field;
     };
 
-    public initializePermissions(
-        projectOb: ProjectObject,
-        refOb: RefObject
-    ): VePromise<PermissionCache, PermissionsResponse> {
-        return this.permissionsSvc.initializePermissions(projectOb, refOb);
+    public getAdmin = (params: ParamsObject): VePromise<AdminObject> => {
+        return new this.$q((resolve, reject) => {
+            if (!params.type || !params.modify) {
+                reject()
+            } else {
+                switch(params.type) {
+                    case 'org':
+                        this.projectSvc.getOrg(params.modify).then(resolve,reject);
+                        break
+                    case 'project':
+                        this.projectSvc.getProject(params.modify).then(resolve,reject);
+                        break
+                    default:
+                        reject()
+                }
+            }
+        })
     }
+
+    public initializeEditPermissions(
+        orgId: string,
+        projectId: string,
+        refId: string
+    ): VePromise<PermissionCache, PermissionsLookupResponse> {
+        return this.permissionsSvc.initializeEditPermissions(orgId, projectId, refId);
+    }
+
+    public initializeAdminPermissions(
+        params: ParamsObject,
+        adminOb: AdminObject
+    ): VePromise<PermissionCache, PermissionsLookupResponse> {
+        return new this.$q((resolve, reject) => {
+            if (!params.type || !params.modify) {
+                reject()
+            } else {
+                switch(params.type) {
+                    case 'org':
+                        this.permissionsSvc.initializeUpdatePermissions(adminOb.id, null).then(resolve,reject);
+                        break
+                    case 'project':
+                        this.permissionsSvc.initializeUpdatePermissions((adminOb as ProjectObject).orgId, adminOb.id).then(resolve,reject);
+                        break
+                    default:
+                        reject()
+                }
+            }
+        });
+    }
+    
 }
 
 veApp.service('ResolveService', ResolveService);

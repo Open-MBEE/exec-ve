@@ -17,7 +17,7 @@ import { veComponents } from '@ve-components';
 
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
 import { InsertResolveFn } from '@ve-types/components';
-import { ElementObject, InstanceSpecObject, ViewObject } from '@ve-types/mms';
+import { DocumentObject, ElementObject, GroupObject, InstanceSpecObject, MmsObject, ViewObject } from '@ve-types/mms';
 import { TreeBranch } from '@ve-types/tree';
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
@@ -245,7 +245,7 @@ class TreesController implements IComponentController {
         };
         const branch = this.treeSvc.getSelectedBranch();
         if (itemType === 'Document') {
-            this.addDocument(branch).then(
+            this.addDocument(branch as TreeBranch<DocumentObject>).then(
                 (result) => {
                     this.insertModal(result);
                     deferred.resolve();
@@ -255,7 +255,7 @@ class TreesController implements IComponentController {
                 }
             );
         } else if (itemType === 'Group') {
-            this.addGroup(branch).then(
+            this.addGroup(branch as TreeBranch<GroupObject>).then(
                 (result) => {
                     this.insertModal(result);
                     deferred.resolve();
@@ -265,7 +265,7 @@ class TreesController implements IComponentController {
                 }
             );
         } else if (itemType === 'View') {
-            this.addView(branch).then(
+            this.addView(branch  as TreeBranch<ViewObject>).then(
                 (result) => {
                     this.insertModal(result);
                     deferred.resolve();
@@ -298,13 +298,13 @@ class TreesController implements IComponentController {
                 },
             },
         };
-        const instance = this.$uibModal.open<InsertResolveFn<InsertViewData>, ElementObject>(settings);
+        const instance = this.$uibModal.open<InsertResolveFn<InsertViewData>, ViewObject>(settings);
         instance.result.then(
             (result) => {
                 if (!this.rootScopeSvc.veEditMode()) {
                     this.eventSvc.$broadcast('show-edits', true);
                 }
-                const newbranch: TreeBranch = {
+                const newbranch: TreeBranch<ViewObject> = {
                     label: result.name,
                     type: branchType,
                     data: result,
@@ -330,7 +330,7 @@ class TreesController implements IComponentController {
                     }
                     return lastChild;
                 };
-                this.treeSvc.addBranch(this.insertData.parentBranch, newbranch, top).then(
+                this.treeSvc.addBranch<ViewObject>(this.insertData.parentBranch, newbranch, top).then(
                     () => {
                         if (this.insertData.type === 'View') {
                             this.treeSvc.viewId2node[result.id] = newbranch;
@@ -360,7 +360,7 @@ class TreesController implements IComponentController {
                                                     if (this.rootScopeSvc.veFullDocMode()) {
                                                         addToFullDocView(node as TreeBranch, curNum, newbranch.data.id);
                                                     }
-                                                    this.addViewSectionsRecursivelyForNode(node as TreeBranch);
+                                                    this.addViewSectionsRecursivelyForNode(node as TreeBranch<ViewObject>);
                                                 },
                                                 (reason) => {
                                                     this.growl.error(
@@ -418,7 +418,7 @@ class TreesController implements IComponentController {
         );
     };
 
-    addDocument(branch: TreeBranch): VePromise<string, string> {
+    addDocument(branch: TreeBranch<ViewObject>): VePromise<string, string> {
         if (!branch) {
             this.insertData.parentBranch = null;
             branch = null;
@@ -432,7 +432,7 @@ class TreesController implements IComponentController {
         return this.$q.resolve('view');
     }
 
-    addGroup(branch: TreeBranch): VePromise<string, string> {
+    addGroup(branch: TreeBranch<ViewObject>): VePromise<string, string> {
         if (branch && branch.type === 'group') {
             this.insertData.parentBranch = branch;
         } else if (branch && branch.type !== 'group') {
@@ -447,7 +447,7 @@ class TreesController implements IComponentController {
         return this.$q.resolve('group');
     }
 
-    addView(branch: TreeBranch): VePromise<string, string> {
+    addView(branch: TreeBranch<ViewObject>): VePromise<string, string> {
         if (!branch) {
             return this.$q.reject({
                 message: 'Add View Error: Select parent view first',
@@ -472,7 +472,7 @@ class TreesController implements IComponentController {
         });
     };
 
-    addViewSectionsRecursivelyForNode = (node: TreeBranch): void => {
+    addViewSectionsRecursivelyForNode = (node: TreeBranch<ViewObject>): void => {
         this.addViewSections(node.data);
         for (let i = 0; i < node.children.length; i++) {
             if (node.children[i].type === 'view') {

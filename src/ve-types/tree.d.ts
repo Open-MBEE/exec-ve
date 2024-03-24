@@ -2,18 +2,18 @@ import angular from 'angular';
 
 import ITreeNode = AngularUITree.ITreeNode;
 
-import { ElementObject, ElementsRequest, ViewObject } from '@ve-types/mms';
+import { ElementObject, ElementsRequest, MmsObject, ViewObject } from '@ve-types/mms';
 
 /**
  * @typedef TreeBranch
  */
-export interface TreeBranch extends ITreeNode {
+export interface TreeBranch<T extends MmsObject = MmsObject> extends ITreeNode {
     label: string;
     type: string;
     priority?: number;
     group?: ElementObject;
-    data: ViewObject;
-    children: TreeBranch[];
+    data: T;
+    children: TreeBranch<T>[];
     hide?: boolean;
     level?: number;
     new?: string;

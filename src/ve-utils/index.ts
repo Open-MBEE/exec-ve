@@ -9,6 +9,7 @@ import './core';
 import './model-schema';
 import './application';
 import './mms-api-client';
+import './docgen';
 
 export * from './ve-utils.module';
 

@@ -20,6 +20,7 @@ export class SchemaService {
     public schemaList: { [key: string]: string } = {
         cameo: 'CameoSchema',
         jupyter: 'JupyterSchema',
+        docgen: 'DocgenSchema'
     };
 
     public schemas: { [key: string]: Schema } = {};

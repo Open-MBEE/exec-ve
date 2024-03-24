@@ -1,6 +1,11 @@
 import { MmsObject } from '@ve-types/mms';
 
-export interface OrgObject extends MmsObject {
+export interface AdminObject extends MmsObject {
+    id: string
+    name?: string
+}
+
+export interface OrgObject extends AdminObject {
     public: boolean;
     created: string;
     name: string;
@@ -8,14 +13,12 @@ export interface OrgObject extends MmsObject {
     id: string;
 }
 
-export interface ProjectObject extends MmsObject {
+export interface ProjectObject extends AdminObject {
     _refId?: string;
     schema?: string;
     _creator?: string;
     _docId?: string;
     _created?: string;
-    name?: string;
-    id: string;
     orgId?: string;
 }
 
@@ -25,15 +28,13 @@ export interface MountObject extends ProjectObject {
     _projectId: string;
 }
 
-export interface RefObject extends MmsObject {
+export interface RefObject extends AdminObject {
     parentRefId?: string;
     deleted?: boolean;
     _docId?: string;
     _creator?: string;
     _created?: string;
     description?: string;
-    name?: string;
-    id: string;
     type: string;
     _projectId: string;
     permission?: string;

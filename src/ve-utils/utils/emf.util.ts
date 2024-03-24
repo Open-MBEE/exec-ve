@@ -64,6 +64,9 @@ class TemplateableElement extends PackageableElement {
 export class Property extends TypedElement {
     type = 'Property';
     defaultValue: any[] = [];
+    associationId: string = null;
+    typeId: string = null;
+    
     constructor(elementOb?: ElementObject) {
         super(elementOb);
         if (elementOb) {
@@ -170,3 +173,17 @@ export class Dependency extends PackageableElement {
         }
     }
 }
+
+export class Association extends Element {
+    type = 'Association'
+    memberEndIds: string[] = []
+    ownedEndIds: string[] = []
+    navigableOwnedEndIds: string[] = []
+    constructor(elementOb?: ElementObject) {
+        super(elementOb);
+        if (elementOb) {
+            Object.assign(this, elementOb);
+        }
+    }
+}
+

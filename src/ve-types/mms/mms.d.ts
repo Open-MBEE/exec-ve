@@ -114,11 +114,25 @@ export interface ParamsObject {
     '#'?: string;
     display?: string;
     preview?: string;
+    modify?: string;
     next?: string;
     [param: string]: string;
 }
 
+/**
+ * eg. To query the ownedElements of an object recursively
+ * {
+ *  "params": {
+ *      "id": "<element_id>"
+ *  },
+ *  "recurse": {
+ *      "id": "ownerId"
+ *  }
+ * 
+ * }
+ */
 export interface QueryObject extends MmsObject {
+    id?: string
     params?: {
         [key: string]: string | object;
     };
@@ -166,20 +180,37 @@ export interface ElementsResponse<T extends ElementObject> extends BasicResponse
     deleted?: T[];
 }
 
-export interface PermissionsResponse extends BasicResponse<PermissionsObject> {
-    lookups: PermissionsObject[];
-    allPassed: boolean;
+export interface PermissionsLookupResponse extends BasicResponse<PermissionsLookupObject> {
+    lookups: PermissionsLookupObject[];
+    allPassed?: boolean;
+}
+
+export interface PermissionsResponse extends GenericResponse {
+    inherit: boolean;
+    users: {
+        permissions: PermissionsObject[]
+    }
+    groups: {
+        permissions: PermissionsObject[]
+    }
+    public: boolean;
 }
 
 export interface PermissionsObject {
+    name: string;
+    role: string;
+    inherited: boolean;
+}
+
+export interface PermissionsLookupObject {
     type: string;
     orgId?: string;
     projectId?: string;
     refId?: string;
     groupName?: string;
-    privilege: string;
-    allowAnonIfPublic: boolean;
-    hasPrivilege: boolean;
+    privilege?: string;
+    allowAnonIfPublic?: boolean;
+    hasPrivilege?: boolean;
 }
 
 export interface SearchResponse<T> extends ElementsResponse<T> {

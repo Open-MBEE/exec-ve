@@ -31,6 +31,7 @@ import { AuthService, URLService, PermissionCache, ViewService, DocumentMetadata
 
 import { VePromise } from '@ve-types/angular';
 import {
+    AdminObject,
     CheckAuthResponse,
     DocumentObject,
     GenericResponse,
@@ -41,7 +42,7 @@ import {
     OrgsResponse,
     PackageObject,
     ParamsObject,
-    PermissionsResponse,
+    PermissionsLookupResponse,
     ProjectObject,
     ProjectsResponse,
     RefObject,
@@ -243,6 +244,191 @@ veApp.config([
                         },
                     },
                 },
+            })
+            .state('main.admin', {
+                url: '/admin',
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params();
+                        },
+                    ],
+                    token: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
+                            return resolveSvc.getToken();
+                        },
+                    ],
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
+                    bannerOb: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
+                            return resolveSvc.getBanner();
+                        },
+                    ],
+                    projectObs: [
+                        'refresh',
+                        'ResolveService',
+                        (
+                            refresh: boolean,
+                            resolveSvc: ResolveService
+                        ): VePromise<ProjectObject[], ProjectsResponse> => {
+                            return resolveSvc.getProjects(null, refresh);
+                        },
+                    ],
+                    orgObs: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
+                            return resolveSvc.getOrgs();
+                        },
+                    ],
+                    rootOb: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<AdminObject> => {
+                            return resolveSvc.getServerRoot();
+                        },
+                    ]
+                },
+                views: {
+                    'banner-top@main': {
+                        component: 'systemBanner',
+                        bindings: {
+                            mmsBanner: 'bannerOb',
+                        },
+                    },
+                    'nav@main': {
+                        component: 'navBar',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                            mmsOrgs: 'orgObs',
+                            mmsProject: 'projectOb',
+                            mmsProjects: 'projectObs',
+                            mmsRef: 'refOb',
+                        },
+                    },
+                    'menu@main': {
+                        component: 'mainMenu',
+                        bindings: {
+                            mmsProject: 'projectOb',
+                            mmsProjects: 'projectObs',
+                            mmsGroup: 'groupOb',
+                            mmsGroups: 'groupObs',
+                            mmsRefs: 'refObs',
+                            mmsRef: 'refOb',
+                        },
+                    },
+                    'pane-left@main': {
+                        component: 'leftPane',
+                        bindings: {
+                            mmsRoot: 'rootOb'
+                        }
+                    },
+                    'toolbar-left@main': {
+                        component: 'leftToolbar',
+                        bindings: {
+                            mmsRoot: 'rootOb'
+                        }
+                    },
+                    'pane-center@main': {
+                        component: 'admin',
+                        // bindings: {
+                        //     mmsParams: 'params',
+                        //     mmsProject: 'projectOb',
+                        //     mmsRef: 'refOb',
+                        //     mmsGroup: 'groupOb',
+                        //     mmsDocument: 'documentOb',
+                        // },
+                    },
+                },
+
+            })
+            .state('main.admin.preview', {
+                url: '?viewId&type',
+                params: {
+                    viewId: {
+                        inherit: true,
+                        type: 'query',
+                    },
+                    type: {
+                        inherit: true,
+                        type: 'query',
+                    },
+                },
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params();
+                        },
+                    ],
+                    token: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
+                            return resolveSvc.getToken();
+                        },
+                    ],
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
+                    bannerOb: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
+                            return resolveSvc.getBanner();
+                        },
+                    ],
+                    adminOb: [
+                        'params',
+                        'ResolveService',
+                        (params: ParamsObject, resolveSvc: ResolveService): VePromise<AdminObject> => {
+                            return resolveSvc.getAdmin(params);
+                        }
+                    ],
+                    permissions: [
+                        'params',
+                        'adminOb',
+                        'ResolveService',
+                        (  
+                            params: ParamsObject,
+                            adminOb: AdminObject,
+                            resolveSvc: ResolveService
+                        ): VePromise<PermissionCache, PermissionsLookupResponse> => {
+                            return resolveSvc.initializeAdminPermissions(params, adminOb);
+                        },
+                    ],
+                },
+                views: {
+                    'banner-top@main': {
+                        component: 'systemBanner',
+                        bindings: {
+                            mmsBanner: 'bannerOb',
+                        },
+                    },
+                    'nav@main': {
+                        component: 'navBar',
+                    },
+                    'menu@main': {
+                        component: 'mainMenu',
+                    },
+                    'pane-center@main': {
+                        component: 'admin',
+                        bindings: {
+                            mmsParams: 'params',
+                            mmsObject: 'adminOb'
+                        },
+                    },
+                }
+
             })
             .state('main.project', {
                 //TODO this will be the ui to diff and merge and manage refs
@@ -446,8 +632,8 @@ veApp.config([
                             refOb: RefObject,
                             projectOb: ProjectObject,
                             resolveSvc: ResolveService
-                        ): VePromise<PermissionCache, PermissionsResponse> => {
-                            return resolveSvc.initializePermissions(projectOb, refOb);
+                        ): VePromise<PermissionCache, PermissionsLookupResponse> => {
+                            return resolveSvc.initializeEditPermissions(projectOb.orgId, projectOb.id, refOb.id);
                         },
                     ],
                 },
@@ -638,6 +824,61 @@ veApp.config([
                 views: {
                     'pane-center@main': {
                         component: 'slideshow',
+                        bindings: {
+                            mmsParams: 'params',
+                            mmsProject: 'projectOb',
+                            mmsRef: 'refOb',
+                            mmsGroup: 'groupOb',
+                            mmsDocument: 'documentOb',
+                        },
+                    },
+                },
+            })
+            .state('main.project.ref.portal.docgen', {
+                url: '/docgen?preview',
+                params: {
+                    preview: {
+                        inherit: true,
+                        type: 'query',
+                    },
+                },
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params();
+                        },
+                    ],
+                    documentOb: [
+                        'ResolveService',
+                        'params',
+                        'refOb',
+                        'refresh',
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject,
+                            refOb: RefObject,
+                            refresh: boolean
+                        ): VePromise<DocumentObject> => {
+                            return resolveSvc.getPreviewDocument(params, refOb, refresh);
+                        },
+                    ],
+                    groupOb: [
+                        'groupObs',
+                        'documentOb',
+                        'ResolveService',
+                        (
+                            groupObs: GroupObject[],
+                            documentOb: DocumentObject,
+                            resolveSvc: ResolveService
+                        ): GroupObject => {
+                            return resolveSvc.getGroup(groupObs, documentOb);
+                        },
+                    ],
+                },
+                views: {
+                    'pane-center@main': {
+                        component: 'docgen',
                         bindings: {
                             mmsParams: 'params',
                             mmsProject: 'projectOb',

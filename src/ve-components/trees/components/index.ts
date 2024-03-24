@@ -4,3 +4,4 @@ import './tree-of-figures.component';
 import './tree-of-tables.component';
 import './tree-of-documents.component';
 import './tree-of-favorites.component';
+import './tree-of-orgs.component';

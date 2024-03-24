@@ -10,7 +10,6 @@ export const left_default_toolbar: IToolBarButton[] = [
         permission: true,
         tooltip: 'Favorite Documents',
         spinner: false,
-        category: 'portal',
         enabledFor: ['**.portal.**'],
     },
     {
@@ -62,6 +61,16 @@ export const left_default_toolbar: IToolBarButton[] = [
         tooltip: 'List of Equations',
         spinner: false,
         enabledFor: ['**.present.**'],
+    },
+    {
+        id: 'tree-of-orgs',
+        icon: 'fa-folder-tree',
+        selected: false,
+        active: false,
+        permission: true,
+        tooltip: 'Server Tree',
+        spinner: false,
+        enabledFor: ['**.admin.**'],
     },
 ];
 

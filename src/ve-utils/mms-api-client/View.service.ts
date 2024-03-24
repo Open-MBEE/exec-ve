@@ -566,7 +566,7 @@ export class ViewService extends BaseApiService {
                             cloneValue = _.cloneDeep(keyValue);
                             if (!cloneValue.id || !cloneValue.ownerId) {
                                 cloneValue.id = this.isSection(data)
-                                    ? this.apiSvc.createUniqueId()
+                                    ? this.apiSvc.createUniqueId()+ '_vc_expression'
                                     : data.id + '_vc_expression';
                                 cloneValue.ownerId = this.isSection(data) ? data.id : data.id + '_vc';
                             }

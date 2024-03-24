@@ -65,8 +65,8 @@ const LeftToolbarComponent: VeComponentOptions = {
             this.eventSvc.$init(this);
             let initialState: string;
             if (this.mmsRoot) {
-                initialState = this.$state.includes('**.portal.**') ? 'tree-of-documents' : 'tree-of-contents';
-            }
+                initialState = this.$state.includes('**.portal.**') ? 'tree-of-documents' : this.$state.includes('**.admin.**') ? 'tree-of-orgs' : 'tree-of-contents';
+            } 
             this.toolbarSvc.initApi(
                 this.toolbarId,
                 this.tbInit,

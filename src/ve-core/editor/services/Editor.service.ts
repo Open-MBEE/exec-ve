@@ -317,16 +317,7 @@ export class EditorService {
     public openEdit(elementOb: ElementObject): VePromise<EditObject, ElementsResponse<ElementObject>> {
         return new this.$q((resolve, reject) => {
             this.permissionsSvc
-                .initializePermissions(
-                    {
-                        id: elementOb._projectId,
-                    },
-                    {
-                        id: elementOb._refId,
-                        _projectId: elementOb._projectId,
-                        type: 'Branch',
-                    }
-                )
+                .initializeEditPermissions(null,elementOb._projectId,elementOb._refId)
                 .finally(() => {
                     const reqOb = {
                         elementId: elementOb.id,

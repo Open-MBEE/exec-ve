@@ -221,6 +221,10 @@ export class SpecService implements angular.Injectable<any> {
         this._updateElement();
     };
 
+    public prevElement = (): void => {
+        
+    }
+
     private _updateElement = (): void => {
         const reqOb = Object.assign({}, this.specApi);
         this.elementSvc

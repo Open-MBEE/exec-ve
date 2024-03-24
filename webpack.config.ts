@@ -69,7 +69,7 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
                 require(`./config/experimental-${process.env.VE_ENV ? process.env.VE_ENV : "example"}.json`) as VeConfig
             } catch (err) {
-                extensionConfig = configObj
+                extensionConfig = null
             }
             if (extensionConfig && extensionConfig.experimental) {
                 const validExt = ['specTools', 'transclusions', 'presentations', 'insertions', 'trees']
