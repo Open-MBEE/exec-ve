@@ -14,7 +14,7 @@ const LoginBannerComponent: VeComponentOptions = {
     <i ng-show="$ctrl.spin" class="fa fa-spin fa-spinner"></i>
     <div ng-hide="$ctrl.spin" class="login-box login-banner">
         <ul>
-            <li ng-repeat="message in $ctrl.message">{{message}}</li>
+            <li ng-repeat="message in $ctrl.message" ng-bind-html="message"></li>
         </ul>
     </div>
 </div>
