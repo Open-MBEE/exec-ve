@@ -9,6 +9,7 @@ import 'lodash';
 import 'angular-ui-bootstrap';
 import 'rx-lite';
 import 'flatpickr';
+import '@svgdotjs/svg.js';
 
 import 'angular-animate';
 import 'angular-cookies';

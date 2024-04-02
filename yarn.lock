@@ -1149,6 +1149,11 @@
     tiny-glob "^0.2.9"
     tslib "^2.4.0"
 
+"@svgdotjs/svg.js@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/@svgdotjs/svg.js/-/svg.js-3.2.0.tgz"
+  integrity sha512-Tr8p+QVP7y+QT1GBlq1Tt57IvedVH8zCPoYxdHLX0Oof3a/PqnC/tXAkVufv1JQJfsDHlH/UrjcDfgxSofqSNA==
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.npmjs.org/@tsconfig/node10/-/node10-1.0.9.tgz"

@@ -1,7 +1,7 @@
 {
   "name": "view-editor",
   "version": "5.0.0",
-  "license":"Apache-2.0",
+  "license": "Apache-2.0",
   "description": "View Editor Application",
   "repository": "https://github.com/Open-MBEE/ve.git",
   "main": "main.ts",
@@ -78,6 +78,7 @@
     "@openmbee/angularjs-dropdown-multiselect": "./lib/openmbee-angularjs-dropdown-multiselect-v1.0.2.tgz",
     "@openmbee/html-to-vdom": "^0.9.0",
     "@openmbee/pane-layout": "^1.0.40",
+    "@svgdotjs/svg.js": "^3.2.0",
     "@uirouter/angularjs": "^1.0.30",
     "angular": "^1.8.2",
     "angular-animate": "^1.8.2",
