@@ -221,7 +221,7 @@ const NavBarComponent: VeComponentOptions = {
                                 <a href="https://github.com/Open-MBEE/ve/issues" target="_blank">Report Issue</a>
                             </li>
                             <li class="divider"></li>
-                            <li ng-if="$ctrl.isAdmin()">
+                            <li ng-if="$ctrl.user && $ctrl.user.admin">
                                 <a ng-click="$ctrl.toggleAbout()" href="">About View Editor</a>
                             </li>
                             <li class="list-section-bottom">

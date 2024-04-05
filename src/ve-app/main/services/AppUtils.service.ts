@@ -377,7 +377,9 @@ Save CSV</button></div>
 
         // Remove comments, table features, and all elements with classes: ve-error, no-print, ng-hide
         printElementCopy.find('transclude-com').remove();
-        printElementCopy.find('style').remove(); //prevent user inserted styles from interfering
+        printElementCopy.find('style').filter((index, element) => {
+                return element.parentElement.nodeName != 'svg'
+        }).remove(); //prevent user inserted styles from interfering
         printElementCopy.find('div.tableSearch').remove();
         //printElementCopy.find('.ve-error').html('error');
         printElementCopy.find('.no-print').remove();
@@ -397,10 +399,20 @@ Save CSV</button></div>
                 $this.remove();
             }
         });
-        printElementCopy.find('[width]').not('img').not('.ve-fixed-width').removeAttr('width');
+        printElementCopy.find('[width]').not('img').not('.ve-fixed-width')
+            .filter((index,element) => { 
+                return ! $(element).parents('.mms-svg') || element.nodeName == 'svg'
+            }).removeAttr('width');
+        printElementCopy.find('[height]').not('img').not('.ve-fixed-heightl')
+            .filter((index,element) => { 
+                return ! $(element).parents('.mms-svg') || element.nodeName == 'svg'
+            }).removeAttr('height');
         printElementCopy
             .find('[style]')
             .not('hr')
+            .filter((index,element) => { 
+                return ! $(element).parents('.mms-svg')
+            })
             .each((index, element) => {
                 element.style.removeProperty('font-size');
                 element.style.removeProperty('width');

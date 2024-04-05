@@ -17,6 +17,7 @@ import { handleChange, onChangesCallback } from '@ve-utils/utils';
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
 import { EditorActions } from '@ve-types/core/editor';
 import { ElementObject, ElementsResponse, ViewObject } from '@ve-types/mms';
+import { error } from 'console';
 
 export interface ITransclusion extends angular.IComponentController {
     $scope: TranscludeScope;
@@ -317,6 +318,7 @@ export class Transclusion implements ITransclusion, EditorActions {
                     .each((index, element) => {
                         this.imageSvc.fixImgSrc($(element));
                     });
+                this.postRecompile(result);
             },
             (reason) => {
                 if (reason.status !== 200) {
@@ -325,6 +327,10 @@ export class Transclusion implements ITransclusion, EditorActions {
             }
         );
     };
+
+    protected postRecompile = (content: string | HTMLElement[]): void => {
+        //API Method
+    }
 
     protected changeAction: onChangesCallback<string> = (newVal, oldVal, firstChange) => {
         if (!newVal || !this.mmsProjectId || firstChange || newVal === oldVal) {
@@ -350,63 +356,75 @@ export class Transclusion implements ITransclusion, EditorActions {
             commitId: this.commitId,
             //includeRecentVersionElement: true,
         };
+        const successCallback = <T extends ElementObject>(element: T) => {
+            this.element = element;
+            if (!this.panelTitle) {
+                this.panelTitle = this.element.name + ' ' + this.cfTitle;
+                this.panelType = this.cfKind;
+            }
+            if (this.commitId === 'latest') {
+                this.subs.push(
+                    this.eventSvc.$on<veCoreEvents.elementUpdatedData>(
+                        'element.updated',
+                        (data: { element: ElementObject; continueEdit: boolean }) => {
+                            const elementOb = data.element;
+                            const continueEdit = data.continueEdit;
+                            if (
+                                elementOb.id === this.element.id &&
+                                elementOb._projectId === this.element._projectId &&
+                                elementOb._refId === this.element._refId
+                            ) {
+                                this.element = elementOb;
+                                this.cleanUpAction(continueEdit);
+                            }
+                        }
+                    )
+                );
+            }
+            if (this.editTemplate) {
+                this._reopenUnsaved().then(
+                    (data) => {
+                        if (data) this.startEdit();
+                        else this.recompile();
+                    },
+                    () => {
+                        this.recompile();
+                    }
+                );
+            } else {
+                this.recompile();
+            }
+        }
+
+        const errorCallback = <T>(reason: VePromiseReason<T>) => {
+            this.$element.empty();
+                    //TODO: Add reason/errorMessage handling here.
+            this.$transcludeEl = $(
+                '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type" mms-field="::field"></annotation>'
+            );
+            this.$element.append(this.$transcludeEl);
+            this.$compile(this.$transcludeEl)(
+                Object.assign(this.$scope.$new(), {
+                    elementId: reqOb,
+                    recentElement: reason.recentVersionOfElement,
+                    type: 'transclusion',
+                    field: this.cfField,
+                })
+            );
+        }
+
         this.elementSvc
             .getElement(reqOb, 1, false)
             .then(
-                (data) => {
-                    this.element = data;
-                    if (!this.panelTitle) {
-                        this.panelTitle = this.element.name + ' ' + this.cfTitle;
-                        this.panelType = this.cfKind;
-                    }
-                    if (this.commitId === 'latest') {
-                        this.subs.push(
-                            this.eventSvc.$on<veCoreEvents.elementUpdatedData>(
-                                'element.updated',
-                                (data: { element: ElementObject; continueEdit: boolean }) => {
-                                    const elementOb = data.element;
-                                    const continueEdit = data.continueEdit;
-                                    if (
-                                        elementOb.id === this.element.id &&
-                                        elementOb._projectId === this.element._projectId &&
-                                        elementOb._refId === this.element._refId
-                                    ) {
-                                        this.element = elementOb;
-                                        this.cleanUpAction(continueEdit);
-                                    }
-                                }
-                            )
-                        );
-                    }
-                    if (this.editTemplate) {
-                        this._reopenUnsaved().then(
-                            (data) => {
-                                if (data) this.startEdit();
-                                else this.recompile();
-                            },
-                            () => {
-                                this.recompile();
-                            }
-                        );
-                    } else {
-                        this.recompile();
-                    }
-                },
+                successCallback,
                 (reason) => {
-                    this.$element.empty();
-                    //TODO: Add reason/errorMessage handling here.
-                    this.$transcludeEl = $(
-                        '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type" mms-field="::field"></annotation>'
-                    );
-                    this.$element.append(this.$transcludeEl);
-                    this.$compile(this.$transcludeEl)(
-                        Object.assign(this.$scope.$new(), {
-                            elementId: reqOb,
-                            recentElement: reason.recentVersionOfElement,
-                            type: 'transclusion',
-                            field: this.cfField,
-                        })
-                    );
+                    
+                    if (reason.status == 404) {
+                        this.elementSvc.getElementByTwcId(reqOb, reqOb.elementId).then(successCallback,errorCallback)
+                    } else {
+                        errorCallback(reason)
+                    }
+                    
                 }
             )
             .finally(() => {
@@ -426,7 +444,7 @@ export class Transclusion implements ITransclusion, EditorActions {
     };
 
     /**
-     * @name Utils#reopenUnsavedElts     * called by transcludes when users have unsaved edits, leaves that view, and comes back to that view.
+     * @name Transclusion#reopenUnsavedElts     * called by transcludes when users have unsaved edits, leaves that view, and comes back to that view.
      * the editor will reopen if there are unsaved edits.
      * assumes no reload.
      * uses these in the scope:

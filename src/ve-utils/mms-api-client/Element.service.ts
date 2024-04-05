@@ -107,9 +107,6 @@ export class ElementService extends BaseApiService {
     ): VePromise<T> {
         this.apiSvc.normalize(reqOb);
         const requestCacheKey = this.getRequestKey(reqOb, reqOb.elementId);
-        if (!reqOb.projectId) {
-            console.log('foo');
-        }
         const url = this.uRLSvc.getElementURL(reqOb);
         const cached: T = this.cacheSvc.get<T>(requestCacheKey);
         // if it's in the this.inProgress queue get it immediately
@@ -171,6 +168,62 @@ export class ElementService extends BaseApiService {
         );
         return this._getInProgress(url) as VePromise<T>;
     }
+
+    getElementByTwcId<T extends ElementObject>(
+        reqOb: RequestObject,
+        twcId: string,
+        weight?: number,
+        refresh?: boolean,
+        allowEmpty?: boolean
+    ) {
+        this.apiSvc.normalize(reqOb);
+        const requestCacheKey = this.getRequestKey(reqOb, twcId);
+        const cached: T = this.cacheSvc.get<T>(requestCacheKey);
+
+        const deletedRequestCacheKey = this.getRequestKey(reqOb, twcId);
+        deletedRequestCacheKey.push('deleted');
+        const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey);
+        if (deleted && !refresh) {
+            return new this.$q<T>((resolve, reject) => {
+                return reject({
+                    status: 410,
+                    recentVersionOfElement: deleted,
+                    message: 'Deleted',
+                });
+            });
+        }
+        if (cached && !refresh) {
+            return new this.$q<T>((resolve, reject) => {
+                return resolve(cached);
+            });
+        }
+
+        return new this.$q<T>((resolve, reject) => {
+            this.search<T>(reqOb, {
+                params: {
+                    _twcId: twcId,
+                }
+            }, {}, weight).then((data) => {
+                if (Array.isArray(data.elements) && data.elements.length > 0) {
+                    resolve(this.cacheElement<T>(reqOb, data.elements[0]));
+                } else if (allowEmpty) {
+                    resolve(null);
+                } else {
+                    reject({
+                        status: 500,
+                        message: 'Server Error: empty response',
+                    }); //TODO
+                }
+            }, (response) => {
+                if (allowEmpty && response.status == 404) {
+                    resolve(null);
+                } else {
+                    reject(response);
+                }
+            })
+        })
+    }
+
 
     /**
      * @name veUtils/ElementService#getElements
@@ -258,6 +311,9 @@ export class ElementService extends BaseApiService {
             this.cacheSvc.link(requestCacheKey, realCacheKey);
         }
         result = this.cacheSvc.put<T>(realCacheKey, result, true);
+        if (result._twcId) {
+            this.cacheSvc.link(this.getRequestKey(reqOb, result._twcId), realCacheKey)
+        }
         return result;
     }
 
@@ -279,6 +335,11 @@ export class ElementService extends BaseApiService {
         };
         const commitCacheKey = this.apiSvc.makeCacheKey(deletedReqOb, deletedOb.id);
         this.cacheSvc.link(requestCacheKey, commitCacheKey);
+        if (deletedOb._twcId) {
+            const twcRequestCacheKey = this.getRequestKey(deletedReqOb, deletedOb._twcId);
+            twcRequestCacheKey.push('deleted');
+            this.cacheSvc.link(twcRequestCacheKey, commitCacheKey);
+        }
         this.cacheSvc.put(commitCacheKey, deletedOb, true);
     };
 

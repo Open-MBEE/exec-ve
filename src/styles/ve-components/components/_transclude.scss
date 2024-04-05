@@ -169,10 +169,22 @@ caption {
   cursor: pointer;
 }
 
-transclude-img img {
+transclude-img {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+transclude-img {
+  div svg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    }
+  img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .no-padding-panel {

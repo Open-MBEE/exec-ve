@@ -116,10 +116,10 @@ export class ViewPresentationElemController implements angular.IComponentControl
                         if (this.viewCtrl) {
                             this.viewCtrl.elementTranscluded(instanceSpec, this.presentationElem.type);
                         }
-                        this.$element.on('click', (e) => {
-                            if (this.viewCtrl) this.viewCtrl.transcludeClicked(instanceSpec);
-                            e.stopPropagation();
-                        });
+                        // this.$element.on('click', (e) => {
+                        //     if (this.viewCtrl) this.viewCtrl.transcludeClicked(instanceSpec);
+                        //     e.stopPropagation();
+                        // });
                         const tag = this.extensionSvc.getTagByType('present', this.presentationElem.type);
 
                         const newPe = $(
