@@ -185,21 +185,24 @@ export interface PermissionsLookupResponse extends BasicResponse<PermissionsLook
     allPassed?: boolean;
 }
 
-export interface PermissionsResponse extends GenericResponse {
+export interface PermissionsResponse extends BasicResponse<PermissionsResponse>, PermissionsObject {
     inherit: boolean;
-    users: {
-        permissions: PermissionsObject[]
-    }
-    groups: {
-        permissions: PermissionsObject[]
-    }
     public: boolean;
 }
 
-export interface PermissionsObject {
+export interface PermissionsRecord {
     name: string;
     role: string;
     inherited: boolean;
+}
+
+export interface PermissionsObject {
+    users: {
+        permissions: PermissionsRecord[]
+    }
+    groups: {
+        permissions: PermissionsRecord[]
+    }
 }
 
 export interface PermissionsLookupObject {

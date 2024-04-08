@@ -1,0 +1,65 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.utils._variables
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ * @author Josh Kaplan
+ * @author Jake Ursetta
+ *
+ * @description Defines the variables.
+ */
+$mbee-color-blue: #007bff;
+$mbee-color-purple: #727cf5;
+
+/* LM light theme colors */
+$mbee-background: white;
+$mbee-color: #333333;
+$mbee-font: "Avenir Next", "Helvetica Neue", Helvetica, Arial, "Sans Serif";
+$mbee-color-primary: $mbee-color-purple;
+$mbee-navbar-color: #1a3652;
+$mbee-navbar-text: #dedede;
+
+/* Button colors */
+$color-primary: #007bff;
+$color-danger: #dc3545;
+$color-secondary: #6c757d;
+$color-success: #28a745;
+$color-warning: #ffc107;
+$color-info: #17a2b8;
+
+/*$highlight-color-primary: #c4e1ff;*/
+/*$highlight-color-primary: #d8ebff;*/
+$highlight-color-primary: #ebf5ff;
+
+/* Alternate theme */
+$color1: #3D444E;  /* dark grey */
+$color2: #4EA18A;  /* blue-green ish */
+$color3: #B9D35C;  /* green */
+$color4: #F6D594;  /* beige */
+$color5: #E55643;  /* red */
+
+/* sizing */
+$banner-height: 20px;
+$sidebar-full-width: 220px;
+$sidebar-min-width: 50px;
+$sidebar-text: #656565;
+
+/* Swagger Colors */
+$swagger-border-color-get:      #9a9a9a;
+$swagger-border-color-post:     #9a9a9a;
+$swagger-border-color-patch:   #9a9a9a;
+$swagger-border-color-put:      #9a9a9a;
+$swagger-border-color-delete:   #9a9a9a;
+
+$swagger-background-color-get:      #f8f8f8;
+$swagger-background-color-post:     #f8f8f8;
+$swagger-background-color-patch:    #f8f8f8;
+$swagger-background-color-put:      #f8f8f8;
+$swagger-background-color-delete:   #f8f8f8;

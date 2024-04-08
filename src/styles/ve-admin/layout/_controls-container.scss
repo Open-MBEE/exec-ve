@@ -1,0 +1,48 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.layout._controls-container
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines the template for controls container.
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+.controls-container {
+  display: flex;
+  grid-area: button;
+  justify-content: flex-end;
+  padding-right: 5px;
+
+  .add-btn, .download-btn {
+    color: $color-secondary;
+    padding-right: 20px;
+
+    &:hover {
+      color: darken($color-secondary, 20);
+      cursor: pointer;
+    }
+  }
+
+  .delete-btn {
+    color: $color-danger;
+  }
+
+  .delete-btn:hover {
+    color: darken($color-danger, 20);
+    cursor: pointer;
+  }
+
+  .fake-icon {
+    color: transparent;
+  }
+}

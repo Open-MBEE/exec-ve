@@ -1,0 +1,124 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.components._general
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines general html sass component styles
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+.about-top {
+  padding-top: 30px;
+}
+
+.bigger-width-btn {
+  width: 150px;
+}
+
+// TODO: Only in stat list: consider moving it?
+.bold-name {
+  font-weight: 600;
+}
+
+//TODO: Only in box list: consider moving it?
+.bolder-name {
+  font-weight: 700;
+}
+
+.bottom-spacing {
+  padding-bottom: 10px;
+}
+
+%btn-light-header {
+  padding: 0px;
+  margin-left: 5px;
+  font-size: 0.9rem;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  outline: none !important;
+  color: $mbee-navbar-color;
+}
+
+#btn-expand, #btn-collapse {
+  @extend %btn-light-header;
+
+  &:focus, &:active, &:hover, &:visited {
+    @extend %btn-light-header;
+    font-weight: 600;
+  }
+}
+
+#grp-expand-collapse {
+  margin-top: 5px;
+  margin-left: 35px;
+  margin-bottom: -20px;
+}
+
+.empty-item {
+  display: none;
+}
+
+// TODO: Consider changing certain pages to modals with headers & footers
+.extra-padding {
+  padding: 20px;
+}
+
+.grayed-out {
+  color: #c0c0c0 !important;
+}
+
+.header-box-depth {
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.25);
+}
+
+.loading {
+  width: 100%;
+  height:100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#login-form {
+  margin-top: 40%;
+
+  button {
+    margin-top: 10px;
+    width: 100%;
+  }
+}
+
+.minimize {
+  font-size: smaller;
+}
+
+.required-fields {
+  font-size: x-small;
+  padding-bottom: 10px;
+  color: $color-danger;
+}
+
+.table-width {
+  width: 60%;
+}
+
+.transparent {
+  color: transparent;
+}
+
+.warning-label {
+  color: $color-danger;
+  font-size: 10px;
+  padding-left: 20px;
+}

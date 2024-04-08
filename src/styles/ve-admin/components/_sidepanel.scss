@@ -1,0 +1,134 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.components._sidepanel
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines the side panel styles.
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+.cross-ref-broken {
+  color: $color-danger;
+
+  &:hover {
+    color: darken($color-danger, 20%);
+  }
+}
+
+.element-create {
+  width: 100%;
+  padding: 24px;
+  position: sticky;
+  top: 0px;
+  height: 80vh;
+  overflow: scroll;
+
+  h2 {
+    padding-bottom: 5px;
+    border-bottom: 1px solid $mbee-color;
+  }
+
+  button {
+    margin-right: 10px;
+  }
+
+  p {
+    padding: 8px 0;
+  }
+
+  #parent {
+    font-size: 14px;
+    font-weight: normal;
+    padding: 10px 0;
+  }
+}
+
+.element-panel-display {
+  font-size: 14px;
+  height: 86vh;
+  overflow: scroll;
+  padding: 15px;
+  position: sticky;
+  top: 0px;
+  width: 100%;
+
+  hr {
+    width: 95%;
+  }
+
+  .element-data {
+    width: 100%;
+
+    table {
+      width: 100%;
+    }
+
+    hr {
+      margin: 5px 0px 5px 0px;
+    }
+
+    .element-header {
+      border-bottom: 1px solid black;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .element-edit-form {
+      padding-left: 5px;
+      padding-top: 15px;
+    }
+  }
+
+  .side-icons {
+    display: flex;
+    justify-content: flex-end;
+
+    .delete-btn {
+      color: $color-danger;
+      padding-right: 15px;
+
+      &:hover {
+        cursor: pointer;
+        color: darken($color-danger, 30);
+      }
+    }
+
+    .edit-btn {
+      height: 5%;
+      color: $color-primary;
+      padding-right: 15px;
+
+      &:hover {
+        cursor: pointer;
+        color: $color-secondary
+      }
+    }
+
+    .exit-btn {
+      height: 5%;
+      color: $color-secondary;
+
+      &:hover {
+        cursor: pointer;
+        color: darken($color-secondary, 30);
+      }
+    }
+  }
+}
+
+.selector-value {
+  font-size: 14px;
+  font-weight: normal;
+  padding-bottom: 8px;
+}

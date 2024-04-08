@@ -33,7 +33,9 @@
       "@ve-app": ["ve-app"],
       "@ve-app/*": ["ve-app/*"],
       "@ve-types": ["ve-types"],
-      "@ve-types/*": ["ve-types/*"]
+      "@ve-types/*": ["ve-types/*"],
+      "@ve-admin": ["ve-admin"],
+      "@ve-admin/*": ["ve-admin/*"]
     },
     "skipLibCheck": true
   },

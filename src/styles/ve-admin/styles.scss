@@ -1,0 +1,85 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.styles
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ * @author Josh Kaplan
+ * @author Jake Ursetta
+ *
+ * @description This defines the style and layout for MBEE.
+ */
+
+// Import FontAwesome Sass
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
+
+/**
+* Utils
+*
+* Below are all the files that are contained in the utils folder.
+* These scss files provide help to other scss files. Such as defining
+* variables or commonly used functions, placeholder, or mix-ins.
+*/
+@import './utils/_variables.scss';
+
+/**
+* Themes
+*
+* Below are all the files that are contained in the themes folder.
+* These scss files provide style of themes through out our UI.
+*/
+@import './themes/_themes.scss';
+
+/**
+* Layout
+*
+* Below are all the files that are contained in the layout folder.
+* These scss files contain main definitions of page layouts through
+* out our UI. Such as the grid layout for our main layout.
+*/
+@import './layout/_controls-container.scss';
+@import './layout/_grid.scss';
+@import './layout/_workspace.scss';
+
+/**
+* Base
+*
+* Below are all the files that are contained in the base folder.
+* These scss files contain definitions of html elements that
+* are styled specifically to MCF UI. Such as the body or scroll-bar.
+*/
+@import './base/_base.scss';
+
+/**
+* Component
+*
+* Below are all the files that are contained in the component folder.
+* These scss files contain definitions of element components in our UI.
+* Such as the navbar.
+*/
+@import './components/_box-list.scss';
+@import './components/_custom-data.scss';
+@import './components/_general.scss';
+@import './components/_list.scss';
+@import './components/_model';
+@import './components/_navbar.scss';
+@import './components/_search.scss';
+@import './components/_sidebar.scss';
+@import './components/_sidepanel.scss';
+
+/**
+* Pages
+*
+* Below are all the files that are contained in the pages folder.
+* These scss files contain definitions of styles specific to pages
+* in our UI. Such as the home page or project page.
+*/
+@import './pages/_home.scss';
+@import './pages/_members.scss';
+@import './pages/_project.scss';

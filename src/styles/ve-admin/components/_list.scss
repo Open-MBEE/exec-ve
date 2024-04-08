@@ -1,0 +1,174 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.components._list
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines the style for the list and list items.
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+@mixin grid-list-items($grid_temp, $grid_areas, $just_cont, $align_items) {
+  display: grid;
+  grid-template-columns: $grid_temp;
+  grid-template-areas: $grid_areas;
+  justify-content: $just_cont;
+  align-items: $align_items;
+}
+
+// TODO (ld): Important is not best practice, but only way to get to work
+.archived-link {
+  color: #c0c0c0 !important;
+}
+
+#branch-list-items, #artifact-list-items {
+  margin: 0.5em;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+// TODO - consider renaming as it is only in lists/ or move it same with above
+.hover-darken:hover {
+  background: #f7f7f7;
+}
+
+.list-item {
+  margin: 0;
+  padding: .5em;
+  width: 100%;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list {
+  a {
+    text-decoration: none;
+    color: black;
+  }
+  hr {
+    border-color: darkgrey;
+    margin: 0;
+  }
+}
+
+// TODO - consider splitting it up in specific lists?
+.project-hover {
+  border-left: #eeeeee solid;
+  margin-left: 10px;
+
+  &:hover {
+    background: #f7f7f7;
+    border-left: $mbee-navbar-color solid;
+  }
+}
+
+%stat-list-template {
+  display: flex;
+  align-items: center;
+}
+
+.stats-list {
+  @extend %stat-list-template;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 100%;
+  max-width: 100%;
+}
+
+.stats-list-member {
+  @extend %stat-list-template;
+  justify-content: space-around;
+}
+
+
+.stats-item {
+  @extend %stat-list-template;
+  justify-content: flex-start;
+  padding-left: 1em;
+  padding-right: 1em;
+  i {
+    padding-right: .3em;
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.stats-divider {
+  border-right: 1px solid #eee;
+  height: 80%;
+  padding-left: 0;
+  padding-right: 0;
+  width: 1px;
+}
+
+.stats-list-item {
+  @include grid-list-items(minmax(auto, 750px) 1fr, "header stats", space-between, center);
+
+  .list-header {
+    margin: 1em;
+    grid-area: header;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    a:hover {
+      color:  lighten($mbee-navbar-color, 20);
+    }
+  }
+}
+
+%template-list-header {
+  @include grid-list-items(1fr minmax(2px, 60px), "main button", left, center);
+}
+
+.template-header {
+  @extend %template-list-header;
+  border-bottom: 1px solid #ccc;
+
+  .head-info {
+    grid-area: main;
+    justify-content: space-around;
+  }
+}
+
+.template-item {
+  margin: 1em;
+  font-size: smaller;
+  grid-area: header;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.user-info {
+  @extend %template-list-header;
+
+  &:hover {
+    background: #f7f7f7;
+  }
+
+  .user-name {
+    grid-area: main;
+    justify-content: space-around;
+    margin: 5px;
+    font-size: smaller;
+  }
+}
+
+#user-list-items {
+  margin: 0.5em;
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+}

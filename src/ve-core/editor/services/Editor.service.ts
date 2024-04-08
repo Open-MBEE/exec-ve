@@ -317,17 +317,17 @@ export class EditorService {
     public openEdit(elementOb: ElementObject): VePromise<EditObject, ElementsResponse<ElementObject>> {
         return new this.$q((resolve, reject) => {
             this.permissionsSvc
-                .initializeEditPermissions(null,elementOb._projectId,elementOb._refId)
-                .finally(() => {
+                .getRefPermission(elementOb._projectId,elementOb._refId)
+                .then((permission) => {
+                    if (permission.permission == 'read') {
+                        reject({ message: 'No edit permission on branch', status: 403 });
+                        return;
+                    }
                     const reqOb = {
                         elementId: elementOb.id,
                         projectId: elementOb._projectId,
                         refId: elementOb._refId,
                     };
-                    if (!this.permissionsSvc.hasBranchEditPermission(elementOb._projectId, elementOb._refId)) {
-                        reject({ message: 'No edit permission on branch', status: 403 });
-                        return;
-                    }
                     this.elementSvc.getElementForEdit(reqOb).then(
                         (edit) => {
                             if (this.valueSvc.isValue(edit.element)) {

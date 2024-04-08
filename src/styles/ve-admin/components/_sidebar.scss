@@ -1,0 +1,103 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.components._sidebar
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines the sidebar styles.
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+.sidebar {
+  background: whitesmoke;
+  border-right: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: $sidebar-min-width;
+
+  &.sidebar-expanded {
+    width: $sidebar-full-width
+  }
+
+  a {
+    color: $sidebar-text;
+    display: block;
+    font-size: 10px;
+    font-weight: 200;
+    text-decoration: none;
+    &.active {
+      :hover {
+        color: $mbee-navbar-color;
+        font-weight: 600;
+      }
+      background-color: darken(whitesmoke, 5);
+      color: $mbee-navbar-color;
+      font-weight: 600;
+    }
+    :hover {
+      color: darken($sidebar-text, 20);
+      font-weight: 300;
+    }
+  }
+
+  hr {
+    border-color: #9c9c9c;
+    margin: .75em;
+  }
+
+  hr.divider {
+    border-color: #e8e8e8;
+    margin: .75em 0;
+  }
+
+  .nested-sidebar-header {
+    color: lighten($sidebar-text, 5);
+    font-size: 0.75rem;
+    padding: 10px;
+  }
+
+  .sidebar-header {
+    display: flex;
+    font-weight: 500;
+    justify-content: center;
+    margin-top: 15px;
+    margin-bottom: 0px;
+    padding: 10px 20px;
+  }
+
+  .sidebar-item {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 10px;
+    height: 50px;
+    justify-content: center;
+    padding:20px;
+    h4, p {
+      font-size: 1.5em;
+      margin: 0 auto 0 0;
+      padding: 10px 10px 10px 20px;
+    }
+
+    i.fas, i.fa {
+      font-size: 12px;
+      text-align: center;
+      width: 12px;
+    }
+  }
+
+  .sidebar-links {
+    height: 100vh;
+    overflow: scroll;
+  }
+}

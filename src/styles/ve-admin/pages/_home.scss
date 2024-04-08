@@ -1,0 +1,65 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.pages._home
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines all the home page sass variables.
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+.home-space {
+  overflow: hidden;
+}
+
+.org-proj-list {
+  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 10px) 1fr minmax(2px, 60px);
+  grid-template-areas: "icon org button";
+  justify-content: left;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  &:hover {
+    background: #f7f7f7;
+  }
+
+  .org-icon {
+    grid-area: icon;
+    justify-content: flex-start;
+    margin: 0;
+  }
+
+  .org-info {
+    grid-area: org;
+    justify-content: space-around;
+    margin: 5px;
+  }
+}
+
+.proj-list {
+  align-items: center;
+  border-left: #eeeeee solid;
+  display: grid;
+  grid-template-columns: 1fr minmax(0px, 65px);
+  grid-template-areas: "org button";
+  justify-content: left;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: 25px;
+
+  &:hover {
+    background: #f7f7f7;
+    border-left: $mbee-navbar-color solid;
+  }
+}

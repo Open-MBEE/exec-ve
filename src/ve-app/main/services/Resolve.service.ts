@@ -5,6 +5,7 @@ import { EventService } from '@ve-utils/core';
 import {
     AuthService,
     ElementService,
+    OrgService,
     PermissionCache,
     PermissionsService,
     ProjectService,
@@ -48,6 +49,7 @@ export class ResolveService {
         'URLService',
         'AuthService',
         'ProjectService',
+        'OrgService',
         'ViewService',
         'ElementService',
         'PermissionsService',
@@ -65,6 +67,7 @@ export class ResolveService {
         private uRLSvc: URLService,
         private authSvc: AuthService,
         private projectSvc: ProjectService,
+        private orgSvc: OrgService,
         private viewSvc: ViewService,
         private elementSvc: ElementService,
         private permissionsSvc: PermissionsService,
@@ -99,7 +102,7 @@ export class ResolveService {
     }
 
     public getOrg(projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> {
-        const promise = this.projectSvc.getOrg(projectOb.orgId);
+        const promise = this.orgSvc.getOrg(projectOb.orgId);
         promise.then(
             (result) => {
                 this.eventSvc.resolve('mmsOrg', result);
@@ -112,7 +115,7 @@ export class ResolveService {
     }
 
     public getOrgs(): VePromise<OrgObject[], OrgsResponse> {
-        const promise = this.projectSvc.getOrgs();
+        const promise = this.orgSvc.getOrgs();
         promise.then(
             (result) => {
                 this.eventSvc.resolve('mmsOrgs', result);
@@ -512,7 +515,7 @@ export class ResolveService {
             } else {
                 switch(params.type) {
                     case 'org':
-                        this.projectSvc.getOrg(params.modify).then(resolve,reject);
+                        this.orgSvc.getOrg(params.modify).then(resolve,reject);
                         break
                     case 'project':
                         this.projectSvc.getProject(params.modify).then(resolve,reject);
@@ -529,7 +532,7 @@ export class ResolveService {
         projectId: string,
         refId: string
     ): VePromise<PermissionCache, PermissionsLookupResponse> {
-        return this.permissionsSvc.initializeEditPermissions(orgId, projectId, refId);
+        return this.permissionsSvc.initializePermissions(orgId, projectId, refId);
     }
 
     public initializeAdminPermissions(
@@ -542,10 +545,10 @@ export class ResolveService {
             } else {
                 switch(params.type) {
                     case 'org':
-                        this.permissionsSvc.initializeUpdatePermissions(adminOb.id, null).then(resolve,reject);
+                        this.permissionsSvc.initializePermissions(adminOb.id, null).then(resolve,reject);
                         break
                     case 'project':
-                        this.permissionsSvc.initializeUpdatePermissions((adminOb as ProjectObject).orgId, adminOb.id).then(resolve,reject);
+                        this.permissionsSvc.initializePermissions((adminOb as ProjectObject).orgId, adminOb.id).then(resolve,reject);
                         break
                     default:
                         reject()

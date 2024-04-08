@@ -3,6 +3,8 @@ import { MmsObject } from '@ve-types/mms';
 export interface AdminObject extends MmsObject {
     id: string
     name?: string
+    permissions?: PermissionsObject[]
+    permission?: string
 }
 
 export interface OrgObject extends AdminObject {
@@ -11,6 +13,7 @@ export interface OrgObject extends AdminObject {
     name: string;
     modified: string;
     id: string;
+    projects?: ProjectObject[]
 }
 
 export interface ProjectObject extends AdminObject {

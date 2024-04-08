@@ -1,14 +1,15 @@
-import { URLService, UserService } from '@ve-utils/mms-api-client';
+import { ApiService, URLService, UserService } from '@ve-utils/mms-api-client';
 
 import { veUtils } from '@ve-utils';
 
 import { VePromise, VeQService } from '@ve-types/angular';
-import { PermissionsLookupResponse, PermissionsLookupObject, UsersResponse, PermissionsResponse } from '@ve-types/mms';
+import { PermissionsLookupResponse, PermissionsLookupObject, UsersResponse, PermissionsResponse, PermissionsObject, AdminObject } from '@ve-types/mms';
+import { CacheService } from '@ve-utils/core';
 
 export interface PermissionCache {
-    org: { [id: string]: boolean };
-    project: { [id: string]: boolean };
-    ref: { [id: string]: boolean };
+    org: { [id: string]: string };
+    project: { [id: string]: string };
+    ref: { [id: string]: string };
 }
 
 /**
@@ -21,13 +22,29 @@ export interface PermissionCache {
  * * This utility service handles permissions inquiries
  */
 export class PermissionsService {
-    private editPermissions: PermissionCache = { org: {}, project: {}, ref: {} };
+    private permissions: PermissionCache = { org: {}, project: {}, ref: {} };
 
-    private updatePermissions: PermissionCache = { org: {}, project: {}, ref: {} };
+    private permissionsMap = {
+        project: {
+            read: "PROJECT_READ",
+            write: "PROJECT_EDIT",
+            admin: "PROJECT_UPDATE_PERMISSIONS"
+        },
+        org: {
+            read: "ORG_READ",
+            write: "ORG_EDIT",
+            admin: "ORG_UPDATE_PERMISSIONS"
+        },
+        branch: {
+            read: "BRANCH_READ",
+            write: "BRANCH_EDIT_CONTENT",
+            admin: "BRANCH_UPDATE_PERMISSIONS"
+        }
+    }
 
-    static $inject = ['$q', '$http', 'URLService', 'UserService'];
+    static $inject = ['$q', '$http', 'URLService', 'ApiService', 'UserService', 'CacheService'];
 
-    constructor(private $q: VeQService, private $http: angular.IHttpService, private uRLSvc: URLService, private userSvc: UserService) {}
+    constructor(private $q: VeQService, private $http: angular.IHttpService, private uRLSvc: URLService, private apiSvc: ApiService, private userSvc: UserService, private cacheSvc: CacheService) {}
 
 
     public lookupPermissions(lookups: PermissionsLookupObject[]): VePromise<PermissionsLookupObject[], PermissionsLookupResponse> {
@@ -58,132 +75,243 @@ export class PermissionsService {
         })
     }
 
-    public getProjectPermissions(projectId: string): VePromise<PermissionsResponse> {
+    public getProjectPermissions(projectId: string, updateCache?: boolean): VePromise<PermissionsObject, PermissionsResponse> {
         const url = this.uRLSvc.getProjectPermissionsURL(projectId);
         return new this.$q((resolve,reject) => {
-            this.$http.get<PermissionsResponse>(url).then(
-                (response) => {
-                    
+            const cacheKey = this.apiSvc.makeCacheKey(null, projectId, false, 'permissions')
+            if (this.cacheSvc.exists(cacheKey) && !updateCache) {
+                resolve(this.cacheSvc.get<PermissionsObject>(cacheKey));
+                return;
+            } else {
+                this.$http.get<PermissionsResponse>(url).then(
+                    (response) => {
+                        resolve(this.cacheSvc.put<PermissionsObject>(cacheKey, response.data))
+                    }
+                ),
+                (response: angular.IHttpResponse<PermissionsResponse>) => {
+                    reject(this.uRLSvc.handleHttpStatus(response));
                 }
-            )
-            //Cache it in normal object cache?
+            }
         })
     }
-    
-    public initializeEditPermissions(
-        orgId: string,
-        projectId: string,
-        refId: string
-    ): VePromise<PermissionCache, PermissionsLookupResponse> {
 
+    public getRefPermissions(projectId: string, refId: string, updateCache?: boolean): VePromise<PermissionsObject, PermissionsResponse> {
+        const url = this.uRLSvc.getRefPermissionsURL(projectId, refId);
         return new this.$q((resolve,reject) => {
+            const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'permissions');
+            if (this.cacheSvc.exists(cacheKey) && !updateCache) {
+                resolve(this.cacheSvc.get<PermissionsObject>(cacheKey));
+                return;
+            } else {
+                this.$http.get<PermissionsResponse>(url).then(
+                    (response) => {
+                        resolve(this.cacheSvc.put<PermissionsObject>(cacheKey, response.data))
+                    }
+                ),
+                (response: angular.IHttpResponse<PermissionsResponse>) => {
+                    reject(this.uRLSvc.handleHttpStatus(response));
+                }
+            }
+        })
+    }
 
-        
-        if ((!projectId && this.editPermissions.org[orgId] !== undefined) || (
-            this.editPermissions.org[orgId] !== undefined &&
-            this.editPermissions.project[projectId] !== undefined &&
-            this.editPermissions.ref[projectId + '/' + refId] !== undefined
-        )) {
-            resolve(this.editPermissions);
-        }
-        const lookups: PermissionsLookupObject[] = []
-        if (orgId) {
-            lookups.push({
-                type: 'ORG',
-                orgId: orgId,
-                privilege: 'ORG_EDIT',
-            })
-        }
-        if (projectId) {
-            lookups.push({
-                type: 'PROJECT',
+    public getOrgPermissions(orgId: string, updateCache?: boolean): VePromise<PermissionsObject, PermissionsResponse> {
+        const url = this.uRLSvc.getOrgPermissionsURL(orgId);
+        return new this.$q((resolve,reject) => {
+            const cacheKey = this.apiSvc.makeCacheKey(null, orgId, false, 'permissions');
+            if (this.cacheSvc.exists(cacheKey) && !updateCache) {
+                resolve(this.cacheSvc.get<PermissionsObject>(cacheKey));
+                return;
+            } else {
+                this.$http.get<PermissionsResponse>(url).then(
+                    (response) => {
+                        resolve(this.cacheSvc.put<PermissionsObject>(cacheKey, response.data))
+                    }
+                ),
+                (response: angular.IHttpResponse<PermissionsResponse>) => {
+                    reject(this.uRLSvc.handleHttpStatus(response));
+                }
+            }
+        })
+    }
+
+    public getProjectPermission(projectId: string): VePromise<AdminObject, PermissionsLookupResponse> {
+        const type: string = 'project'
+        const lookups: PermissionsLookupObject[] = [
+            {
+                type: type.toUpperCase(),
                 projectId: projectId,
-                privilege: 'PROJECT_EDIT',
-            })
-        }
-        if (refId) {
-            lookups.push({
-                type: 'BRANCH',
+                privilege: this.permissions[type].read
+            },
+            {
+                type: type.toUpperCase(),
+                projectId: projectId,
+                privilege: this.permissions[type].edit
+            },
+            {
+                type: type.toUpperCase(),
+                projectId: projectId,
+                privilege: this.permissions[type].admin
+            }
+        ]
+        return new this.$q((resolve, reject) => {
+            const cacheKey = this.apiSvc.makeCacheKey(null, projectId, false, 'permission')
+            if (this.cacheSvc.exists(cacheKey)) {
+                resolve(this.cacheSvc.get<AdminObject>(cacheKey));
+                return;
+            } else {
+                this.lookupPermissions(lookups).then((response) => {
+                    let permission: number = 0
+                    response.forEach((lookup) => {
+                        switch (lookup.privilege) {
+                            case this.permissions[type].read:
+                                permission = permission + 4
+                                break;
+                            case this.permissions[type].edit:
+                                permission = permission + 2
+                                break;
+                            case this.permissions[type].admin:
+                                permission = permission + 1
+                                break;
+                        }
+                    })
+                    resolve(this.cacheSvc.put<AdminObject>(cacheKey, { id: projectId, permission: permission == 7 ? "admin" : permission == 6 ? "write" : "read" }))
+                }, reject)
+            }
+        })
+    }
+
+    public getOrgPermission(orgId: string): VePromise<AdminObject, PermissionsLookupResponse> {
+        const type: string = 'org'
+        const lookups: PermissionsLookupObject[] = [
+            {
+                type: type.toUpperCase(),
+                orgId: orgId,
+                privilege: this.permissions[type].read
+            },
+            {
+                type: type.toUpperCase(),
+                orgId: orgId,
+                privilege: this.permissions[type].edit
+            },
+            {
+                type: type.toUpperCase(),
+                orgId: orgId,
+                privilege: this.permissions[type].admin
+            }
+        ]
+        return new this.$q((resolve, reject) => {
+            const cacheKey = this.apiSvc.makeCacheKey(null, orgId, false, 'permission')
+            if (this.cacheSvc.exists(cacheKey)) {
+                resolve(this.cacheSvc.get<AdminObject>(cacheKey));
+                return;
+            } else {
+                this.lookupPermissions(lookups).then((response) => {
+                    let permission: number = 0
+                    response.forEach((lookup) => {
+                        switch (lookup.privilege) {
+                            case this.permissions[type].read:
+                                permission = permission + 4
+                                break;
+                            case this.permissions[type].edit:
+                                permission = permission + 2
+                                break;
+                            case this.permissions[type].admin:
+                                permission = permission + 1
+                                break;
+                        }
+                    })
+                    resolve(this.cacheSvc.put<AdminObject>(cacheKey, { id: orgId, permission: permission == 7 ? "admin" : permission == 6 ? "write" : "read" }))
+                }, reject)
+            }
+        })
+    }
+
+    public getRefPermission(projectId: string, refId: string): VePromise<AdminObject, PermissionsLookupResponse> {
+        const type: string = 'branch'
+        const lookups: PermissionsLookupObject[] = [
+            {
+                type: type.toUpperCase(),
                 projectId: projectId,
                 refId: refId,
-                privilege: 'BRANCH_EDIT_CONTENT',
-            })
-        }
-
-        this.lookupPermissions(lookups)
-            .then(
-                (response) => {
-                    this._cachePermissions(response, this.editPermissions)
-                    resolve(this.editPermissions);
-                },
-                (response: angular.IHttpResponse<PermissionsLookupResponse>) => {
-                    reject(this.uRLSvc.handleHttpStatus(response));
-                }
-            );
-
-        })
-    }
-
-    public initializeUpdatePermissions(
-            orgId: string,
-            projectId: string
-        ): VePromise<PermissionCache, PermissionsLookupResponse> {
-    
-        return new this.$q((resolve,reject) => {
-            if ((!projectId && this.updatePermissions.org[orgId] !== undefined) || (
-                    this.updatePermissions.org[orgId] !== undefined &&
-                    this.updatePermissions.project[projectId] !== undefined
-                )
-            ) {
-                resolve(this.updatePermissions);
+                privilege: this.permissions[type].read
+            },
+            {
+                type: type.toUpperCase(),
+                projectId: projectId,
+                refId: refId,
+                privilege: this.permissions[type].edit
+            },
+            {
+                type: type.toUpperCase(),
+                projectId: projectId,
+                refId: refId,
+                privilege: this.permissions[type].admin
             }
-            const lookups: PermissionsLookupObject[] = [
-                {
-                    type: 'ORG',
-                    orgId: orgId,
-                    privilege: 'ORG_UPDATE_PERMISSIONS',
-                },
-            ]
-            if (projectId) {
-                lookups.push({
-                    type: 'PROJECT',
-                    projectId: projectId,
-                    privilege: 'PROJECT_UPDATE_PERMISSIONS'
-                })
-            
-            }
-            this.lookupPermissions(lookups)
-            .then(
-                (response) => {
-                    this._cachePermissions(response, this.updatePermissions)
-                    resolve(this.updatePermissions);
-                },
-                (response: angular.IHttpResponse<PermissionsLookupResponse>) => {
-                    reject(this.uRLSvc.handleHttpStatus(response));
-                }
-            );
-    
-        })
-    }
-
-    private _cachePermissions(lookups: PermissionsLookupObject[], permissionsCache: PermissionCache): void {
-        lookups.forEach((lookup) => {
-            if (lookup.type == 'ORG'){
-                permissionsCache.org[lookup.orgId] = lookup.hasPrivilege;
-            } else if (lookup.type == 'PROJECT') {
-                permissionsCache.project[lookup.projectId] = lookup.hasPrivilege;
+        ]
+        return new this.$q((resolve, reject) => {
+            const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'permission')
+            if (this.cacheSvc.exists(cacheKey)) {
+                resolve(this.cacheSvc.get<AdminObject>(cacheKey));
+                return;
             } else {
-                permissionsCache.ref[lookup.projectId + '/' + lookup.refId] = lookup.hasPrivilege;
+                this.lookupPermissions(lookups).then((response) => {
+                    let permission: number = 0
+                    response.forEach((lookup) => {
+                        switch (lookup.privilege) {
+                            case this.permissions[type].read:
+                                permission = permission + 4
+                                break;
+                            case this.permissions[type].edit:
+                                permission = permission + 2
+                                break;
+                            case this.permissions[type].admin:
+                                permission = permission + 1
+                                break;
+                        }
+                    })
+                    resolve(this.cacheSvc.put<AdminObject>(cacheKey, { id: projectId, permission: permission == 7 ? "admin" : permission == 6 ? "write" : "read" }))
+                }, reject)
             }
         })
     }
+
+    public initializePermissions(orgId: string, projectId: string, refId?: string): VePromise<PermissionCache, PermissionsLookupResponse> {
+        return new this.$q((resolve,reject) => {
+            let promises: VePromise<void, PermissionsLookupResponse>[] = []
+            promises.push(this.getOrgPermission(orgId).then((result) => {
+                this.permissions.org[orgId] = result.permission
+            },reject))
+
+            if (projectId) {
+                promises.push(this.getProjectPermission(projectId).then((result) => {
+                    this.permissions.project[projectId] = result.permission
+                },reject))
+            }
+
+            if (refId) {
+                promises.push(this.getRefPermission(projectId, refId).then((result) => {
+                    this.permissions.ref[projectId + '/' + refId] = result.permission
+                },reject))
+            }
+
+
+            this.$q.all(promises).finally(() => {
+                resolve(this.permissions)
+            })
+        })
+    }
+
+    public hasOrgEditPermission = (orgId: string): boolean => {
+        return this.permissions.org[orgId] == "edit" || this.permissions.org[orgId] == "admin";
+    };
 
     public hasProjectEditPermission = (projectId: string): boolean => {
-        return this.editPermissions.project[projectId];
+        return this.permissions.project[projectId] == "edit" || this.permissions.project[projectId] == "admin";
     };
 
     public hasBranchEditPermission = (projectId: string, refId: string): boolean => {
-        return this.editPermissions.ref[projectId + '/' + refId];
+        return this.permissions.ref[projectId + '/' + refId] == "edit" || this.permissions.ref[projectId + '/' + refId] == "admin";
     };
 
     public hasAdminPermission = (username: string): VePromise<boolean, UsersResponse> => {

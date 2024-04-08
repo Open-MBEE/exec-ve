@@ -1,0 +1,54 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.pages._project
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines the project page sass variables
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+.branch-link {
+  color: $mbee-navbar-color;
+
+  &:hover {
+    color: lighten($mbee-navbar-color, 20);
+    text-decoration: none;
+  }
+}
+
+// TODO (ld): consider moving this to model
+// TODO (ld): or consider moving model into project page
+.model-dropdown-btn {
+  &:active {
+    border: none;
+    outline: none;
+  }
+  &:focus {
+    border: none;
+    outline: none;
+  }
+}
+
+.proj-org-header {
+  a {
+    width: 10%;
+
+    &:hover {
+      color: lighten($mbee-navbar-color, 20);
+    }
+  }
+
+  &:hover {
+    background: #f7f7f7;
+  }
+}

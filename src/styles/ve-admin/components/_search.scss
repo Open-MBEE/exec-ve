@@ -1,0 +1,307 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.components._search
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author James Eckstein
+ *
+ * @description Defines the style for the search component.
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+/******************************************************************************
+/*                           Adv Search Form Styling                          *
+/******************************************************************************/
+
+#adv-btns-grp {
+  margin: 0;
+}
+
+#adv-card {
+  padding: 0;
+  margin-top: 15px;
+}
+
+#adv-card-body {
+  padding: 10px;
+}
+
+.adv-col {
+  padding: 0 10px 0 0;
+}
+
+#adv-filter-btn {
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+// Need to override col class
+.adv-input-field {
+  border-radius: 0.25rem !important;
+  width: 97% !important;
+}
+
+#adv-search-header{
+  display: flex;
+  margin: 0;
+}
+
+.adv-search-row {
+  padding: 5px;
+}
+
+.adv-search-select {
+  width: 100% !important; // Need important or inline style
+  margin-left: 5px;
+}
+
+#adv-separator {
+  border-top: 1px solid rgba(0,0,0,0.125);
+  margin: 12px;
+}
+
+%btn-fa-gray {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: gray;
+  font-size: 1.25rem;
+  outline: none !important;
+}
+
+.adv-row-del {
+  @extend %btn-fa-gray;
+  padding-top: 7px !important;
+
+  &:hover, &:focus, &:active {
+    @extend %btn-fa-gray;
+  }
+}
+
+#btn-adv-search {
+  float: none;
+  font-size: 0.875rem;
+  margin: 0 auto;
+  width: 200px;
+}
+
+%btn-adv-standard {
+  background-color: Transparent;
+  border: none;
+  box-shadow: none;
+  color: $color-primary;
+  font-size: 0.875rem;
+  padding: 0 0 5px;
+}
+
+#btn-add-adv-row {
+  @extend %btn-adv-standard;
+  padding: 6px 0px 0px 6px;
+}
+
+#btn-adv-search-toggle{
+  @extend %btn-fa-gray;
+}
+
+#frm-adv-label {
+  font-size: 0.9rem;
+  padding: 7px 0 0 14px;
+  margin: 0;
+}
+
+/******************************************************************************
+/*                       Adv Filter Form Styling                              *
+/******************************************************************************/
+
+.adv-filter-col {
+  padding: 0 !important;
+}
+
+.adv-elem-filters {
+  margin-right: 10px !important;
+  width: auto !important;
+}
+
+#adv-filter-frm {
+  margin: 0;
+  padding-left: 40px;
+}
+
+.adv-filter-item {
+  display: flex;
+}
+
+#adv-filter-label {
+  margin: auto;
+}
+
+#adv-filter-separator {
+  border-top: 1px solid rgba(0,0,0,0.125);
+  margin: 4px 15px;
+}
+
+#adv-filter-toggle {
+  outline: none !important;
+}
+
+#btn-grp-adv-filter {
+  margin: 0 10px 0 10px;
+}
+
+#filter-menu {
+  width: 475px !important;
+  overflow: visible;
+}
+
+/******************************************************************************
+/*                           Search Form Styling                              *
+/******************************************************************************/
+
+%no-border {
+  background-color: Transparent;
+  border: none;
+  box-shadow: none;
+  outline: none !important;
+}
+
+%gray-border {
+  border: 1px solid rgba(0,0,0,0.125);
+  border-radius: .25rem;
+}
+
+// Need to override btn-page class
+#btn-back, #btn-next {
+  @extend %no-border;
+  color: black;
+  font-size: small;
+  font-weight: 100;
+
+  &:hover, &:focus, &:active {
+    @extend %no-border;
+    cursor: pointer;
+    color: #cccccc;
+    text-decoration: underline;
+  }
+}
+
+#btn-pagination-grp {
+  float: right;
+}
+
+.no-results {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.result-row:hover {
+  cursor: pointer;
+}
+
+#search {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.search-body {
+  font-size: smaller;
+  font-weight: 300;
+  grid-area: header;
+  margin: 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+#search-branch-bar {
+  padding: 80px 80px 0px 60px;
+}
+
+.search-form {
+  padding: 0px 80px 1px;
+
+  .form-row {
+    width: 100%;
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+#search-input {
+  margin-left: -20px;
+}
+
+#search-input-box {
+  @extend %gray-border;
+  display: flex;
+}
+
+#search-query-input {
+  @extend %no-border;
+  width: 93%;
+  padding: 2px 0 0 0;
+
+  &:hover, &:focus, &:active {
+    @extend %no-border;
+  }
+}
+
+#btn-search {
+  @extend %btn-fa-gray;
+  padding: 6px;
+}
+
+#search-message {
+  font-size: 13px;
+  margin-left: 80px;
+  margin-bottom: 15px;
+}
+
+#search-results {
+  @extend %gray-border;
+  margin-top: 20px;
+}
+
+#tbl-elem-info {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  table-layout: fixed;
+
+  th, td {
+    border-top: 0;
+    padding: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  tr {
+    background-color: transparent !important;
+  }
+}
+
+// Alternate table strip color
+#tbl-results tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.0);
+}
+
+#tbl-results tbody tr:nth-of-type(4n+1) {
+  background-color: rgba(0,0,0,0.03);
+}
+
+.results-border {
+  padding: 10px;
+  width: 100%;
+}

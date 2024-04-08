@@ -1,0 +1,27 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.themes._themes
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Jake Ursetta
+ *
+ * @description Defines general html sass component styles
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+// Light Theme (default)
+// This is the default color scheme.
+.mbee-theme {
+  background-color: $mbee-background;
+  color: $mbee-color;
+  font-family: $mbee-font;
+  height: 100%;
+}

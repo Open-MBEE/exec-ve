@@ -1,5 +1,5 @@
 import { ApplicationService } from '@ve-utils/application/Application.service';
-import { ElementService, ProjectService, URLService, ViewService } from '@ve-utils/mms-api-client';
+import { ElementService, OrgService, ProjectService, URLService, ViewService } from '@ve-utils/mms-api-client';
 
 import { veUtils } from '@ve-utils';
 
@@ -21,6 +21,7 @@ export class ShortUrlService {
         '$location',
         'URLService',
         'ProjectService',
+        'OrgService',
         'ViewService',
         'ElementService',
         'ApplicationService',
@@ -32,6 +33,7 @@ export class ShortUrlService {
         private $location: angular.ILocationService,
         private uRLSvc: URLService,
         private projectSvc: ProjectService,
+        private orgSvc: OrgService,
         private viewSvc: ViewService,
         private elementSvc: ElementService,
         private applicationSvc: ApplicationService
@@ -58,7 +60,7 @@ export class ShortUrlService {
         if (orgId) {
             const deferOrg = this.$q.defer<void>();
             promises.push(deferOrg.promise);
-            this.projectSvc.getOrgs().then(
+            this.orgSvc.getOrgs().then(
                 (data) => {
                     const org = data.filter((o) => {
                         return o.id.endsWith(orgId);

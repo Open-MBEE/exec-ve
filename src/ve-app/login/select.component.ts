@@ -4,7 +4,7 @@ import Rx from 'rx-lite';
 
 import { BrandingStyle, RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { ProjectService, AuthService } from '@ve-utils/mms-api-client';
+import { ProjectService, AuthService, OrgService } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
@@ -20,6 +20,7 @@ class SelectController implements IComponentController {
         '$localStorage',
         'growl',
         'ProjectService',
+        'OrgService',
         'AuthService',
         'RootScopeService',
         'EventService',
@@ -58,6 +59,7 @@ class SelectController implements IComponentController {
         private $localStorage: VeStorageService,
         private growl: angular.growl.IGrowlService,
         private projectSvc: ProjectService,
+        private orgSvc: OrgService,
         private authSvc: AuthService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService
@@ -129,7 +131,7 @@ class SelectController implements IComponentController {
     public refreshOrgs = (): void => {
         this.orgSpin = true;
         this.orgs.length = 0;
-        this.projectSvc
+        this.orgSvc
             .getOrgs(true)
             .then((data) => {
                 this.orgs.push(...data);

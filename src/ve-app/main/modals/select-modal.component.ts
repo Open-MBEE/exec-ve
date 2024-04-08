@@ -1,7 +1,7 @@
 import { StateService } from '@uirouter/angularjs';
 import angular from 'angular';
 
-import { ProjectService } from '@ve-utils/mms-api-client';
+import { OrgService, ProjectService } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
@@ -29,7 +29,7 @@ export interface SelectModalResolveFn extends VeModalResolveFn {
 }
 
 class SelectModalController implements VeModalController {
-    static $inject = ['$scope', '$state', 'ProjectService'];
+    static $inject = ['$scope', '$state', 'ProjectService', 'OrgService'];
 
     //bindings
     public modalInstance: VeModalInstanceService<void>;
@@ -46,7 +46,7 @@ class SelectModalController implements VeModalController {
     protected orgSpin: boolean;
     protected projSpin: boolean;
 
-    constructor(private $scope: angular.IScope, private $state: StateService, private projectSvc: ProjectService) {}
+    constructor(private $scope: angular.IScope, private $state: StateService, private projectSvc: ProjectService, private orgSvc: OrgService) {}
 
     $onInit(): void {
         this.orgs = this.resolve.mmsOrgs;
@@ -101,7 +101,7 @@ class SelectModalController implements VeModalController {
     public refreshOrgs = (): void => {
         this.orgSpin = true;
         this.orgs.length = 0;
-        this.projectSvc
+        this.orgSvc
             .getOrgs(true)
             .then((data) => {
                 this.orgs.push(...data);

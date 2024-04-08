@@ -1,0 +1,58 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass._base
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines general html sass component styles.
+ */
+
+body,html {
+  margin: 0;
+  padding: 0;
+}
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* make scrollbar transparent */
+}
+
+h2 {
+  font-size: 18px;
+}
+
+h3 {
+  font-size: 15px;
+}
+
+hr {
+  border-color: #9c9c9c;
+}
+
+label {
+  font-size: 15px;
+}
+
+textarea[name="custom"] {
+  font-family: Consolas, "Courier New";
+  resize: vertical;
+  outline: none;
+}
+
+th, td {
+  padding: 5px;
+}
+
+th {
+  text-align: left;
+}

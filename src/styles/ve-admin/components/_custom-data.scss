@@ -1,0 +1,114 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.components._custom-data
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ * @author James Eckstein
+ *
+ * @description Defines the all custom data styles.
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+%custom-key-display {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-data {
+  padding-left: 20px;
+
+  .custom-key {
+    @extend %custom-key-display;
+    padding-left: .5em;
+
+    i {
+      font-size: 12px;
+      color: $color-secondary;
+
+      &:hover {
+        color: darken($color-secondary, 20);
+        cursor: pointer;
+      }
+    }
+
+    .key-name {
+      padding: 5px;
+    }
+  }
+
+  .custom-key-info {
+    @extend %custom-key-display;
+    padding-left: 1em;
+  }
+
+  .last-element {
+    padding-left: 1em;
+  }
+}
+
+.custom-header {
+  padding: 5px;
+  font-weight: 700;
+}
+
+/******************************************************************************
+/*                       Custom Data Edit Styling                             *
+/******************************************************************************/
+
+#btn-add-kv-pair {
+  display: block;
+  margin: 15px auto 0;
+
+  &:disabled {
+    color: #6c757d;
+    border-color: #6c757d;
+  }
+}
+
+%btn-row-del {
+  padding: 0px;
+  font-size: 1.25rem;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  outline: none !important;
+  color: gray;
+}
+
+#custom-input-nav {
+  border-color: transparent;
+}
+
+#custom-form {
+  border: 1px solid #dee2e6;
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  padding: 15px;
+}
+
+.custom-key-col {
+  padding: 0;
+}
+
+.custom-kv-row {
+  margin-bottom: 10px;
+}
+
+.custom-row-del {
+  @extend %btn-row-del;
+
+  &:hover, &:focus, &:active {
+    @extend %btn-row-del;
+  }
+}

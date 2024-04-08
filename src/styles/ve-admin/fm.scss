@@ -1,0 +1,110 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.fm
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Josh Kaplan
+ * @author Jake Ursetta
+ *
+ * @description This defines the Sass variables.
+ */
+
+// MBEE modules
+@import './utils/_variables';
+
+#fm {
+
+    color: $mbee-color;
+    padding-bottom: 10px;
+
+    h1.title {
+        color: $mbee-color;
+        font-weight: 100;
+        font-size: 56px;
+        margin: 40px 15px 0px 15px;
+    }
+
+    h2.subtitle {
+        color: $mbee-color;
+        font-weight: 100;
+        font-size: 14px;
+        margin: 0px 15px 40px 15px;
+    }
+
+    .nav-link {
+        border-radius: 0px;
+        color:  $mbee-color;
+    }
+
+    .nav-pills .nav-link.active {
+        color: $mbee-color;
+        background-color: transparent;
+        border-bottom: 1px solid #007bff;
+    }
+
+    .tab-content {
+
+        color: $mbee-color;
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 300;
+            color: $mbee-color;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 48px;
+            font-weight: 100;
+        }
+
+        h2 {
+            border-bottom: 1px solid #5c6166;
+            padding-bottom: 2px;
+            margin-bottom: 18px;
+            font-size: 24px;
+        }
+
+        h3 {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        h4 {
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        h5 {
+            font-weight: 600;
+            font-size: 18px
+        }
+
+        h6 {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        pre {
+            color: #adb0b2;
+            background: #343a40;
+            padding: 4px 4px;
+            border: 1px solid #484d53;
+
+            code {
+                max-height: 200px;
+                overflow: scroll;
+            }
+        }
+
+        img {
+            max-width: 80%;
+        }
+    }
+}

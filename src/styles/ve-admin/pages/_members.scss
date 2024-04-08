@@ -1,0 +1,57 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.pages._members
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines the members page style
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+.members-box {
+  padding: 10px;
+}
+
+.members-dropdown {
+  background: white;
+  border-bottom: #c0c0c0c0 solid 1px;
+  border-left: #c0c0c0c0 solid 1px;
+  border-right: #c0c0c0c0 solid 1px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.25);
+  position: absolute;
+  width: 325px;
+}
+
+.members-dropdown-item {
+  display: grid;
+  padding: 10px;
+
+  &:hover {
+    background: #f7f7f7;
+    cursor: pointer;
+  }
+}
+
+.member-username {
+  font-size: small;
+}
+
+.roles-box {
+  background-color: #f9f9f9;
+  border: 1px solid #e8e8e8;
+  margin-bottom: 15px;
+
+  hr {
+    border: 1px solid #ccc;
+  }
+}

@@ -1,0 +1,82 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.layout._grid
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines the template for all grid styles.
+ */
+
+// MBEE modules
+@import '../utils/_variables';
+
+#header-footer {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  display: grid;
+  grid-template-rows: $banner-height 1fr $banner-height;
+  grid-template-areas:
+    "header"
+    "root"
+    "footer";
+
+
+  #header {
+    grid-area: header;
+  }
+
+  #footer {
+    grid-area: footer;
+  }
+}
+
+#root {
+  grid-area: root;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  display: grid;
+  grid-template-rows: auto minmax(10px, 1fr);
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "nav"
+    "main";
+
+
+  #nav {
+    grid-area: nav;
+  }
+
+  #main {
+    grid-area: main;
+
+    #container {
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-template-columns: auto minmax(10px, 1fr);
+      height: 100%;
+
+      #sidebar {
+        grid-column-start: 1;
+        grid-column-end: 2;
+        overflow: hidden;
+        border-right: 1px solid #e8e8e8;
+      }
+
+      #view {
+        grid-column-start: 2;
+        grid-column-end: 3;
+        overflow: scroll;
+      }
+    }
+  }
+
+}

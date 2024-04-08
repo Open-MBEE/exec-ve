@@ -1,0 +1,52 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.components._box-list.scss
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ *
+ * @description Defines the box list styles.
+ */
+
+%box-display {
+  display: flex;
+  justify-content: space-between;
+}
+
+.box-list {
+  padding: 5px 10px;
+  margin: 15px;
+
+  .box-list-header {
+    @extend %box-display;
+  }
+
+  .box-list-footer {
+    @extend %box-display;
+    padding-top: 5px;
+
+    .footer-btn {
+      color: black;
+      &:hover {
+        cursor: pointer;
+        color: #cccccc;
+      }
+
+      .btn-label {
+        font-size: small;
+        font-weight: 100;
+      }
+
+      i {
+        padding: 5px;
+        font-size: small;
+      }
+    }
+  }
+}

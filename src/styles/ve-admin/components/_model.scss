@@ -1,0 +1,157 @@
+/**
+ * @classification UNCLASSIFIED
+ *
+ * @module ui.sass.components._model
+ *
+ * @copyright Copyright (C) 2018, Lockheed Martin Corporation
+ *
+ * @license Apache-2.0
+ *
+ * @owner James Eckstein
+ *
+ * @author Leah De Laurell
+ * @author James Eckstein
+ *
+ * @description Defines the element tree styles.
+ */
+
+// MBEE modules
+@import '../utils/variables';
+
+.branch-bar {
+  padding: 20px 48px 15px 17px;
+  display: flex;
+
+  .branches-dropdown {
+    display: flex;
+  }
+
+  .branch-input {
+    width: 200px;
+  }
+
+  .branch-tag {
+    display: flex;
+    padding-left: 10px;
+    padding-top: 3px;
+
+    .archived-check-box {
+      padding-left: 10px;
+      position: sticky;
+    }
+  }
+
+  .options-btn {
+    padding-left: 10px;
+  }
+
+  .branch-label {
+    padding: 6px;
+    font-weight: 600;
+    font-size: small;
+  }
+}
+
+// TODO - go delete the id instead of keep class and id
+#element-tree-container, .element-tree-container {
+  padding-top: 10px;
+  white-space: nowrap;
+  padding-bottom: 10px;
+
+  .clear-btn {
+    color: #9c9c9c;
+    padding-left: 10px;
+
+    &:hover {
+      color: darken(#9c9c9c, 15);
+      cursor: pointer;
+    }
+  }
+
+  .element-link {
+    color: black;
+  }
+
+  .element-tree {
+    padding-left: 24px;
+    border-left: 1px solid #e8e8e8;
+  }
+
+  .element-tree-root {
+    border-left: none;
+    padding-bottom: 10px;
+  }
+
+  .element-tree, .element-tree-root {
+    i.fa-caret-right, i.fa-caret-down {
+      width: 20px;
+    }
+
+    .element-id {
+      font-weight: 600;
+      font-size: 12px;
+      color: #cccccc;
+      padding-left: 10px
+    }
+  }
+
+  .element-tree > .element-link > span {
+    transition: all .15s ease-in-out;
+  }
+
+  .element-tree > .element-link:hover {
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .element-tree > .element-link:hover > span:not(.element-id) {
+    color: lighten($mbee-navbar-color, 20%);
+  }
+
+  .element-tree.tree-selected > .element-name > span {
+    background: $highlight-color-primary;
+  }
+
+  i {
+    padding-right: 10px;
+  }
+
+  .transparent {
+    color: transparent;
+  }
+}
+
+.element-selector {
+  display: inline;
+  margin-left: 10px;
+
+  i.fas:hover {
+    color: lighten(#333333, 25%);
+  }
+}
+
+.element-selector-modal {
+  .modal-footer {
+    p {
+      width: 100%;
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+}
+
+.element-selector-project {
+  padding: 4px;
+  display: flex;
+
+  .project-label {
+    padding: 6px;
+    font-weight: 600;
+    font-size: small;
+  }
+}
+
+.options-card {
+  padding: 15px 35px;
+}

@@ -2,7 +2,7 @@ import { IQResolveReject } from 'angular';
 
 import { ApplicationService, RootScopeService, UserSettingsObject } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
+import { ApiService, ElementService, OrgService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
 
 import { veCore } from '@ve-core';
 
@@ -87,6 +87,7 @@ export class TreeService {
         'growl',
         'ApiService',
         'ProjectService',
+        'OrgService',
         'ElementService',
         'ViewService',
         'ApplicationService',
@@ -100,6 +101,7 @@ export class TreeService {
         private growl: angular.growl.IGrowlService,
         private apiSvc: ApiService,
         private projectSvc: ProjectService,
+        private orgSvc: OrgService,
         private elementSvc: ElementService,
         private viewSvc: ViewService,
         private applicationSvc: ApplicationService,
@@ -947,7 +949,7 @@ export class TreeService {
                 //     treeOptions.sectionTypes.push('snapshot')
                 // }
                 if (!this.treeApi.projectId) {
-                    this.projectSvc.getOrgs().then((orgs) => {
+                    this.orgSvc.getOrgs().then((orgs) => {
                         this.buildTreeHierarchy<AdminObject>(orgs, 'id', 'org', 'orgId',this.orgLevel2Func).then((treeHierarchy) => {
                             treeData.push(...treeHierarchy);
                             this.processedFocus = '';
