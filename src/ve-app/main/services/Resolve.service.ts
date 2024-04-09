@@ -33,6 +33,8 @@ import {
     ProjectsResponse,
     RefObject,
     RefsResponse,
+    UserObject,
+    UsersResponse,
     ViewObject,
 } from '@ve-types/mms';
 import { VeStorageService } from '@ve-types/view-editor';
@@ -99,6 +101,12 @@ export class ResolveService {
             }
         );
         return deferred.promise;
+    }
+
+    public getCurrentUser(): VePromise<UserObject, UsersResponse> {
+        return new this.$q((resolve, reject) => {
+            this.
+        })
     }
 
     public getOrg(projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> {

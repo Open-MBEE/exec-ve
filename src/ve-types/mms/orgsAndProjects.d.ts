@@ -1,19 +1,20 @@
 import { MmsObject } from '@ve-types/mms';
 
 export interface AdminObject extends MmsObject {
-    id: string
-    name?: string
-    permissions?: PermissionsObject[]
-    permission?: string
+    id: string;
+    name?: string;
+    permissions?: PermissionsObject[];
+    permission?: string;
+    description?: string;
 }
 
 export interface OrgObject extends AdminObject {
     public: boolean;
-    created: string;
+    created?: string;
     name: string;
-    modified: string;
+    modified?: string;
     id: string;
-    projects?: ProjectObject[]
+    projects?: ProjectObject[];
 }
 
 export interface ProjectObject extends AdminObject {
@@ -37,7 +38,6 @@ export interface RefObject extends AdminObject {
     _docId?: string;
     _creator?: string;
     _created?: string;
-    description?: string;
     type: string;
     _projectId: string;
     permission?: string;

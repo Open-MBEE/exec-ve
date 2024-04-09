@@ -3,11 +3,16 @@
 // import { OrgService } from '../services/org.service';
 
 import { veAdmin } from "@ve-admin/ve-admin.module";
-import { VeComponentOptions } from "@ve-types/angular";
+import { VeComponentOptions, VePromise, VeQService } from "@ve-types/angular";
 import { OrgObject, UserObject } from "@ve-types/mms";
-import { OrgService, UserService } from "@ve-utils/mms-api-client";
+import { VeModalService } from "@ve-types/view-editor";
+import { AuthService, OrgService, PermissionsService, UserService } from "@ve-utils/mms-api-client";
+import { handleChange } from "@ve-utils/utils";
 
 class HomeComponentController implements angular.IComponentController {
+  //Bindings
+  private mmsUser: UserObject
+  private mmsOrgs: OrgObject[]
 
   width: number | null = null;
   modalCreate = false;
@@ -20,54 +25,66 @@ class HomeComponentController implements angular.IComponentController {
   error: any = null;
   homeRef: HTMLElement | null = null;
 
-  static $inject = ['$element', '$window', '$uibModal', 'OrgService', 'UserService'];
+  static $inject = ['$element', '$window', '$uibModal', 'OrgService', 'UserService', 'PermissionsService'];
 
-  constructor(private $element: ng.IRootElementService,
-              private $window: ng.IWindowService,
-              private $uibModal: ng.ui.bootstrap.IModalService,
+  constructor(private $q: VeQService,
+              private $element: JQuery<HTMLElement>,
+              private $window: angular.IWindowService,
+              private $uibModal: VeModalService,
               private orgSvc: OrgService,
-              private userSvc: UserService) {}
+              private userSvc: UserService,
+              private permissionsSvc: PermissionsService) {}
 
   $onInit(): void {
     this.homeRef = this.$element[0].querySelector('#home-space') as HTMLElement;
     this.$window.addEventListener('resize', this.handleResize);
     this.handleResize();
-    this.refresh();
+    
+    this.refresh(this.mmsOrgs);
   }
 
   $onDestroy(): void {
     this.$window.removeEventListener('resize', this.handleResize);
   }
 
-  async setMountedComponentStates(userData: UserObject, orgData: OrgObject[]): Promise<void> {
+  $onChanges(onChangesObj: angular.IOnChangesObject): void {
+    handleChange(onChangesObj, 'mmsUser', this.refresh);
+    handleChange(onChangesObj, 'mmsOrgs', this.refresh);
+}
+
+  refreshUser(user: UserObject): void {
+    this.user = user
+    this.orgs = []
+    this.refresh(this.mmsOrgs)
+  }
+
+  refresh(orgs: OrgObject[]): void {
+    this.user = this.mmsUser
     let writePermOrgs: OrgObject[] = [];
 
-    if (!userData.admin) {
-      orgData.forEach((org) => {
-        const perm = org.permissions[userData.username];
-
-        if ((perm === 'write') || (perm === 'admin')) {
-          writePermOrgs.push(org);
-        }
+    if (!this.user.admin) {
+      orgs.forEach((org) => {
+        this.permissionsSvc.getOrgPermission(org.id).then((perm) => {
+          if ((perm.permission === 'write') || (perm.permission === 'admin')) {
+            writePermOrgs.push(org);
+          }
+        })
       });
-    } else if (userData.admin) {
+    } else if (this.user.admin) {
       writePermOrgs = this.orgs;
+      this.admin = this.user.admin;
     }
 
     if (writePermOrgs.length > 0) {
       this.write = true;
     }
 
-    if (userData.admin) {
-      this.admin = userData.admin;
-    }
-
     const display = {};
-    orgData.forEach((org) => {
+    orgs.forEach((org) => {
       display[org.id] = true;
     });
 
-    this.orgs = orgData;
+    this.orgs = orgs;
     this.displayOrgs = display;
   }
 
@@ -77,8 +94,81 @@ class HomeComponentController implements angular.IComponentController {
     }
   };
 
-  handleCreateToggle = (): void => {
-    this.modalCreate = !this.modalCreate;
+  handleCreate = (): void => {
+        const insertData: InsertRefData = {
+            type: itemType,
+            parentRefId: '',
+            parentTitle: '',
+            insertType: 'ref',
+            lastCommit: true,
+        };
+        const branch = this.refSelected;
+        // Item specific setup:
+        if (itemType === 'Branch') {
+            if (!branch) {
+                this.growl.warning('Add Branch Error: Select a branch or tag first');
+                return;
+            }
+            if (branch.type === 'Tag') {
+                insertData.parentTitle = 'Tag ' + branch.name;
+            } else {
+                insertData.parentTitle = 'Branch ' + branch.name;
+            }
+            insertData.parentRefId = branch.id;
+        } else if (itemType === 'Tag') {
+            if (!branch) {
+                this.growl.warning('Add Tag Error: Select a branch or tag first');
+                return;
+            }
+            insertData.parentRefId = branch.id;
+        } else {
+            this.growl.error('Add Item of Type ' + itemType + ' is not supported');
+            return;
+        }
+        const instance = this.$uibModal.open<InsertResolveFn<InsertRefData>, RefObject>({
+            component: 'insertElementModal',
+            resolve: {
+                getInsertData: () => {
+                    return insertData;
+                },
+                getFilter: () => {
+                    return this.$filter;
+                },
+                getProjectId: () => {
+                    return this.project.id;
+                },
+                getRefId: () => {
+                    return null;
+                },
+                getOrgId: () => {
+                    return this.project.orgId;
+                },
+                getSeenViewIds: () => {
+                    return null;
+                },
+            },
+        });
+        instance.result.then(
+            (data) => {
+                if (data.type === 'Branch') {
+                    this.branches.push(data);
+                    this.refSelected = data;
+                } else {
+                    this.tags.push(data);
+                    this.refSelected = data;
+                }
+            },
+            (reason?) => {
+                if (reason && reason.status !== 444) {
+                    this.growl.error('Ref Creation Error:' + reason.message);
+                } else {
+                    this.growl.info('Ref Creation Cancelled', {
+                        ttl: 1000,
+                    });
+                }
+            }
+        );
+    };
   };
 
   handleDeleteToggle = (): void => {
@@ -98,26 +188,7 @@ class HomeComponentController implements angular.IComponentController {
       return acc;
     }, {});
   };
-
-  async refresh(): Promise<void> {
-    try {
-      const data: UserObject = await this.permissionS.getUserData().toPromise();
-      this.user = data;
-
-      const options = {
-        params: {
-          populate: 'projects',
-          includeArchived: true,
-        },
-      };
-
-      const orgData: IOrganization[] = await this.orgSvc.getOrgs(options);
-
-      await this.setMountedComponentStates(data, orgData);
-    } catch (error) {
-      this.error = error;
-    }
-  }
+  
 
 }
 
@@ -170,11 +241,14 @@ const HomeComponent: VeComponentOptions = {
       </div>
 
       <div class="extra-padding">
-        <ng-container ng-if="$ctrl.orgs.length === 0; else orgList">
+        <div ng-show="$ctrl.orgs.length == 0">
           <div class="list-item">
             <h3>No organizations.</h3>
           </div>
-        </ng-container>
+        </div>
+        <div ng-hide="$ctrl.orgs.length == 0" class="list">
+        
+        </div>
 
         <ng-template #orgList>
           <app-list>

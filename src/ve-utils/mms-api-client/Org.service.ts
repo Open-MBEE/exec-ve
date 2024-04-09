@@ -5,20 +5,7 @@ import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 import { veUtils } from '@ve-utils';
 
 import { VePromise, VeQService } from '@ve-types/angular';
-import {
-    CommitObject,
-    CommitResponse,
-    ElementObject,
-    GroupObject,
-    GroupsResponse,
-    MountObject,
-    OrgObject,
-    OrgsResponse,
-    ProjectObject,
-    ProjectsResponse,
-    RefObject,
-    RefsResponse,
-} from '@ve-types/mms';
+import { OrgObject, OrgsResponse } from '@ve-types/mms';
 
 export class OrgService extends BaseApiService {
     static $inject = ['$q', '$http', 'CacheService', 'ElementService', 'ProjectService', 'URLService', 'ApiService'];
@@ -108,7 +95,7 @@ export class OrgService extends BaseApiService {
                                         if (includeProjects) {
                                             this.projectSvc.getProjects(org.id).then((projects) => {
                                                 org.projects = projects;
-                                            })
+                                            });
                                         }
                                         this.cacheSvc.put(['org', org.id], org, true);
                                         orgs.push(this.cacheSvc.get<OrgObject>(['org', org.id]));
@@ -130,12 +117,12 @@ export class OrgService extends BaseApiService {
         return this._getInProgress(key) as VePromise<OrgObject[], OrgsResponse>;
     }
 
-    public createOrg(name: string): VePromise<OrgObject, OrgsResponse> {
+    public createOrg(orgObj: OrgObject): VePromise<OrgObject, OrgsResponse> {
         return new this.$q<OrgObject, OrgsResponse>((resolve, reject) => {
             const url = this.uRLSvc.getOrgsURL();
             this.$http
                 .post<OrgsResponse>(url, {
-                    orgs: { name: name },
+                    orgs: orgObj,
                     source: `ve-${this.apiSvc.getVeVersion()}`,
                 })
                 .then(
@@ -151,7 +138,6 @@ export class OrgService extends BaseApiService {
                 );
         });
     }
-
 }
 
 veUtils.service('OrgService', OrgService);

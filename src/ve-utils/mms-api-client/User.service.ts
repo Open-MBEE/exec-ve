@@ -6,15 +6,17 @@ import { veUtils } from '@ve-utils';
 
 import { VePromise, VeQService } from '@ve-types/angular';
 import { UserObject, UsersResponse } from '@ve-types/mms';
+import { AuthService } from './Authorization.service';
 
 export class UserService extends BaseApiService {
-    static $inject = ['$q', '$http', 'CacheService', 'URLService'];
+    static $inject = ['$q', '$http', 'CacheService', 'URLService', 'AuthService'];
 
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
         private cacheSvc: CacheService,
-        private uRLSvc: URLService
+        private uRLSvc: URLService,
+        private authSvc: AuthService
     ) {
         super();
     }
@@ -60,6 +62,14 @@ export class UserService extends BaseApiService {
         );
 
         return this._getInProgress(url) as VePromise<UserObject, UsersResponse>;
+    }
+
+    getCurrentUser(): VePromise<UserObject, UsersResponse> {
+        return new this.$q((resolve, reject) => {
+            this.authSvc.checkLogin().then((response) => {
+                this.getUserData(response.username).then(resolve,reject)
+            },reject)
+        })
     }
 }
 

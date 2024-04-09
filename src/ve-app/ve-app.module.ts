@@ -47,6 +47,8 @@ import {
     ProjectsResponse,
     RefObject,
     RefsResponse,
+    UserObject,
+    UsersResponse,
     ViewObject,
 } from '@ve-types/mms';
 import { VeModalService } from '@ve-types/view-editor';
@@ -289,6 +291,12 @@ veApp.config([
                             return resolveSvc.getOrgs();
                         },
                     ],
+                    userOb: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<UserObject, UsersResponse> => {
+                            return resolveSvc.getCurrentUser()
+                        }
+                    ],
                     rootOb: [
                         'ResolveService',
                         (resolveSvc: ResolveService): VePromise<AdminObject> => {
@@ -337,14 +345,11 @@ veApp.config([
                         }
                     },
                     'pane-center@main': {
-                        component: 'admin',
-                        // bindings: {
-                        //     mmsParams: 'params',
-                        //     mmsProject: 'projectOb',
-                        //     mmsRef: 'refOb',
-                        //     mmsGroup: 'groupOb',
-                        //     mmsDocument: 'documentOb',
-                        // },
+                        component: 'adminHome',
+                        bindings: {
+                            mmsOrgs: 'orgObs',
+                            mmsUser: 'userOb'
+                        },
                     },
                 },
 
