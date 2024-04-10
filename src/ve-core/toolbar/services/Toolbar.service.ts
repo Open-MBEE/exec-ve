@@ -90,7 +90,7 @@ export class ToolbarService {
     }
 
     public waitForApi = (id: string): VePromise<ToolbarApi, void> => {
-        if (!this.toolbars.hasOwnProperty(id)) {
+        if (!Object.prototype.hasOwnProperty.call(this.toolbars, id)) {
             this.toolbars[id] = {};
             this.toolbars[id].promise = new this.$q<ToolbarApi, void>((resolve, reject) => {
                 this.toolbars[id].resolve = resolve;
@@ -158,7 +158,7 @@ export class ToolbarService {
     }
 
     public destroyApi = (id: string): void => {
-        if (this.toolbars.hasOwnProperty(id)) {
+        if (Object.prototype.hasOwnProperty.call(this.toolbars, id)) {
             delete this.toolbars[id];
         }
     };
@@ -199,7 +199,7 @@ export class ToolbarService {
      * @returns {Object} Button object
      */
     public getToolbarButton = (buttonId: string): ToolButton => {
-        if (this.buttons.hasOwnProperty(buttonId)) {
+        if (Object.prototype.hasOwnProperty.call(this.buttons, buttonId)) {
             const newButton = new ToolButton(buttonId, this.buttons[buttonId]);
             if (this.buttons[buttonId].dynamic_ids) {
                 newButton.dynamicButtons = [];
@@ -214,7 +214,7 @@ export class ToolbarService {
     };
 
     public getDynamicButton = (button: string): IToolBarButton => {
-        if (this.dynamicButtons.hasOwnProperty(button)) {
+        if (Object.prototype.hasOwnProperty.call(this.dynamicButtons, button)) {
             return this.dynamicButtons[button];
         }
     };

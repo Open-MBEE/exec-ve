@@ -44,7 +44,7 @@
 //
 //                         // does it have an owner and is the owner a member of this model?
 //                         if (
-//                             elem.hasOwnProperty('ownerId') &&
+//                             Object.prototype.hasOwnProperty.call(elem, 'ownerId') &&
 //                             ownedElementsMap[elem.ownerId]
 //                         ) {
 //                             node.parent = elem.ownerId

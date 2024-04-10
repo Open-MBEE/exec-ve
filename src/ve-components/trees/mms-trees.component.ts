@@ -504,7 +504,7 @@ class TreesController implements IComponentController {
 
             this.currentTitle = data.title ? data.title : inspect.tooltip;
 
-            if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
+            if (!Object.prototype.hasOwnProperty.call(this.show, _.camelCase(data.id))) {
                 this.startTree(data.id);
                 this.show[_.camelCase(data.id)] = { tree: true, pe: false };
             } else {

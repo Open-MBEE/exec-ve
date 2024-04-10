@@ -147,7 +147,7 @@ class MenuController implements IComponentController {
         if (this.child && this.child != oldChild) {
             this.crumbs = [];
             if (this.child.type === 'Package') {
-                //child.hasOwnProperty('_id')) {
+                //Object.prototype.hasOwnProperty.call(child, '_id')) {
                 this.crumbs.push({
                     name: this.child.name,
                     id: this.child.id,

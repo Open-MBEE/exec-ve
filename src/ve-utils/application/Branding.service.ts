@@ -114,7 +114,7 @@ export class BrandingService {
 
     private _getLabel = (labelName: string): string => {
         let msg = '';
-        if (this.labels.hasOwnProperty(labelName)) {
+        if (Object.prototype.hasOwnProperty.call(this.labels, labelName)) {
             msg = this.labels[labelName];
         } else {
             msg = 'Missing Label';

@@ -130,7 +130,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                     this._setToolbarHeight();
                 }
             })
-        )
+        );
 
         this.view2Node[this.mmsDocument.id] = {
             label: this.mmsDocument.name,
@@ -269,7 +269,12 @@ class FullDocumentController implements IComponentController, Ng1Controller {
 
                     case 'refresh-numbering':
                         this.fullDocumentApi.loadRemainingViews(() => {
-                            this.utilsSvc.makeTablesAndFiguresTOC(this.treeSvc.getFirstBranch(), angular.element('#print-div'), true, false);
+                            this.utilsSvc.makeTablesAndFiguresTOC(
+                                this.treeSvc.getFirstBranch(),
+                                angular.element('#print-div'),
+                                true,
+                                false
+                            );
                         });
                         break;
                 }
@@ -284,10 +289,10 @@ class FullDocumentController implements IComponentController, Ng1Controller {
     }
 
     private _setToolbarHeight(): void {
-        const barHeight = $('.pane-center-btn-group').outerHeight()
-        if (barHeight){
-            this.bbSize = barHeight.toString(10) + 'px'
-            this.$scope.$apply
+        const barHeight = $('.pane-center-btn-group').outerHeight();
+        if (barHeight) {
+            this.bbSize = barHeight.toString(10) + 'px';
+            this.$scope.$apply();
         }
     }
 

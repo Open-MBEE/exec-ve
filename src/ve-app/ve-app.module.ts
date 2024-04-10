@@ -57,6 +57,7 @@ export const veApp = angular.module('ve-app', [
     've-utils',
     've-core',
     've-components',
+    've-admin',
     'ui.bootstrap',
     uiRouter,
     ngPane,
@@ -294,15 +295,15 @@ veApp.config([
                     userOb: [
                         'ResolveService',
                         (resolveSvc: ResolveService): VePromise<UserObject, UsersResponse> => {
-                            return resolveSvc.getCurrentUser()
-                        }
+                            return resolveSvc.getCurrentUser();
+                        },
                     ],
                     rootOb: [
                         'ResolveService',
                         (resolveSvc: ResolveService): VePromise<AdminObject> => {
                             return resolveSvc.getServerRoot();
                         },
-                    ]
+                    ],
                 },
                 views: {
                     'banner-top@main': {
@@ -335,24 +336,23 @@ veApp.config([
                     'pane-left@main': {
                         component: 'leftPane',
                         bindings: {
-                            mmsRoot: 'rootOb'
-                        }
+                            mmsRoot: 'rootOb',
+                        },
                     },
                     'toolbar-left@main': {
                         component: 'leftToolbar',
                         bindings: {
-                            mmsRoot: 'rootOb'
-                        }
+                            mmsRoot: 'rootOb',
+                        },
                     },
                     'pane-center@main': {
                         component: 'adminHome',
                         bindings: {
-                            mmsOrgs: 'orgObs',
-                            mmsUser: 'userOb'
+                            orgs: 'orgObs',
+                            user: 'userOb',
                         },
                     },
                 },
-
             })
             .state('main.admin.preview', {
                 url: '?viewId&type',
@@ -397,13 +397,13 @@ veApp.config([
                         'ResolveService',
                         (params: ParamsObject, resolveSvc: ResolveService): VePromise<AdminObject> => {
                             return resolveSvc.getAdmin(params);
-                        }
+                        },
                     ],
                     permissions: [
                         'params',
                         'adminOb',
                         'ResolveService',
-                        (  
+                        (
                             params: ParamsObject,
                             adminOb: AdminObject,
                             resolveSvc: ResolveService
@@ -429,11 +429,10 @@ veApp.config([
                         component: 'admin',
                         bindings: {
                             mmsParams: 'params',
-                            mmsObject: 'adminOb'
+                            mmsObject: 'adminOb',
                         },
                     },
-                }
-
+                },
             })
             .state('main.project', {
                 //TODO this will be the ui to diff and merge and manage refs
@@ -498,7 +497,7 @@ veApp.config([
                         'ResolveService',
                         'projectOb',
                         (resolveSvc: ResolveService, projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> => {
-                            return resolveSvc.getOrg(projectOb);
+                            return resolveSvc.getProjectOrg(projectOb);
                         },
                     ],
                     orgObs: [
@@ -1218,7 +1217,7 @@ veApp.config([
                         if (config.url != uRLSvc.getAuthenticationUrl()) {
                             config.headers = uRLSvc.getAuthorizationHeader(config.headers);
                         } else {
-                            console.log("IM DOING IT MOM")
+                            console.log('IM DOING IT MOM');
                         }
                         if (!config.timeout) {
                             config.cancel = $q.defer();

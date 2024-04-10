@@ -128,11 +128,11 @@ export interface ParamsObject {
  *  "recurse": {
  *      "id": "ownerId"
  *  }
- * 
+ *
  * }
  */
 export interface QueryObject extends MmsObject {
-    id?: string
+    id?: string;
     params?: {
         [key: string]: string | object;
     };
@@ -185,9 +185,15 @@ export interface PermissionsLookupResponse extends BasicResponse<PermissionsLook
     allPassed?: boolean;
 }
 
-export interface PermissionsResponse extends BasicResponse<PermissionsResponse>, PermissionsObject {
+export interface PermissionsResponse extends BasicResponse<PermissionsResponse> {
     inherit: boolean;
     public: boolean;
+    users: {
+        permissions: PermissionsRecord[];
+    };
+    groups: {
+        permissions: PermissionsRecord[];
+    };
 }
 
 export interface PermissionsRecord {
@@ -197,12 +203,8 @@ export interface PermissionsRecord {
 }
 
 export interface PermissionsObject {
-    users: {
-        permissions: PermissionsRecord[]
-    }
-    groups: {
-        permissions: PermissionsRecord[]
-    }
+    users: { [username: string]: string };
+    groups: { [groupname: string]: string };
 }
 
 export interface PermissionsLookupObject {

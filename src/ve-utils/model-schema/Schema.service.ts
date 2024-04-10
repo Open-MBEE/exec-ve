@@ -20,7 +20,7 @@ export class SchemaService {
     public schemaList: { [key: string]: string } = {
         cameo: 'CameoSchema',
         jupyter: 'JupyterSchema',
-        docgen: 'DocgenSchema'
+        docgen: 'DocgenSchema',
     };
 
     public schemas: { [key: string]: Schema } = {};
@@ -52,7 +52,7 @@ export class SchemaService {
         if (lookup && typeof lookup === 'object') {
             const response: T[] = [];
             keys.forEach((key) => {
-                if (lookup.hasOwnProperty(key)) {
+                if (Object.prototype.hasOwnProperty.call(lookup, key)) {
                     response.push(lookup[key] as T);
                 }
             });
@@ -102,7 +102,7 @@ export class SchemaService {
     private _getSchema = (schemaName?: string, id?: string): Schema | null => {
         schemaName = schemaName ? schemaName : this.defaultSchema;
         id = id ? id : 'error: unknown';
-        if (this.schemas.hasOwnProperty(schemaName)) {
+        if (Object.prototype.hasOwnProperty.call(this.schemas, schemaName)) {
             return this.schemas[schemaName];
         } else {
             console.log(`Object ${id} uses an unknown schema ${schemaName}`);

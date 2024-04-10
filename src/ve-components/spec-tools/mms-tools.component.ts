@@ -324,7 +324,7 @@ class ToolsController {
 
             this.currentTitle = data.title ? data.title : inspect.tooltip;
 
-            if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
+            if (!Object.prototype.hasOwnProperty.call(this.show, _.camelCase(data.id))) {
                 this.startTool(data.id);
                 this.show[_.camelCase(data.id)] = true;
             } else {

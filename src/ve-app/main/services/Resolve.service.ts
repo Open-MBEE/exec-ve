@@ -10,6 +10,7 @@ import {
     PermissionsService,
     ProjectService,
     URLService,
+    UserService,
     ViewService,
 } from '@ve-utils/mms-api-client';
 
@@ -50,6 +51,7 @@ export class ResolveService {
         'BrandingService',
         'URLService',
         'AuthService',
+        'UserService',
         'ProjectService',
         'OrgService',
         'ViewService',
@@ -68,6 +70,7 @@ export class ResolveService {
         private brandingSvc: BrandingService,
         private uRLSvc: URLService,
         private authSvc: AuthService,
+        private userSvc: UserService,
         private projectSvc: ProjectService,
         private orgSvc: OrgService,
         private viewSvc: ViewService,
@@ -105,36 +108,25 @@ export class ResolveService {
 
     public getCurrentUser(): VePromise<UserObject, UsersResponse> {
         return new this.$q((resolve, reject) => {
-            this.
-        })
+            this.userSvc.getCurrentUser().then(resolve, reject);
+        });
     }
 
-    public getOrg(projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> {
-        const promise = this.orgSvc.getOrg(projectOb.orgId);
-        promise.then(
-            (result) => {
-                this.eventSvc.resolve('mmsOrg', result);
-            },
-            (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message);
-            }
-        );
-        return promise;
+    public getOrg(orgId: string): VePromise<OrgObject, OrgsResponse> {
+        return this.orgSvc.getOrg(orgId);
+    }
+
+    public getProjectOrg(projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> {
+        return this.getOrg(projectOb.orgId);
     }
 
     public getOrgs(): VePromise<OrgObject[], OrgsResponse> {
-        const promise = this.orgSvc.getOrgs();
-        promise.then(
-            (result) => {
-                this.eventSvc.resolve('mmsOrgs', result);
-            },
-            (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message);
-            }
-        );
-        return promise;
+        return new this.$q((resolve, reject) => {
+            this.orgSvc.getOrgsPermissions().then(() => {
+                this.orgSvc.getOrgsProjects().then(resolve, reject);
+            }, reject);
+        });
     }
-
     public getProject(params: ParamsObject): VePromise<ProjectObject, ProjectsResponse> {
         const promise = this.projectSvc.getProject(params.projectId);
         promise.then(
@@ -149,7 +141,7 @@ export class ResolveService {
     }
 
     public getProjects(projectOb?: ProjectObject, refresh?: boolean): VePromise<ProjectObject[], ProjectsResponse> {
-        const orgId = projectOb ? projectOb.orgId : null
+        const orgId = projectOb ? projectOb.orgId : null;
         const promise = this.projectSvc.getProjects(orgId, refresh);
         promise.then(
             (result) => {
@@ -239,7 +231,7 @@ export class ResolveService {
     }
 
     public getServerRoot(): VePromise<AdminObject> {
-        return this.$q.resolve({ id: 'server', name: 'MMS Server'})
+        return this.$q.resolve({ id: 'server', name: 'MMS Server' });
     }
 
     public getCoverDocument(
@@ -300,9 +292,9 @@ export class ResolveService {
                     } else if (reason.status === 410) {
                         //resurrect
                         let name = projectOb.name + ' Cover Page ';
-                        try {
-                            name = `${reason.data.deleted[0].name} `;
-                        } catch (e) {}
+                        if (reason.data.deleted && reason.data.deleted.length > 0 && reason.data.deleted[0].name) {
+                            name = reason.data.deleted[0].name;
+                        }
                         this.elementSvc
                             .updateElements([
                                 {
@@ -311,7 +303,7 @@ export class ResolveService {
                                     id: eid,
                                     name: name,
                                     type: 'Class',
-                                }
+                                },
                             ])
                             .then(
                                 (data) => {
@@ -519,21 +511,21 @@ export class ResolveService {
     public getAdmin = (params: ParamsObject): VePromise<AdminObject> => {
         return new this.$q((resolve, reject) => {
             if (!params.type || !params.modify) {
-                reject()
+                reject();
             } else {
-                switch(params.type) {
+                switch (params.type) {
                     case 'org':
-                        this.orgSvc.getOrg(params.modify).then(resolve,reject);
-                        break
+                        this.orgSvc.getOrg(params.modify).then(resolve, reject);
+                        break;
                     case 'project':
-                        this.projectSvc.getProject(params.modify).then(resolve,reject);
-                        break
+                        this.projectSvc.getProject(params.modify).then(resolve, reject);
+                        break;
                     default:
-                        reject()
+                        reject();
                 }
             }
-        })
-    }
+        });
+    };
 
     public initializeEditPermissions(
         orgId: string,
@@ -549,22 +541,23 @@ export class ResolveService {
     ): VePromise<PermissionCache, PermissionsLookupResponse> {
         return new this.$q((resolve, reject) => {
             if (!params.type || !params.modify) {
-                reject()
+                reject();
             } else {
-                switch(params.type) {
+                switch (params.type) {
                     case 'org':
-                        this.permissionsSvc.initializePermissions(adminOb.id, null).then(resolve,reject);
-                        break
+                        this.permissionsSvc.initializePermissions(adminOb.id, null).then(resolve, reject);
+                        break;
                     case 'project':
-                        this.permissionsSvc.initializePermissions((adminOb as ProjectObject).orgId, adminOb.id).then(resolve,reject);
-                        break
+                        this.permissionsSvc
+                            .initializePermissions((adminOb as ProjectObject).orgId, adminOb.id)
+                            .then(resolve, reject);
+                        break;
                     default:
-                        reject()
+                        reject();
                 }
             }
         });
     }
-    
 }
 
 veApp.service('ResolveService', ResolveService);

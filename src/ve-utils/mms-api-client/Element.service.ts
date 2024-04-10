@@ -199,31 +199,38 @@ export class ElementService extends BaseApiService {
         }
 
         return new this.$q<T>((resolve, reject) => {
-            this.search<T>(reqOb, {
-                params: {
-                    _twcId: twcId,
+            this.search<T>(
+                reqOb,
+                {
+                    params: {
+                        _twcId: twcId,
+                    },
+                },
+                {},
+                weight
+            ).then(
+                (data) => {
+                    if (Array.isArray(data.elements) && data.elements.length > 0) {
+                        resolve(this.cacheElement<T>(reqOb, data.elements[0]));
+                    } else if (allowEmpty) {
+                        resolve(null);
+                    } else {
+                        reject({
+                            status: 500,
+                            message: 'Server Error: empty response',
+                        }); //TODO
+                    }
+                },
+                (response) => {
+                    if (allowEmpty && response.status == 404) {
+                        resolve(null);
+                    } else {
+                        reject(response);
+                    }
                 }
-            }, {}, weight).then((data) => {
-                if (Array.isArray(data.elements) && data.elements.length > 0) {
-                    resolve(this.cacheElement<T>(reqOb, data.elements[0]));
-                } else if (allowEmpty) {
-                    resolve(null);
-                } else {
-                    reject({
-                        status: 500,
-                        message: 'Server Error: empty response',
-                    }); //TODO
-                }
-            }, (response) => {
-                if (allowEmpty && response.status == 404) {
-                    resolve(null);
-                } else {
-                    reject(response);
-                }
-            })
-        })
+            );
+        });
     }
-
 
     /**
      * @name veUtils/ElementService#getElements
@@ -312,7 +319,7 @@ export class ElementService extends BaseApiService {
         }
         result = this.cacheSvc.put<T>(realCacheKey, result, true);
         if (result._twcId) {
-            this.cacheSvc.link(this.getRequestKey(reqOb, result._twcId), realCacheKey)
+            this.cacheSvc.link(this.getRequestKey(reqOb, result._twcId), realCacheKey);
         }
         return result;
     }
@@ -517,7 +524,7 @@ export class ElementService extends BaseApiService {
         const editOb = this.editSvc.get(this.getEditElementKey(elementOb));
         if (editOb && editOb.element) {
             Object.keys(editOb.element).forEach((key) => {
-                if (!elementOb.hasOwnProperty(key)) {
+                if (!Object.prototype.hasOwnProperty.call(elementOb, key)) {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     ob[key] = editOb.element[key];
                 }
@@ -616,7 +623,7 @@ export class ElementService extends BaseApiService {
                 resolve(resp);
             };
 
-            if (!elementOb.hasOwnProperty('id')) {
+            if (!Object.prototype.hasOwnProperty.call(elementOb, 'id')) {
                 reject({
                     status: 400,
                     message: 'Element id not found, create element first!',
@@ -1059,7 +1066,7 @@ export class ElementService extends BaseApiService {
                     const elements = data.elements.reverse();
                     const entries = elements.entries();
                     for (const [i, element] of entries) {
-                        if (element.hasOwnProperty('name')) {
+                        if (Object.prototype.hasOwnProperty.call(element, 'name')) {
                             qualifiedName += element.name;
                         }
                         if (i != elements.length - 1) {
@@ -1093,9 +1100,9 @@ export class ElementService extends BaseApiService {
     private _validate(elementObs: ElementObject[]): boolean {
         return _.every(elementObs, (elementOb) => {
             return (
-                elementOb.hasOwnProperty('id') &&
-                elementOb.hasOwnProperty('_projectId') &&
-                elementOb.hasOwnProperty('_refId')
+                Object.prototype.hasOwnProperty.call(elementOb, 'id') &&
+                Object.prototype.hasOwnProperty.call(elementOb, '_projectId') &&
+                Object.prototype.hasOwnProperty.call(elementOb, '_refId')
             );
         });
     }

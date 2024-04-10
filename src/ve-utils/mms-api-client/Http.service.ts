@@ -68,7 +68,7 @@ export class HttpService {
                         }
                     )
                     .finally(() => {
-                        if (this.cache.hasOwnProperty(url)) {
+                        if (Object.prototype.hasOwnProperty.call(this.cache, url)) {
                             delete this.cache[url];
                         }
                     });
@@ -77,7 +77,7 @@ export class HttpService {
             } else {
                 this.queue[1].push(request);
             }
-            if (this.cache.hasOwnProperty(url)) {
+            if (Object.prototype.hasOwnProperty.call(this.cache, url)) {
                 if (this.cache[url].weight < request.weight) this.cache[url].weight = request.weight;
             } else {
                 this.cache[url] = request;
@@ -98,7 +98,7 @@ export class HttpService {
                 .finally(() => {
                     this.inProgress--;
                     let next: HttpServiceRequest;
-                    if (this.cache.hasOwnProperty(url)) {
+                    if (Object.prototype.hasOwnProperty.call(this.cache, url)) {
                         delete this.cache[url];
                     }
                     if (this.queue[1].length > 0) {
@@ -124,7 +124,7 @@ export class HttpService {
         if (weight === undefined) {
             weight = 1;
         }
-        if (this.cache.hasOwnProperty(url)) {
+        if (Object.prototype.hasOwnProperty.call(this.cache, url)) {
             if (weight > this.cache[url].weight) {
                 const request = this.cache[url];
                 let index: number;
@@ -156,7 +156,7 @@ export class HttpService {
             //will the queue ever be defined?
             for (let i = 0; i < this.queue[1].length; i++) {
                 this.queue[1][i].weight = 0;
-                // if(cache.hasOwnProperty(queue[1][i].request.url))
+                // if(Object.prototype.hasOwnProperty.call(cache, queue[1][i].request.url))
                 //     cache[queue[1][i].request.url].weight = 0;
                 this.queue[0].push(this.queue[1][i]);
                 //queue[1][i].shift();

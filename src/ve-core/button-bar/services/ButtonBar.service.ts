@@ -54,7 +54,7 @@ export class ButtonBarService {
     }
 
     public waitForApi = (id: string): VePromise<ButtonBarApi, void> => {
-        if (!this.buttonBars.hasOwnProperty(id)) {
+        if (!Object.prototype.hasOwnProperty.call(this.buttonBars, id)) {
             this.buttonBars[id] = {};
             this.buttonBars[id].promise = new this.$q<ButtonBarApi, void>((resolve, reject) => {
                 this.buttonBars[id].resolve = resolve;
@@ -102,7 +102,7 @@ export class ButtonBarService {
     }
 
     destroy(id: string): void {
-        if (this.buttonBars.hasOwnProperty(id)) {
+        if (Object.prototype.hasOwnProperty.call(this.buttonBars, id)) {
             delete this.buttonBars[id];
         }
     }
@@ -114,7 +114,7 @@ export class ButtonBarService {
     }
 
     getButtonBarButton = (buttonId: string, ctrl?: EditorActions): BarButton => {
-        if (this.buttons.hasOwnProperty(buttonId)) {
+        if (Object.prototype.hasOwnProperty.call(this.buttons, buttonId)) {
             const newButton = new BarButton(buttonId, this.buttons[buttonId]);
             if (this.buttons[buttonId].dropdown) {
                 newButton.dropdown_buttons = [];
@@ -135,7 +135,7 @@ export class ButtonBarService {
     };
 
     getButtonDefinition = (buttonId: string): IButtonBarButton => {
-        if (this.buttons.hasOwnProperty(buttonId)) {
+        if (Object.prototype.hasOwnProperty.call(this.buttons, buttonId)) {
             return this.buttons[buttonId];
         }
         return null;

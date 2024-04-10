@@ -63,7 +63,7 @@ export class ApiService {
     }
 
     public getVeVersion = (): string => {
-        return this.veConfig.version ? this.veConfig.version : "ve-app";
+        return this.veConfig.version ? this.veConfig.version : 've-app';
     };
 
     /**
@@ -98,7 +98,7 @@ export class ApiService {
      */
 
     private _cleanValueSpec = (vs: ValueObject): void => {
-        if (vs.hasOwnProperty('valueExpression')) delete vs.valueExpression;
+        if (Object.prototype.hasOwnProperty.call(vs, 'valueExpression')) delete vs.valueExpression;
         if (vs.operand && Array.isArray(vs.operand)) {
             for (let i = 0; i < vs.operand.length; i++) {
                 this._cleanValueSpec(vs.operand[i] as ValueObject);
@@ -144,10 +144,10 @@ export class ApiService {
             }
         }
 
-        if (elem.hasOwnProperty('specialization')) {
+        if (Object.prototype.hasOwnProperty.call(elem, 'specialization')) {
             delete elem.specialization;
         }
-        if (!elem.hasOwnProperty('appliedStereotypeIds') && elem._appliedStereotypeIds) {
+        if (!Object.prototype.hasOwnProperty.call(elem, 'appliedStereotypeIds') && elem._appliedStereotypeIds) {
             elem.appliedStereotypeIds = elem._appliedStereotypeIds;
         }
         if (forEdit) {
@@ -245,7 +245,7 @@ export class ApiService {
     // public filterProperties(a: ElementObject, b: ElementObject): ElementObject {
     //     const res: ElementObject = null
     //     for (const key in a) {
-    //         if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
+    //         if (Object.prototype.hasOwnProperty.call(a, key) && Object.prototype.hasOwnProperty.call(b, key)) {
     //             res[key] = b[key]
     //         }
     //     }
@@ -279,7 +279,11 @@ export class ApiService {
             ) {
                 continue;
             }
-            if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
+            if (
+                Object.prototype.hasOwnProperty.call(edit, i) &&
+                Object.prototype.hasOwnProperty.call(orig, i) &&
+                Object.prototype.hasOwnProperty.call(server, i)
+            ) {
                 if (!_.isEqual(orig[i], server[i])) {
                     return true;
                 }

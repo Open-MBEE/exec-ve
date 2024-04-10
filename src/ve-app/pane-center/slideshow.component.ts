@@ -44,7 +44,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
 
     public bbApi: ButtonBarApi;
     bbId = 'view-ctrl';
-    bbSize: string = '34px'
+    bbSize: string = '34px';
     bars: string[] = [];
     comments: {
         count: number;
@@ -130,7 +130,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                     this._setToolbarHeight();
                 }
             })
-        )
+        );
 
         //Init/Reset Tree Updated Subject
         this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false);
@@ -242,20 +242,25 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                     this.appUtilsSvc.tableToCsv(angular.element('#print-div'), false);
                     return;
                 } else if (data.clicked === 'refresh-numbering') {
-                    this.utilsSvc.makeTablesAndFiguresTOC(this.treeSvc.getFirstBranch(), angular.element('#print-div'), true, false);
+                    this.utilsSvc.makeTablesAndFiguresTOC(
+                        this.treeSvc.getFirstBranch(),
+                        angular.element('#print-div'),
+                        true,
+                        false
+                    );
                     return;
                 }
             })
         );
     }
 
-    private _setToolbarHeight(): void {
-        const barHeight = $('.pane-center-btn-group').outerHeight()
-        if (barHeight){
-            this.bbSize = barHeight.toString(10) + 'px'
-            this.$scope.$apply
+    private _setToolbarHeight = (): void => {
+        const barHeight = $('.pane-center-btn-group').outerHeight();
+        if (barHeight) {
+            this.bbSize = barHeight.toString(10) + 'px';
+            this.$scope.$apply();
         }
-    }
+    };
 
     uiOnParamsChanged(newValues: ParamsObject, $transition$: Transition): void {
         if (newValues.viewId && newValues.viewId !== this.params.viewId)
@@ -418,7 +423,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
     };
 
     public elementTranscluded = (elementOb: ElementObject, type): void => {
-        if (type === 'Comment' && !this.comments.map.hasOwnProperty(elementOb.id)) {
+        if (type === 'Comment' && !Object.prototype.hasOwnProperty.call(this.comments.map, elementOb.id)) {
             this.comments.map[elementOb.id] = elementOb;
             this.comments.count++;
             if (elementOb._modified > this.comments.lastCommented) {

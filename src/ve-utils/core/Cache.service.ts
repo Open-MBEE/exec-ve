@@ -24,7 +24,7 @@ export class CacheService {
             }
             return this.cache[key] as T;
         };
-        if (this.cache.hasOwnProperty(realKey)) {
+        if (Object.prototype.hasOwnProperty.call(this.cache, realKey)) {
             let result: T;
             if (typeof this.cache[realKey] === 'string') {
                 result = recurse(this.cache[realKey] as string) as T;
@@ -47,7 +47,7 @@ export class CacheService {
     getLatestElements<T extends MmsObject>(projectId: string, refId: string): T[] {
         const latestElements: T[] = [];
         for (const key in this.cache) {
-            if (!this.cache.hasOwnProperty(key)) {
+            if (!Object.prototype.hasOwnProperty.call(this.cache, key)) {
                 continue;
             }
             if (
@@ -111,7 +111,10 @@ export class CacheService {
      */
     public link(sourceKey: string | string[], targetKey: string | string[]): void {
         const realSourceKey: string = this._makeKey(sourceKey);
-        if (this.cache.hasOwnProperty(realSourceKey) && typeof this.cache[realSourceKey] !== 'string') {
+        if (
+            Object.prototype.hasOwnProperty.call(this.cache, realSourceKey) &&
+            typeof this.cache[realSourceKey] !== 'string'
+        ) {
             delete this.cache[realSourceKey];
         }
 
@@ -132,7 +135,7 @@ export class CacheService {
         } else {
             realKey = key;
         }
-        if (!this.cache.hasOwnProperty(realKey)) {
+        if (!Object.prototype.hasOwnProperty.call(this.cache, realKey)) {
             return null;
         }
         const removed = this.cache[realKey];
@@ -157,7 +160,7 @@ export class CacheService {
         } else {
             realKey = key;
         }
-        if (!this.cache.hasOwnProperty(realKey)) {
+        if (!Object.prototype.hasOwnProperty.call(this.cache, realKey)) {
             return false;
         }
         const val = this.cache[realKey];

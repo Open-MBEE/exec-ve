@@ -32,6 +32,7 @@ import {
  * (You may run into problems like cross origin security policy that prevents it from
  *  actually getting the resources from a different server, solution TBD)
  */
+
 export class URLService {
     readonly root: string;
     readonly url: URL;
@@ -163,7 +164,7 @@ export class URLService {
 
     getOrgPermissionsURL = (orgId: string): string => {
         return this.addPermissions(this.getOrgURL(orgId));
-    }
+    };
 
     getOrgsURL = (): string => {
         return `${this.root}/orgs`;
@@ -180,7 +181,7 @@ export class URLService {
 
     getProjectPermissionsURL = (projectId: string): string => {
         return this.addPermissions(this.getProjectURL(projectId));
-    }
+    };
 
     getProjectMountsURL = (projectId: string, refId: string): string => {
         return `${this.root}/projects/${projectId}/refs/${refId}/mounts`;
@@ -196,7 +197,7 @@ export class URLService {
 
     getRefPermissionsURL = (projectId: string, refId: string): string => {
         return this.addPermissions(this.getRefURL(projectId, refId));
-    }
+    };
 
     getCommitsURL = (projectId: string, refId: string, timestamp?: string, limit?: number): string => {
         let r = `${this.root}/projects/${projectId}/refs/${refId}/commits`;
@@ -481,9 +482,9 @@ export class URLService {
         return r;
     };
 
-    private addPermissions = (url:string): string => {
-        return `${url}/permissions`
-    }
+    private addPermissions = (url: string): string => {
+        return `${url}/permissions`;
+    };
 
     private addChildViews = (url: string, add: boolean): string => {
         const r = url;

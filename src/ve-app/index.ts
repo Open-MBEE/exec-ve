@@ -38,6 +38,7 @@ import '../lib/angular-ui-tree-filter/angular-ui-tree-filter';
 import '@ve-utils';
 import '@ve-core';
 import '@ve-components';
+import '@ve-admin';
 
 import './ve-app.module';
 

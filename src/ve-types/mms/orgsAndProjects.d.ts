@@ -1,9 +1,9 @@
-import { MmsObject } from '@ve-types/mms';
+import { MmsObject, PermissionsObject } from '@ve-types/mms';
 
 export interface AdminObject extends MmsObject {
     id: string;
     name?: string;
-    permissions?: PermissionsObject[];
+    permissions?: PermissionsObject;
     permission?: string;
     description?: string;
 }

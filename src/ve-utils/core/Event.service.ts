@@ -77,7 +77,10 @@ export class EventService {
 
     exists(eventOrBinding: string): boolean {
         const name = this.createName(eventOrBinding);
-        return this.subjects.hasOwnProperty(name) || this.bindings.hasOwnProperty(name);
+        return (
+            Object.prototype.hasOwnProperty.call(this.subjects, name) ||
+            Object.prototype.hasOwnProperty.call(this.bindings, name)
+        );
     }
 }
 

@@ -22,7 +22,6 @@ import {
     ElementObject,
     ElementsRequest,
     ElementsResponse,
-    InstanceSpecObject,
     ParamsObject,
     ProjectObject,
     RefObject,
@@ -192,7 +191,7 @@ class LeftPaneController implements angular.IComponentController {
                     }
                     b.children = newChildren;
                     this.treeSvc.addSectionElements(viewOrSection, viewBranch, b, false);
-                })
+                });
             })
         );
         /*
@@ -308,7 +307,7 @@ class LeftPaneController implements angular.IComponentController {
         if ((rootId && this.treeSvc.processedRoot !== rootId && rootId != '') || !this.treeApi) {
             new this.$q<string, RefsResponse>((resolve, reject) => {
                 if (this.$state.includes('**.admin.**')) {
-                    resolve(null)
+                    resolve(null);
                 } else if (
                     !this.treeApi ||
                     !this.treeApi.refType ||
@@ -336,12 +335,9 @@ class LeftPaneController implements angular.IComponentController {
                     this.treeApi.onDblClick = this.treeDblClickCallback;
 
                     this.treeSvc.treeApi = this.treeApi;
-                    this.treeSvc.treeEditable = this.$state.includes('**.admin.**') 
-                    ? false 
-                    : this.permissionsSvc.hasBranchEditPermission(
-                        this.mmsProject.id,
-                        this.mmsRef.id
-                    );
+                    this.treeSvc.treeEditable = this.$state.includes('**.admin.**')
+                        ? false
+                        : this.permissionsSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id);
 
                     this.treeApi.sectionNumbering = this.$state.includes('**.present.**');
                     this.treeApi.expandLevel = this.$state.includes('**.present.**')
@@ -569,7 +565,9 @@ class LeftPaneController implements angular.IComponentController {
                                     if (branch.type === 'view') {
                                         this.treeSvc.getParent(branch).then((parentBranch) => {
                                             if (!this.$state.includes('**.present.**')) {
-                                                this.viewSvc.downgradeDocument(branch.data as ElementObject).then(resolve, reject);
+                                                this.viewSvc
+                                                    .downgradeDocument(branch.data as ElementObject)
+                                                    .then(resolve, reject);
                                             } else {
                                                 this.viewSvc
                                                     .removeViewFromParentView({

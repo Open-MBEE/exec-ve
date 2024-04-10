@@ -2,10 +2,9 @@ import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirou
 import { Transition } from '@uirouter/core';
 
 import { AppUtilsService, ResolveService } from '@ve-app/main/services';
-import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config';
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
 import { TreeService } from '@ve-components/trees';
-import { ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar';
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
@@ -14,18 +13,7 @@ import { PermissionsService, URLService, ViewApi } from '@ve-utils/mms-api-clien
 import { veApp } from '@ve-app';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
-import {
-    AdminObject,
-    DocumentObject,
-    ElementObject,
-    GroupObject,
-    OrgObject,
-    ParamsObject,
-    PermissionsLookupObject,
-    ProjectObject,
-    RefObject,
-    ViewObject,
-} from '@ve-types/mms';
+import { AdminObject, ElementObject, ParamsObject, PermissionsLookupObject } from '@ve-types/mms';
 
 /**
  * Note: This controller is intended for navigating between 'views' and 'sections' only. If you wish to navigate between
@@ -43,7 +31,7 @@ class AdminController implements angular.IComponentController, Ng1Controller {
 
     public bbApi: ButtonBarApi;
     bbId = 'view-ctrl';
-    bbSize: string = '34px'
+    bbSize: string = '34px';
     bars: string[] = [];
     comments: {
         count: number;
@@ -62,8 +50,8 @@ class AdminController implements angular.IComponentController, Ng1Controller {
     number: string;
     private viewId: string;
     private params: ParamsObject;
-    private view: AdminObject
-    private permissions: PermissionsLookupObject[]
+    private view: AdminObject;
+    private permissions: PermissionsLookupObject[];
 
     static $inject = [
         '$q',
@@ -269,20 +257,18 @@ class AdminController implements angular.IComponentController, Ng1Controller {
     initView = (params?: ParamsObject): void => {
         this.rootScopeSvc.veViewContentLoading(true);
 
-        this.viewId = this.view.id
+        this.viewId = this.view.id;
 
         //this.permissionsSvc.getObjectPermissions
         this.rootScopeSvc.veViewContentLoading(false);
-        
-        const data = { 
-            rootId: 'server', 
+
+        const data = {
+            rootId: 'server',
             elementId: this.viewId,
             projectId: null,
-            refId: null
-        }
+            refId: null,
+        };
         this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data);
-        
-
 
         // this.contentWindowSvc.toggleLeftPane(false);
 
@@ -302,7 +288,7 @@ class AdminController implements angular.IComponentController, Ng1Controller {
         this.buttonBarSvc.destroy(this.bbId);
     }
 
-    public bbInit = (api: ButtonBarApi): void => {};
+    //public bbInit = (api: ButtonBarApi): void => {};
 
     public copyToClipboard = ($event: JQuery.ClickEvent): void => {
         this.shortUrlSvc.copyToClipboard(this.$element, $event).then(
@@ -316,7 +302,7 @@ class AdminController implements angular.IComponentController, Ng1Controller {
     };
 
     public elementTranscluded = (elementOb: ElementObject, type): void => {
-        // if (type === 'Comment' && !this.comments.map.hasOwnProperty(elementOb.id)) {
+        // if (type === 'Comment' && !Object.prototype.hasOwnProperty.call(this.comments.map, elementOb.id)) {
         //     this.comments.map[elementOb.id] = elementOb;
         //     this.comments.count++;
         //     if (elementOb._modified > this.comments.lastCommented) {
