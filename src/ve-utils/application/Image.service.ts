@@ -14,12 +14,14 @@ export class ImageService {
     public fixImgSrc(imgDom: JQuery<HTMLElement>): void {
         let src = imgDom.attr('src');
         if (src) {
-            if (src) {
-                if (src.indexOf('http') < 0) {
-                    src = this.veConfig.apiUrl + src;
-                }
-                imgDom.attr('src', src + '?token=' + this.authSvc.getToken());
+            if (src.indexOf('http') < 0) {
+                src = this.veConfig.apiUrl + src;
             }
+            let existingToken = src.indexOf('?token=');
+            if (existingToken > 0) {
+                src = src.substring(0, existingToken)
+            }
+            imgDom.attr('src', src + '?token=' + this.authSvc.getToken());
             if (imgDom.width() < 860) {
                 //keep image relative centered with text if less than 9 in
                 return;
@@ -35,16 +37,24 @@ export class ImageService {
     }
 
     public fixImgUrl = (src: string, addToken?: boolean): string => {
-        const url = new window.URL(src);
-        const params = new window.URLSearchParams(url.search);
-        if (params.has('token')) {
-            params.delete('token');
+        if (src.indexOf('http') < 0) {
+            src = this.veConfig.apiUrl + src;
         }
-        if (addToken) {
-            params.append('token', this.authSvc.getToken());
+        try {
+            const url = new window.URL(src);
+            const params = new window.URLSearchParams(url.search);
+            if (params.has('token')) {
+                params.delete('token');
+            }
+            if (addToken) {
+                params.append('token', this.authSvc.getToken());
+            }
+            url.search = params.toString();
+            return url.toString();
+        } catch(e) {
+            console.log(e);
+            return src;
         }
-        url.search = params.toString();
-        return url.toString();
     };
 }
 
