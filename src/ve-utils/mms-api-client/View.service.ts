@@ -34,7 +34,7 @@ import {
     PresentationReference,
     ElementsResponse,
     GenericResponse,
-    BasicResponse,
+    BasicResponse, TaggedValueObject,
 } from '@ve-types/mms';
 import { TreeBranch, View2NodeMap } from '@ve-types/tree';
 
@@ -1427,7 +1427,7 @@ export class ViewService extends BaseApiService {
             return res;
         }
         values.forEach((value) => {
-            if (value.type !== 'LiteralString' || !value.value) return;
+            if (!value.value) return;
             res.push(value.value as string);
         });
         return res;
@@ -1469,18 +1469,14 @@ export class ViewService extends BaseApiService {
             const elementIds = [
                 `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'Header', this.schema)}`, //header
                 `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'Footer', this.schema)}`, //footer
-                `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>(
-                    'DOCUMENT_IDS',
-                    'NumDepth',
-                    this.schema
-                )}`, //numbering depth
+                `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'NumDepth', this.schema)}`, //numbering depth
                 `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'NumSep', this.schema)}`, //numbering separator
             ];
             const metaReqOb: ElementsRequest<string[]> = Object.assign(reqOb, {
                 elementId: elementIds,
             });
             this.elementSvc
-                .getElements<SlotObject>(metaReqOb, weight)
+                .getElements<TaggedValueObject>(metaReqOb, weight)
                 .then(
                     (data) => {
                         if (data.length === 0) {
@@ -1488,7 +1484,7 @@ export class ViewService extends BaseApiService {
                         }
                         for (let i = 0; i < data.length; i++) {
                             const prop = data[i];
-                            const feature: string = prop.definingFeatureId ? prop.definingFeatureId : null;
+                            const feature: string = prop.tagDefinitionId ? prop.tagDefinitionId : null;
                             const value: LiteralObject<unknown>[] = prop.value ? prop.value : null;
                             if (!feature || !value || !Array.isArray(value)) {
                                 continue;

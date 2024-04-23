@@ -19,6 +19,7 @@ import { left_default_buttons } from './left-buttons.config';
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import {
+    DocumentObject,
     ElementObject,
     ElementsRequest,
     ElementsResponse,
@@ -355,9 +356,8 @@ class LeftPaneController implements angular.IComponentController {
                                 projectId: this.treeApi.projectId,
                             };
                             this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
-                                // TODO this call is taking a long time that keeps the tree from being visible, need
-                                // to see if it can be moved to a resolve or faster
-                                /*if (this.apiSvc.isDocument(root) && this.$state.includes('**.present.**')) {
+                                // TODO this call may take a long time that keeps the tree from being visible?
+                                if (this.apiSvc.isDocument(root) && this.$state.includes('**.present.**')) {
                                     this.viewSvc
                                         .getDocumentMetadata({
                                             elementId: root.id,
@@ -367,7 +367,7 @@ class LeftPaneController implements angular.IComponentController {
                                         .then((result) => {
                                             this.treeApi.numberingDepth = result.numberingDepth
                                             this.treeApi.numberingSeparator = result.numberingSeparator
-                                            this.treeApi.startChapter = (root as DocumentObject)._startChapter
+                                            this.treeApi.startChapter = Number.isInteger((root as DocumentObject)._startChapter)
                                                 ? (root as DocumentObject)._startChapter
                                                 : 1
 
@@ -375,12 +375,12 @@ class LeftPaneController implements angular.IComponentController {
                                                 (root as DocumentObject)._childViews = []
                                             resolve(root)
                                         }, reject)
-                                } else {*/
+                                } else {
                                 this.treeApi.numberingDepth = 0;
                                 this.treeApi.numberingSeparator = '.';
                                 this.treeApi.startChapter = 1;
                                 resolve(root);
-                                //}
+                                }
                             }, reject);
                         } else {
                             resolve(null);
