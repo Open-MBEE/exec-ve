@@ -1,3 +1,4 @@
+import { MmsObject } from '@ve-types/mms';
 import { TreeBranch } from '@ve-types/tree';
 
 export namespace veAppEvents {
@@ -7,9 +8,9 @@ export namespace veAppEvents {
         prevSibId?: string;
     }
 
-    interface viewDeletedData {
-        parentBranch: TreeBranch;
-        prevBranch: TreeBranch;
-        branch: TreeBranch;
+    interface viewDeletedData<T extends MmsObject = MmsObject> {
+        parentBranch: TreeBranch<T>;
+        prevBranch: TreeBranch<T>;
+        branch: TreeBranch<T>;
     }
 }

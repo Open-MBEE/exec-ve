@@ -149,7 +149,7 @@ class LeftPaneController implements angular.IComponentController {
         // Start listening to change events
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.elementSelectedData>('view.selected', this.changeData),
-            this.eventSvc.$on<veAppEvents.viewDeletedData>('view.deleted', (data) => {
+            this.eventSvc.$on<veAppEvents.viewDeletedData<ViewObject>>('view.deleted', (data) => {
                 let goto = '^.currentState';
                 let documentId = this.treeApi.rootId;
                 let viewId: string;
@@ -174,24 +174,29 @@ class LeftPaneController implements angular.IComponentController {
                 });
             }),
             this.eventSvc.$on<ElementObject>('view.reordered', (viewOrSection) => {
-                this.treeSvc.getBranch<ViewObject>(viewOrSection).then((b) => {
-                    const old = b.children;
-                    const newChildren = [];
-                    let viewBranch = b;
-                    for (const c of old) {
-                        if (c.type === 'view') {
-                            newChildren.push(c);
+                this.treeSvc.getBranch<ViewObject>(viewOrSection).then(
+                    (b) => {
+                        const old = b.children;
+                        const newChildren: TreeBranch<ViewObject>[] = [];
+                        let viewBranch = b;
+                        for (const c of old) {
+                            if (c.type === 'view') {
+                                newChildren.push(c);
+                            }
                         }
-                    }
-                    if (b.type === 'section') {
-                        viewBranch = this.treeSvc.viewId2node[b.viewId];
-                        if (!viewBranch) {
-                            viewBranch = b;
+                        if (b.type === 'section') {
+                            viewBranch = this.treeSvc.viewId2node[b.viewId];
+                            if (!viewBranch) {
+                                viewBranch = b;
+                            }
                         }
+                        b.children = newChildren;
+                        void this.treeSvc.addSectionElements(viewOrSection, viewBranch, b, false);
+                    },
+                    () => {
+                        //Do Nothing
                     }
-                    b.children = newChildren;
-                    this.treeSvc.addSectionElements(viewOrSection, viewBranch, b, false);
-                });
+                );
             })
         );
         /*
