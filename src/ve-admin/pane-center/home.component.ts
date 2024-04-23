@@ -1,12 +1,23 @@
+import { IPane, IRegion } from '@openmbee/pane-layout';
 import { IOnChangesObject } from 'angular';
 
+import { ListApi } from '@ve-admin/components/list/list.component';
 import { veAdmin } from '@ve-admin/ve-admin.module';
-import { handleChange } from '@ve-utils/utils';
+import { RootScopeService } from '@ve-utils/application';
+import { OrgService, UserService } from '@ve-utils/mms-api-client';
 
 import { VeComponentOptions } from '@ve-types/angular';
-import { OrgObject, UserObject } from '@ve-types/mms';
+import { OrgObject, PermissionMap, UserObject } from '@ve-types/mms';
 
 class HomeController {
+    mmsOrgs: OrgObject[];
+    mmsUser: UserObject;
+
+    $pane: IPane;
+    $resized: Rx.Disposable;
+
+    listApi: ListApi;
+
     width: number | null = null;
     modalCreate: boolean = false;
     modalDelete: boolean = false;
@@ -17,49 +28,107 @@ class HomeController {
     displayOrgs: { [key: string]: boolean } = {};
     error: any = null;
 
-    static $inject = ['$scope', '$window', '$element'];
+    orgPerms: { [orgId: string]: { admin: boolean; write: boolean } } = {};
 
-    constructor(private $scope: ng.IScope, private $window: ng.IWindowService, private $element: JQuery<HTMLElement>) {}
+    static $inject = ['growl', 'RootScopeService', 'OrgService', 'UserService'];
+
+    constructor(
+        private growl: angular.growl.IGrowlService,
+        private rootScopeSvc: RootScopeService,
+        private orgSvc: OrgService,
+        private userSvc: UserService
+    ) {}
 
     $onInit(): void {
-        this.$window.addEventListener('resize', this.handleResize);
+        this.rootScopeSvc.veHideLeft(true);
+        this.rootScopeSvc.veHideRight(true);
+        this.$resized = (this.$pane.$resized as Rx.Subject<IRegion>).subscribe(() => this.handleResize());
+        this.listApi = {
+            onExpandChange: this.onExpandChange,
+            onRefresh: this.refresh,
+        };
         this.handleResize();
-        //this.setMountedComponentStates();
+        this.init(this.mmsOrgs, this.mmsUser);
     }
 
     $onChanges(onChangesObj: IOnChangesObject): void {
-        handleChange(onChangesObj, 'orgs', this.setMountedComponentStates);
+        if (
+            (onChangesObj['mmsOrgs'] && !onChangesObj['mmsOrgs'].isFirstChange() && this.mmsUser) ||
+            (onChangesObj['mmsUser'] && !onChangesObj['mmsUser'].isFirstChange() && this.mmsOrgs)
+        ) {
+            this.init(
+                onChangesObj['mmsOrgs'].currentValue as OrgObject[],
+                onChangesObj['mmsUser'].currentValue as UserObject
+            );
+        }
     }
 
-    setMountedComponentStates = (): void => {
+    $onDestroy(): void {
+        this.$resized.dispose();
+    }
+
+    refresh = (): void => {
+        this.orgSvc.getOrgs(true).then(
+            (orgs) => {
+                this.userSvc.getCurrentUser(true).then(
+                    (user) => {
+                        this.init(orgs, user);
+                    },
+                    () => {
+                        this.growl.error('Unable to retrieve user detaisl');
+                    }
+                );
+            },
+            () => {
+                this.growl.error('Unable to refresh Orgs');
+            }
+        );
+    };
+
+    init = (orgData?: OrgObject[], user?: UserObject): void => {
         let writePermOrgs: OrgObject[] = [];
-        if (!this.user.admin) {
-            this.orgs.forEach((org) => {
-                const users = org.permissions && org.permissions.users ? org.permissions.users : {};
-                const perm = users[this.user.username] ? users[this.user.username] : '';
+        if (!user.admin) {
+            orgData.forEach((org) => {
+                let perms: PermissionMap;
+                this.orgPerms[org.id] = {
+                    admin: false,
+                    write: false,
+                };
+                Object.keys(org).forEach((key) => {
+                    if (key == 'permission') {
+                        perms = org[key];
+                    } else if (key == 'projects') {
+                        console.log(key);
+                    }
+                });
+                const users = perms && perms.users ? perms.users : {};
+                const perm = users[user.username] ? users[user.username] : '';
                 if (perm === 'write' || perm === 'admin') {
                     writePermOrgs.push(org);
+                    this.orgPerms[org.id].write = true;
+                    if (perm === 'admin') {
+                        this.orgPerms[org.id].admin = true;
+                    }
                 }
             });
-        } else if (this.user.admin) {
-            writePermOrgs = this.orgs;
-        }
-        if (writePermOrgs.length > 0) {
-            this.write = true;
-        }
-        if (this.user.admin) {
-            this.admin = this.user.admin;
+        } else if (user.admin) {
+            writePermOrgs = orgData;
+            this.admin = user.admin;
         }
         const display: { [key: string]: boolean } = {};
-        this.orgs.forEach((org) => {
-            display[org.id] = true;
+        orgData.forEach((org) => {
+            display[org.id] = false;
         });
         this.displayOrgs = display;
+        this.orgs = orgData;
+        this.user = user;
         //this.$scope.$apply();
     };
 
     handleResize = (): void => {
-        this.width = this.$element[0].clientWidth;
+        if (this.$pane.$region) {
+            this.width = this.$pane.$region.width;
+        }
         //this.$scope.$apply();
     };
 
@@ -82,18 +151,17 @@ class HomeController {
             this.displayOrgs[org] = expanded;
         });
     };
-
-    $onDestroy(): void {
-        this.$window.removeEventListener('resize', this.handleResize);
-    }
 }
 
 const HomeComponent: VeComponentOptions = {
     controller: HomeController,
     selector: 'adminHome',
+    require: {
+        $pane: '^ngPane',
+    },
     bindings: {
-        orgs: '<',
-        user: '<',
+        mmsOrgs: '<',
+        mmsUser: '<',
     },
     template: `
     <div class="home-space" ng-ref="$ctrl.homeRef">
@@ -123,17 +191,14 @@ const HomeComponent: VeComponentOptions = {
   </div>
   <div class="extra-padding">
     <div ng-if="$ctrl.orgs.length === 0" class="list-item"><h3>No organizations.</h3></div>
-    <div ng-repeat="org in $ctrl.orgs">
-      <org-list org="org"
-                key="{{'org-key-' + org.id}}"
-                user="$ctrl.user"
-                write="$ctrl.write"
-                admin="$ctrl.admin"
-                show-projs="$ctrl.displayOrgs[org.id]"
-                on-expand-change="$ctrl.onExpandChange(org.id, value)"
-                refresh="$ctrl.refresh()">
-      </org-list>
-    </div>
+    <org-list ng-repeat="org in $ctrl.orgs" org="org"
+              key="{{'org-key-' + org.id}}"
+              user="$ctrl.user"
+              write="$ctrl.admin || $ctrl.orgPerms[org.id].admin || $ctrl.orgPerms[org.id].write"
+              admin="$ctrl.admin || $ctrl.orgPerms[org.id].admin"
+              show-projs="$ctrl.displayOrgs[org.id]"
+              list-api="$ctrl.listApi">
+    </org-list>
   </div>
   <!-- <modal is-open="$ctrl.modalCreate" toggle="$ctrl.handleCreateToggle()">
     <modal-body>

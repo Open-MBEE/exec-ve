@@ -1,5 +1,13 @@
 import { CacheService, EditService, SessionService } from '@ve-utils/core';
-import { ElementService, HttpService, ProjectService, URLService, ViewService } from '@ve-utils/mms-api-client';
+import {
+    ElementService,
+    HttpService,
+    OrgService,
+    ProjectService,
+    URLService,
+    UserService,
+    ViewService,
+} from '@ve-utils/mms-api-client';
 
 import { veUtils } from '@ve-utils';
 
@@ -31,6 +39,8 @@ export class AuthService {
         'ProjectService',
         'SessionService',
         'EditService',
+        'UserService',
+        'OrgService',
     ];
     constructor(
         private $q: VeQService,
@@ -42,7 +52,9 @@ export class AuthService {
         private viewSvc: ViewService,
         private projectSvc: ProjectService,
         private sessionSvc: SessionService,
-        private autosaveSvc: EditService
+        private autosaveSvc: EditService,
+        private userSvc: UserService,
+        private orgSvc: OrgService
     ) {
         this.token = localStorage.getItem('token');
     }
@@ -54,6 +66,7 @@ export class AuthService {
             (success) => {
                 this.uRLSvc.setToken(success.data.token);
                 this.token = success.data.token;
+                this.userSvc.setUsername(credentialsJSON.username);
                 localStorage.setItem('token', this.token);
                 deferred.resolve(this.token);
             },
@@ -67,10 +80,12 @@ export class AuthService {
     removeToken = (): void => {
         localStorage.removeItem('token');
         this.token = undefined;
+        this.userSvc.reset();
         this.uRLSvc.setToken(null);
         this.httpSvc.dropAll();
         this.elementSvc.reset();
         this.projectSvc.reset();
+        this.orgSvc.reset();
         this.viewSvc.reset();
         this.cacheSvc.reset();
         this.autosaveSvc.reset();
@@ -81,27 +96,33 @@ export class AuthService {
         return this.token;
     };
 
-    checkLogin(): VePromise<CheckAuthResponse> {
-        const deferred = this.$q.defer<CheckAuthResponse>();
-        if (!this.token) {
-            deferred.reject(false);
-            return deferred.promise;
-        }
-        this.uRLSvc.setToken(this.token);
-        this.$http.get(this.uRLSvc.getCheckTokenURL()).then(
-            (response: angular.IHttpResponse<CheckAuthResponse>) => {
-                if (response.status === 401) {
-                    deferred.reject(response);
-                } else {
-                    deferred.resolve(response.data);
-                }
-            },
-            (fail) => {
-                deferred.reject(fail);
-                this.removeToken();
+    setToken = (token: string): void => {
+        localStorage.setItem('token', token);
+        this.token = token;
+        this.uRLSvc.setToken(token);
+    };
+
+    checkLogin(): VePromise<void, CheckAuthResponse> {
+        return new this.$q((resolve, reject) => {
+            if (!this.token) {
+                reject(null);
             }
-        );
-        return deferred.promise;
+            this.uRLSvc.setToken(this.token);
+            this.$http.get<CheckAuthResponse>(this.uRLSvc.getCheckTokenURL()).then(
+                (response) => {
+                    if (response.status === 401) {
+                        reject(response);
+                    } else {
+                        this.userSvc.setUsername(response.data.username);
+                        resolve();
+                    }
+                },
+                (fail: angular.IHttpResponse<CheckAuthResponse>) => {
+                    reject(fail);
+                    this.removeToken();
+                }
+            );
+        });
     }
 
     // async isAuthenticated(): Promise<boolean> {

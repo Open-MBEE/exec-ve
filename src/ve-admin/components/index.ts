@@ -1,3 +1,4 @@
-import './list/orgs-list-item.component';
-import './stats/stat.component';
-import './stats/stats-list.component';
+import './list';
+import './sidebar';
+import './stat/stat.component';
+import './stat/stat-list.component';

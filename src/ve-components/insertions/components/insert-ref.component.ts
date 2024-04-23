@@ -75,6 +75,7 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             type: this.type,
             description: '',
             permission: 'read',
+            public: false,
         };
         this.dateTimeOpts = {
             enableTime: true,

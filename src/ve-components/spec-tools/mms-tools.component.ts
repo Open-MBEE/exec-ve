@@ -7,7 +7,7 @@ import { veCoreEvents } from '@ve-core/events';
 import { IToolBarButton, ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EditObject, EditService, EventService } from '@ve-utils/core';
-import { ElementService, ProjectService, PermissionsService } from '@ve-utils/mms-api-client';
+import { ElementService, ProjectService, PermissionService } from '@ve-utils/mms-api-client';
 
 import { veComponents } from '@ve-components';
 
@@ -26,7 +26,7 @@ import { VeModalService } from '@ve-types/view-editor';
  * @requires veUtils/AuthService
  * @requires veUtils/ElementService
  * @requires veUtils/ViewService
- * @requires veUtils/PermissionsService
+ * @requires veUtils/PermissionService
  * @requires $compile
  * @requires $templateCache
  * @requires growl
@@ -87,7 +87,7 @@ import { VeModalService } from '@ve-types/view-editor';
 
 class ToolsController {
     //Bindings
-    toolsCategory: string;
+    toolbarId: string;
 
     //Local
     elementId: string;
@@ -114,9 +114,6 @@ class ToolsController {
     elementLoading: boolean;
 
     protected errorType: string;
-
-    toolbarId: string;
-
     protected $tools: JQuery;
     static $inject = [
         '$q',
@@ -130,7 +127,7 @@ class ToolsController {
         'ElementService',
         'ProjectService',
         'ComponentService',
-        'PermissionsService',
+        'PermissionService',
         'RootScopeService',
         'EventService',
         'EditService',
@@ -153,7 +150,7 @@ class ToolsController {
         private elementSvc: ElementService,
         private projectSvc: ProjectService,
         private componentSvc: ComponentService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
         private autosaveSvc: EditService,
@@ -318,9 +315,6 @@ class ToolsController {
             if (!data.title) {
                 data.title = inspect.tooltip;
             }
-            if (!data.category) {
-                data.category = inspect.category;
-            }
 
             this.currentTitle = data.title ? data.title : inspect.tooltip;
 
@@ -444,7 +438,6 @@ const MmsToolsComponent: VeComponentOptions = {
     `,
     bindings: {
         toolbarId: '@',
-        toolsCategory: '<',
     },
     controller: ToolsController,
 };

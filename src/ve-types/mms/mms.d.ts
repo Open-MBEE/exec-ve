@@ -2,6 +2,7 @@ import {
     CommitObject,
     ElementObject,
     GroupObject,
+    DataObject,
     MmsObject,
     OrgObject,
     ProjectObject,
@@ -22,7 +23,7 @@ export interface UserObject extends MmsObject {
     fullName?: string;
 }
 
-export interface CommitObject extends MmsObject {
+export interface CommitObject extends DataObject {
     deleted?: CommitChangeElement[];
     _creator?: string;
     added?: CommitChangeElement[];
@@ -30,16 +31,14 @@ export interface CommitObject extends MmsObject {
     _created?: string;
     comment?: null;
     source?: null;
-    id: string;
     updated?: CommitChangeElement[];
     _refId: string;
     _projectId: string;
 }
 
-export interface CommitChangeElement extends MmsObject {
+export interface CommitChangeElement extends DataObject {
     _previousDocId: string;
     _docId: string;
-    id: string;
     type: string;
 }
 
@@ -180,34 +179,34 @@ export interface ElementsResponse<T extends ElementObject> extends BasicResponse
     deleted?: T[];
 }
 
-export interface PermissionsLookupResponse extends BasicResponse<PermissionsLookupObject> {
-    lookups: PermissionsLookupObject[];
+export interface PermissionLookupResponse extends BasicResponse<PermissionLookupObject> {
+    lookups: PermissionLookupObject[];
     allPassed?: boolean;
 }
 
-export interface PermissionsResponse extends BasicResponse<PermissionsResponse> {
+export interface PermissionResponse extends BasicResponse<PermissionResponse> {
     inherit: boolean;
     public: boolean;
     users: {
-        permissions: PermissionsRecord[];
+        permissions: PermissionRecord[];
     };
     groups: {
-        permissions: PermissionsRecord[];
+        permissions: PermissionRecord[];
     };
 }
 
-export interface PermissionsRecord {
+export interface PermissionRecord {
     name: string;
     role: string;
     inherited: boolean;
 }
 
-export interface PermissionsObject {
+export interface PermissionMap {
     users: { [username: string]: string };
     groups: { [groupname: string]: string };
 }
 
-export interface PermissionsLookupObject {
+export interface PermissionLookupObject {
     type: string;
     orgId?: string;
     projectId?: string;

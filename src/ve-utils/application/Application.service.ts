@@ -1,5 +1,5 @@
 import { CacheService } from '@ve-utils/core';
-import { ApiService, ElementService, ProjectService } from '@ve-utils/mms-api-client';
+import { ApiService, ElementService, UserService } from '@ve-utils/mms-api-client';
 
 import { veUtils } from '@ve-utils';
 
@@ -43,11 +43,11 @@ export class ApplicationService {
 
     public PROJECT_URL_PREFIX = '#/projects/';
 
-    static $inject = ['$q', 'ProjectService', 'ElementService', 'ApiService', 'CacheService'];
+    static $inject = ['$q', 'UserService', 'ElementService', 'ApiService', 'CacheService'];
 
     constructor(
         private $q: VeQService,
-        private projectSvc: ProjectService,
+        private userSvc: UserService,
         private elementSvc: ElementService,
         private apiSvc: ApiService,
         private cacheSvc: CacheService
@@ -116,10 +116,7 @@ export class ApplicationService {
         });
     };
 
-    public updateUserSettings = (
-        reqOb: UsersRequest,
-        settingsOb: UserSettingsObject
-    ): VePromise<UserSettingsObject> => {
+    public updateUserSettings = (settingsOb: UserSettingsObject): VePromise<UserSettingsObject> => {
         return this.elementSvc.updateElement<UserSettingsObject>(settingsOb);
     };
 
@@ -177,7 +174,8 @@ export class ApplicationService {
         });
     };
 
-    addPins(username: string, projectId: string, refId: string, pinned: string[]): VePromise<UserSettingsObject> {
+    addPins(projectId: string, refId: string, pinned: string[]): VePromise<UserSettingsObject> {
+        const username = this.userSvc.getUsername();
         return new this.$q((resolve, reject) => {
             this.getUserSettings({ username, projectId, refId }).then((result) => {
                 if (result.pinned) {
@@ -195,7 +193,8 @@ export class ApplicationService {
         });
     }
 
-    removePins(username: string, projectId: string, refId: string, unpinned: string[]): VePromise<UserSettingsObject> {
+    removePins(projectId: string, refId: string, unpinned: string[]): VePromise<UserSettingsObject> {
+        const username = this.userSvc.getUsername();
         return new this.$q((resolve, reject) => {
             this.getUserSettings({ username, projectId, refId }).then((response) => {
                 if (response.pinned) {

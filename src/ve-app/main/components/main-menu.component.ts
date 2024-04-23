@@ -236,10 +236,14 @@ class MenuController implements IComponentController {
     }
 
     goHome(): void {
-        void this.$state.go('main.project.ref.portal', {
-            field: undefined,
-            keywords: undefined,
-        });
+        if (this.$state.includes('**.admin.**')) {
+            void this.$state.go('main.admin', {});
+        } else {
+            void this.$state.go('main.project.ref.portal', {
+                field: undefined,
+                keywords: undefined,
+            });
+        }
     }
 }
 
@@ -248,7 +252,7 @@ const MainMenuComponent: VeComponentOptions = {
     template: `
     <nav class="project-level-header navbar navbar-inverse navbar-fixed-top block" role="navigation">
     <i ng-show="$ctrl.spin && !$ctrl.isRefsView" class="fa fa-spin fa-spinner nav-spin"></i>
-    <div class="btn-group ve-dark-dropdown-nav pull-left" uib-dropdown keyboard-nav>
+    <div class="btn-group ve-dark-dropdown-nav pull-left" uib-dropdown keyboard-nav ng-if="$ctrl.projects">
         <button type="button" class="dropdown-toggle" uib-dropdown-toggle>
             <span class="label-dropdown">Project:&nbsp;</span><span class="selected-dropdown">{{ $ctrl.currentProject }}</span>
             <span><i class="fa-solid fa-caret-down" aria-hidden="true"></i></span>
@@ -275,7 +279,7 @@ const MainMenuComponent: VeComponentOptions = {
             </li>
         </ul>
     </div>
-    <div ng-show="!$ctrl.isRefsView" class="nav navbar-nav navbar-right" style="padding-right: 15px">
+    <div ng-if="$ctrl.refs && !$ctrl.isRefsView" class="nav navbar-nav navbar-right" style="padding-right: 15px">
         <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="outsideClick">
             <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
                 <span class="label-dropdown">{{ $ctrl.currentRef.type }}:</span>

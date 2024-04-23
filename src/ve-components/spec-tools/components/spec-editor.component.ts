@@ -10,7 +10,7 @@ import {
     URLService,
     ElementService,
     ViewService,
-    PermissionsService,
+    PermissionService,
     ProjectService,
     ApiService,
     ValueService,
@@ -29,7 +29,7 @@ import { ElementObject, ElementsResponse } from '@ve-types/mms';
  * @requires veUtils/AuthService
  * @requires veUtils/ElementService
  * @requires veUtils/ViewService
- * @requires veUtils/PermissionsService
+ * @requires veUtils/PermissionService
  * @requires $compile
  * @requires $templateCache
  * @requires growl
@@ -105,7 +105,7 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
-        permissionsSvc: PermissionsService,
+        permissionSvc: PermissionService,
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService,
@@ -125,7 +125,7 @@ class SpecEditorController extends SpecTool implements ISpecTool {
             applicationSvc,
             apiSvc,
             viewSvc,
-            permissionsSvc,
+            permissionSvc,
             eventSvc,
             specSvc,
             toolbarSvc

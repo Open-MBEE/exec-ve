@@ -8,7 +8,7 @@ import { EditObject, EventService } from '@ve-utils/core';
 import {
     ApiService,
     ElementService,
-    PermissionsService,
+    PermissionService,
     ProjectService,
     URLService,
     ViewService,
@@ -123,7 +123,7 @@ export class SpecTool implements ISpecTool {
         'ApplicationService',
         'ApiService',
         'ViewService',
-        'PermissionsService',
+        'PermissionService',
         'EventService',
         'SpecService',
         'ToolbarService',
@@ -141,7 +141,7 @@ export class SpecTool implements ISpecTool {
         protected applicationSvc: ApplicationService,
         protected apiSvc: ApiService,
         protected viewSvc: ViewService,
-        protected permissionsSvc: PermissionsService,
+        protected permissionSvc: PermissionService,
         protected eventSvc: EventService,
         public specSvc: SpecService,
         protected toolbarSvc: ToolbarService

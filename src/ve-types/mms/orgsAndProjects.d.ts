@@ -1,10 +1,8 @@
-import { MmsObject, PermissionsObject } from '@ve-types/mms';
+import { DataObject, PermissionMap } from '@ve-types/mms';
 
-export interface AdminObject extends MmsObject {
-    id: string;
+export interface AdminObject extends DataObject {
     name?: string;
-    permissions?: PermissionsObject;
-    permission?: string;
+    permission?: PermissionMap;
     description?: string;
 }
 
@@ -13,11 +11,11 @@ export interface OrgObject extends AdminObject {
     created?: string;
     name: string;
     modified?: string;
-    id: string;
     projects?: ProjectObject[];
 }
 
 export interface ProjectObject extends AdminObject {
+    public?: boolean;
     _refId?: string;
     schema?: string;
     _creator?: string;

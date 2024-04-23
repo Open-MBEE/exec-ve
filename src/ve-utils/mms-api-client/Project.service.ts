@@ -1,19 +1,19 @@
 import { CacheService } from '@ve-utils/core';
-import { ApiService, ElementService, URLService } from '@ve-utils/mms-api-client';
+import { ApiService, ElementService, PermissionService, URLService } from '@ve-utils/mms-api-client';
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 
 import { veUtils } from '@ve-utils';
 
 import { VePromise, VeQService } from '@ve-types/angular';
 import {
+    BasicResponse,
     CommitObject,
     CommitResponse,
     ElementObject,
     GroupObject,
     GroupsResponse,
+    MmsObject,
     MountObject,
-    OrgObject,
-    OrgsResponse,
     ProjectObject,
     ProjectsResponse,
     RefObject,
@@ -33,19 +33,18 @@ import {
  * * This is a utility service for getting project, ref, commit information
  */
 export class ProjectService extends BaseApiService {
-    static $inject = ['$q', '$http', 'CacheService', 'ElementService', 'URLService', 'ApiService'];
+    static $inject = ['$q', '$http', 'CacheService', 'ElementService', 'URLService', 'ApiService', 'PermissionService'];
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
         private cacheSvc: CacheService,
         private elementSvc: ElementService,
         private uRLSvc: URLService,
-        private apiSvc: ApiService
+        private apiSvc: ApiService,
+        private permissionSvc: PermissionService
     ) {
         super();
     }
-
-
 
     public getProjects(orgId?: string, updateCache?: boolean): VePromise<ProjectObject[], ProjectsResponse> {
         const url = this.uRLSvc.getProjectsURL(orgId);
@@ -71,33 +70,25 @@ export class ProjectService extends BaseApiService {
                                         });
                                         return;
                                     }
-                                    if (!orgId) {
-                                        const orgProjects: {
-                                            [orgId: string]: ProjectObject[];
-                                        } = {};
-                                        response.data.projects.forEach((project) => {
-                                            const porg = project.orgId;
+                                    const promises: VePromise<MmsObject, BasicResponse<MmsObject>>[] = [];
+                                    const projects = response.data.projects;
+                                    projects.forEach((project) => {
+                                        const perms = this.permissionSvc.getProjectPermission(project.id);
+                                        perms.then((perms) => {
+                                            project.permission = perms;
                                             const pCacheKey = this.apiSvc.makeCacheKey(
                                                 null,
                                                 project.id,
                                                 false,
                                                 'project'
                                             );
-
-                                            if (orgProjects[porg] === undefined) {
-                                                orgProjects[porg] = [];
-                                            }
-                                            orgProjects[porg].push(this.cacheSvc.put(pCacheKey, project, true));
-                                            Object.keys(orgProjects).forEach((orgId) => {
-                                                this.cacheSvc.put(
-                                                    this.apiSvc.makeCacheKey(null, orgId, false, 'projects'),
-                                                    orgProjects[orgId],
-                                                    false
-                                                );
-                                            });
-                                        });
-                                    }
-                                    resolve(this.cacheSvc.put<ProjectObject[]>(cacheKey, response.data.projects));
+                                            this.cacheSvc.put(pCacheKey, project, false);
+                                        }, reject);
+                                        promises.push(perms);
+                                    });
+                                    this.$q.all(promises).finally(() => {
+                                        resolve(this.cacheSvc.put(cacheKey, projects, false));
+                                    });
                                 },
                                 (response: angular.IHttpResponse<ProjectsResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
@@ -430,8 +421,7 @@ export class ProjectService extends BaseApiService {
                         }
                         const createdRef = response.data.refs[0];
                         const list = this.cacheSvc.get<RefObject[]>(
-                            this.apiSvc.makeCacheKey(null, projectId, false, 'refs'),
-                            true
+                            this.apiSvc.makeCacheKey(null, projectId, false, 'refs')
                         );
                         if (list) {
                             list.push(createdRef);
@@ -486,8 +476,7 @@ export class ProjectService extends BaseApiService {
                     if (refOb) {
                         this.cacheSvc.remove(key);
                         const list = this.cacheSvc.get<RefObject[]>(
-                            this.apiSvc.makeCacheKey(null, projectId, false, 'refs'),
-                            true
+                            this.apiSvc.makeCacheKey(null, projectId, false, 'refs')
                         );
                         if (list) {
                             for (let i = 0; i < list.length; i++) {

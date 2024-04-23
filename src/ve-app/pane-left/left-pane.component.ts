@@ -10,7 +10,7 @@ import { veCoreEvents } from '@ve-core/events';
 import { ConfirmDeleteModalResolveFn } from '@ve-core/modals';
 import { RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { ApiService, ElementService, PermissionsService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
+import { ApiService, ElementService, PermissionService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
 
 import { veApp } from '@ve-app';
@@ -81,7 +81,7 @@ class LeftPaneController implements angular.IComponentController {
         'ProjectService',
         'AppUtilsService',
         'TreeService',
-        'PermissionsService',
+        'PermissionService',
         'RootScopeService',
         'EventService',
         'ButtonBarService',
@@ -109,7 +109,7 @@ class LeftPaneController implements angular.IComponentController {
         private projectSvc: ProjectService,
         private appUtilsSvc: AppUtilsService,
         private treeSvc: TreeService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
         public eventSvc: EventService,
         private buttonBarSvc: ButtonBarService
@@ -272,14 +272,14 @@ class LeftPaneController implements angular.IComponentController {
         api.setPermission('tree-delete', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
         api.setPermission(
             'tree-add.group',
-            this.permissionsSvc.hasProjectEditPermission(this.treeSvc.treeApi.projectId)
+            this.permissionSvc.hasProjectEditPermission(this.treeSvc.treeApi.projectId)
         )
         api.setPermission('tree-add.document', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
 
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-group'))
         api.setPermission(
             'tree-reorder-group',
-            this.permissionsSvc.hasProjectEditPermission(this.treeSvc.treeApi.projectId)
+            this.permissionSvc.hasProjectEditPermission(this.treeSvc.treeApi.projectId)
         )
         api.setPermission('tree-add.view', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
 
@@ -337,7 +337,7 @@ class LeftPaneController implements angular.IComponentController {
                     this.treeSvc.treeApi = this.treeApi;
                     this.treeSvc.treeEditable = this.$state.includes('**.admin.**')
                         ? false
-                        : this.permissionsSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id);
+                        : this.permissionSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id);
 
                     this.treeApi.sectionNumbering = this.$state.includes('**.present.**');
                     this.treeApi.expandLevel = this.$state.includes('**.present.**')

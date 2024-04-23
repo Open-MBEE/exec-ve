@@ -7,7 +7,7 @@ import {
     ApiService,
     AuthService,
     ElementService,
-    PermissionsService,
+    PermissionService,
     ProjectService,
     URLService,
     UserService,
@@ -73,7 +73,7 @@ export class SpecService implements angular.Injectable<any> {
         'URLService',
         'AuthService',
         'UserService',
-        'PermissionsService',
+        'PermissionService',
         'UtilsService',
         'ApiService',
         'ValueService',
@@ -96,7 +96,7 @@ export class SpecService implements angular.Injectable<any> {
         private uRLSvc: URLService,
         private authSvc: AuthService,
         private userSvc: UserService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private utilsSvc: UtilsService,
         private apiSvc: ApiService,
         private valueSvc: ValueService,
@@ -221,9 +221,7 @@ export class SpecService implements angular.Injectable<any> {
         this._updateElement();
     };
 
-    public prevElement = (): void => {
-        
-    }
+    public prevElement = (): void => {};
 
     private _updateElement = (): void => {
         const reqOb = Object.assign({}, this.specApi);
@@ -289,7 +287,7 @@ export class SpecService implements angular.Injectable<any> {
                     }
                     if (
                         (this.specApi.commitId && this.specApi.commitId !== 'latest') ||
-                        !this.permissionsSvc.hasBranchEditPermission(data._projectId, data._refId) ||
+                        !this.permissionSvc.hasBranchEditPermission(data._projectId, data._refId) ||
                         this.specApi.refType === 'Tag'
                     ) {
                         this.editable = false;

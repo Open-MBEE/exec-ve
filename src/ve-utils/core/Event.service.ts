@@ -53,7 +53,7 @@ export class EventService {
     }
 
     destroy(subs: Rx.IDisposable[]): void {
-        if (subs.length > 0) {
+        if (subs && subs.length > 0) {
             for (let i = 0; i < subs.length; i++) {
                 if (typeof subs[i].dispose === 'function') {
                     subs[i].dispose();

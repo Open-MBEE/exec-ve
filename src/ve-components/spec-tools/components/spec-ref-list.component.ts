@@ -9,7 +9,7 @@ import { EventService } from '@ve-utils/core';
 import {
     ApiService,
     ElementService,
-    PermissionsService,
+    PermissionService,
     ProjectService,
     URLService,
     ViewService,
@@ -36,7 +36,7 @@ import { VeModalService } from '@ve-types/view-editor';
  * @requires {ProjectService} projectSvc
  * @requires {UtilsService} utilsSvc
  * @requires {ViewService} viewSvc
- * @requires {PermissionsService} permissionsSvc
+ * @requires {PermissionService} permissionSvc
  * @requires {EventService} eventSvc
  * @requires {SpecService} specSvc
  * @requires {ToolbarService} toolbarSvc
@@ -72,7 +72,7 @@ class SpecRefListController extends SpecTool implements ISpecTool {
         applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
-        permissionsSvc: PermissionsService,
+        permissionSvc: PermissionService,
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService,
@@ -90,7 +90,7 @@ class SpecRefListController extends SpecTool implements ISpecTool {
             applicationSvc,
             apiSvc,
             viewSvc,
-            permissionsSvc,
+            permissionSvc,
             eventSvc,
             specSvc,
             toolbarSvc
@@ -131,7 +131,7 @@ class SpecRefListController extends SpecTool implements ISpecTool {
 
         this.docEditable =
             this.specApi.refType != 'Tag' &&
-            this.permissionsSvc.hasBranchEditPermission(this.specApi.projectId, this.specApi.refId);
+            this.permissionSvc.hasBranchEditPermission(this.specApi.projectId, this.specApi.refId);
     };
 
     public docMergeAction = (srcRef: RefObject): void => {

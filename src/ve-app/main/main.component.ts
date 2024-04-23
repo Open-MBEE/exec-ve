@@ -384,7 +384,7 @@ const MainComponent: VeComponentOptions = {
                 <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-pane" pane-closed="$ctrl.closeLeft" ng-hide="$ctrl.hideLeft">
                     <ui-view name="pane-left" class="container-pane-left"></ui-view>
                 </ng-pane>
-                <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-no-toggle="true" parent-ctrl="$ctrl" pane-closed="$ctrl.paneClosed" ng-hide="$ctrl.hideRight">
+                <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-no-toggle="true" parent-ctrl="$ctrl" pane-closed="$ctrl.paneClosed">
                     <ui-view name="toolbar-right"></ui-view>
                 </ng-pane>
                 <ng-pane pane-id="content" pane-anchor="center" pane-closed="$ctrl.hidePanes" class="content-pane" parent-ctrl="$ctrl">

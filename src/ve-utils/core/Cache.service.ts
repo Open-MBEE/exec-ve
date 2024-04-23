@@ -9,7 +9,7 @@ export class CacheService {
 
     static $inject = [];
 
-    get<T>(key: string | string[], noCopy?: boolean): T | undefined {
+    get<T>(key: string | string[]): T | undefined {
         const realKey: string = this._makeKey(key);
         const result: T = this._get<T>(realKey);
 
@@ -79,7 +79,7 @@ export class CacheService {
     put<T extends MmsObject | MmsObject[]>(key: string | string[], value: T, merge?: boolean): T {
         const m = typeof merge === 'undefined' ? false : merge;
         const realKey = this._makeKey(key);
-        let currentValue: T = this.get<T>(realKey, true);
+        let currentValue: T = this.get<T>(realKey);
         if (currentValue && m) {
             _.mergeWith(currentValue, value, (a: unknown, b: unknown, id: string) => {
                 if ((id === '_contents' || id === 'specification') && b && (b as ElementObject).type === 'Expression') {

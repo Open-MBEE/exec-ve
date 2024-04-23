@@ -6,71 +6,82 @@ import { veUtils } from '@ve-utils';
 
 import { VePromise, VeQService } from '@ve-types/angular';
 import { UserObject, UsersResponse } from '@ve-types/mms';
-import { AuthService } from './Authorization.service';
 
 export class UserService extends BaseApiService {
-    static $inject = ['$q', '$http', 'CacheService', 'URLService', 'AuthService'];
+    static $inject = ['$q', '$http', 'CacheService', 'URLService'];
+
+    private username: string;
 
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
         private cacheSvc: CacheService,
-        private uRLSvc: URLService,
-        private authSvc: AuthService
+        private uRLSvc: URLService
     ) {
         super();
+        this.username = localStorage.getItem('username');
     }
 
-    getUserData(username: string): VePromise<UserObject, UsersResponse> {
-        const key = ['user', username];
+    getUsername(): string {
+        return this.username;
+    }
+
+    setUsername(username: string): void {
+        localStorage.setItem('username', username);
+        this.username = username;
+    }
+
+    getUserData(username: string, updateCache?: boolean): VePromise<UserObject, UsersResponse> {
         const url = this.uRLSvc.getPersonURL(username);
-        const cached = this.cacheSvc.get<UserObject>(key);
-        if (this._isInProgress(url)) {
-            return this._getInProgress(url) as VePromise<UserObject, UsersResponse>;
-        }
-        if (cached) {
-            return new this.$q<UserObject, UsersResponse>((resolve, reject) => {
-                return resolve(cached);
-            });
-        }
-        this._addInProgress(
-            url,
-            new this.$q<UserObject, UsersResponse>((resolve, reject) => {
-                this.$http
-                    .get<UsersResponse>(url)
-                    .then(
-                        (response) => {
-                            if (!response.data.users || response.data.users.length < 1) {
-                                reject({
-                                    status: 404,
-                                    message: 'User not found',
-                                });
-                            } else {
-                                this.cacheSvc.put(key, response.data.users[0], false);
-                                resolve(this.cacheSvc.get<UserObject>(key));
-                            }
-                        },
-                        (response: angular.IHttpResponse<UsersResponse>) => {
-                            this.uRLSvc.handleHttpStatus(response);
-                            reject(response);
-                        }
-                    )
-                    .finally(() => {
+
+        if (!this._isInProgress(url)) {
+            this._addInProgress(
+                url,
+                new this.$q<UserObject, UsersResponse>((resolve, reject) => {
+                    const key = ['user', username];
+                    if (this.cacheSvc.exists(key) && !updateCache) {
+                        resolve(this.cacheSvc.get<UserObject>(key));
                         this._removeInProgress(url);
-                    });
-            })
-        );
+                    } else {
+                        this.$http
+                            .get<UsersResponse>(url)
+                            .then(
+                                (response) => {
+                                    if (!response.data.users || response.data.users.length < 1) {
+                                        reject({
+                                            status: 404,
+                                            message: 'User not found',
+                                        });
+                                    } else {
+                                        this.cacheSvc.put(key, response.data.users[0], false);
+                                        resolve(this.cacheSvc.get<UserObject>(key));
+                                    }
+                                },
+                                (response: angular.IHttpResponse<UsersResponse>) => {
+                                    this.uRLSvc.handleHttpStatus(response);
+                                    reject(response);
+                                }
+                            )
+                            .finally(() => {
+                                this._removeInProgress(url);
+                            });
+                    }
+                })
+            );
+        }
 
         return this._getInProgress(url) as VePromise<UserObject, UsersResponse>;
     }
 
-    getCurrentUser(): VePromise<UserObject, UsersResponse> {
-        return new this.$q((resolve, reject) => {
-            this.authSvc.checkLogin().then((response) => {
-                this.getUserData(response.username).then(resolve,reject)
-            },reject)
-        })
+    getCurrentUser(updateCache?: boolean): VePromise<UserObject, UsersResponse> {
+        return this.getUserData(this.username, updateCache);
     }
+
+    reset = (): void => {
+        this.inProgress = {};
+        this.username = null;
+        localStorage.removeItem('username');
+    };
 }
 
 veUtils.service('UserService', UserService);

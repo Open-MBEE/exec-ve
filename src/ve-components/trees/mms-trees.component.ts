@@ -11,13 +11,13 @@ import { veCoreEvents } from '@ve-core/events';
 import { IToolBarButton, ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { ApiService, PermissionsService, ViewService } from '@ve-utils/mms-api-client';
+import { ApiService, PermissionService, ViewService } from '@ve-utils/mms-api-client';
 
 import { veComponents } from '@ve-components';
 
 import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
 import { InsertResolveFn } from '@ve-types/components';
-import { DocumentObject, ElementObject, GroupObject, InstanceSpecObject, MmsObject, ViewObject } from '@ve-types/mms';
+import { DocumentObject, GroupObject, ViewObject } from '@ve-types/mms';
 import { TreeBranch } from '@ve-types/tree';
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
@@ -30,7 +30,7 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
  * @requires veUtils/AuthService
  * @requires veUtils/ElementService
  * @requires veUtils/ViewService
- * @requires veUtils/PermissionsService
+ * @requires veUtils/PermissionService
  * @requires $compile
  * @requires $templateCache
  * @requires growl
@@ -131,7 +131,7 @@ class TreesController implements IComponentController {
         'growl',
         'ApiService',
         'ViewService',
-        'PermissionsService',
+        'PermissionService',
         'RootScopeService',
         'EventService',
         'ToolbarService',
@@ -151,7 +151,7 @@ class TreesController implements IComponentController {
         private growl: angular.growl.IGrowlService,
         private apiSvc: ApiService,
         private viewSvc: ViewService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
         private toolbarSvc: ToolbarService,
@@ -265,7 +265,7 @@ class TreesController implements IComponentController {
                 }
             );
         } else if (itemType === 'View') {
-            this.addView(branch  as TreeBranch<ViewObject>).then(
+            this.addView(branch as TreeBranch<ViewObject>).then(
                 (result) => {
                     this.insertModal(result);
                     deferred.resolve();
@@ -360,7 +360,9 @@ class TreesController implements IComponentController {
                                                     if (this.rootScopeSvc.veFullDocMode()) {
                                                         addToFullDocView(node as TreeBranch, curNum, newbranch.data.id);
                                                     }
-                                                    this.addViewSectionsRecursivelyForNode(node as TreeBranch<ViewObject>);
+                                                    this.addViewSectionsRecursivelyForNode(
+                                                        node as TreeBranch<ViewObject>
+                                                    );
                                                 },
                                                 (reason) => {
                                                     this.growl.error(
@@ -487,7 +489,7 @@ class TreesController implements IComponentController {
         });
     };
 
-    private changeTree = (data: { id: string; category?: string; title?: string }): void => {
+    private changeTree = (data: veCoreEvents.toolbarClicked): void => {
         if (!this.currentTree) {
             this.currentTree = '';
         }
@@ -497,10 +499,6 @@ class TreesController implements IComponentController {
             }
             this.currentTree = data.id;
             const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(data.id);
-
-            if (!data.category) {
-                data.category = inspect.category;
-            }
 
             this.currentTitle = data.title ? data.title : inspect.tooltip;
 

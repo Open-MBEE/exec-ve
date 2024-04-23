@@ -6,7 +6,7 @@ import { EditDialogService } from '@ve-core/editor';
 import { ConfirmDeleteModalResolveFn } from '@ve-core/modals';
 import { ToolbarService } from '@ve-core/toolbar';
 import { CacheService, EditObject, EditService, EventService } from '@ve-utils/core';
-import { ApiService, ElementService, PermissionsService, ViewService, ValueService } from '@ve-utils/mms-api-client';
+import { ApiService, ElementService, PermissionService, ViewService, ValueService } from '@ve-utils/mms-api-client';
 
 import { veCore } from '@ve-core';
 
@@ -27,7 +27,7 @@ export class EditorService {
         'growl',
         'ApiService',
         'CacheService',
-        'PermissionsService',
+        'PermissionService',
         'ElementService',
         'ValueService',
         'ViewService',
@@ -44,7 +44,7 @@ export class EditorService {
         private growl: angular.growl.IGrowlService,
         private apiSvc: ApiService,
         private cacheSvc: CacheService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private elementSvc: ElementService,
         private valueSvc: ValueService,
         private viewSvc: ViewService,
@@ -316,30 +316,28 @@ export class EditorService {
      */
     public openEdit(elementOb: ElementObject): VePromise<EditObject, ElementsResponse<ElementObject>> {
         return new this.$q((resolve, reject) => {
-            this.permissionsSvc
-                .getRefPermission(elementOb._projectId,elementOb._refId)
-                .then((permission) => {
-                    if (permission.permission == 'read') {
-                        reject({ message: 'No edit permission on branch', status: 403 });
-                        return;
-                    }
-                    const reqOb = {
-                        elementId: elementOb.id,
-                        projectId: elementOb._projectId,
-                        refId: elementOb._refId,
-                    };
-                    this.elementSvc.getElementForEdit(reqOb).then(
-                        (edit) => {
-                            if (this.valueSvc.isValue(edit.element)) {
-                                edit.values = this.valueSvc.getValues(edit.element);
-                            }
-                            resolve(edit);
-                        },
-                        (reason) => {
-                            reject(reason);
+            this.permissionSvc.lookupRefPermission(elementOb._projectId, elementOb._refId).then((permission) => {
+                if (permission == 'read') {
+                    reject({ message: 'No edit permission on branch', status: 403 });
+                    return;
+                }
+                const reqOb = {
+                    elementId: elementOb.id,
+                    projectId: elementOb._projectId,
+                    refId: elementOb._refId,
+                };
+                this.elementSvc.getElementForEdit(reqOb).then(
+                    (edit) => {
+                        if (this.valueSvc.isValue(edit.element)) {
+                            edit.values = this.valueSvc.getValues(edit.element);
                         }
-                    );
-                });
+                        resolve(edit);
+                    },
+                    (reason) => {
+                        reject(reason);
+                    }
+                );
+            }, reject);
         });
     }
 

@@ -66,7 +66,7 @@ export class Property extends TypedElement {
     defaultValue: any[] = [];
     associationId: string = null;
     typeId: string = null;
-    
+
     constructor(elementOb?: ElementObject) {
         super(elementOb);
         if (elementOb) {
@@ -175,10 +175,10 @@ export class Dependency extends PackageableElement {
 }
 
 export class Association extends Element {
-    type = 'Association'
-    memberEndIds: string[] = []
-    ownedEndIds: string[] = []
-    navigableOwnedEndIds: string[] = []
+    type = 'Association';
+    memberEndIds: string[] = [];
+    ownedEndIds: string[] = [];
+    navigableOwnedEndIds: string[] = [];
     constructor(elementOb?: ElementObject) {
         super(elementOb);
         if (elementOb) {
@@ -186,4 +186,3 @@ export class Association extends Element {
         }
     }
 }
-

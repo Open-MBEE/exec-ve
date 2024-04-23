@@ -7,7 +7,7 @@ export class BaseApiService {
     } = {};
 
     protected _isInProgress = (key: string): boolean => {
-        return Object.prototype.hasOwnProperty.call(this.inProgress, key);
+        return Object.prototype.hasOwnProperty.call(this.inProgress, key) as boolean;
     };
 
     protected _getInProgress<T extends MmsObject, U = BasicResponse<T>>(key: string): VePromise<T | T[], U> {

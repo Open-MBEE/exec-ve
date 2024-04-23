@@ -114,7 +114,6 @@ const ToolBarComponent: VeComponentOptions = {
             if (!button.dynamic) {
                 this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
                     id: button.id,
-                    category: button.category,
                     title: button.tooltip,
                 });
             } else {

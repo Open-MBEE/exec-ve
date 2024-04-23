@@ -7,9 +7,8 @@ import {
     ElementService,
     OrgService,
     PermissionCache,
-    PermissionsService,
+    PermissionService,
     ProjectService,
-    URLService,
     UserService,
     ViewService,
 } from '@ve-utils/mms-api-client';
@@ -29,7 +28,7 @@ import {
     OrgsResponse,
     PackageObject,
     ParamsObject,
-    PermissionsLookupResponse,
+    PermissionResponse,
     ProjectObject,
     ProjectsResponse,
     RefObject,
@@ -49,14 +48,13 @@ export class ResolveService {
         '$uiRouter',
         'ShortUrlService',
         'BrandingService',
-        'URLService',
         'AuthService',
         'UserService',
         'ProjectService',
         'OrgService',
         'ViewService',
         'ElementService',
-        'PermissionsService',
+        'PermissionService',
         'EventService',
     ];
 
@@ -68,14 +66,13 @@ export class ResolveService {
         private $uiRouter: UIRouter,
         private shortUrlSvc: ShortUrlService,
         private brandingSvc: BrandingService,
-        private uRLSvc: URLService,
         private authSvc: AuthService,
         private userSvc: UserService,
         private projectSvc: ProjectService,
         private orgSvc: OrgService,
         private viewSvc: ViewService,
         private elementSvc: ElementService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private eventSvc: EventService
     ) {}
 
@@ -92,24 +89,20 @@ export class ResolveService {
     }
 
     public getToken(): VePromise<string, CheckAuthResponse> {
-        const deferred = this.$q.defer<string>();
-        this.authSvc.checkLogin().then(
-            (data) => {
-                this.uRLSvc.setToken(this.$localStorage.token);
-                deferred.resolve(this.$localStorage.token);
-                this.$cookies.put('com.tomsawyer.web.license.user', data.username, { path: '/' });
-            },
-            (rejection) => {
-                deferred.reject(rejection);
-            }
-        );
-        return deferred.promise;
+        return new this.$q<string, CheckAuthResponse>((resolve, reject) => {
+            this.authSvc.checkLogin().then(
+                () => {
+                    resolve(this.authSvc.getToken());
+                },
+                (rejection) => {
+                    reject(rejection);
+                }
+            );
+        });
     }
 
     public getCurrentUser(): VePromise<UserObject, UsersResponse> {
-        return new this.$q((resolve, reject) => {
-            this.userSvc.getCurrentUser().then(resolve, reject);
-        });
+        return this.userSvc.getCurrentUser();
     }
 
     public getOrg(orgId: string): VePromise<OrgObject, OrgsResponse> {
@@ -121,11 +114,7 @@ export class ResolveService {
     }
 
     public getOrgs(): VePromise<OrgObject[], OrgsResponse> {
-        return new this.$q((resolve, reject) => {
-            this.orgSvc.getOrgsPermissions().then(() => {
-                this.orgSvc.getOrgsProjects().then(resolve, reject);
-            }, reject);
-        });
+        return this.orgSvc.getOrgs();
     }
     public getProject(params: ParamsObject): VePromise<ProjectObject, ProjectsResponse> {
         const promise = this.projectSvc.getProject(params.projectId);
@@ -527,36 +516,12 @@ export class ResolveService {
         });
     };
 
-    public initializeEditPermissions(
+    public initializePermission(
         orgId: string,
         projectId: string,
         refId: string
-    ): VePromise<PermissionCache, PermissionsLookupResponse> {
-        return this.permissionsSvc.initializePermissions(orgId, projectId, refId);
-    }
-
-    public initializeAdminPermissions(
-        params: ParamsObject,
-        adminOb: AdminObject
-    ): VePromise<PermissionCache, PermissionsLookupResponse> {
-        return new this.$q((resolve, reject) => {
-            if (!params.type || !params.modify) {
-                reject();
-            } else {
-                switch (params.type) {
-                    case 'org':
-                        this.permissionsSvc.initializePermissions(adminOb.id, null).then(resolve, reject);
-                        break;
-                    case 'project':
-                        this.permissionsSvc
-                            .initializePermissions((adminOb as ProjectObject).orgId, adminOb.id)
-                            .then(resolve, reject);
-                        break;
-                    default:
-                        reject();
-                }
-            }
-        });
+    ): VePromise<PermissionCache, PermissionResponse> {
+        return this.permissionSvc.initializePermission(orgId, projectId, refId);
     }
 }
 

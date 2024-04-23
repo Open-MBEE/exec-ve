@@ -9,7 +9,7 @@ import { veCoreEvents } from '@ve-core/events';
 import { ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EditObject, EditService, EventService } from '@ve-utils/core';
-import { ElementService, PermissionsService, ProjectService } from '@ve-utils/mms-api-client';
+import { ElementService, PermissionService, ProjectService } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
@@ -28,7 +28,7 @@ class RightPaneController implements IComponentController {
     private mmsRoot: ElementObject;
 
     //Local Values
-    public history: string[]
+    public history: string[];
 
     public subs: Rx.IDisposable[];
 
@@ -52,7 +52,7 @@ class RightPaneController implements IComponentController {
         'growl',
         'ElementService',
         'ProjectService',
-        'PermissionsService',
+        'PermissionService',
         'RootScopeService',
         'EventService',
         'EditService',
@@ -72,7 +72,7 @@ class RightPaneController implements IComponentController {
         private growl: angular.growl.IGrowlService,
         private elementSvc: ElementService,
         private projectSvc: ProjectService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
         private autosaveSvc: EditService,
@@ -203,7 +203,7 @@ class RightPaneController implements IComponentController {
                     data.rootId &&
                     this.mmsRef.type === 'Branch' &&
                     refType === 'Branch' &&
-                    this.permissionsSvc.hasBranchEditPermission(projectId, refId);
+                    this.permissionSvc.hasBranchEditPermission(projectId, refId);
 
                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                     (api) => api.setIcon('spec-editor', 'fa-edit'),

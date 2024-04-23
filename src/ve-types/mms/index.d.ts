@@ -10,13 +10,16 @@ export * from './classesAndProperties.d';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MmsObject = Record<string, any>;
 
+export interface DataObject extends MmsObject {
+    id: string;
+}
+
 export interface TransclusionObject extends MmsObject {
     element?: ElementObject;
     tag: string;
 }
 
-export interface ElementObject extends MmsObject {
-    id: string;
+export interface ElementObject extends DataObject {
     _projectId: string;
     _refId: string;
     _commitId?: string;

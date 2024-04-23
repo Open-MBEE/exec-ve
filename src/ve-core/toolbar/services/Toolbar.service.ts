@@ -13,7 +13,6 @@ export interface IToolBarButton {
     id: string;
     icon: string;
     tooltip: string;
-    category?: string;
     icon_original?: string;
     selected?: boolean;
     active?: boolean;
@@ -38,7 +37,6 @@ export interface toolbarInitFn {
 
 export class ToolButton implements IToolBarButton {
     id: string;
-    category: string = 'global';
     icon: string = 'fa-gears';
     tooltip: string = 'Generic Button';
     icon_original: string = 'fa-gears';

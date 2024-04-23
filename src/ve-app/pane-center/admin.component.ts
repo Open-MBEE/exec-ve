@@ -8,12 +8,12 @@ import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { PermissionsService, URLService, ViewApi } from '@ve-utils/mms-api-client';
+import { PermissionService, URLService, ViewApi } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
-import { AdminObject, ElementObject, ParamsObject, PermissionsLookupObject } from '@ve-types/mms';
+import { AdminObject, ElementObject, ParamsObject, PermissionLookupObject } from '@ve-types/mms';
 
 /**
  * Note: This controller is intended for navigating between 'views' and 'sections' only. If you wish to navigate between
@@ -51,7 +51,7 @@ class AdminController implements angular.IComponentController, Ng1Controller {
     private viewId: string;
     private params: ParamsObject;
     private view: AdminObject;
-    private permissions: PermissionsLookupObject[];
+    private permission: PermissionLookupObject[];
 
     static $inject = [
         '$q',
@@ -70,7 +70,7 @@ class AdminController implements angular.IComponentController, Ng1Controller {
         'UtilsService',
         'ShortUrlService',
         'ContentWindowService',
-        'PermissionsService',
+        'PermissionService',
         'RootScopeService',
         'ResolveService',
         'TreeService',
@@ -95,7 +95,7 @@ class AdminController implements angular.IComponentController, Ng1Controller {
         private utilsSvc: UtilsService,
         private shortUrlSvc: ShortUrlService,
         private contentWindowSvc: ContentWindowService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
         private resolveSvc: ResolveService,
         private treeSvc: TreeService,
@@ -259,7 +259,7 @@ class AdminController implements angular.IComponentController, Ng1Controller {
 
         this.viewId = this.view.id;
 
-        //this.permissionsSvc.getObjectPermissions
+        //this.permissionSvc.getObjectPermission
         this.rootScopeSvc.veViewContentLoading(false);
 
         const data = {

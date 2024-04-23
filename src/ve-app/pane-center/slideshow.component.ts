@@ -9,7 +9,7 @@ import { ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button
 import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { PermissionsService, URLService, ViewApi } from '@ve-utils/mms-api-client';
+import { PermissionService, URLService, ViewApi } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
@@ -81,7 +81,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         'UtilsService',
         'ShortUrlService',
         'ContentWindowService',
-        'PermissionsService',
+        'PermissionService',
         'RootScopeService',
         'ResolveService',
         'TreeService',
@@ -106,7 +106,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         private utilsSvc: UtilsService,
         private shortUrlSvc: ShortUrlService,
         private contentWindowSvc: ContentWindowService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
         private resolveSvc: ResolveService,
         private treeSvc: TreeService,
@@ -337,7 +337,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
             api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'));
             api.setPermission(
                 'show-edits',
-                this.permissionsSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id)
+                this.permissionSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id)
             );
             api.toggleButton('show-edits', this.rootScopeSvc.veEditMode());
             this.hotkeys.bindTo(this.$scope).add({

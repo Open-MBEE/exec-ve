@@ -154,7 +154,7 @@ export class URLService {
         return `${this.root}/authentication`;
     };
 
-    getPermissionsLookupURL = (): string => {
+    getPermissionLookupURL = (): string => {
         return `${this.root}/permissions`;
     };
 
@@ -162,8 +162,8 @@ export class URLService {
         return `${this.root}/orgs/${orgId}`;
     };
 
-    getOrgPermissionsURL = (orgId: string): string => {
-        return this.addPermissions(this.getOrgURL(orgId));
+    getOrgPermissionURL = (orgId: string): string => {
+        return this.addPermission(this.getOrgURL(orgId));
     };
 
     getOrgsURL = (): string => {
@@ -179,8 +179,8 @@ export class URLService {
         return `${this.root}/projects/${projectId}`;
     };
 
-    getProjectPermissionsURL = (projectId: string): string => {
-        return this.addPermissions(this.getProjectURL(projectId));
+    getProjectPermissionURL = (projectId: string): string => {
+        return this.addPermission(this.getProjectURL(projectId));
     };
 
     getProjectMountsURL = (projectId: string, refId: string): string => {
@@ -195,8 +195,8 @@ export class URLService {
         return `${this.root}/projects/${projectId}/refs/${refId}`;
     };
 
-    getRefPermissionsURL = (projectId: string, refId: string): string => {
-        return this.addPermissions(this.getRefURL(projectId, refId));
+    getRefPermissionURL = (projectId: string, refId: string): string => {
+        return this.addPermission(this.getRefURL(projectId, refId));
     };
 
     getCommitsURL = (projectId: string, refId: string, timestamp?: string, limit?: number): string => {
@@ -482,7 +482,7 @@ export class URLService {
         return r;
     };
 
-    private addPermissions = (url: string): string => {
+    private addPermission = (url: string): string => {
         return `${url}/permissions`;
     };
 

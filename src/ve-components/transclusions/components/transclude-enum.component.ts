@@ -147,7 +147,7 @@ export class TranscludeEnumController extends Transclusion implements ITransclus
     //         !ctrl.isEditing &&
     //         ctrl.element &&
     //         ctrl.commitId === 'latest' &&
-    //         this.permissionsSvc.hasBranchEditPermission(
+    //         this.permissionSvc.hasBranchEditPermission(
     //             ctrl.element._projectId,
     //             ctrl.element._refId
     //         )

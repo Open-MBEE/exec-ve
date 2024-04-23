@@ -53,7 +53,6 @@ export interface TreeApi extends ElementsRequest<string> {
     sort?: boolean;
     startChapter?: number;
     treeContentLoading?: boolean;
-    treeCategory?: string;
     expandCallback?(elementId: string, branch: TreeBranch, recurse: boolean);
     onSelect?(branch: TreeBranch): void;
     onDblClick?(branch: TreeBranch): void;

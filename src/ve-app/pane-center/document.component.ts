@@ -13,7 +13,7 @@ import { IButtonBarButton, ButtonBarApi, ButtonBarService, ButtonWrapEvent } fro
 import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { PermissionsService, ViewData, ViewService, URLService } from '@ve-utils/mms-api-client';
+import { PermissionService, ViewData, ViewService, URLService } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
@@ -76,7 +76,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         'ContentWindowService',
         'URLService',
         'UtilsService',
-        'PermissionsService',
+        'PermissionService',
         'RootScopeService',
         'ViewService',
         'TreeService',
@@ -102,7 +102,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         private contentWindowSvc: ContentWindowService,
         private uRLSvc: URLService,
         private utilsSvc: UtilsService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
         private viewSvc: ViewService,
         private treeSvc: TreeService,
@@ -343,7 +343,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         if (
             this.mmsDocument &&
             this.mmsRef.type === 'Branch' &&
-            this.permissionsSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id)
+            this.permissionSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id)
         ) {
             api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'));
             api.toggleButton('show-edits', this.rootScopeSvc.veEditMode());

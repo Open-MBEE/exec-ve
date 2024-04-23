@@ -1,7 +1,6 @@
-import { StateService, UIRouter } from '@uirouter/angularjs';
+import { StateService } from '@uirouter/angularjs';
 
 import { SelectModalResolveFn } from '@ve-app/main/modals/select-modal.component';
-import { RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { AuthService, UserService } from '@ve-utils/mms-api-client';
 
@@ -12,19 +11,7 @@ import { OrgObject, ProjectObject, RefObject, UserObject } from '@ve-types/mms';
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
 class NavBarController implements angular.IComponentController {
-    static $inject = [
-        '$uiRouter',
-        '$state',
-        '$location',
-        '$uibModal',
-        '$window',
-        'hotkeys',
-        'growl',
-        'AuthService',
-        'UserService',
-        'EventService',
-        'RootScopeService',
-    ];
+    static $inject = ['$state', '$uibModal', 'hotkeys', 'growl', 'UserService', 'AuthService', 'EventService'];
 
     //bindings
     public mmsOrg: OrgObject;
@@ -52,17 +39,13 @@ class NavBarController implements angular.IComponentController {
     private orgs: OrgObject[];
 
     constructor(
-        private $uiRouter: UIRouter,
         private $state: StateService,
-        private $location: angular.ILocationService,
         private $uibModal: VeModalService,
-        private $window: angular.IWindowService,
         private hotkeys: angular.hotkeys.HotkeysProvider,
         private growl: angular.growl.IGrowlService,
-        private authSvc: AuthService,
         private userSvc: UserService,
-        private eventSvc: EventService,
-        private rootScopeSvc: RootScopeService
+        private authSvc: AuthService,
+        private eventSvc: EventService
     ) {
         this.isNavCollapsed = true;
 
@@ -78,28 +61,19 @@ class NavBarController implements angular.IComponentController {
 
         this.showSearch = !this.$state.includes('**.search.**');
 
-        void this.authSvc.checkLogin().then(
-            (data) => {
-                this.username = data.username;
-                this.userSvc.getUserData(data.username).then(
-                    (userData) => {
-                        this.user = userData;
-                        if (this.user.firstName) {
-                            this.userBadge = this.user.firstName.substring(0, 1).toUpperCase();
-                            this.userBadge += this.user.lastName.substring(0, 1).toUpperCase();
-                        } else {
-                            this.userBadge = this.user.username
-                                ? this.user.username.substring(0, 2).toUpperCase()
-                                : 'VE';
-                        }
-                    },
-                    () => {
-                        this.userBadge = this.username.substring(0, 1).toUpperCase();
-                    }
-                );
+        this.username = this.userSvc.getUsername();
+        this.userSvc.getCurrentUser().then(
+            (userData) => {
+                this.user = userData;
+                if (this.user.firstName) {
+                    this.userBadge = this.user.firstName.substring(0, 1).toUpperCase();
+                    this.userBadge += this.user.lastName.substring(0, 1).toUpperCase();
+                } else {
+                    this.userBadge = this.user.username ? this.user.username.substring(0, 2).toUpperCase() : 'VE';
+                }
             },
             () => {
-                this.eventSvc.$broadcast('mms.unauthorized');
+                this.userBadge = this.username.substring(0, 1).toUpperCase();
             }
         );
     }
@@ -164,7 +138,7 @@ class NavBarController implements angular.IComponentController {
     }
 
     isAdmin(): boolean {
-        return this.user.admin
+        return this.user.admin;
     }
 }
 

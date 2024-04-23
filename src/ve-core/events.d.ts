@@ -19,7 +19,6 @@ export namespace veCoreEvents {
 
     interface toolbarClicked {
         id: string;
-        category?: string;
         title?: string;
     }
 

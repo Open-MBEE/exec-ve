@@ -1,5 +1,6 @@
 import {
     ElementObject,
+    DataObject,
     MmsObject,
     ExpressionObject,
     InstanceSpecObject,
@@ -54,7 +55,7 @@ export interface PresentationReference extends MmsObject {
     isOpaque: boolean;
 }
 
-export interface PresentationInstanceObject extends MmsObject {
+export interface PresentationInstanceObject extends DataObject {
     type: string;
     isOpaque?: boolean;
 }

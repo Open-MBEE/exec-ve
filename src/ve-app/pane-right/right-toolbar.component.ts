@@ -7,7 +7,7 @@ import { ExtensionService } from '@ve-components/services';
 import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
-import { PermissionsService } from '@ve-utils/mms-api-client';
+import { PermissionService } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
@@ -19,7 +19,7 @@ class RightToolbarController implements IComponentController {
         'growl',
         '$state',
         'ExtensionService',
-        'PermissionsService',
+        'PermissionService',
         'EditService',
         'EventService',
         'ToolbarService',
@@ -31,6 +31,7 @@ class RightToolbarController implements IComponentController {
 
     //Bindings
     private mmsRef: RefObject;
+    private disabled: boolean;
 
     // Though we don't explicitly use it right now, we do need it to trigger updates when
     // entering/exiting certain states
@@ -43,7 +44,7 @@ class RightToolbarController implements IComponentController {
         public growl: angular.growl.IGrowlService,
         public $state: StateService,
         public extensionSvc: ExtensionService,
-        private permissionsSvc: PermissionsService,
+        private permissionSvc: PermissionService,
         private autosaveSvc: EditService,
         private eventSvc: EventService,
         private toolbarSvc: ToolbarService,
@@ -53,6 +54,9 @@ class RightToolbarController implements IComponentController {
     }
 
     $onInit(): void {
+        if (this.disabled) {
+            return;
+        }
         this.eventSvc.$init(this);
 
         this.toolbarSvc.initApi(
@@ -95,7 +99,7 @@ class RightToolbarController implements IComponentController {
                 button.permission =
                     this.mmsRef &&
                     this.mmsRef.type === 'Branch' &&
-                    this.permissionsSvc.hasBranchEditPermission(this.mmsRef._projectId, this.mmsRef.id);
+                    this.permissionSvc.hasBranchEditPermission(this.mmsRef._projectId, this.mmsRef.id);
             }
         }
     };
@@ -124,6 +128,7 @@ const RightToolbarComponent: VeComponentOptions = {
     bindings: {
         mmsRef: '<',
         mmsRoot: '<',
+        disabled: '<',
     },
     controller: RightToolbarController,
 };

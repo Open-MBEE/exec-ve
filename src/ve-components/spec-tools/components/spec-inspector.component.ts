@@ -9,7 +9,7 @@ import {
     ProjectService,
     URLService,
     ViewService,
-    PermissionsService,
+    PermissionService,
     ElementService,
     ApiService,
 } from '@ve-utils/mms-api-client';
@@ -27,7 +27,7 @@ import { VeComponentOptions, VeQService } from '@ve-types/angular';
  * @requires veUtils/AuthService
  * @requires veUtils/ElementService
  * @requires veUtils/ViewService
- * @requires veUtils/PermissionsService
+ * @requires veUtils/PermissionService
  * @requires $compile
  * @requires $templateCache
  * @requires growl
@@ -101,7 +101,7 @@ class SpecInspectorController extends SpecTool implements ISpecTool {
         applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
-        permissionsSvc: PermissionsService,
+        permissionSvc: PermissionService,
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService
@@ -118,7 +118,7 @@ class SpecInspectorController extends SpecTool implements ISpecTool {
             applicationSvc,
             apiSvc,
             viewSvc,
-            permissionsSvc,
+            permissionSvc,
             eventSvc,
             specSvc,
             toolbarSvc

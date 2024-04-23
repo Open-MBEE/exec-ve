@@ -7,7 +7,7 @@ import { ToolbarService } from '@ve-core/toolbar';
 import { ApplicationService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import {
-    PermissionsService,
+    PermissionService,
     URLService,
     ElementService,
     ViewService,
@@ -64,7 +64,7 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
-        permissionsSvc: PermissionsService,
+        permissionSvc: PermissionService,
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService
@@ -81,7 +81,7 @@ class SpecReorderController extends SpecTool implements ISpecTool {
             applicationSvc,
             apiSvc,
             viewSvc,
-            permissionsSvc,
+            permissionSvc,
             eventSvc,
             specSvc,
             toolbarSvc

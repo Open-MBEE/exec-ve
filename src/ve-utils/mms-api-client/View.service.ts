@@ -566,7 +566,7 @@ export class ViewService extends BaseApiService {
                             cloneValue = _.cloneDeep(keyValue);
                             if (!cloneValue.id || !cloneValue.ownerId) {
                                 cloneValue.id = this.isSection(data)
-                                    ? this.apiSvc.createUniqueId()+ '_vc_expression'
+                                    ? this.apiSvc.createUniqueId() + '_vc_expression'
                                     : data.id + '_vc_expression';
                                 cloneValue.ownerId = this.isSection(data) ? data.id : data.id + '_vc';
                             }
@@ -923,7 +923,9 @@ export class ViewService extends BaseApiService {
                     type: 'Class',
                 });
             }
+            const newPeId: string = this.apiSvc.createUniqueId();
             const peSpec: PresentationInstanceObject = {
+                id: newPeId + '-value',
                 type: 'Paragraph',
                 sourceType: 'reference',
                 source: newViewId,
@@ -940,7 +942,7 @@ export class ViewService extends BaseApiService {
                 specification: new ValueSpec({
                     value: JSON.stringify(peSpec),
                     type: 'LiteralString',
-                    id: this.apiSvc.createUniqueId(),
+                    id: newPeId,
                     ownerId: newInstanceId,
                     _projectId: viewOb._projectId,
                     _refId: viewOb._refId,
@@ -993,7 +995,7 @@ export class ViewService extends BaseApiService {
                         data2._groupId = ownerOb.id;
                     }
                     const cacheKey = ['documents', ownerOb._projectId, ownerOb._refId];
-                    const cachedView: ViewObject[] = this.cacheSvc.get(cacheKey, true);
+                    const cachedView: ViewObject[] = this.cacheSvc.get(cacheKey);
                     if (cachedView) {
                         cachedView.forEach((document: DocumentObject, index) => {
                             if (document.id === data2.id) delete cachedView[index];
@@ -1103,7 +1105,7 @@ export class ViewService extends BaseApiService {
                 (data) => {
                     // remove this group for cache
                     const cacheKey = ['groups', packageOb._projectId, packageOb._refId];
-                    const groups: ElementObject[] = this.cacheSvc.get<PackageObject[]>(cacheKey, true) || [];
+                    const groups: ElementObject[] = this.cacheSvc.get<PackageObject[]>(cacheKey) || [];
                     _.remove(groups, (group: PackageObject) => {
                         return group.id === packageOb.id;
                     });
@@ -1236,6 +1238,7 @@ export class ViewService extends BaseApiService {
         const instanceSpecSpec: ValueObject = instanceSpec.specification;
         if (!instanceSpecSpec) {
             return {
+                id: 'null',
                 type: 'Paragraph',
                 sourceType: 'text',
                 text: '',

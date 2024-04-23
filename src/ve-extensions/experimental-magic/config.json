@@ -5,7 +5,6 @@
             "path": "experimental-magic",
             "toolButton": {
                 "id": "spec-magic",
-                "category": "global",
                 "icon": "fa-magic",
                 "selected": true,
                 "active": true,

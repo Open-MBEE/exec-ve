@@ -11,7 +11,7 @@ import { EventService } from '@ve-utils/core';
 import {
     ApiService,
     ElementService,
-    PermissionsService,
+    PermissionService,
     ProjectService,
     URLService,
     ViewService,
@@ -79,7 +79,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
         applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
-        permissionsSvc: PermissionsService,
+        permissionSvc: PermissionService,
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService,
@@ -97,7 +97,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
             applicationSvc,
             apiSvc,
             viewSvc,
-            permissionsSvc,
+            permissionSvc,
             eventSvc,
             specSvc,
             toolbarSvc
@@ -125,7 +125,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
                     this.historyVer = 'latest';
                     this.compareCommit.history = data;
                     this.compareCommit.commitSelected = this.compareCommit.history[0];
-                    for (let history of data) {
+                    for (const history of data) {
                         if (history.id === this.element._commitId) {
                             this.compareCommit.commitSelected = history;
                             break;

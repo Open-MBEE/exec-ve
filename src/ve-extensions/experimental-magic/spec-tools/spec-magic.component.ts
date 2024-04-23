@@ -9,7 +9,7 @@ import { EventService } from '@ve-utils/core';
 import {
     ApiService,
     ElementService,
-    PermissionsService,
+    PermissionService,
     ProjectService,
     URLService,
     ViewService,
@@ -34,7 +34,7 @@ class SpecMagicController extends SpecTool implements ISpecTool {
         applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
-        permissionsSvc: PermissionsService,
+        permissionSvc: PermissionService,
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService
@@ -51,7 +51,7 @@ class SpecMagicController extends SpecTool implements ISpecTool {
             applicationSvc,
             apiSvc,
             viewSvc,
-            permissionsSvc,
+            permissionSvc,
             eventSvc,
             specSvc,
             toolbarSvc

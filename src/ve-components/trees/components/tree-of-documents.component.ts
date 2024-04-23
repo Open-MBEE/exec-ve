@@ -39,19 +39,13 @@ class TreeOfDocumentsController extends TreeController {
         $event.stopPropagation();
         let promise: VePromise<UserSettingsObject>;
         if (!branch.favorite) {
-            promise = this.applicationSvc.addPins(
-                this.applicationSvc.getState().user,
-                this.treeSvc.treeApi.projectId,
-                this.treeSvc.treeApi.refId,
-                [branch.data.id]
-            );
+            promise = this.applicationSvc.addPins(this.treeSvc.treeApi.projectId, this.treeSvc.treeApi.refId, [
+                branch.data.id as string,
+            ]);
         } else {
-            promise = this.applicationSvc.removePins(
-                this.applicationSvc.getState().user,
-                this.treeSvc.treeApi.projectId,
-                this.treeSvc.treeApi.refId,
-                [branch.data.id]
-            );
+            promise = this.applicationSvc.removePins(this.treeSvc.treeApi.projectId, this.treeSvc.treeApi.refId, [
+                branch.data.id as string,
+            ]);
         }
 
         promise.then(
