@@ -12,6 +12,7 @@ import { veComponents } from '@ve-components';
 import { VeComponentOptions } from '@ve-types/angular';
 import { ElementObject, ElementsRequest } from '@ve-types/mms';
 import {VeConfig} from "@ve-types/config";
+import {StateService} from "@uirouter/angularjs";
 
 /**
  * @ngdoc directive
@@ -65,6 +66,7 @@ class ViewLinkController implements angular.IComponentController {
         '$scope',
         '$element',
         '$compile',
+        '$state',
         'growl',
         'ElementService',
         'ApiService',
@@ -84,6 +86,7 @@ class ViewLinkController implements angular.IComponentController {
         private $scope: angular.IScope,
         private $element: JQuery<HTMLElement>,
         private $compile: angular.ICompileService,
+        private $state: StateService,
         private growl: angular.growl.IGrowlService,
         private elementSvc: ElementService,
         private apiSvc: ApiService,
@@ -207,6 +210,10 @@ class ViewLinkController implements angular.IComponentController {
                         this.vid = data.id;
                     } else {
                         this.$element.html('<span class="ve-error">view link doesn\'t refer to a view</span>');
+                    }
+                    if (this.veConfig.viewLink.alwaysKeepCurrentDoc && this.applicationSvc.getState().currentDoc &&
+                            this.$state.includes('**.present.**')) {
+                        this.docid = this.applicationSvc.getState().currentDoc;
                     }
                     if (this.applicationSvc.getState().fullDoc) {
                         this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`;

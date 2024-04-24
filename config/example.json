@@ -30,7 +30,8 @@
   "viewLink": {
     "sectionPrefix": "Section ",
     "appendixPrefix": "Appendix ",
-    "hidePrefixForSections": false
+    "hidePrefixForSections": false,
+    "alwaysKeepCurrentDoc": false
   },
   "experimental": [
     {

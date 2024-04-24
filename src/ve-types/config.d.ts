@@ -17,6 +17,7 @@ export interface VeConfig {
         sectionPrefix: string;
         appendixPrefix: string;
         hidePrefixForSections: boolean;
+        alwaysKeepCurrentDoc: boolean;
     }
     experimental?: VeExperimentDescriptor[];
     expConfig?: VeExperimentConfig;
