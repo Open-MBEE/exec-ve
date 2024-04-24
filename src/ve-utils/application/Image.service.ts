@@ -17,11 +17,15 @@ export class ImageService {
             if (src.indexOf('http') < 0) {
                 src = this.veConfig.apiUrl + src;
             }
-            let existingToken = src.indexOf('?token=');
-            if (existingToken > 0) {
-                src = src.substring(0, existingToken)
+            const url = new window.URL(src);
+            const params = new window.URLSearchParams(url.search);
+            if (params.has('token')) {
+                params.delete('token');
             }
-            imgDom.attr('src', src + '?token=' + this.authSvc.getToken());
+            params.append('token', this.authSvc.getToken());
+            url.search = params.toString();
+            src = url.toString();
+            imgDom.attr('src', src);
             if (imgDom.width() < 860) {
                 //keep image relative centered with text if less than 9 in
                 return;
