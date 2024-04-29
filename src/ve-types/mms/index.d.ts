@@ -12,6 +12,7 @@ export type MmsObject = Record<string, any>;
 
 export interface DataObject extends MmsObject {
     id: string;
+    name?: string;
 }
 
 export interface TransclusionObject extends MmsObject {
@@ -35,6 +36,5 @@ export interface ElementObject extends DataObject {
     typeId?: string;
     defaultValue?: ValueObject;
     documentation?: string;
-    name?: string;
     ownerId?: string;
 }

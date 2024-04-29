@@ -425,7 +425,7 @@ class LeftPaneController implements angular.IComponentController {
         );
     };
 
-    treeClickCallback = (branch: TreeBranch): void => {
+    treeClickCallback = (branch: TreeBranch<ElementObject>): void => {
         if (this.$state.includes('**.portal.**')) {
             if (branch.type === 'group') {
                 void this.$state.go('main.project.ref.portal.preview', {
@@ -443,7 +443,7 @@ class LeftPaneController implements angular.IComponentController {
 
             // If clicked on a PE send the element.selected event for Tool Pane
             if (!(branch.type === 'view' || branch.type === 'section')) {
-                const data = {
+                const data: veCoreEvents.elementSelectedData = {
                     elementId: branch.data.id,
                     projectId: branch.data._projectId,
                     refId: branch.data._refId,
@@ -568,22 +568,24 @@ class LeftPaneController implements angular.IComponentController {
                             return (): VePromise<void, RefsResponse> => {
                                 return new this.$q<void, RefsResponse>((resolve, reject) => {
                                     if (branch.type === 'view') {
-                                        this.treeSvc.getParent(branch).then((parentBranch) => {
-                                            if (!this.$state.includes('**.present.**')) {
-                                                this.viewSvc
-                                                    .downgradeDocument(branch.data as ElementObject)
-                                                    .then(resolve, reject);
-                                            } else {
-                                                this.viewSvc
-                                                    .removeViewFromParentView({
-                                                        projectId: parentBranch.data._projectId,
-                                                        refId: parentBranch.data._refId,
-                                                        parentViewId: parentBranch.data.id,
-                                                        viewId: branch.data.id,
-                                                    })
-                                                    .then(resolve, reject);
-                                            }
-                                        }, reject);
+                                        this.treeSvc
+                                            .getParent(branch)
+                                            .then((parentBranch: TreeBranch<ElementObject>) => {
+                                                if (!this.$state.includes('**.present.**')) {
+                                                    this.viewSvc
+                                                        .downgradeDocument(branch.data as ElementObject)
+                                                        .then(resolve, reject);
+                                                } else {
+                                                    this.viewSvc
+                                                        .removeViewFromParentView({
+                                                            projectId: parentBranch.data._projectId,
+                                                            refId: parentBranch.data._refId,
+                                                            parentViewId: parentBranch.data.id,
+                                                            viewId: branch.data.id,
+                                                        })
+                                                        .then(resolve, reject);
+                                                }
+                                            }, reject);
                                     } else if (branch.type === 'group') {
                                         this.viewSvc.removeGroup(branch.data as ElementObject).then(resolve, reject);
                                     } else {
