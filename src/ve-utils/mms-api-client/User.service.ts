@@ -31,6 +31,47 @@ export class UserService extends BaseApiService {
         this.username = username;
     }
 
+    getUsers(updateCache?: boolean): VePromise<UserObject[], UsersResponse> {
+        const url = this.uRLSvc.getUsersURL();
+
+        if (!this._isInProgress(url)) {
+            this._addInProgress(
+                url,
+                new this.$q<UserObject[], UsersResponse>((resolve, reject) => {
+                    const key = ['users'];
+                    if (this.cacheSvc.exists(key) && !updateCache) {
+                        resolve(this.cacheSvc.get<UserObject[]>(key));
+                        this._removeInProgress(url);
+                    } else {
+                        this.$http
+                            .get<UsersResponse>(url)
+                            .then(
+                                (response) => {
+                                    if (!response.data.users || response.data.users.length < 1) {
+                                        reject({
+                                            status: 404,
+                                            message: 'User not found',
+                                        });
+                                    } else {
+                                        this.cacheSvc.put(key, response.data.users, false);
+                                        resolve(this.cacheSvc.get<UserObject[]>(key));
+                                    }
+                                },
+                                (response: angular.IHttpResponse<UsersResponse>) => {
+                                    this.uRLSvc.handleHttpStatus(response);
+                                    reject(response);
+                                }
+                            )
+                            .finally(() => {
+                                this._removeInProgress(url);
+                            });
+                    }
+                })
+            );
+        }
+        return this._getInProgress(url) as VePromise<UserObject[], UsersResponse>;
+    }
+
     getUserData(username: string, updateCache?: boolean): VePromise<UserObject, UsersResponse> {
         const url = this.uRLSvc.getUserURL(username);
 

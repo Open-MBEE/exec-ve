@@ -152,10 +152,10 @@ export class PermissionService {
                             groups: {},
                         };
                         response.data.users.permissions.forEach((perm) => {
-                            perms.users[perm.name] = perm.role.toLowerCase();
+                            perms.users[perm.name] = perm;
                         });
                         response.data.groups.permissions.forEach((perm) => {
-                            perms.groups[perm.name] = perm.role.toLowerCase();
+                            perms.groups[perm.name] = perm;
                         });
                         resolve(this.cacheSvc.put<PermissionMap>(cacheKey, perms));
                     },
@@ -234,7 +234,7 @@ export class PermissionService {
     }
 
     public updateGroupPermissions(groupName: string, reqOb: PermissionUpdateRequest): VePromise<PermissionUpdateResponse> {
-        const url = this.uRLSvc.getGroupPermissionURL(orgId);
+        const url = this.uRLSvc.getGroupPermissionURL(groupName);
         return this._updatePermissions(url, reqOb);
     }
 
@@ -281,7 +281,7 @@ export class PermissionService {
             const org = this.getOrgPermission(orgId);
             const username = this.userSvc.getUsername();
             org.then((result) => {
-                this.permission.org[orgId] = result.users && result.users[username] ? result.users[username] : 'read';
+                this.permission.org[orgId] = result.users && result.users[username] ? result.users[username].role : 'READER';
             }, reject);
             promises.push(org);
 
@@ -289,7 +289,7 @@ export class PermissionService {
                 const project = this.getProjectPermission(projectId);
                 project.then((result) => {
                     this.permission.project[projectId] =
-                        result.users && result.users[username] ? result.users[username] : 'read';
+                        result.users && result.users[username] ? result.users[username].role : 'READER';
                 }, reject);
                 promises.push(project);
             }
@@ -298,7 +298,7 @@ export class PermissionService {
                 const ref = this.getRefPermission(projectId, refId);
                 ref.then((result) => {
                     this.permission.ref[projectId + '/' + refId] =
-                        result.users && result.users[username] ? result.users[username] : 'read';
+                        result.users && result.users[username] ? result.users[username].role : 'READER';
                 }, reject);
                 promises.push(ref);
             }

@@ -352,6 +352,95 @@ veApp.config([
                     },
                 },
             })
+            .state('main.admin.org', {
+                url: '/orgs/:orgId',
+                params: {
+                    orgId: {
+                        inherit: true,
+                        type: 'path',
+                    },
+                },
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params();
+                        },
+                    ],
+                    token: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
+                            return resolveSvc.getToken();
+                        },
+                    ],
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
+                    bannerOb: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
+                            return resolveSvc.getBanner();
+                        },
+                    ],
+                    orgOb: [
+                        'ResolveService',
+                        'params',
+                        (resolveSvc: ResolveService, params: ParamsObject): VePromise<OrgObject, OrgsResponse> => {
+                            return resolveSvc.getOrg(params.orgId);
+                        },
+                    ],
+                },
+                views: {
+                    'nav@main': {
+                        component: 'navBar',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                            mmsProject: 'projectOb',
+                            mmsProjects: 'projectObs',
+                        },
+                    },
+                    'menu@main': {
+                        component: 'mainMenu',
+                        bindings: {
+                            mmsOrgs: 'orgObs',
+                            mmsOrg: 'orgOb',
+                        },
+                    },
+                    'toolbar-left@main': {
+                        component: 'leftToolbar',
+                        bindings: {
+                            disabled: 'noOp',
+                        },
+                    },
+                    'toolbar-right@main': {
+                        component: 'orgSidebar',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                        },
+                    },
+                    'pane-center@main': {
+                        component: 'orgInfo',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                        },
+                    },
+                },
+            })
+            .state('main.admin.org.users', {
+                url: '/users',
+                views: {
+                    'pane-center@main': {
+                        component: 'membersPage',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                        },
+                    },
+                },
+            })
             .state('main.admin.project', {
                 url: '/projects/:projectId',
                 params: {
@@ -433,6 +522,25 @@ veApp.config([
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
                             mmsUser: 'userOb',
+                        },
+                    },
+                    'pane-center@main': {
+                        component: 'projectInfo',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                            mmsProject: 'projectOb',
+                            mmsUser: 'userOb',
+                        },
+                    },
+                },
+            })
+            .state('main.admin.project.users', {
+                url: '/users',
+                views: {
+                    'pane-center@main': {
+                        component: 'membersPage',
+                        bindings: {
+                            mmsProject: 'projectOb',
                         },
                     },
                 },

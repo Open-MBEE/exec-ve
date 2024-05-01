@@ -179,7 +179,7 @@ export interface ElementsResponse<T extends ElementObject> extends BasicResponse
     deleted?: T[];
 }
 
-export type RoleString = 'ADMIN' | 'WRITER' | 'READER';
+export type RoleString = 'ADMIN' | 'WRITER' | 'READER' | 'NONE';
 
 export type PermissionUpdateAction = 'MODIFY' | 'REPLACE' | 'REMOVE';
 
@@ -190,7 +190,7 @@ export interface PermissionLookupResponse extends BasicResponse<PermissionLookup
     allPassed?: boolean;
 }
 
-export interface PermissionUpdateRequest extends BasicResponse<PermissionResponse> {
+export interface PermissionUpdateRequest {
     inherit?: boolean;
     public?: boolean;
     users?: {
@@ -247,8 +247,8 @@ export interface PermissionRecord {
 }
 
 export interface PermissionMap {
-    users: { [username: string]: string };
-    groups: { [groupname: string]: string };
+    users: { [username: string]: PermissionRecord };
+    groups: { [groupname: string]: PermissionRecord };
 }
 
 export interface PermissionLookupObject {

@@ -10,21 +10,15 @@ class MembersPageController implements angular.IComponentController {
     //local
     admin: boolean;
     modal: boolean;
-    selectedUser: UserObject;
+    selectedUser: UserObject | string;
     title: string;
     userperm: PermissionMap;
     users: string[];
-    constructor() {}
 
     // Define toggle function
-    handleToggle(username, perm) {
+    handleToggle(username: string): void {
         // Verify username provided
-        if (typeof username === 'string') {
-            // Set selected user state
-            this.setState({ selectedUser: { username, perm } });
-        } else {
-            this.setState({ selectedUser: null });
-        }
+        this.selectedUser = username;
     }
 
     $onInit(): void {
@@ -52,14 +46,12 @@ const MembersPageComponent: VeComponentOptions = {
         <div id='workspace-body' className='extra-padding'>
           <div className='main-workspace'>
             <div className='roles-box'>
-              {(this.project && !this.org)
-                ? (<MemberEdit project={this.project}
-                               selectedUser={this.state.selectedUser}
-                               refresh={this.refresh}/>)
-                : (<MemberEdit org={this.org}
-                               selectedUser={this.state.selectedUser}
-                               refresh={this.refresh}/>)
-              }
+              <member-edit ng-show="$ctrl.project && !$ctrl.org" project="$ctrl.project
+                selected-user="$ctrl.selectedUser"
+                admin="$ctrl.admin"/>
+              <member-edit ng-hide="$ctrl.project && !$ctrl.org" org="$ctrl.org
+                selected-user="$ctrl.selectedUser"
+                admin="$ctrl.admin"/>
             </div>
             <list className='members-box'>
                 <div class='template-header' key='user-info-template'>
@@ -74,18 +66,18 @@ const MembersPageComponent: VeComponentOptions = {
                                 _key='user-template'/>
                 </div>
                 <div ng-repeat="user in $ctrl.users" class='user-info' key="user-info-{{user}}">
-                <user-list-item className='user-name'
-                                user={user}
-                                permission={perm}
+                  <user-list-item class-name='user-name'
+                                user="{{user}}"
+                                permission="$ctrl.userperm[user].role"
                                 _key="key-{{user}}"
-                <div class='controls-container'>
-                <span uib-tooltip tooltip-placement='top' target="edit-{{user}}-roles">
-                    Edit
-                    </span>
-                    <i id="edit-{{user}}-roles"
-                    class='fas fa-user-edit add-btn'
-                    ng-click="() => $ctrl.handleToggle(user, perm)" />
-                </div>
+                  <div class='controls-container'>
+                  <span uib-tooltip tooltip-placement='top' target="edit-{{user}}-roles">
+                      Edit
+                      </span>
+                      <i id="edit-{{user}}-roles"
+                      class='fas fa-user-edit add-btn'
+                      ng-click="() => $ctrl.handleToggle(user)" />
+                  </div>
                 </div>
             </list>
           </div>
@@ -93,7 +85,10 @@ const MembersPageComponent: VeComponentOptions = {
       </div>
     `,
     controller: MembersPageController,
-    bindings: {},
+    bindings: {
+        org: '<mmsOrg',
+        project: '<mmsProject',
+    },
 };
 
 veAdmin.component(MembersPageComponent.selector, MembersPageComponent);

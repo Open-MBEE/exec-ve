@@ -14,7 +14,9 @@ class ElementTreeController implements angular.IComponentController {
 
     constructor(private $q: VeQService, private elementSvc: ElementService) {}
 
-    $onInit(): void {}
+    $onInit(): void {
+        //Do nothing
+    }
 
     getElement = (data: veCoreEvents.elementSelectedData): void => {
         this.elementSvc
