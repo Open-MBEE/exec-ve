@@ -29,7 +29,7 @@ export class ShortUrlService {
 
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private $location: angular.ILocationService,
         private uRLSvc: URLService,
         private projectSvc: ProjectService,

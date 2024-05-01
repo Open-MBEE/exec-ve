@@ -44,7 +44,7 @@ export class ApiService {
 
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private uRLSvc: URLService,
         private schemaSvc: SchemaService
     ) {}

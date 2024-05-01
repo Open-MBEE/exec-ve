@@ -18,7 +18,7 @@ export class FullDocumentApi {
     constructor(
         private $timeout: angular.ITimeoutService,
         private $interval: angular.IIntervalService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private growl: angular.growl.IGrowlService
     ) {}
 
@@ -198,7 +198,7 @@ export class FullDocumentService {
     constructor(
         private $timeout: angular.ITimeoutService,
         private $interval: angular.IIntervalService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private growl: angular.growl.IGrowlService
     ) {}
 

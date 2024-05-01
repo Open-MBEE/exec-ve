@@ -3,13 +3,15 @@ import { ApiService, URLService, UserService } from '@ve-utils/mms-api-client';
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import {
     PermissionLookupResponse,
     PermissionLookupObject,
     UsersResponse,
     PermissionResponse,
     PermissionMap,
+    PermissionUpdateRequest,
+    PermissionUpdateResponse,
 } from '@ve-types/mms';
 
 export interface PermissionCache {
@@ -58,7 +60,7 @@ export class PermissionService {
 
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private uRLSvc: URLService,
         private apiSvc: ApiService,
         private userSvc: UserService,
@@ -207,6 +209,41 @@ export class PermissionService {
             },
         ];
         return this.lookupPermission(type, lookups);
+    }
+
+    public updateOrgPermissions(orgId: string, reqOb: PermissionUpdateRequest): VePromise<PermissionUpdateResponse> {
+        const url = this.uRLSvc.getOrgPermissionURL(orgId);
+        return this._updatePermissions(url, reqOb);
+    }
+
+    public updateProjectPermissions(
+        projectId: string,
+        reqOb: PermissionUpdateRequest
+    ): VePromise<PermissionUpdateResponse> {
+        const url = this.uRLSvc.getProjectPermissionURL(projectId);
+        return this._updatePermissions(url, reqOb);
+    }
+
+    public updateRefPermissions(
+        projectId: string,
+        refId: string,
+        reqOb: PermissionUpdateRequest
+    ): VePromise<PermissionUpdateResponse> {
+        const url = this.uRLSvc.getRefPermissionURL(projectId, refId);
+        return this._updatePermissions(url, reqOb);
+    }
+
+    public updateGroupPermissions(groupName: string, reqOb: PermissionUpdateRequest): VePromise<PermissionUpdateResponse> {
+        const url = this.uRLSvc.getGroupPermissionURL(orgId);
+        return this._updatePermissions(url, reqOb);
+    }
+
+    private _updatePermissions(url: string, reqOb: PermissionUpdateRequest): VePromise<PermissionUpdateResponse> {
+        return new this.$q<PermissionUpdateResponse>((resolve, reject) => {
+            this.$http.post<PermissionUpdateResponse, PermissionUpdateRequest>(url, reqOb).then((response) => {
+                resolve(response.data);
+            }, reject);
+        });
     }
 
     public lookupRefPermission(projectId: string, refId: string): VePromise<string, PermissionLookupResponse> {

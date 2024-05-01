@@ -10,8 +10,6 @@ export class ListComponentController implements angular.IComponentController {
 
     appliedClasses: string;
 
-    constructor() {}
-
     $onInit(): void {
         this.appliedClasses = `list ${this.className ? this.className : ''}`;
     }
@@ -25,8 +23,8 @@ const ListComponent: VeComponentOptions = {
     transclude: true,
     template: `
     <div class={{$ctrl.appliedClasses}}>
-        <ng-transclude></ng-transclude>
-        </div>
+    <ng-transclude></ng-transclude>
+</div>
     `,
     controller: ListComponentController,
 };

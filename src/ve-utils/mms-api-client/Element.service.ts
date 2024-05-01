@@ -39,7 +39,7 @@ export class ElementService extends BaseApiService {
 
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private cacheSvc: CacheService,
         private editSvc: EditService,
         private uRLSvc: URLService,

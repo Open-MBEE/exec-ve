@@ -63,6 +63,32 @@ export class CameoSchema implements Schema {
             this.schema.TYPE_TO_CLASSIFIER_ID['Figure'],
         ],
     };
+    ownership = {
+        OWNED: [
+            'packagedElementIds',
+            'nestedClassifierIds',
+            'ownedAttributeIds',
+            'ownedBehaviorIds',
+            'ownedCommentIds',
+            'ownedConnectorIds',
+            'ownedDiagramIds',
+            'ownedEndIds',
+            'ownedMemberIds',
+            'ownedOperationIds',
+            'ownedParameterIds',
+            'ownedParameterSetIds',
+            'ownedParameteredElementIds',
+            'ownedPortIds',
+            'ownedRuleIds',
+            'ownedReceptionIds',
+            'ownedStereotypeIds',
+            'ownedTemplateSignatureId',
+            'ownedTypeIds',
+            'ownedUseCaseIds',
+            'ownedMember',
+        ],
+        OWNER: 'ownerId',
+    };
 }
 
 veUtils.service('CameoSchema', CameoSchema);

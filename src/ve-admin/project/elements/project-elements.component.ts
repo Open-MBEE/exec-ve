@@ -15,7 +15,6 @@ export class ProjectElementsController implements angular.IComponentController {
     orgId: string;
     projId: string;
     branchId: string;
-    constructor() {}
 
     $onInit(): void {
         this.orgId = this.mmsProject.orgId;

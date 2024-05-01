@@ -13,6 +13,8 @@ export interface IStatBindings {
     divider?: boolean;
     noTooltip?: boolean;
     setChildWidth?: (title: string, width: number) => void;
+    key?: string;
+    _key?: string;
 }
 
 interface IStatScope extends angular.IScope, IStatBindings {}

@@ -85,7 +85,18 @@ const OrgListItemComponent: VeComponentOptions = {
       <div class="list-header">
         <a ng-class="$ctrl.org.archived ? 'archived-link' : ''" ng-href="/admin/orgs/{{$ctrl.org.id}}">{{$ctrl.org.name}}</a>
       </div>
-      <stat-list ng-if="$ctrl.width > 600" stats="$ctrl.stats"></stat-list>
+      <stat-list ng-if="$ctrl.width > 600">
+        <stat ng-repeat="stat in $ctrl.stats" 
+            stat-title="stat.title" 
+            stat-label="stat.label"
+            stat-icon="stat.icon" 
+            stat-value="stat.value" 
+            class-name="stat.className" 
+            divider="stat.divider"
+            no-tooltip="stat.noTooltip"
+            ng-if="$ctrl.width && $ctrl.getTotalStatsWidth() <= $ctrl.width">
+        </stat>
+      </stat-list>
     </div>
   `,
 };

@@ -2,14 +2,11 @@ import { IPane, IRegion } from '@openmbee/pane-layout';
 
 import { veAdmin } from '@ve-admin/ve-admin.module';
 
-import { IStatBindings } from './stat.component';
-
 import { VeComponentOptions } from '@ve-types/angular';
 
 export class StatListController implements angular.IComponentController {
     width: number | null;
     childWidths: { [key: string]: number } = {};
-    stats: IStatBindings[];
     className: string;
 
     $pane: IPane;
@@ -53,25 +50,16 @@ export class StatListController implements angular.IComponentController {
 const StatList: VeComponentOptions = {
     bindings: {
         className: '@',
-        stats: '<',
     },
     require: {
         $pane: '^ngPane',
     },
     selector: 'statList',
     controller: StatListController,
+    transclude: true,
     template: `
       <div class="{{$ctrl.className}}">
-        <stat ng-repeat="stat in $ctrl.stats" 
-            stat-title="stat.title" 
-            stat-label="stat.label"
-            stat-icon="stat.icon" 
-            stat-value="stat.value" 
-            class-name="stat.className" 
-            divider="stat.divider"
-            no-tooltip="stat.noTooltip"
-            ng-if="$ctrl.width && $ctrl.getTotalStatsWidth() <= $ctrl.width">
-        </stat>
+        <ng-transclude></ng-transclude>
       </div>
     `,
 };

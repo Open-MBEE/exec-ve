@@ -10,6 +10,7 @@ export interface Schema {
     jsonName: string;
     schema: SchemaMapping;
     map?: SchemaMapping;
+    ownership?: { OWNED: string[]; OWNER: string };
 }
 
 export class SchemaService {
@@ -89,6 +90,16 @@ export class SchemaService {
                 return false;
             });
             return response;
+        }
+    };
+
+    getOwnership = (schemaName?: string, sourceId?: string): { OWNED: string[]; OWNER: string } => {
+        const schema: Schema = this._getSchema(schemaName, sourceId);
+        if (schema.ownership) {
+            return schema.ownership;
+        } else {
+            this._schemaError('ownership', schemaName);
+            return null;
         }
     };
 

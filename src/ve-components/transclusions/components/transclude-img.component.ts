@@ -1,17 +1,18 @@
+import * as SVG from '@svgdotjs/svg.js';
+
 import { ExtensionService, ComponentService } from '@ve-components/services';
 import { Transclusion, ITransclusion } from '@ve-components/transclusions';
 import { ButtonBarService } from '@ve-core/button-bar';
 import { EditorService } from '@ve-core/editor';
+import { veCoreEvents } from '@ve-core/events';
 import { UtilsService, MathService, ImageService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
-import { ElementService, HttpService, URLService } from '@ve-utils/mms-api-client';
+import { ElementService, URLService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
 
 import { veComponents } from '@ve-components';
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
-import * as SVG from '@svgdotjs/svg.js';
-import { veCoreEvents } from '@ve-core/events';
 
 /**
  * @ngdoc component
@@ -54,7 +55,7 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
     png: { url: string; image: boolean; ext: string }[];
     artifacts: { url: string; image: boolean; ext: string }[];
 
-    private svgData: SVG.Svg
+    private svgData: SVG.Svg;
 
     static $inject: string[] = [...Transclusion.$inject, 'URLService', '$http'];
 
@@ -76,7 +77,7 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService,
         private urlSvc: URLService,
-        private $http: angular.IHttpService
+        private $http: VeHttpService
     ) {
         super(
             $q,
@@ -132,39 +133,46 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
                         };
                     });
                 this.svg = this.artifacts.filter((a) => a.ext === 'svg');
-                this.png = this.artifacts.filter((a) => a.ext === 'png')
+                this.png = this.artifacts.filter((a) => a.ext === 'png');
             }
-                resolve(`<div id=${this.mmsElementId}-svg class=mms-svg></div><img ng-hide=true class="mms-png" ng-src="${this.png[0].url}"  alt="${this.element.name}"/>`)
-        })
-        
+            resolve(
+                `<div id=${this.mmsElementId}-svg class=mms-svg></div><img ng-hide=true class="mms-png" ng-src="${this.png[0].url}"  alt="${this.element.name}"/>`
+            );
+        });
     };
 
     protected postRecompile = (content: string | HTMLElement[]): void => {
-            if (this.svg) {
-                this.$http.get<string>(this.svg[0].url).then((result) => {
-                    const parse = SVG.SVG().svg(result.data)
-                    this.svgData = parse.children()[0] as SVG.Svg;
-                    this.svgData.width('100%');
-                    this.svgData.height('100%');
-                    //this.svgData.attr('pointer-events', 'bounding-box')
-                    this.svgData.addTo(`#${this.mmsElementId}-svg`);
-                    this.svgData.last().children().filter((child) => {return child.hasClass('element')}).forEach((child) => {
-                        const path = child.first()
-                        console.log('HI!')
-                        path.fill('transparent')
+        if (this.svg) {
+            this.$http.get<string>(this.svg[0].url).then((result) => {
+                const parse = SVG.SVG().svg(result.data);
+                this.svgData = parse.children()[0] as SVG.Svg;
+                this.svgData.width('100%');
+                this.svgData.height('100%');
+                //this.svgData.attr('pointer-events', 'bounding-box')
+                this.svgData.addTo(`#${this.mmsElementId}-svg`);
+                this.svgData
+                    .last()
+                    .children()
+                    .filter((child) => {
+                        return child.hasClass('element');
+                    })
+                    .forEach((child) => {
+                        const path = child.first();
+                        console.log('HI!');
+                        path.fill('transparent');
                         path.on('click', (e) => {
                             const id: string = child.attr('id');
                             this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', {
                                 elementId: id,
                                 projectId: this.projectId,
-                                refId: this.refId
-                            })
+                                refId: this.refId,
+                            });
                             e.stopPropagation();
-                        })
-                    })
-                })
-            }
-    }
+                        });
+                    });
+            });
+        }
+    };
 }
 
 export const TranscludeImgComponent: VeComponentOptions = {

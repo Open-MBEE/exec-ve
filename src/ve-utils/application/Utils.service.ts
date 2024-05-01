@@ -31,7 +31,7 @@ export class UtilsService {
 
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private uRLSvc: URLService,
         private apiSvc: ApiService
     ) {}

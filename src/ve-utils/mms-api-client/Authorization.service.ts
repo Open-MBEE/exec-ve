@@ -11,7 +11,7 @@ import {
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import { AuthRequest, AuthResponse, CheckAuthResponse } from '@ve-types/mms';
 
 /**
@@ -44,7 +44,7 @@ export class AuthService {
     ];
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private cacheSvc: CacheService,
         private uRLSvc: URLService,
         private httpSvc: HttpService,
@@ -62,7 +62,7 @@ export class AuthService {
     getAuthorized(credentialsJSON: AuthRequest): VePromise<string, AuthResponse> {
         const deferred = this.$q.defer<string>();
         const loginURL = this.uRLSvc.getAuthenticationUrl();
-        this.$http.post<AuthResponse>(loginURL, credentialsJSON).then(
+        this.$http.post<AuthResponse, AuthRequest>(loginURL, credentialsJSON).then(
             (success) => {
                 this.uRLSvc.setToken(success.data.token);
                 this.token = success.data.token;

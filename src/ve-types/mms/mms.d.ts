@@ -179,9 +179,54 @@ export interface ElementsResponse<T extends ElementObject> extends BasicResponse
     deleted?: T[];
 }
 
+export type RoleString = 'ADMIN' | 'WRITER' | 'READER';
+
+export type PermissionUpdateAction = 'MODIFY' | 'REPLACE' | 'REMOVE';
+
+export type PermissionUpdateResult = 'ADD' | 'REMOVE';
+
 export interface PermissionLookupResponse extends BasicResponse<PermissionLookupObject> {
     lookups: PermissionLookupObject[];
     allPassed?: boolean;
+}
+
+export interface PermissionUpdateRequest extends BasicResponse<PermissionResponse> {
+    inherit?: boolean;
+    public?: boolean;
+    users?: {
+        permissions: PermissionUpdateRecord[];
+        action: PermissionUpdateAction;
+    };
+    groups?: {
+        permissions: PermissionUpdateRecord[];
+        action: PermissionUpdateAction;
+    };
+}
+
+export interface PermissionUpdateRecord {
+    name: string;
+    role?: RoleString;
+    inherited?: boolean;
+}
+
+export interface PermissionUpdateResponse {
+    users: {
+        permissionUpdates: PermissionUpdateResultRecord[];
+    };
+    groups: {
+        permissionUpdates: PermissionUpdateResultRecord[];
+    };
+}
+
+export interface PermissionUpdateResultRecord extends PermissionUpdateRecord {
+    action: PermissionUpdateResult;
+    role: RoleString;
+    orgId: string;
+    orgName: string;
+    projectId?: string;
+    projectName?: string;
+    branchId?: string;
+    inherited: boolean;
 }
 
 export interface PermissionResponse extends BasicResponse<PermissionResponse> {
@@ -197,7 +242,7 @@ export interface PermissionResponse extends BasicResponse<PermissionResponse> {
 
 export interface PermissionRecord {
     name: string;
-    role: string;
+    role: RoleString;
     inherited: boolean;
 }
 
@@ -231,6 +276,11 @@ export interface ProjectsResponse extends BasicResponse<ProjectObject> {
 
 export interface RefsResponse extends BasicResponse<RefObject> {
     refs: RefObject[];
+}
+
+export interface RefsUpdateRequest {
+    refs: RefObject[];
+    source: string;
 }
 
 export interface CommitResponse extends BasicResponse<CommitObject> {

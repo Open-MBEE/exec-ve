@@ -85,7 +85,7 @@ class AdminController implements angular.IComponentController, Ng1Controller {
         private $timeout: angular.ITimeoutService,
         private $window: angular.IWindowService,
         private $location: angular.ILocationService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private $element: JQuery<HTMLElement>,
         private $uiRouterGlobals: UIRouterGlobals,
         private growl: angular.growl.IGrowlService,

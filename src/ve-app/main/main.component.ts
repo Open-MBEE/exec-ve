@@ -69,7 +69,7 @@ class MainController implements IComponentController {
         private $window: angular.IWindowService,
         private $uibModal: VeModalService,
         private $interval: angular.IIntervalService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private growl: angular.growl.IGrowlService,
         private hotkeys: angular.hotkeys.HotkeysProvider,
         private growlMessages: angular.growl.IGrowlMessagesService,

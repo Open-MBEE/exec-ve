@@ -4,7 +4,7 @@ import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import {
     BasicResponse,
     CommitObject,
@@ -18,6 +18,7 @@ import {
     ProjectsResponse,
     RefObject,
     RefsResponse,
+    RefsUpdateRequest,
 } from '@ve-types/mms';
 
 /**
@@ -36,7 +37,7 @@ export class ProjectService extends BaseApiService {
     static $inject = ['$q', '$http', 'CacheService', 'ElementService', 'URLService', 'ApiService', 'PermissionService'];
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private cacheSvc: CacheService,
         private elementSvc: ElementService,
         private uRLSvc: URLService,
@@ -404,7 +405,7 @@ export class ProjectService extends BaseApiService {
                 'ref'
             );
             this.$http
-                .post<RefsResponse>(url, {
+                .post<RefsResponse, RefsUpdateRequest>(url, {
                     refs: [refOb],
                     source: `ve-${this.apiSvc.getVeVersion()}`,
                 })
@@ -440,7 +441,7 @@ export class ProjectService extends BaseApiService {
         return new this.$q<RefObject, RefsResponse>((resolve, reject) => {
             const url = this.uRLSvc.getRefsURL(projectId);
             this.$http
-                .post<RefsResponse>(url, {
+                .post<RefsResponse, RefsUpdateRequest>(url, {
                     refs: [refOb],
                     source: `ve-${this.apiSvc.getVeVersion()}`,
                 })
@@ -502,7 +503,7 @@ export class ProjectService extends BaseApiService {
         updateCache?: boolean
     ): VePromise<GroupObject[], GroupsResponse> {
         const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'groups');
-        const url = this.uRLSvc.getGroupsURL(projectId, refId);
+        const url = this.uRLSvc.getProjectGroupsURL(projectId, refId);
         if (!this._isInProgress(url)) {
             this._addInProgress(
                 url,

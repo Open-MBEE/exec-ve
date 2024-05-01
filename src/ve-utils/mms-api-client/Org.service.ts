@@ -11,7 +11,7 @@ export class OrgService extends BaseApiService {
     static $inject = ['$q', '$http', 'CacheService', 'ProjectService', 'URLService', 'ApiService', 'PermissionService'];
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private cacheSvc: CacheService,
         private projectSvc: ProjectService,
         private uRLSvc: URLService,

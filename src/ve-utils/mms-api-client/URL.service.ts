@@ -158,33 +158,40 @@ export class URLService {
         return `${this.root}/permissions`;
     };
 
-    getOrgURL = (orgId: string): string => {
-        return `${this.root}/orgs/${orgId}`;
+    getGroupsURL = (): string => {
+        return `${this.root}/groups`;
     };
 
-    getOrgPermissionURL = (orgId: string): string => {
-        return this.addPermission(this.getOrgURL(orgId));
+    getGroupURL = (groupName: string): string => {
+        return `${this.getGroupsURL()}/${groupName}`;
+    };
+
+    getGroupPermissionURL = (groupName: string): string => {
+        return this.addPermission(this.getGroupURL(groupName));
     };
 
     getOrgsURL = (): string => {
         return `${this.root}/orgs`;
     };
 
+    getOrgURL = (orgId: string): string => {
+        return `${this.getOrgsURL()}/${orgId}`;
+    };
+
+    getOrgPermissionURL = (orgId: string): string => {
+        return this.addPermission(this.getOrgURL(orgId));
+    };
     getProjectsURL = (orgId?: string): string => {
         if (orgId) return `${this.root}/projects?orgId=${orgId}`;
         return `${this.root}/projects`;
     };
 
     getProjectURL = (projectId: string): string => {
-        return `${this.root}/projects/${projectId}`;
+        return `${this.getProjectsURL()}/${projectId}`;
     };
 
     getProjectPermissionURL = (projectId: string): string => {
         return this.addPermission(this.getProjectURL(projectId));
-    };
-
-    getProjectMountsURL = (projectId: string, refId: string): string => {
-        return `${this.root}/projects/${projectId}/refs/${refId}/mounts`;
     };
 
     getRefsURL = (projectId: string): string => {
@@ -198,7 +205,6 @@ export class URLService {
     getRefPermissionURL = (projectId: string, refId: string): string => {
         return this.addPermission(this.getRefURL(projectId, refId));
     };
-
     getCommitsURL = (projectId: string, refId: string, timestamp?: string, limit?: number): string => {
         let r = `${this.root}/projects/${projectId}/refs/${refId}/commits`;
         if (timestamp && this.isTimestamp(timestamp)) {
@@ -214,11 +220,15 @@ export class URLService {
     };
 
     getCommitUrl = (projectId: string, refId: string, commitId: string): string => {
-        return `${this.root}/projects/${projectId}/refs/${refId}/commits/${commitId}`;
+        return `${this.getCommitsURL(projectId, refId)}/${commitId}`;
     };
 
-    getGroupsURL = (projectId: string, refId: string): string => {
-        return `${this.root}/projects/${projectId}/refs/${refId}/groups`;
+    getProjectMountsURL = (projectId: string, refId: string): string => {
+        return `${this.getRefURL(projectId, refId)}/mounts`;
+    };
+
+    getProjectGroupsURL = (projectId: string, refId: string): string => {
+        return `${this.getRefURL(projectId, refId)}/groups`;
     };
 
     /**
@@ -228,9 +238,9 @@ export class URLService {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url
      */
-    getProjectDocumentsURL = (reqOb: RequestObject): string => {
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/documents`;
-        return this.addVersion(r, reqOb.commitId);
+    getProjectDocumentsURL = (projectId: string, refId: string, commitId: string): string => {
+        const r = `${this.getRefURL(projectId, refId)}/documents`;
+        return this.addVersion(r, commitId);
     };
 
     /**
@@ -424,8 +434,12 @@ export class URLService {
         return `${this.root}/checkAuth`; //TODO remove when server returns 404
     };
 
-    getPersonURL = (username: string): string => {
-        return `${this.root}/users?user=${username}`;
+    getUsersURL = (): string => {
+        return `${this.root}/users`;
+    };
+
+    getUserURL = (username: string): string => {
+        return `${this.getUsersURL()}?user=${username}`;
     };
 
     /**

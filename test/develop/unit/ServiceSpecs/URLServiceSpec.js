@@ -107,7 +107,7 @@ describe("URLService", function () {
 		var refId = 'thisisaref';
 		it("should create the url for the groups of a project", function() {
 			var groupsUrl = root + '/projects/' + projectId + '/refs/' + refId + '/groups';
-			expect(groupsUrl).toBe(URLServiceObj.getGroupsURL(projectId, refId));
+			expect(groupsUrl).toBe(URLServiceObj.getProjectGroupsURL(projectId, refId));
 		});
 	});
 

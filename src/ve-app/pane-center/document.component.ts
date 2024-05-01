@@ -93,7 +93,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         private $anchorScroll: angular.IAnchorScrollService,
         private $location: angular.ILocationService,
         private $timeout: angular.ITimeoutService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private hotkeys: angular.hotkeys.HotkeysProvider,
         private growl: angular.growl.IGrowlService,
         private fullDocumentSvc: FullDocumentService,

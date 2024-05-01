@@ -9,7 +9,7 @@ import { Class, Expression, InstanceSpec, Package, ValueSpec } from '@ve-utils/u
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular';
+import { VeHttpService, VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
     ElementObject,
@@ -83,7 +83,7 @@ export class ViewService extends BaseApiService {
     static $inject = ['$q', '$http', 'URLService', 'ElementService', 'ApiService', 'CacheService', 'SchemaService'];
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private uRLSvc: URLService,
         private elementSvc: ElementService,
         private apiSvc: ApiService,
@@ -1144,7 +1144,7 @@ export class ViewService extends BaseApiService {
         refresh?: boolean
     ): VePromise<DocumentObject[], GenericResponse<DocumentObject>> {
         this.apiSvc.normalize(reqOb);
-        const url = this.uRLSvc.getProjectDocumentsURL(reqOb);
+        const url = this.uRLSvc.getProjectDocumentsURL(reqOb.projectId, reqOb.refId, reqOb.commitId);
         const cacheKey = ['documents', reqOb.projectId, reqOb.refId];
         const inProgKey = cacheKey.join('-');
         if (!this._isInProgress(inProgKey)) {

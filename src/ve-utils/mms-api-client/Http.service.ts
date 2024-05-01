@@ -22,7 +22,7 @@ export class HttpService {
 
     static $inject = ['$http'];
 
-    constructor(private $http: angular.IHttpService) {
+    constructor(private $http: VeHttpService) {
         this.queue[0] = []; //high proirity
         this.queue[1] = []; //low prority
     }

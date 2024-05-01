@@ -4,7 +4,7 @@ import { URLService } from '@ve-utils/mms-api-client/URL.service';
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import { UserObject, UsersResponse } from '@ve-types/mms';
 
 export class UserService extends BaseApiService {
@@ -14,7 +14,7 @@ export class UserService extends BaseApiService {
 
     constructor(
         private $q: VeQService,
-        private $http: angular.IHttpService,
+        private $http: VeHttpService,
         private cacheSvc: CacheService,
         private uRLSvc: URLService
     ) {
@@ -32,7 +32,7 @@ export class UserService extends BaseApiService {
     }
 
     getUserData(username: string, updateCache?: boolean): VePromise<UserObject, UsersResponse> {
-        const url = this.uRLSvc.getPersonURL(username);
+        const url = this.uRLSvc.getUserURL(username);
 
         if (!this._isInProgress(url)) {
             this._addInProgress(

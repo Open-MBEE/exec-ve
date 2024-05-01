@@ -2,6 +2,8 @@
 import angular, {
     IComponentOptions,
     IHttpHeadersGetter,
+    IHttpService,
+    IHttpPromise,
     INgModelController,
     IPromise,
     IQResolveReject,
@@ -66,4 +68,8 @@ export interface VePromiseReason<T> {
     statusText?: string;
     /** Added in AngularJS 1.6.6 */
     xhrStatus?: 'complete' | 'error' | 'timeout' | 'abort';
+}
+
+export interface VeHttpService extends IHttpService {
+    post<T, U>(url: string, data: U, config?: IRequestShortcutConfig): IHttpPromise<T>;
 }
