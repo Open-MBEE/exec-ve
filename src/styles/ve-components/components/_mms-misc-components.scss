@@ -53,7 +53,14 @@ thead td,
 table caption {
   font-weight: bold;
 }
-
+view table, spec-inspector table {
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+}
+view table td, view table th, spec-inspector table td, spec-inspector table th {
+  border: 1px solid #ddd;
+  padding: 5px;
+}
 .table {
   tr {
     @include globals.transition(globals.$background-hover-transition);
