@@ -228,7 +228,7 @@ export class UtilsService {
             capEq.html(equationCap);
             // If caption does not exist, add to html
             if (capEq.length === 0) {
-                el.find('present-equation > transclude > transclude-doc > p')
+                el.find('present-equation > mms-cf > transclude-doc > p')
                     .last()
                     .append('<span class="caption-type-equation pull-right">' + equationCap + '</span>');
             }
@@ -469,7 +469,7 @@ th {background-color: #f2f3f2;}
 3. Typography
 ------------------------------------------------------------------*/
 h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}
-.h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;} .h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}
+.bm-level-1 {font-size: 18pt;} .bm-level-2 {font-size: 14pt;} .bm-level-3 {font-size: 12pt;} .bm-level-4 {font-size: 10pt;} .bm-level-5, .bm-level-6, .bm-level-7, .bm-level-8, .bm-level-9 {font-size: 9pt;}
 .ng-hide {display: none;}
 .chapter h1.view-title {font-size: 20pt; }
 body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }
@@ -498,7 +498,7 @@ del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}
 caption, figcaption, .caption-type-equation {text-align: center; font-weight: bold;}
 table, figure {margin-bottom: 10px;}
 .caption-type-equation {float: right;}
-mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}
+present-equation, present-figure, present-image {page-break-inside: avoid;}
 
 /*------------------------------------------------------------------
 5. Table of Contents

@@ -9,7 +9,7 @@ Visualizations
 ----------------------------------------
 
 For TomSawyer diagrams or plots, please see the DocGen Manual.
- 
+
 Temporal Diff Tag
 -------------------------------------------
 
@@ -227,7 +227,7 @@ table[border='0'], table[border='0'] th, table[border='0'] td {border:
 0px;}
 table, th > p, td > p {margin: 0px; padding: 0px;}
 table, th > div > p, td > div > p {margin: 0px; padding: 0px;}
-table mms-transclude-doc p {margin: 0 0 5px;}
+table transclude-doc p {margin: 0 0 5px;}
 th {background-color: #f2f3f2;}
 /\*------------------------------------------------------------------
 3. Typography
@@ -263,16 +263,16 @@ line-through;}
 /\*------------------------------------------------------------------
 3.2 Errors
 ------------------------------------------------------------------\*/
-.mms-error {background: repeating-linear-gradient(45deg,#fff,#fff
+.ve-error {background: repeating-linear-gradient(45deg,#fff,#fff
 10px,#fff2e4 10px,#fff2e4 20px);}
 /\*------------------------------------------------------------------
 4. Figure Captions
 ------------------------------------------------------------------\*/
-caption, figcaption, .mms-equation-caption {text-align: center;
+caption, figcaption, .caption-type-equation {text-align: center;
 font-weight: bold;}
 table, figure {margin-bottom: 10px;}
-.mms-equation-caption {float: right;}
-mms-view-equation, mms-view-figure, mms-view-image {page-break-inside:
+.caption-type-equation {float: right;}
+present-equation, present-figure, present-image {page-break-inside:
 avoid;}
 /\*------------------------------------------------------------------
 5. Table of Contents
@@ -318,15 +318,15 @@ p, div {widows: 2; orphans: 2;}
 /\*------------------------------------------------------------------
 9. Bookmark Level
 ------------------------------------------------------------------\*/
-.h1 {bookmark-level: 1;}
-.h2 {bookmark-level: 2;}
-.h3 {bookmark-level: 3;}
-.h4 {bookmark-level: 4;}
-.h5 {bookmark-level: 5;}
-.h6 {bookmark-level: 6;}
-.h7 {bookmark-level: 7;}
-.h8 {bookmark-level: 8;}
-.h9 {bookmark-level: 9;}`
+.bm-level-1 {bookmark-level: 1;}
+.bm-level-2 {bookmark-level: 2;}
+.bm-level-3 {bookmark-level: 3;}
+.bm-level-4 {bookmark-level: 4;}
+.bm-level-5 {bookmark-level: 5;}
+.bm-level-6 {bookmark-level: 6;}
+.bm-level-7 {bookmark-level: 7;}
+.bm-level-8 {bookmark-level: 8;}
+.bm-level-9 {bookmark-level: 9;}`
 
 For page related css, see Paged Media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -347,8 +347,8 @@ Available Classes
 | .fir       | first view                                              |
 | st-chapter |                                                         |
 +------------+---------------------------------------------------------+
-| .h1, .h2,  | corresponds to view or section titles at that level     |
-| .h3, etc   | (title of view/section 1.2.3 would have class of .h3)   |
+| .bm-level-1, .bm-level-2,  | corresponds to view or section titles at that level     |
+| .bm-level-3, etc   | (title of view/section 1.2.3 would have class of .bm-level-3)   |
 +------------+---------------------------------------------------------+
 | .v         | the h1 title of a view or section                       |
 | iew-title, |                                                         |
@@ -377,8 +377,8 @@ Change font size of titles based on level:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 :mark:`//smaller sizes for nested titles
-.h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;}
-.h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}
+.bm-level-1 {font-size: 18pt;} .bm-level-2 {font-size: 14pt;} .bm-level-3 {font-size: 12pt;}
+.bm-level-4 {font-size: 10pt;} .bm-level-5, .bm-level-6, .bm-level-7, .bm-level-8, .bm-level-9 {font-size: 9pt;}
 //start top level sections on odd pages
 .chapter {page-break-before: right;}`
 
@@ -424,41 +424,3 @@ element's, then 'master' for refId and 'latest' for commitId.
 
 The attributes can be added manually via the text editor's html editing
 tab if desired.
-
-View Editor User Guide: 10 Run XLR
-----------------------------------
-
-There's a custom tag one can add to trigger an XLR release from any
-view.
-
-To add the button, go into source mode of a text field and add the
-following:
-
-<run-xlr template-id="{templateId}" xlr-task-name="Run XLR"
-xlr-release-name="release name">ignore</run-xlr>
-
-Where the template-id is the string in the url for the xlr design
-template, with '/' instead of '-'.
-
-Ex, if the url in xlr for your template is this:
-
-https://cae-xlrelease.jpl.nasa.gov/#/templates/Folder898892011-Folder521642095-Folder47c1077774ae4cf69d499daa260b3904-Release619d801931384eae9a25ba8baff2,
-
-the template-id would be
-
-Folder898892011/Folder521642095/Folder47c1077774ae4cf69d499daa260b3904/Release619d801931384eae9a25ba8baff2
-
-The xlr-task-name attribute is just the name of the button that will
-display.
-
-The xlr-release-name is what the release will be called in xlr.
-
-Once a user clicks the button, a login popup will appear, this is for
-logging into xlrelease using jpl username/pass and permission to create
-a release based on the template is controlled by xlr.
-
-Currently will send the following as variables in the release:
-
-"contentEditor": jpl username
-
-"editorEmail": jpl email
