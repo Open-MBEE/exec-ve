@@ -1,11 +1,8 @@
-import * as SVG from '@svgdotjs/svg.js';
-
 import { ExtensionService, ComponentService } from '@ve-components/services';
 import { Transclusion, ITransclusion } from '@ve-components/transclusions';
 import { ButtonBarService } from '@ve-core/button-bar';
 import { EditorService } from '@ve-core/editor';
-import { veCoreEvents } from '@ve-core/events';
-import { UtilsService, MathService, ImageService } from '@ve-utils/application';
+import { UtilsService, MathService, ImageService, SVGService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { ElementService, URLService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
@@ -55,9 +52,7 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
     png: { url: string; image: boolean; ext: string }[];
     artifacts: { url: string; image: boolean; ext: string }[];
 
-    private svgData: SVG.Svg;
-
-    static $inject: string[] = [...Transclusion.$inject, 'URLService', '$http'];
+    static $inject: string[] = [...Transclusion.$inject, 'URLService', 'SVGService'];
 
     constructor(
         $q: VeQService,
@@ -76,8 +71,8 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService,
-        private urlSvc: URLService,
-        private $http: VeHttpService
+        private uRLSvc: URLService,
+        private sVGSvc: SVGService
     ) {
         super(
             $q,
@@ -127,7 +122,7 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
                     .filter((a) => this.includeExt.includes(a.extension))
                     .map((a) => {
                         return {
-                            url: this.urlSvc.getArtifactURL(reqOb, a.extension),
+                            url: this.uRLSvc.getArtifactURL(reqOb, a.extension),
                             image: a.mimetype.indexOf('image') > -1,
                             ext: a.extension,
                         };
@@ -143,34 +138,24 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
 
     protected postRecompile = (content: string | HTMLElement[]): void => {
         if (this.svg) {
-            this.$http.get<string>(this.svg[0].url).then((result) => {
-                const parse = SVG.SVG().svg(result.data);
-                this.svgData = parse.children()[0] as SVG.Svg;
-                this.svgData.width('100%');
-                this.svgData.height('100%');
-                //this.svgData.attr('pointer-events', 'bounding-box')
-                this.svgData.addTo(`#${this.mmsElementId}-svg`);
-                this.svgData
-                    .last()
-                    .children()
-                    .filter((child) => {
-                        return child.hasClass('element');
-                    })
-                    .forEach((child) => {
-                        const path = child.first();
-                        console.log('HI!');
-                        path.fill('transparent');
-                        path.on('click', (e) => {
-                            const id: string = child.attr('id');
-                            this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', {
-                                elementId: id,
-                                projectId: this.projectId,
-                                refId: this.refId,
-                            });
-                            e.stopPropagation();
-                        });
-                    });
-            });
+            this.sVGSvc
+                .parseSVG(
+                    {
+                        projectId: this.projectId,
+                        refId: this.refId,
+                        commitId: this.commitId,
+                    },
+                    this.svg[0].url
+                )
+                .then(
+                    (svgData) => {
+                        $(`#${this.mmsElementId}-svg`).empty();
+                        svgData.addTo(`#${this.mmsElementId}-svg`);
+                    },
+                    (respose) => {
+                        this.growl.error('Problem retrieving SVG: ' + respose.message);
+                    }
+                );
         }
     };
 }

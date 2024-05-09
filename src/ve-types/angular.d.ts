@@ -3,7 +3,7 @@ import angular, {
     IComponentOptions,
     IHttpHeadersGetter,
     IHttpService,
-    IHttpPromise,
+    IHttpResponse,
     INgModelController,
     IPromise,
     IQResolveReject,
@@ -19,9 +19,9 @@ export interface VeComponentOptions extends IComponentOptions {
 
 export interface VeQService extends IQService {
     new <T, U = ElementsResponse<T>>(
-        resolver: (resolve: IQResolveReject<T>, reject: IQResolveReject<VePromiseReason<U>>) => any
+        resolver: (resolve: IQResolveReject<T>, reject: IQResolveReject<VePromiseResponse<U>>) => any
     ): VePromise<T, U>;
-    <T, U>(resolver: (resolve: IQResolveReject<T>, reject: IQResolveReject<VePromiseReason<U>>) => any): VePromise<
+    <T, U>(resolver: (resolve: IQResolveReject<T>, reject: IQResolveReject<VePromiseResponse<U>>) => any): VePromise<
         T,
         U
     >;
@@ -30,25 +30,29 @@ export interface VeQService extends IQService {
 export interface VePromise<T, U = ElementsResponse<T>> extends IPromise<T> {
     then<TResult1 = T, TResult2 = never>(
         successCallback?: ((value: T) => PromiseLike<never> | PromiseLike<TResult1> | TResult1) | null,
-        errorCallback?: ((reason: VePromiseReason<U>) => PromiseLike<never> | PromiseLike<TResult2> | TResult2) | null,
+        errorCallback?:
+            | ((reason: VePromiseResponse<U>) => PromiseLike<never> | PromiseLike<TResult2> | TResult2)
+            | null,
         notifyCallback?: (state: unknown) => unknown
     ): VePromise<TResult1 | TResult2, U>;
     then<TResult1 = T, TResult2 = never>(
         successCallback?: ((value: T) => PromiseLike<never> | PromiseLike<TResult1> | TResult1) | null,
-        errorCallback?: ((reason: VePromiseReason<U>) => PromiseLike<never> | PromiseLike<TResult2> | TResult2) | null,
+        errorCallback?:
+            | ((reason: VePromiseResponse<U>) => PromiseLike<never> | PromiseLike<TResult2> | TResult2)
+            | null,
         notifyCallback?: (state: unknown) => unknown
     ): VePromise<TResult1 | TResult2, U>;
 
     catch<TResult = never>(
-        onRejected?: ((reason: VePromiseReason<U>) => PromiseLike<never> | PromiseLike<TResult> | TResult) | null
+        onRejected?: ((reason: VePromiseResponse<U>) => PromiseLike<never> | PromiseLike<TResult> | TResult) | null
     ): VePromise<T | TResult, U>;
     catch<TResult = never>(
-        onRejected?: ((reason: VePromiseReason<U>) => VePromise<never> | IPromise<TResult> | TResult) | null
+        onRejected?: ((reason: VePromiseResponse<U>) => VePromise<never> | IPromise<TResult> | TResult) | null
     ): VePromise<T | TResult, U>;
 }
 
 export interface VePromisesResponse<T, U = ElementsResponse<T>> {
-    failedRequests?: VePromiseReason<U>[];
+    failedRequests?: VePromiseResponse<U>[];
     successfulRequests?: T[];
 }
 
@@ -56,7 +60,7 @@ export interface VeNgModelController<T> extends INgModelController {
     $modelValue: T;
 }
 
-export interface VePromiseReason<T> {
+export interface VePromiseResponse<T> extends IHttpResponse<T> {
     type?: 'error' | 'info' | 'warning';
     state?: angular.PromiseState;
     message?: string;
@@ -70,6 +74,16 @@ export interface VePromiseReason<T> {
     xhrStatus?: 'complete' | 'error' | 'timeout' | 'abort';
 }
 
+export interface VeHttpResponse<T> extends VePromiseResponse<T>, IHttpResponse<T> {}
+
 export interface VeHttpService extends IHttpService {
-    post<T, U>(url: string, data: U, config?: IRequestShortcutConfig): IHttpPromise<T>;
+    post<T, U>(url: string, data: U, config?: IRequestShortcutConfig): VePromise<VeHttpResponse<T>, T>;
+
+    /**
+     * Shortcut method to perform GET request.
+     *
+     * @param url Relative or absolute URL specifying the destination of the request
+     * @param config Optional configuration object
+     */
+    get<T>(url: string, config?: IRequestShortcutConfig): VePromise<VeHttpResponse<T>, T>;
 }

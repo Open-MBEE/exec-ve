@@ -5,6 +5,7 @@ import { ViewData } from '@ve-utils/mms-api-client';
 
 import { veUtils } from '@ve-utils';
 
+import { VeHttpService } from '@ve-types/angular';
 import { TreeBranch } from '@ve-types/tree';
 
 export class FullDocumentApi {

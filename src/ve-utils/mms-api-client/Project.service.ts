@@ -4,7 +4,7 @@ import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 
 import { veUtils } from '@ve-utils';
 
-import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import {
     BasicResponse,
     CommitObject,
@@ -91,7 +91,7 @@ export class ProjectService extends BaseApiService {
                                         resolve(this.cacheSvc.put(cacheKey, projects, false));
                                     });
                                 },
-                                (response: angular.IHttpResponse<ProjectsResponse>) => {
+                                (response: VeHttpResponse<ProjectsResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
                                 }
                             )
@@ -132,7 +132,7 @@ export class ProjectService extends BaseApiService {
                                     this.cacheSvc.put(cacheKey, response.data.projects[0], true);
                                     resolve(this.cacheSvc.get<ProjectObject>(cacheKey));
                                 },
-                                (response: angular.IHttpResponse<ProjectsResponse>) => {
+                                (response: VeHttpResponse<ProjectsResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
                                 }
                             )
@@ -194,7 +194,7 @@ export class ProjectService extends BaseApiService {
                                             }
                                             resolve(this.cacheSvc.put<MountObject>(cacheKey, result, false));
                                         },
-                                        (response: angular.IHttpResponse<ProjectsResponse>) => {
+                                        (response: VeHttpResponse<ProjectsResponse>) => {
                                             this.apiSvc.handleErrorCallback(response, reject);
                                         }
                                     )
@@ -273,7 +273,7 @@ export class ProjectService extends BaseApiService {
                                     this.cacheSvc.put(cacheKey, refs, false);
                                     resolve(this.cacheSvc.get<RefObject[]>(cacheKey));
                                 },
-                                (response: angular.IHttpResponse<RefsResponse>) => {
+                                (response: VeHttpResponse<RefsResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
                                 }
                             )
@@ -306,7 +306,7 @@ export class ProjectService extends BaseApiService {
                                     this.cacheSvc.put<RefObject>(cacheKey, response.data.refs[0]);
                                     resolve(this.cacheSvc.get<RefObject>(cacheKey));
                                 },
-                                (response: angular.IHttpResponse<RefsResponse>) => {
+                                (response: VeHttpResponse<RefsResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
                                 }
                             )
@@ -352,7 +352,7 @@ export class ProjectService extends BaseApiService {
                                 }
                                 resolve(response.data.commits);
                             },
-                            (response: angular.IHttpResponse<CommitResponse>) => {
+                            (response: VeHttpResponse<CommitResponse>) => {
                                 this.apiSvc.handleErrorCallback(response, reject);
                             }
                         )
@@ -381,7 +381,7 @@ export class ProjectService extends BaseApiService {
                                 (response) => {
                                     resolve(this.cacheSvc.put(cacheKey, response.data.commits[0]));
                                 },
-                                (response: angular.IHttpResponse<CommitResponse>) => {
+                                (response: VeHttpResponse<CommitResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
                                 }
                             )
@@ -430,7 +430,7 @@ export class ProjectService extends BaseApiService {
                         this.cacheSvc.put(cacheKey, createdRef);
                         resolve(this.cacheSvc.get<RefObject>(cacheKey));
                     },
-                    (response: angular.IHttpResponse<RefsResponse>) => {
+                    (response: VeHttpResponse<RefsResponse>) => {
                         this.apiSvc.handleErrorCallback(response, reject);
                     }
                 );
@@ -460,7 +460,7 @@ export class ProjectService extends BaseApiService {
                         this.cacheSvc.put(['ref', projectId, resp.id], resp, true);
                         resolve(this.cacheSvc.get<RefObject>(['ref', projectId, resp.id]));
                     },
-                    (response: angular.IHttpResponse<RefsResponse>) => {
+                    (response: VeHttpResponse<RefsResponse>) => {
                         this.apiSvc.handleErrorCallback(response, reject);
                     }
                 );
@@ -490,7 +490,7 @@ export class ProjectService extends BaseApiService {
                     }
                     resolve();
                 },
-                (response: angular.IHttpResponse<RefsResponse>) => {
+                (response: VeHttpResponse<RefsResponse>) => {
                     this.apiSvc.handleErrorCallback(response, reject);
                 }
             );
@@ -543,7 +543,7 @@ export class ProjectService extends BaseApiService {
                                     this.cacheSvc.put(cacheKey, groups, false);
                                     resolve(this.cacheSvc.get<GroupObject[]>(cacheKey));
                                 },
-                                (response: angular.IHttpResponse<GroupsResponse>) => {
+                                (response: VeHttpResponse<GroupsResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
                                 }
                             )

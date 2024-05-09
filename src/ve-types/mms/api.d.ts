@@ -9,6 +9,7 @@ import {
     RefObject,
     UserObject,
 } from '@ve-types/mms';
+import { VeRole } from '@ve-types/mms/permissions';
 
 export interface UserObject extends MmsObject {
     username: string;
@@ -21,6 +22,12 @@ export interface UserObject extends MmsObject {
     admin?: boolean;
     enabled?: boolean;
     fullName?: string;
+}
+
+export interface UserGroupObject extends MmsObject {
+    name: string;
+    type: string;
+    users?: string[];
 }
 
 export interface CommitObject extends DataObject {
@@ -164,6 +171,10 @@ interface BasicResponse<T extends MmsObject> {
     rejected: RejectedObject<T>[];
 }
 
+interface BasicRequest {
+    source: string;
+}
+
 interface GenericResponse<T extends MmsObject> extends BasicResponse<T> {
     [p: string]: T[];
 }
@@ -179,7 +190,9 @@ export interface ElementsResponse<T extends ElementObject> extends BasicResponse
     deleted?: T[];
 }
 
-export type RoleString = 'ADMIN' | 'WRITER' | 'READER' | 'NONE';
+export interface ElementsUpdateRequest<T extends ElementObject> extends BasicRequest {
+    elements: T[];
+}
 
 export type PermissionUpdateAction = 'MODIFY' | 'REPLACE' | 'REMOVE';
 
@@ -205,7 +218,7 @@ export interface PermissionUpdateRequest {
 
 export interface PermissionUpdateRecord {
     name: string;
-    role?: RoleString;
+    role?: VeRole['ANY'];
     inherited?: boolean;
 }
 
@@ -220,7 +233,7 @@ export interface PermissionUpdateResponse {
 
 export interface PermissionUpdateResultRecord extends PermissionUpdateRecord {
     action: PermissionUpdateResult;
-    role: RoleString;
+    role: VeRole['ANY'];
     orgId: string;
     orgName: string;
     projectId?: string;
@@ -242,7 +255,7 @@ export interface PermissionResponse extends BasicResponse<PermissionResponse> {
 
 export interface PermissionRecord {
     name: string;
-    role: RoleString;
+    role: VeRole['ANY'];
     inherited: boolean;
 }
 
@@ -270,6 +283,11 @@ export interface SearchResponse<T> extends ElementsResponse<T> {
 export interface OrgsResponse extends BasicResponse<OrgObject> {
     orgs: OrgObject[];
 }
+
+export interface OrgsUpdateRequest extends BasicRequest {
+    orgs: OrgObject[];
+}
+
 export interface ProjectsResponse extends BasicResponse<ProjectObject> {
     projects: ProjectObject[];
 }

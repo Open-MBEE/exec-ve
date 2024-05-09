@@ -4,7 +4,7 @@ import IModalService = angular.ui.bootstrap.IModalService;
 import IModalSettings = angular.ui.bootstrap.IModalSettings;
 import IModalInstanceService = angular.ui.bootstrap.IModalInstanceService;
 
-import { VeComponentOptions, VePromise, VePromiseReason } from '@ve-types/angular';
+import { VeComponentOptions, VePromise, VePromiseResponse } from '@ve-types/angular';
 import { MmsObject, OrgObject, ProjectObject, ViewObject } from '@ve-types/mms';
 
 export type veSearchCallback<T extends MmsObject = MmsObject> = (elem: T, property: string) => void;
@@ -77,7 +77,7 @@ export interface VeApiObject<T> {
 
 export interface VeApiWait<T> {
     resolve?(result: T): void;
-    reject?(reason: VePromiseReason<T>): void;
+    reject?(reason: VePromiseResponse<T>): void;
     promise?: VePromise<T, void>;
     api?: T;
     refId?: string;

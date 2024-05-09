@@ -17,7 +17,7 @@ import {
 
 import { PropertySpec, veComponents } from '@ve-components';
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
     ElementObject,
@@ -319,7 +319,7 @@ export class SpecService implements angular.Injectable<any> {
 
                     this.$q.allSettled(promises).then(
                         () => this.eventSvc.resolve<boolean>('spec.ready', true),
-                        (reason: VePromiseReason<unknown>) => {
+                        (reason: VePromiseResponse<unknown>) => {
                             this.growl.error('Getting Element Error: ' + reason.message);
                         }
                     );

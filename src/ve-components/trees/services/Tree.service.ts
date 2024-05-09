@@ -6,14 +6,14 @@ import { ApiService, ElementService, OrgService, ProjectService, ViewService } f
 
 import { veCore } from '@ve-core';
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import {
     AdminObject,
+    DataObject,
     ElementObject,
     ElementsRequest,
     ExpressionObject,
     InstanceValueObject,
-    MmsObject,
     ProjectObject,
     UsersRequest,
     ValueObject,
@@ -21,6 +21,7 @@ import {
     ViewObject,
 } from '@ve-types/mms';
 import { TreeApi, TreeBranch, TreeRow } from '@ve-types/tree';
+import Icon from '@ve-types/icons';
 
 export class TreeService {
     public selectedBranch: TreeBranch = null;
@@ -37,7 +38,7 @@ export class TreeService {
     public loading: boolean;
 
     private inProgress: VePromise<void, unknown> = null;
-    private treeData: TreeBranch<MmsObject>[] = [];
+    private treeData: TreeBranch<DataObject>[] = [];
 
     public viewId2node: { [key: string]: TreeBranch<ViewObject> } = {};
     public seenViewIds: { [key: string]: TreeBranch<ViewObject> } = {};
@@ -112,8 +113,8 @@ export class TreeService {
         return this.treeData.length > 0;
     };
 
-    public getTreeData = (): TreeBranch<MmsObject>[] => {
-        return this.treeData;
+    public getTreeData = <T extends DataObject = DataObject>(): TreeBranch<T>[] => {
+        return this.treeData as TreeBranch<T>[];
     };
     //
     // public setTreeApi = (treeOptions: TreeOptions): void => {
@@ -131,7 +132,7 @@ export class TreeService {
      * @param {callback} level2_Func function to get child objects
      * @returns {void} root node
      */
-    public buildTreeHierarchy = <T extends MmsObject = ElementObject>(
+    public buildTreeHierarchy = <T extends DataObject = ElementObject>(
         elementObs: T[],
         idKey: string,
         type: string,
@@ -203,61 +204,10 @@ export class TreeService {
         let t = type;
         if (!t) t = 'unknown';
         t = t.toLowerCase();
-        switch (t) {
-            case 'tag':
-                return 'fa-solid fa-tag';
-            case 'association':
-                return 'fa-solid fa-left-right';
-            case 'connector':
-                return 'fa-solid fa-expand';
-            case 'dependency':
-                return 'fa-solid fa-long-arrow-right';
-            case 'document':
-                return 'fa-solid fa-file-lines';
-            case 'directedrelationship':
-                return 'fa-solid fa-arrow-right-long';
-            case 'element':
-                return 'fa-solid fa-border-top-left';
-            case 'property':
-                return 'fa-solid fa-circle';
-            case 'generalization':
-                return 'fa-solid fa-arrow-up-long';
-            case 'package':
-                return 'fa-regular fa-folder';
-            case 'section':
-                return 'section-icon'; //"fa-file-o";
-            case 'group':
-                return 'fa-solid fa-folder';
-            case 'snapshot':
-                return 'fa-solid fa-camera';
-            case 'view':
-                return 'fa-solid fa-file';
-            case 'view-composite':
-                return 'fa-solid fa-file';
-            case 'view-shared':
-                return 'fa-regular fa-file';
-            case 'view-none':
-                return 'fa-regular fa-file';
-            case 'branch':
-                return 'fa-solid fa-code-branch';
-            case 'table':
-                return 'fa-solid fa-table';
-            case 'figure':
-                return 'fa-regular fa-image';
-            case 'diagram':
-                return 'fa-solid fa-diagram-project';
-            case 'equation':
-                return 'fa-solid fa-superscript';
-            case 'project':
-                return 'fa-solid fa-sitemap';
-            case 'org':
-                return 'fa-solid fa-warehouse';
-            default:
-                return 'fa-solid fa-file-circle-question';
-        }
+        return Icon(t);
     };
 
-    static treeError(reason: VePromiseReason<unknown>): string {
+    static treeError(reason: VePromiseResponse<unknown>): string {
         return 'Error refreshing tree: ' + reason.message;
     }
 
@@ -289,8 +239,8 @@ export class TreeService {
      * Gets the first branch in the tree
      * @returns {TreeBranch}
      */
-    public getFirstBranch = (): TreeBranch => {
-        if (this.treeData.length > 0) return this.treeData[0];
+    public getFirstBranch = <T extends DataObject = DataObject>(): TreeBranch<T> => {
+        if (this.treeData.length > 0) return this.treeData[0] as TreeBranch<T>;
     };
 
     /**
@@ -337,7 +287,7 @@ export class TreeService {
      * @param {TreeBranch} new_branch new branch to be added to the tree
      * @param {boolean} top boolean determining if this item should be at the top
      */
-    public addBranch = <T extends MmsObject = MmsObject>(
+    public addBranch = <T extends DataObject = DataObject>(
         parent: TreeBranch<T>,
         new_branch: TreeBranch<T>,
         top: boolean
@@ -558,7 +508,7 @@ export class TreeService {
      * @name TreeApi#getBranch
      * Returns the branch with the specified data
      */
-    public getBranch = <T extends MmsObject>(data: MmsObject): VePromise<TreeBranch<T>, unknown> => {
+    public getBranch = <T extends DataObject>(data: T): VePromise<TreeBranch<T>, unknown> => {
         return new this.$q<TreeBranch<T>, unknown>((resolve, reject) => {
             this.forEachBranch<T>((b) => {
                 if (b.data.id === data.id) {
@@ -573,7 +523,7 @@ export class TreeService {
      * @param {(branch: TreeBranch, level: number) => void} func
      * @param {TreeBranch} excludeBranch
      */
-    public forEachBranch = <T extends MmsObject>(
+    public forEachBranch = <T extends DataObject>(
         func: (branch: TreeBranch<T>, flag?: boolean) => void,
         useFlag?: boolean,
         excludeBranch?: TreeBranch<T>
@@ -741,7 +691,7 @@ export class TreeService {
                         this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, true);
                         this.eventSvc.$broadcast('tree.ready');
                         resolve();
-                    });
+                    }, reject);
                 } else {
                     this.treeData.forEach((branch) => {
                         this._addBranchData(1, [], branch, true, {});
@@ -943,7 +893,7 @@ export class TreeService {
     changeRoots = (root?: ElementObject): VePromise<void, unknown> => {
         this.processedRoot = this.treeApi.rootId;
 
-        const treeData: TreeBranch<MmsObject>[] = [];
+        const treeData: TreeBranch<DataObject>[] = [];
         return new this.$q<void, unknown>((resolve, reject) => {
             if (!root) {
                 // if (this.mmsRef.type === 'Branch') {
@@ -1198,7 +1148,7 @@ export class TreeService {
     public handleChildren = (
         curNode: TreeBranch<ViewObject>,
         childNodes: TreeBranch<ViewObject>[],
-        reject: IQResolveReject<VePromiseReason<unknown>>
+        reject: IQResolveReject<VePromiseResponse<unknown>>
     ): void => {
         const newChildNodes: TreeBranch<ViewObject>[] = [];
         let node: TreeBranch<ViewObject>;

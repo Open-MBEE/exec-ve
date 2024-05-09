@@ -5,7 +5,7 @@ import { veCore } from '@ve-core';
 
 import { ToolbarApi } from './Toolbar.api';
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { VeConfig } from '@ve-types/config';
 import { VeApiObject } from '@ve-types/view-editor';
 
@@ -217,7 +217,7 @@ export class ToolbarService {
         }
     };
 
-    static error(reason?: VePromiseReason<unknown>): string {
+    static error(reason?: VePromiseResponse<unknown>): string {
         if (reason && reason.message) return 'Toolbar error: ' + reason.message;
         else return 'Toolbar Error!';
     }

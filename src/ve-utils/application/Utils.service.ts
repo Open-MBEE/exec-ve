@@ -4,7 +4,7 @@ import { ApiService, DocumentMetadata, URLService } from '@ve-utils/mms-api-clie
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VeQService } from '@ve-types/angular';
+import { VePromise, VeQService, VeHttpService, VeHttpResponse } from '@ve-types/angular';
 import { ElementObject, ViewObject } from '@ve-types/mms';
 import { TreeBranch } from '@ve-types/tree';
 
@@ -43,7 +43,7 @@ export class UtilsService {
      * @param {TreeBranch} rootBranch the root element (document or view) of the main tree
      * @returns {string} toc string
      */
-    public makeHtmlTOC = (rootBranch: TreeBranch): string => {
+    public makeHtmlTOC = (rootBranch: TreeBranch<ViewObject>): string => {
         let result = '<div class="toc"><h1 class="header">Table of Contents</h1>';
         result += this.makeHtmlTOCChild(rootBranch, true);
         result += '</div>';
@@ -57,7 +57,7 @@ export class UtilsService {
      * @param skip
      * @return {string}
      */
-    public makeHtmlTOCChild = (branch: TreeBranch, skip?): string => {
+    public makeHtmlTOCChild = (branch: TreeBranch<ViewObject>, skip?): string => {
         let result = '';
         if (!skip) {
             const anchor: string = '<a href=#' + branch.data.id + '>';
@@ -96,7 +96,7 @@ export class UtilsService {
      * @returns {object} results
      */
     public makeTablesAndFiguresTOC(
-        rootBranch: TreeBranch,
+        rootBranch: TreeBranch<ViewObject>,
         printElement: JQuery<HTMLElement>,
         live: boolean,
         html: boolean
@@ -143,7 +143,7 @@ export class UtilsService {
      * @returns {void} nothing
      */
     public makeTablesAndFiguresTOCChild(
-        child: TreeBranch,
+        child: TreeBranch<ViewObject>,
         printElement: JQuery<HTMLElement>,
         ob: TOCHtmlObject,
         live: boolean,
@@ -408,7 +408,7 @@ export class UtilsService {
             if (!elementId) {
                 return;
             }
-            elementId = elementId.replace(/[^\w\-]/gi, '');
+            elementId = elementId.replace(/[^\w-]/gi, '');
             const isElementInDoc = printElement.find('#' + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href', '#' + elementId);
@@ -616,7 +616,7 @@ caption::before {content: "Table " counter(table-counter) ". "; }
                     window.URL.revokeObjectURL(url);
                     deferred.resolve('ok');
                 },
-                (error: angular.IHttpResponse<string>) => {
+                (error: VeHttpResponse<string>) => {
                     deferred.reject(this.uRLSvc.handleHttpStatus(error));
                 }
             );

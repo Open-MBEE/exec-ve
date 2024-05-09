@@ -4,8 +4,8 @@ import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VeQService } from '@ve-types/angular';
-import { BasicResponse, MmsObject, OrgObject, OrgsResponse } from '@ve-types/mms';
+import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
+import { BasicResponse, MmsObject, OrgObject, OrgsResponse, OrgsUpdateRequest } from '@ve-types/mms';
 
 export class OrgService extends BaseApiService {
     static $inject = ['$q', '$http', 'CacheService', 'ProjectService', 'URLService', 'ApiService', 'PermissionService'];
@@ -43,7 +43,7 @@ export class OrgService extends BaseApiService {
                         this.$http
                             .get(url)
                             .then(
-                                (response: angular.IHttpResponse<OrgsResponse>) => {
+                                (response: VeHttpResponse<OrgsResponse>) => {
                                     if (!response.data.orgs || response.data.orgs.length < 1) {
                                         reject({
                                             status: 404,
@@ -68,7 +68,7 @@ export class OrgService extends BaseApiService {
                                         });
                                     }
                                 },
-                                (response: angular.IHttpResponse<OrgsResponse>) =>
+                                (response: VeHttpResponse<OrgsResponse>) =>
                                     this.apiSvc.handleErrorCallback<OrgObject>(response, reject)
                             )
                             .finally(() => {
@@ -123,7 +123,7 @@ export class OrgService extends BaseApiService {
                                         resolve(this.cacheSvc.put(key, orgs, false));
                                     });
                                 },
-                                (response: angular.IHttpResponse<OrgsResponse>) => {
+                                (response: VeHttpResponse<OrgsResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
                                 }
                             )
@@ -198,9 +198,11 @@ export class OrgService extends BaseApiService {
     public createOrg(orgObj: OrgObject): VePromise<OrgObject, OrgsResponse> {
         return new this.$q<OrgObject, OrgsResponse>((resolve, reject) => {
             const url = this.uRLSvc.getOrgsURL();
+            const orgs: OrgObject[] = [];
+            orgs.push(orgObj);
             this.$http
-                .post<OrgsResponse>(url, {
-                    orgs: orgObj,
+                .post<OrgsResponse, OrgsUpdateRequest>(url, {
+                    orgs: orgs,
                     source: `ve-${this.apiSvc.getVeVersion()}`,
                 })
                 .then(
@@ -210,7 +212,7 @@ export class OrgService extends BaseApiService {
                         this.cacheSvc.put(key, response.data.orgs[0], true);
                         resolve(this.cacheSvc.get<OrgObject>(key));
                     },
-                    (response: angular.IHttpResponse<OrgsResponse>) => {
+                    (response: VeHttpResponse<OrgsResponse>) => {
                         this.apiSvc.handleErrorCallback(response, reject);
                     }
                 );

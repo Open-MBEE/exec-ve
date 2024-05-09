@@ -12,6 +12,8 @@ export class CameoSchema implements Schema {
             '_18_0beta_9150291_1392290067481_33752_4359',
         ],
         DOCUMENT_SID: '_17_0_2_3_87b0275_1371477871400_792964_43374',
+        VIEWPOINT_SID: '_11_5EAPbeta_be00301_1147420812402_281263_364',
+        CONFORM_SID: '_11_5EAPbeta_be00301_1147420728091_674481_152',
         BLOCK_SID: '_11_5EAPbeta_be00301_1147424179914_458922_958',
         REQUIREMENT_SID: [
             '_project-bundle_mission_PackageableElement-mission_u003aRequirement_PackageableElement',
@@ -65,8 +67,9 @@ export class CameoSchema implements Schema {
     };
     ownership = {
         OWNED: [
-            'packagedElementIds',
+            'edgeIds',
             'nestedClassifierIds',
+            'nodeIds',
             'ownedAttributeIds',
             'ownedBehaviorIds',
             'ownedCommentIds',
@@ -85,7 +88,9 @@ export class CameoSchema implements Schema {
             'ownedTemplateSignatureId',
             'ownedTypeIds',
             'ownedUseCaseIds',
-            'ownedMember',
+            'packagedElementIds',
+            'partitionIds',
+            'variableIds',
         ],
         OWNER: 'ownerId',
     };

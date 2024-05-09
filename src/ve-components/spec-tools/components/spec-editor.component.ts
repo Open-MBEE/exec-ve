@@ -18,7 +18,7 @@ import {
 
 import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { ElementObject, ElementsResponse } from '@ve-types/mms';
 
 /**
@@ -166,7 +166,7 @@ class SpecEditorController extends SpecTool implements ISpecTool {
                 this.specSvc.setEdits(editOb);
                 this.isValue = this.valueSvc.isValue(editOb.element);
             },
-            (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
+            (reason: VePromiseResponse<ElementsResponse<ElementObject>>) => {
                 this.growl.error(reason.message);
             }
         );

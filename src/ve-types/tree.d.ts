@@ -2,7 +2,7 @@ import angular from 'angular';
 
 import ITreeNode = AngularUITree.ITreeNode;
 
-import { DataObject, ElementObject, ElementsRequest, MmsObject, ViewObject } from '@ve-types/mms';
+import { DataObject, ElementObject, ElementsRequest, MmsObject } from '@ve-types/mms';
 
 /**
  * @typedef TreeBranch

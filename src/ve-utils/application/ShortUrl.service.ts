@@ -3,7 +3,7 @@ import { ElementService, OrgService, ProjectService, URLService, ViewService } f
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import { ParamsObject, ShortUrlRequest } from '@ve-types/mms';
 
 export class ShortUrlService {

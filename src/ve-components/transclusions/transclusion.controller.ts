@@ -14,10 +14,9 @@ import { ElementService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
 import { handleChange, onChangesCallback } from '@ve-utils/utils';
 
-import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { EditorActions } from '@ve-types/core/editor';
 import { ElementObject, ElementsResponse, ViewObject } from '@ve-types/mms';
-import { error } from 'console';
 
 export interface ITransclusion extends angular.IComponentController {
     $scope: TranscludeScope;
@@ -330,7 +329,7 @@ export class Transclusion implements ITransclusion, EditorActions {
 
     protected postRecompile = (content: string | HTMLElement[]): void => {
         //API Method
-    }
+    };
 
     protected changeAction: onChangesCallback<string> = (newVal, oldVal, firstChange) => {
         if (!newVal || !this.mmsProjectId || firstChange || newVal === oldVal) {
@@ -394,11 +393,11 @@ export class Transclusion implements ITransclusion, EditorActions {
             } else {
                 this.recompile();
             }
-        }
+        };
 
-        const errorCallback = <T>(reason: VePromiseReason<T>) => {
+        const errorCallback = <T>(reason: VePromiseResponse<T>) => {
             this.$element.empty();
-                    //TODO: Add reason/errorMessage handling here.
+            //TODO: Add reason/errorMessage handling here.
             this.$transcludeEl = $(
                 '<annotation mms-element-id="::elementId" mms-recent-element="::recentElement" mms-type="::type" mms-field="::field"></annotation>'
             );
@@ -411,22 +410,17 @@ export class Transclusion implements ITransclusion, EditorActions {
                     field: this.cfField,
                 })
             );
-        }
+        };
 
         this.elementSvc
             .getElement(reqOb, 1, false)
-            .then(
-                successCallback,
-                (reason) => {
-                    
-                    if (reason.status == 404) {
-                        this.elementSvc.getElementByTwcId(reqOb, reqOb.elementId).then(successCallback,errorCallback)
-                    } else {
-                        errorCallback(reason)
-                    }
-                    
+            .then(successCallback, (reason) => {
+                if (reason.status == 404) {
+                    this.elementSvc.getElementByTwcId(reqOb, reqOb.elementId).then(successCallback, errorCallback);
+                } else {
+                    errorCallback(reason);
                 }
-            )
+            })
             .finally(() => {
                 this.$element.removeClass('isLoading');
                 if (this.mmsCallback) this.mmsCallback();
@@ -515,7 +509,7 @@ export class Transclusion implements ITransclusion, EditorActions {
                         }
                         this.editorSvc.scrollToElement(this.$element);
                     },
-                    (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
+                    (reason: VePromiseResponse<ElementsResponse<ElementObject>>) => {
                         this.growl.error(reason.message);
                     }
                 )

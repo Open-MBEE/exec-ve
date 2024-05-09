@@ -8,7 +8,7 @@ import { ElementService, ViewService } from '@ve-utils/mms-api-client';
 
 import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromiseReason } from '@ve-types/angular';
+import { VeComponentOptions, VePromiseResponse } from '@ve-types/angular';
 import {
     ElementObject,
     ElementsRequest,
@@ -162,7 +162,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
         return this.mmsParentSection;
     };
 
-    private _error = (reqOb: ElementsRequest<string>, reason: VePromiseReason<unknown>): void => {
+    private _error = (reqOb: ElementsRequest<string>, reason: VePromiseResponse<unknown>): void => {
         if (reason.status === 500) {
             this.$element.html(
                 '<span class="ve-error">View element reference error: ' +

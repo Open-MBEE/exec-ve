@@ -1,7 +1,7 @@
 import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirouter/angularjs';
 import { Transition } from '@uirouter/core';
 
-import { AppUtilsService, ResolveService } from '@ve-app/main/services';
+import { AppUtilsService } from '@ve-app/main/services';
 import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config';
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
 import { TreeService } from '@ve-components/trees';
@@ -9,7 +9,7 @@ import { ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button
 import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { PermissionService, URLService, ViewApi } from '@ve-utils/mms-api-client';
+import { PermissionService, ViewApi } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
@@ -68,22 +68,16 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         '$q',
         '$scope',
         '$state',
-        '$timeout',
-        '$window',
-        '$location',
-        '$http',
         '$element',
         '$uiRouterGlobals',
         'growl',
         'hotkeys',
         'AppUtilsService',
-        'URLService',
         'UtilsService',
         'ShortUrlService',
         'ContentWindowService',
         'PermissionService',
         'RootScopeService',
-        'ResolveService',
         'TreeService',
         'EventService',
         'ButtonBarService',
@@ -93,22 +87,16 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         public $q: VeQService,
         private $scope: angular.IScope,
         private $state: StateService,
-        private $timeout: angular.ITimeoutService,
-        private $window: angular.IWindowService,
-        private $location: angular.ILocationService,
-        private $http: VeHttpService,
         private $element: JQuery<HTMLElement>,
         private $uiRouterGlobals: UIRouterGlobals,
         private growl: angular.growl.IGrowlService,
         private hotkeys: angular.hotkeys.HotkeysProvider,
         private appUtilsSvc: AppUtilsService,
-        private uRLSvc: URLService,
         private utilsSvc: UtilsService,
         private shortUrlSvc: ShortUrlService,
         private contentWindowSvc: ContentWindowService,
         private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
-        private resolveSvc: ResolveService,
         private treeSvc: TreeService,
         public eventSvc: EventService,
         private buttonBarSvc: ButtonBarService

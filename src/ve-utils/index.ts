@@ -1,5 +1,6 @@
 //Libraries
 //import 'angular'
+//import '@svgdotjs/svg.js';
 
 import './ve-utils.module';
 

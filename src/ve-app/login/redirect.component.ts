@@ -8,7 +8,7 @@ import { ProjectService, ElementService } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
-import { VeComponentOptions, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VePromiseResponse, VePromisesResponse, VeQService } from '@ve-types/angular';
 import { ElementObject, QueryObject, RequestObject, ViewObject } from '@ve-types/mms';
 
 const RedirectComponent: VeComponentOptions = {
@@ -140,7 +140,7 @@ const RedirectComponent: VeComponentOptions = {
             return queryObs;
         }
 
-        public errorHandler = (reason: VePromiseReason<VePromisesResponse<ViewObject>>): void => {
+        public errorHandler = (reason: VePromiseResponse<VePromisesResponse<ViewObject>>): void => {
             this.growl.error(reason.message);
             void this.$state.go('main.login.select');
         };

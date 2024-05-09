@@ -8,7 +8,7 @@ import { EditObject } from '@ve-utils/core';
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { InsertApi, InsertData } from '@ve-types/components';
 import { BasicResponse, ElementObject, MmsObject } from '@ve-types/mms';
 import { VeModalService, VeModalSettings, veSearchCallback, VeSearchOptions } from '@ve-types/view-editor';
@@ -31,7 +31,7 @@ export class Insertion<
 > {
     //Bindings
     public insertData: T;
-    public insertApi: InsertApi<U, VePromiseReason<BasicResponse<MmsObject>>>;
+    public insertApi: InsertApi<U, VePromiseResponse<BasicResponse<MmsObject>>>;
     public mmsProjectId: string;
     public mmsRefId: string;
     public mmsOrgId: string;
@@ -173,7 +173,7 @@ export class Insertion<
         this.insertApi.resolve(data);
     };
 
-    protected insertReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(reason: V): void => {
+    protected insertReject = <V extends VePromiseResponse<BasicResponse<MmsObject>>>(reason: V): void => {
         this.fail(reason);
         if (!this.continue) {
             this.insertApi.reject(reason);
@@ -185,7 +185,7 @@ export class Insertion<
         /* Put custom success logic here*/
     };
 
-    public fail = <V extends VePromiseReason<MmsObject>>(reason: V): void => {
+    public fail = <V extends VePromiseResponse<MmsObject>>(reason: V): void => {
         if (reason.status === 401) {
             this.reLogin();
         } else {

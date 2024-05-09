@@ -1,5 +1,4 @@
 import { IPane, IRegion } from '@openmbee/pane-layout';
-import { IOnChangesObject } from 'angular';
 
 import { ListApi } from '@ve-admin/components/list/list.component';
 import { veAdmin } from '@ve-admin/ve-admin.module';
@@ -7,7 +6,8 @@ import { RootScopeService } from '@ve-utils/application';
 import { OrgService, UserService } from '@ve-utils/mms-api-client';
 
 import { VeComponentOptions } from '@ve-types/angular';
-import { OrgObject, PermissionMap, UserObject } from '@ve-types/mms';
+import { OrgObject, UserObject } from '@ve-types/mms';
+import Role from '@ve-types/mms/permissions';
 
 class HomeController {
     mmsOrgs: OrgObject[];
@@ -51,17 +51,17 @@ class HomeController {
         this.init(this.mmsOrgs, this.mmsUser);
     }
 
-    $onChanges(onChangesObj: IOnChangesObject): void {
-        if (
-            (onChangesObj['mmsOrgs'] && !onChangesObj['mmsOrgs'].isFirstChange() && this.mmsUser) ||
-            (onChangesObj['mmsUser'] && !onChangesObj['mmsUser'].isFirstChange() && this.mmsOrgs)
-        ) {
-            this.init(
-                onChangesObj['mmsOrgs'].currentValue as OrgObject[],
-                onChangesObj['mmsUser'].currentValue as UserObject
-            );
-        }
-    }
+    // $onChanges(onChangesObj: IOnChangesObject): void {
+    //     if (
+    //         (onChangesObj['mmsOrgs'] && !onChangesObj['mmsOrgs'].isFirstChange() && this.mmsUser) ||
+    //         (onChangesObj['mmsUser'] && !onChangesObj['mmsUser'].isFirstChange() && this.mmsOrgs)
+    //     ) {
+    //         this.init(
+    //             onChangesObj['mmsOrgs'].currentValue as OrgObject[],
+    //             onChangesObj['mmsUser'].currentValue as UserObject
+    //         );
+    //     }
+    // }
 
     $onDestroy(): void {
         this.$resized.dispose();
@@ -89,24 +89,12 @@ class HomeController {
         let writePermOrgs: OrgObject[] = [];
         if (!user.admin) {
             orgData.forEach((org) => {
-                let perms: PermissionMap;
-                this.orgPerms[org.id] = {
-                    admin: false,
-                    write: false,
-                };
-                Object.keys(org).forEach((key) => {
-                    if (key == 'permission') {
-                        perms = org[key];
-                    } else if (key == 'projects') {
-                        console.log(key);
-                    }
-                });
-                const users = perms && perms.users ? perms.users : {};
-                const perm = users[user.username] ? users[user.username] : '';
-                if (perm === 'write' || perm === 'admin') {
+                this.orgPerms[org.id] = { admin: false, write: false };
+                const perm = org.permission.users[user.username].role;
+                if (perm === Role.WRITE || perm === Role.ADMIN) {
                     writePermOrgs.push(org);
                     this.orgPerms[org.id].write = true;
-                    if (perm === 'admin') {
+                    if (perm === Role.ADMIN) {
                         this.orgPerms[org.id].admin = true;
                     }
                 }

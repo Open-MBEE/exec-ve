@@ -17,7 +17,7 @@ import { PermissionService, ViewData, ViewService, URLService } from '@ve-utils/
 
 import { veApp } from '@ve-app';
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import { DocumentObject, ElementObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms';
 import { TreeBranch, View2NodeMap } from '@ve-types/tree';
 

@@ -340,14 +340,14 @@ Save CSV</button></div>
         const absurl = this.$location.absUrl();
         const prefix = protocol + ':// hostname' + (port == 80 || port == 443 ? '' : `:${port}`);
         const mmsIndex = absurl.indexOf('index.html');
-        let toc = this.utilsSvc.makeHtmlTOC(this.treeSvc.getTreeData()[0]);
+        let toc = this.utilsSvc.makeHtmlTOC(this.treeSvc.getTreeData<ViewObject>()[0]);
 
         // Conver to proper links for word/pdf
         this.utilsSvc.convertViewLinks(printElementCopy);
 
         // Get correct table/image numbering based on doc hierarchy
         const tableAndFigTOC = this.utilsSvc.makeTablesAndFiguresTOC(
-            this.treeSvc.getTreeData()[0],
+            this.treeSvc.getTreeData<ViewObject>()[0],
             printElementCopy,
             false,
             htmlTotf
@@ -377,9 +377,12 @@ Save CSV</button></div>
 
         // Remove comments, table features, and all elements with classes: ve-error, no-print, ng-hide
         printElementCopy.find('transclude-com').remove();
-        printElementCopy.find('style').filter((index, element) => {
-                return element.parentElement.nodeName != 'svg'
-        }).remove(); //prevent user inserted styles from interfering
+        printElementCopy
+            .find('style')
+            .filter((index, element) => {
+                return element.parentElement.nodeName != 'svg';
+            })
+            .remove(); //prevent user inserted styles from interfering
         printElementCopy.find('div.tableSearch').remove();
         //printElementCopy.find('.ve-error').html('error');
         printElementCopy.find('.no-print').remove();
@@ -399,19 +402,27 @@ Save CSV</button></div>
                 $this.remove();
             }
         });
-        printElementCopy.find('[width]').not('img').not('.ve-fixed-width')
-            .filter((index,element) => { 
-                return ! $(element).parents('.mms-svg') || element.nodeName == 'svg'
-            }).removeAttr('width');
-        printElementCopy.find('[height]').not('img').not('.ve-fixed-heightl')
-            .filter((index,element) => { 
-                return ! $(element).parents('.mms-svg') || element.nodeName == 'svg'
-            }).removeAttr('height');
+        printElementCopy
+            .find('[width]')
+            .not('img')
+            .not('.ve-fixed-width')
+            .filter((index, element) => {
+                return !$(element).parents('.mms-svg') || element.nodeName == 'svg';
+            })
+            .removeAttr('width');
+        printElementCopy
+            .find('[height]')
+            .not('img')
+            .not('.ve-fixed-heightl')
+            .filter((index, element) => {
+                return !$(element).parents('.mms-svg') || element.nodeName == 'svg';
+            })
+            .removeAttr('height');
         printElementCopy
             .find('[style]')
             .not('hr')
-            .filter((index,element) => { 
-                return ! $(element).parents('.mms-svg')
+            .filter((index, element) => {
+                return !$(element).parents('.mms-svg');
             })
             .each((index, element) => {
                 element.style.removeProperty('font-size');

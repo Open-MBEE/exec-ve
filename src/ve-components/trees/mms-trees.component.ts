@@ -15,7 +15,7 @@ import { ApiService, PermissionService, ViewService } from '@ve-utils/mms-api-cl
 
 import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { InsertResolveFn } from '@ve-types/components';
 import { DocumentObject, GroupObject, ViewObject } from '@ve-types/mms';
 import { TreeBranch } from '@ve-types/tree';
@@ -250,7 +250,7 @@ class TreesController implements IComponentController {
                     this.insertModal(result);
                     deferred.resolve();
                 },
-                (reason: VePromiseReason<string>) => {
+                (reason: VePromiseResponse<string>) => {
                     deferred.reject(reason);
                 }
             );
@@ -260,7 +260,7 @@ class TreesController implements IComponentController {
                     this.insertModal(result);
                     deferred.resolve();
                 },
-                (reason: VePromiseReason<string>) => {
+                (reason: VePromiseResponse<string>) => {
                     deferred.reject(reason);
                 }
             );
@@ -270,7 +270,7 @@ class TreesController implements IComponentController {
                     this.insertModal(result);
                     deferred.resolve();
                 },
-                (reason: VePromiseReason<string>) => {
+                (reason: VePromiseResponse<string>) => {
                     deferred.reject(reason);
                 }
             );

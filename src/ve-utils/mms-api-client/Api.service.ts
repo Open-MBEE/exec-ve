@@ -6,7 +6,7 @@ import { SchemaService } from '@ve-utils/model-schema';
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VeHttpResponse, VeHttpService, VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { VeConfig } from '@ve-types/config';
 import {
     BasicResponse,
@@ -55,7 +55,7 @@ export class ApiService {
             (response) => {
                 deferred.resolve(response.data.mmsVersion);
             },
-            (response: angular.IHttpResponse<VersionResponse>) => {
+            (response: VeHttpResponse<VersionResponse>) => {
                 deferred.reject(this.uRLSvc.handleHttpStatus(response));
             }
         );
@@ -69,13 +69,13 @@ export class ApiService {
     /**
      * @name veUtils/ApiService#handleErrorCallback
      *
-     * @param {angular.IHttpResponse<T>} response
+     * @param {VeHttpResponse<T>} response
      * @param {angular.IDeferred<U>} deferredOrReject
      * @param {} type
      */
     public handleErrorCallback<T extends MmsObject, U = BasicResponse<T>>(
-        response: angular.IHttpResponse<U>,
-        deferredOrReject: angular.IDeferred<U> | angular.IQResolveReject<VePromiseReason<U>>,
+        response: VeHttpResponse<U>,
+        deferredOrReject: angular.IDeferred<U> | angular.IQResolveReject<VePromiseResponse<U>>,
         type?: 'error' | 'warning' | 'info'
     ): void {
         const res = this.uRLSvc.handleHttpStatus<T, U>(response);
@@ -85,7 +85,7 @@ export class ApiService {
         if ((deferredOrReject as angular.IDeferred<U>).reject) {
             (deferredOrReject as angular.IDeferred<U>).reject(res);
         } else {
-            (deferredOrReject as angular.IQResolveReject<VePromiseReason<U>>)(res);
+            (deferredOrReject as angular.IQResolveReject<VePromiseResponse<U>>)(res);
         }
     }
 

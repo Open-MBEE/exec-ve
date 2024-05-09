@@ -1,6 +1,8 @@
 import { veUtils } from '@ve-utils';
 
-export type httpCallback<T> = (response: angular.IHttpResponse<T>) => void;
+import { VeHttpResponse, VeHttpService } from '@ve-types/angular';
+
+export type httpCallback<T> = (response: VeHttpResponse<T>) => void;
 
 export interface HttpServiceRequest {
     url: string;
@@ -60,10 +62,10 @@ export class HttpService {
                 this.$http
                     .get(url)
                     .then(
-                        (response: angular.IHttpResponse<T>) => {
+                        (response: VeHttpResponse<T>) => {
                             successCallback(response);
                         },
-                        (response: angular.IHttpResponse<T>) => {
+                        (response: VeHttpResponse<T>) => {
                             errorCallback(response);
                         }
                     )
@@ -88,10 +90,10 @@ export class HttpService {
             this.$http
                 .get(url)
                 .then(
-                    (response: angular.IHttpResponse<T>) => {
+                    (response: VeHttpResponse<T>) => {
                         successCallback(response);
                     },
-                    (response: angular.IHttpResponse<T>) => {
+                    (response: VeHttpResponse<T>) => {
                         errorCallback(response);
                     }
                 )

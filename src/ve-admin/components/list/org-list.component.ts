@@ -4,6 +4,7 @@ import { ListApi } from './list.component';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { OrgObject, ProjectObject, UserObject } from '@ve-types/mms';
+import Role from '@ve-types/mms/permissions';
 import { VeModalService } from '@ve-types/view-editor';
 
 class OrgListController {
@@ -71,18 +72,18 @@ class OrgListController {
         if (!this.admin) {
             const username = this.user.username;
             projects.forEach((project) => {
-                const perm = project.permission.users[username];
+                const perm = project.permission.users[username].role;
 
                 // Verify if user is project admin
-                if (perm === 'admin') {
+                if (perm === Role.ADMIN) {
                     this.projAdmin[project.id] = true;
                 } else {
                     this.projAdmin[project.id] = false;
                 }
                 // Verify if user can see project
                 if (
-                    perm === 'admin' ||
-                    (!project.archived && (perm === 'write' || perm === 'read' || project.public))
+                    perm === Role.ADMIN ||
+                    (!project.archived && (perm === Role.WRITE || perm === Role.READ || project.public))
                 ) {
                     permissionedProjs.push(project);
                 }

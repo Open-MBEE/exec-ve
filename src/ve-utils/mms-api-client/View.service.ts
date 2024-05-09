@@ -9,7 +9,7 @@ import { Class, Expression, InstanceSpec, Package, ValueSpec } from '@ve-utils/u
 
 import { veUtils } from '@ve-utils';
 
-import { VeHttpService, VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular';
+import { VeHttpService, VePromise, VePromiseResponse, VePromisesResponse, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
     ElementObject,
@@ -170,7 +170,7 @@ export class ViewService extends BaseApiService {
                                     const views = _(viewKeys).values().value() as ViewObject[];
                                     resolve(this.cacheSvc.put(key, views));
                                 },
-                                (reason: VePromiseReason<ElementsResponse<ViewObject>>) => {
+                                (reason: VePromiseResponse<ElementsResponse<ViewObject>>) => {
                                     reject(reason);
                                 }
                             )
@@ -326,7 +326,7 @@ export class ViewService extends BaseApiService {
         childrenFunc?: (
             currItem: TreeBranch | string[],
             childNodes: (string[] | TreeBranch)[],
-            reject: IQResolveReject<VePromiseReason<unknown>>
+            reject: IQResolveReject<VePromiseResponse<unknown>>
         ) => void,
         seen?: { [key: string]: ViewObject }
     ): VePromise<TreeBranch | string[], unknown> {
@@ -468,7 +468,7 @@ export class ViewService extends BaseApiService {
      * @name ViewService#removeViewFromParentView
      * This removes the specified view from the parent view
      *
-     * @param {ViewsRequest} reqOb see this.elementSvc.getElement, use viewId and parentViewId
+     * @param {ViewsRequest} reqOb {@link ElementService#getElement }, use viewId and parentViewId
      * @returns {IPromise<ViewObject>} The promise would be resolved with updated parent View object
      */
     public removeViewFromParentView(reqOb: ViewsRequest): VePromise<ViewObject> {
@@ -525,7 +525,7 @@ export class ViewService extends BaseApiService {
      * This updates a view or section to include a new element, the new element must be a child
      * of an existing element in the view
      *
-     * @param {ViewsRequest} reqOb see this.elementSvc.getElement for description, elementId is the view
+     * @param {ViewsRequest} reqOb {@link ElementService#getElement } for description, elementId is the view
      *                          or section instance element id
      * @param {InstanceValueObject} instanceValOb the instanceValue object to add
      * @param {number} addPeIndex the index of where to add view or section (instance spec) object
@@ -617,7 +617,7 @@ export class ViewService extends BaseApiService {
      * @name ViewService#removeElementFromViewOrSection
      * This removes the specified instanceVal from the contents of the View or Section
      *
-     * @param {object} reqOb see this.elementSvc.getElement for description
+     * @param {object} reqOb see {@link ElementService#getElement } for description
      * @param {object} instanceVal to remove from the View or Section
      * @returns {Promise} The promise would be resolved with updated View or Section object
      */
@@ -1276,9 +1276,9 @@ export class ViewService extends BaseApiService {
         }
      * </pre>
      *
-     * @param {object} reqOb see this.elementSvc.getElement
+     * @param {ElementsRequest<string>} reqOb see {@link ElementService#getElement }
      * @param {object} contents an expression object from a view or section
-     * @param {int} weight the priority of the request
+     * @param {number} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of tree node objects
      */
     public getElementReferenceTree(
@@ -1338,10 +1338,61 @@ export class ViewService extends BaseApiService {
     }
 
     /**
+     * @name ViewService#getViewpoint
+     * gets the viewpoint (if any) that a view conforms to
+     *
+     * @param {ElementsRequest<string>} reqOb see {@link ElementService#getElement }, elementId is the id of the view that you want the viewpoint of.
+     * @param {number} weight the priority of the request
+     * @returns {VePromise<ElementObject>} promise that will resolve to the viewpoint (if any)
+     */
+    public getViewpoint(reqOb: ElementsRequest<string>, weight?: number): VePromise<ElementObject> {
+        return new this.$q((resolve, reject) => {
+            this.elementSvc.getElement(reqOb).then((view) => {
+                if (view.generalizationIds.length == 0) {
+                    resolve(null);
+                    return;
+                }
+
+                const generalizationsReqOb: ElementsRequest<string[]> = {
+                    elementId: view.generalizationIds,
+                    projectId: reqOb.projectId,
+                    refId: reqOb.refId,
+                };
+                this.elementSvc.getElements(generalizationsReqOb, weight).then((generalizations) => {
+                    for (const generalization of generalizations) {
+                        if (
+                            generalization.appliedStereotypeIds.includes(
+                                this.schemaSvc.getSchema<string>('CONFORM_SID', this.schema)
+                            )
+                        ) {
+                            const viewpointReqOb: ElementsRequest<string> = {
+                                elementId: generalization.targetIds[0],
+                                projectId: reqOb.projectId,
+                                refId: reqOb.refId,
+                            };
+                            this.elementSvc.getElement(viewpointReqOb).then((viewpoint) => {
+                                if (
+                                    viewpoint.appliedStereotypeIds.includes(
+                                        this.schemaSvc.getSchema<string>('VIEWPOINT_SID', this.schema)
+                                    )
+                                ) {
+                                    resolve(viewpoint);
+                                    return;
+                                }
+                            }, reject);
+                        }
+                    }
+                    resolve(null);
+                }, reject);
+            }, reject);
+        });
+    }
+
+    /**
      * @name ViewService#this.isSection
      * Returns true if the passed InstanceSpecification is a Section
      *
-     * @param {Object} instanceSpec A InstanceSpecification json object
+     * @param {ViewInstanceSpec} instanceSpec A InstanceSpecification json object
      * @returns {boolean} whether it's a section
      */
     public isSection = (instanceSpec: ViewInstanceSpec): boolean => {
@@ -1458,7 +1509,7 @@ export class ViewService extends BaseApiService {
      * @name ViewService#getDocumentMetadata
      * gets Document properties from docgen's stereotypes
      *
-     * @param {object} reqOb see this.elementSvc.getElement
+     * @param {object} reqOb {@link ElementService#getElement }
      * @param {integer} weight the priority of the request
      * @returns {Promise} The promise will be resolved with metadata object
      *                      with name value pairs corresponding to document stereotype

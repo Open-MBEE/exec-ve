@@ -6,7 +6,7 @@ import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
 import { veComponents } from '@ve-components';
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { InsertApi, InsertData, InsertResolve } from '@ve-types/components';
 import { ElementObject, ElementsResponse, TransclusionObject } from '@ve-types/mms';
 import { VeModalComponent, VeModalController } from '@ve-types/view-editor';
@@ -84,7 +84,7 @@ class CreateTransclusionModalController
     protected linkType: number;
     protected linkText: string;
 
-    protected insertApi: InsertApi<ElementObject, VePromiseReason<ElementsResponse<ElementObject>>>;
+    protected insertApi: InsertApi<ElementObject, VePromiseResponse<ElementsResponse<ElementObject>>>;
     protected insertData: InsertTransclusionData;
     protected inserting: boolean = false;
     protected insertNew: boolean;

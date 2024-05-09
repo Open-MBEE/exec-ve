@@ -6,7 +6,14 @@ import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 
 import { veUtils } from '@ve-utils';
 
-import { VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular';
+import {
+    VePromise,
+    VePromiseResponse,
+    VePromisesResponse,
+    VeQService,
+    VeHttpService,
+    VeHttpResponse,
+} from '@ve-types/angular';
 import {
     CommitObject,
     CommitResponse,
@@ -14,6 +21,7 @@ import {
     ElementObject,
     ElementsRequest,
     ElementsResponse,
+    ElementsUpdateRequest,
     GenericResponse,
     QueryObject,
     QueryParams,
@@ -175,7 +183,7 @@ export class ElementService extends BaseApiService {
         weight?: number,
         refresh?: boolean,
         allowEmpty?: boolean
-    ) {
+    ): VePromise<ElementObject> {
         this.apiSvc.normalize(reqOb);
         const requestCacheKey = this.getRequestKey(reqOb, twcId);
         const cached: T = this.cacheSvc.get<T>(requestCacheKey);
@@ -284,8 +292,7 @@ export class ElementService extends BaseApiService {
                     }
                     resolve(existing);
                 },
-                (response: angular.IHttpResponse<ElementsResponse<T>>) =>
-                    this.apiSvc.handleErrorCallback(response, reject)
+                (response: VeHttpResponse<ElementsResponse<T>>) => this.apiSvc.handleErrorCallback(response, reject)
             );
         });
     }
@@ -319,7 +326,7 @@ export class ElementService extends BaseApiService {
         }
         result = this.cacheSvc.put<T>(realCacheKey, result, true);
         if (result._twcId) {
-            this.cacheSvc.link(this.getRequestKey(reqOb, result._twcId), realCacheKey);
+            this.cacheSvc.link(this.getRequestKey(reqOb, result._twcId as string), realCacheKey);
         }
         return result;
     }
@@ -343,7 +350,7 @@ export class ElementService extends BaseApiService {
         const commitCacheKey = this.apiSvc.makeCacheKey(deletedReqOb, deletedOb.id);
         this.cacheSvc.link(requestCacheKey, commitCacheKey);
         if (deletedOb._twcId) {
-            const twcRequestCacheKey = this.getRequestKey(deletedReqOb, deletedOb._twcId);
+            const twcRequestCacheKey = this.getRequestKey(deletedReqOb, deletedOb._twcId as string);
             twcRequestCacheKey.push('deleted');
             this.cacheSvc.link(twcRequestCacheKey, commitCacheKey);
         }
@@ -495,7 +502,7 @@ export class ElementService extends BaseApiService {
                         resolve(results);
                         return;
                     },
-                    (response: angular.IHttpResponse<GenericResponse<T>>) => {
+                    (response: VeHttpResponse<GenericResponse<T>>) => {
                         this._removeInProgress(url);
                         reject(this.uRLSvc.handleHttpStatus(response));
                     },
@@ -632,14 +639,14 @@ export class ElementService extends BaseApiService {
             const postElem = this.fillInElement(elementOb);
             //.then((postElem) => {
             this.$http
-                .post<ElementsResponse<T>>(
+                .post<ElementsResponse<T>, ElementsUpdateRequest<T>>(
                     this.uRLSvc.getPostViewsURL({
                         projectId: postElem._projectId,
                         refId: postElem._refId,
                         returnChildViews: returnChildViews,
                     }),
                     {
-                        elements: [postElem],
+                        elements: [postElem as T],
                         source: `ve-${this.apiSvc.getVeVersion()}`,
                     },
                     { timeout: 60000 }
@@ -666,7 +673,7 @@ export class ElementService extends BaseApiService {
                         }
                         handleSuccess(response.data);
                     },
-                    (response: angular.IHttpResponse<ElementsResponse<T>>) => {
+                    (response: VeHttpResponse<ElementsResponse<T>>) => {
                         if (response.status === 409) {
                             const serverOb = response.data.elements[0];
                             this.apiSvc.cleanElement(serverOb);
@@ -754,13 +761,13 @@ export class ElementService extends BaseApiService {
                         resolve(successValues);
                     } else {
                         // some requests failed
-                        const rejectionReasons: VePromiseReason<ElementsResponse<T>>[] = responses
+                        const rejectionReasons: VePromiseResponse<ElementsResponse<T>>[] = responses
                             .filter((response) => {
                                 return response.state === 'rejected';
                             })
                             .map((response): unknown => {
-                                return response.reason as VePromiseReason<ElementsResponse<T>>;
-                            }) as VePromiseReason<ElementsResponse<T>>[];
+                                return response.reason as VePromiseResponse<ElementsResponse<T>>;
+                            }) as VePromiseResponse<ElementsResponse<T>>[];
 
                         // since we could have multiple failed requests when having some successful requests,
                         // reject with the following format so that the client can deal with them at a granular level if
@@ -776,7 +783,7 @@ export class ElementService extends BaseApiService {
                     }
                 }, reject);
             } else {
-                const response: VePromiseReason<VePromisesResponse<T>> = {
+                const response: VePromiseResponse<VePromisesResponse<T>> = {
                     status: 400,
                     message: 'Some of the elements do not have id, _projectId, _refId',
                     data: {},
@@ -800,12 +807,12 @@ export class ElementService extends BaseApiService {
         return new this.$q<T>((resolve, reject) => {
             const url = this.uRLSvc.getPostElementsURL(reqOb);
             this.$http
-                .post<ElementsResponse<T>>(url, {
+                .post<ElementsResponse<T>, ElementsUpdateRequest<T>>(url, {
                     elements: reqOb.elements,
                     source: `ve-${this.apiSvc.getVeVersion()}`,
                 })
                 .then(
-                    (response: angular.IHttpResponse<ElementsResponse<T>>) => {
+                    (response: VeHttpResponse<ElementsResponse<T>>) => {
                         if (!Array.isArray(response.data.elements) || response.data.elements.length === 0) {
                             reject({
                                 status: 500,
@@ -824,8 +831,7 @@ export class ElementService extends BaseApiService {
                         }
                         resolve(this.cacheElement(reqOb, resp));
                     },
-                    (response: angular.IHttpResponse<ElementsResponse<T>>) =>
-                        this.apiSvc.handleErrorCallback(response, reject)
+                    (response: VeHttpResponse<ElementsResponse<T>>) => this.apiSvc.handleErrorCallback(response, reject)
                 );
         });
     }
@@ -844,7 +850,7 @@ export class ElementService extends BaseApiService {
         return new this.$q<T[], ElementsResponse<T>>((resolve, reject) => {
             const url = this.uRLSvc.getPostElementsURL(reqOb);
             this.$http
-                .post<ElementsResponse<T>>(url, {
+                .post<ElementsResponse<T>, ElementsUpdateRequest<T>>(url, {
                     elements: reqOb.elements,
                     source: `ve-${this.apiSvc.getVeVersion()}`,
                 })
@@ -866,7 +872,7 @@ export class ElementService extends BaseApiService {
                         }
                         resolve(results);
                     },
-                    (response: angular.IHttpResponse<ElementsResponse<T>>) => {
+                    (response: VeHttpResponse<ElementsResponse<T>>) => {
                         this.apiSvc.handleErrorCallback(response, reject);
                     }
                 );
@@ -931,7 +937,7 @@ export class ElementService extends BaseApiService {
                         });
                     }
                 },
-                (response: angular.IHttpResponse<ElementsResponse<T>>) => {
+                (response: VeHttpResponse<ElementsResponse<T>>) => {
                     this.apiSvc.handleErrorCallback(response, reject);
                 }
             );
@@ -959,7 +965,7 @@ export class ElementService extends BaseApiService {
         const url = this.uRLSvc.getElementSearchURL(reqOb, queryParams);
         return new this.$q<SearchResponse<T>, SearchResponse<T>>((resolve, reject) => {
             this.$http.post(url, query).then(
-                (response: angular.IHttpResponse<SearchResponse<T>>) => {
+                (response: VeHttpResponse<SearchResponse<T>>) => {
                     //var result = [];
                     //for (let i = 0; i < data.data.elements.length; i++) {
                     //    var element = data.data.elements[i];
@@ -971,8 +977,7 @@ export class ElementService extends BaseApiService {
                     //resolve(result);
                     resolve(response.data);
                 },
-                (response: angular.IHttpResponse<SearchResponse<T>>) =>
-                    this.apiSvc.handleErrorCallback(response, reject)
+                (response: VeHttpResponse<SearchResponse<T>>) => this.apiSvc.handleErrorCallback(response, reject)
             );
         });
     }
@@ -1006,12 +1011,12 @@ export class ElementService extends BaseApiService {
             url,
             new this.$q<CommitObject[], CommitResponse>((resolve, reject) => {
                 this.$http.get(this.uRLSvc.getElementHistoryURL(reqOb)).then(
-                    (response: angular.IHttpResponse<CommitResponse>) => {
+                    (response: VeHttpResponse<CommitResponse>) => {
                         this.cacheSvc.put<CommitObject[]>(requestCacheKey, response.data.commits, true);
                         this._removeInProgress(url);
                         resolve(this.cacheSvc.get<CommitObject[]>(requestCacheKey));
                     },
-                    (response: angular.IHttpResponse<CommitResponse>) => {
+                    (response: VeHttpResponse<CommitResponse>) => {
                         this._removeInProgress(url);
                         this.apiSvc.handleErrorCallback(response, reject);
                     }
@@ -1100,14 +1105,14 @@ export class ElementService extends BaseApiService {
     private _validate(elementObs: ElementObject[]): boolean {
         return _.every(elementObs, (elementOb) => {
             return (
-                Object.prototype.hasOwnProperty.call(elementOb, 'id') &&
-                Object.prototype.hasOwnProperty.call(elementOb, '_projectId') &&
-                Object.prototype.hasOwnProperty.call(elementOb, '_refId')
+                (Object.prototype.hasOwnProperty.call(elementOb, 'id') as boolean) &&
+                (Object.prototype.hasOwnProperty.call(elementOb, '_projectId') as boolean) &&
+                (Object.prototype.hasOwnProperty.call(elementOb, '_refId') as boolean)
             );
         });
     }
 
-    private _bulkUpdate<T extends ElementObject, U = ElementsResponse<T>>(
+    private _bulkUpdate<T extends ElementObject, U extends ElementsResponse<T> = ElementsResponse<T>>(
         elements: T[],
         returnChildViews?: boolean
     ): VePromise<T[], U> {
@@ -1123,7 +1128,7 @@ export class ElementService extends BaseApiService {
                       refId: elements[0]._refId,
                   });
             this.$http
-                .post<ElementsResponse<T>>(
+                .post<U, ElementsUpdateRequest<T>>(
                     url,
                     {
                         elements: elements,
@@ -1135,7 +1140,7 @@ export class ElementService extends BaseApiService {
                     (response) => {
                         this._bulkUpdateSuccessHandler(response, resolve);
                     },
-                    (response: angular.IHttpResponse<U>) => {
+                    (response: VeHttpResponse<U>) => {
                         this.apiSvc.handleErrorCallback(response, reject);
                     }
                 );
@@ -1143,7 +1148,7 @@ export class ElementService extends BaseApiService {
     }
 
     private _bulkUpdateSuccessHandler<T extends ElementObject>(
-        serverResponse: angular.IHttpResponse<ElementsResponse<T>>,
+        serverResponse: VePromiseResponse<ElementsResponse<T>>,
         resolve: angular.IQResolveReject<T[]>
     ): void {
         const results: T[] = [];

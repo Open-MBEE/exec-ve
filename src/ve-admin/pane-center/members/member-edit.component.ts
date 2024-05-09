@@ -4,14 +4,8 @@ import { veAdmin } from '@ve-admin/ve-admin.module';
 import { PermissionService, UserService } from '@ve-utils/mms-api-client';
 
 import { VeComponentOptions, VePromise } from '@ve-types/angular';
-import {
-    OrgObject,
-    PermissionUpdateRequest,
-    PermissionUpdateResponse,
-    ProjectObject,
-    RoleString,
-    UserObject,
-} from '@ve-types/mms';
+import { OrgObject, PermissionUpdateRequest, PermissionUpdateResponse, ProjectObject, UserObject } from '@ve-types/mms';
+import Role, { VeRole } from '@ve-types/mms/permissions';
 
 // Define component
 export class MemberEditController implements angular.IComponentController {
@@ -31,12 +25,13 @@ export class MemberEditController implements angular.IComponentController {
     results: UserObject[];
     username: string;
     user: UserObject;
-    permissions: RoleString;
+    permissions: VeRole['ANY'];
     inherited: boolean;
     btnTitle: string;
     header: string;
     title: string;
     notFound: string;
+    roles = Role;
 
     static $inject = ['growl', 'UserService', 'PermissionService'];
 
@@ -77,7 +72,7 @@ export class MemberEditController implements angular.IComponentController {
             this.permissions = this.project.permission.users[name].role;
             this.inherited = this.project.permission.users[name].inherited;
         } else {
-            this.permissions = 'NONE';
+            this.permissions = Role.NONE;
             this.inherited = false;
         }
 
@@ -95,7 +90,7 @@ export class MemberEditController implements angular.IComponentController {
             },
         };
         // Set data to submit
-        if (this.permissions === 'NONE') {
+        if (this.permissions === Role.NONE) {
             data.users.action = 'REMOVE';
             data.users.permissions.push({
                 name: this.username,
@@ -151,7 +146,7 @@ export class MemberEditController implements angular.IComponentController {
 
     resetForm = (): void => {
         this.username = '';
-        this.permissions = null;
+        this.permissions = Role.NONE;
         this.results = null;
     };
 
@@ -170,12 +165,12 @@ const MemberEditComponent: VeComponentOptions = {
     },
     controller: MemberEditController,
     template: `
-      <div class='extra-padding'>
+      <div class="extra-padding">
         <h2>{{ $ctrl.header }}</h2>
         <hr/>
         <h3>{{ $ctrl.title }}</h3>
           <div class="form-group" style="margin: 0">
-            <input type='search'
+            <input type="search"
                    name="username"
                    id="username"
                    autoComplete="off"
@@ -183,12 +178,12 @@ const MemberEditComponent: VeComponentOptions = {
                    ng-model="$ctrl.username"
                    ng-class="{ 'is-invalid': $ctrl.notFound.length > 0 }"
                    ng-change="$ctrl.userChange()"/>
-            <div class='members-dropdown' ng-show="$ctrl.results.length > 0">
-                <div class='members-dropdown-item' key="user-{{ user.username }}"
+            <div class="members-dropdown" ng-show="$ctrl.results.length > 0">
+                <div class="members-dropdown-item" key="user-{{ user.username }}"
                      ng-repeat="user in $ctrl.results track by user.username"
                      ng-click="$ctrl.selectUser(user.username)">
                   <span>{{user.firstName}} {{user.lastName}}</span>
-                  <span class='member-username'>@{{ user.username }}</span>
+                  <span class="member-username">@{{ user.username }}</span>
                 </div>
             </div>
             <div ng-show="$ctrl.notFound.length > 0" class="invalid-feedback">
@@ -198,21 +193,21 @@ const MemberEditComponent: VeComponentOptions = {
           <form style="padding-top: 10px">
             <div class="form-group">
               <label for="permissions">Permissions</label>
-              <input type='select'
-                     name='permissions'
-                     id='permissions'
+              <select
+                     name="permissions"
+                     id="permissions"
                      data-ng-value="$ctrl.permissions"
                      data-ng-model="$ctrl.permissions">
                 <option>Choose one...</option>
-                <option>READER</option>
-                <option>WRITER</option>
-                <option ng-if="$ctrl.admin">ADMIN</option>
-                <option>NONE</option>
-              </input>
+                <option>{{ $ctrl.roles.READ }}</option>
+                <option>{{ $ctrl.roles.WRITE }}</option>
+                <option ng-if="$ctrl.admin">{{ $ctrl.roles.ADMIN }}</option>
+                <option>{{ $ctrl.roles.NONE }}</option>
+              </select>
               <label for="inherited">Inherited</label>
-              <input type='checkbox' 
-                name='inherited'
-                id='inherited'
+              <input type="checkbox" 
+                name="inherited"
+                id="inherited"
 
               />
             </div>

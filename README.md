@@ -80,7 +80,7 @@ on how to configure nginx directly [here](https://hub.docker.com/_/nginx).
 - `VE_PORT` (default = 9000) Specify the desired port for VE to listen on \*
 - `VE_PROTOCOL` (accepts: 'http' | 'https') Enables SSL, you will additionally need to mount your https certificates and key to
   `/run/secrets/cert.key` and `/run/secrets/cert.crt` \*
-- `VE_ENV` (default='example') specify a custom configuration file. Mount the desired file using a docker config 
+- `VE_ENV` (default="example") specify a custom configuration file. Mount the desired file using a docker config 
    to `/opt/mbee/ve/config/<env_file_name>.json` or volume mounted at `/opt/mbee/ve/config`.
 
 (* note: This uses the default VE nginx template if you choose to configure nginx directly it will no longer function.)

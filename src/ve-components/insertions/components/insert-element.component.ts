@@ -9,7 +9,7 @@ import { SchemaService } from '@ve-utils/model-schema';
 
 import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { ElementObject, MmsObject } from '@ve-types/mms';
 import { VeModalService } from '@ve-types/view-editor';
 
@@ -94,7 +94,7 @@ class InsertElementController extends Insertion<InsertTransclusionData> {
         return this.insertionSvc.createAction(this.createItem, this.insertData.noPublish);
     };
 
-    public fail = <V extends VePromiseReason<MmsObject>>(reason: V): void => {
+    public fail = <V extends VePromiseResponse<MmsObject>>(reason: V): void => {
         if (reason.status === 401) {
             this.reLogin();
         } else if (reason.status === 422) {

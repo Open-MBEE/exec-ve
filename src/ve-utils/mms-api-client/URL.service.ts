@@ -1,6 +1,6 @@
 import { veUtils } from '@ve-utils';
 
-import { VePromiseReason } from '@ve-types/angular';
+import { VeHttpResponse, VePromiseResponse } from '@ve-types/angular';
 import { VeConfig } from '@ve-types/config';
 import {
     ArtifactsRequest,
@@ -439,7 +439,7 @@ export class URLService {
     };
 
     getUserURL = (username: string): string => {
-        return `${this.getUsersURL()}?user=${username}`;
+        return `${this.getUsersURL()}?username=${username}`;
     };
 
     /**
@@ -459,10 +459,8 @@ export class URLService {
      *          }
      *      ```
      */
-    handleHttpStatus<T extends MmsObject, U = BasicResponse<T>>(
-        response: angular.IHttpResponse<U>
-    ): VePromiseReason<U> {
-        const result: VePromiseReason<U> = response;
+    handleHttpStatus<T extends MmsObject, U = BasicResponse<T>>(response: VeHttpResponse<U>): VePromiseResponse<U> {
+        const result: VePromiseResponse<U> = response;
         const data: U = result.data;
         if (result.status === 404) result.message = 'Not Found';
         else if (result.status === 500) {

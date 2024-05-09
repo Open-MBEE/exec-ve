@@ -6,7 +6,7 @@ import { AuthService } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
-import { VeComponentOptions, VePromiseReason } from '@ve-types/angular';
+import { VeComponentOptions, VePromiseResponse } from '@ve-types/angular';
 import { ParamsObject } from '@ve-types/mms';
 import { VeModalResolveFn, VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
@@ -117,7 +117,7 @@ const LoginComponent: VeComponentOptions = {
                                 });
                         }
                     },
-                    (reason: VePromiseReason<unknown>) => {
+                    (reason: VePromiseResponse<unknown>) => {
                         this.spin = false;
                         this.growl.error(reason.message);
                         deferred.reject(reason);

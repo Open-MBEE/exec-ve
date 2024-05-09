@@ -141,23 +141,23 @@
 //     else if (props.archived && data.archived) {
 //       // Element should be rendered as the ID initially
 //       element = (
-//         <span className='element-id'>
+//         <span className="element-id">
 //          {data.id}
 //         </span>
 //       );
 //       // If the name is not blank, render the name
 //       if (data.name !== '' && props.displayIds) {
 //         element = (
-//           <span className='grayed-out'>
+//           <span className="grayed-out">
 //             {data.name}
-//             <span className='element-id'>({data.id})</span>
+//             <span className="element-id">({data.id})</span>
 //           </span>
 //         );
 //       }
 //       // If the name is not blank and has displayIds to false
 //       else if (data.name !== '' && !props.displayIds) {
 //         element = (
-//           <span className='grayed-out'>
+//           <span className="grayed-out">
 //           {data.name}
 //           </span>
 //         );
@@ -182,8 +182,8 @@
 //     elementLink = (
 //       <Link to={`#${props.id}`}
 //             onClick={handleClick}
-//             className='element-link'>
-//           <span className='element-name'>
+//             className="element-link">
+//           <span className="element-name">
 //             {elementIcon}
 //             {element}
 //           </span>
@@ -191,8 +191,8 @@
 //   } else {
 //     elementLink = (
 //       <span onClick={handleClick}
-//            className='element-link'>
-//         <span className='element-name'>
+//            className="element-link">
+//         <span className="element-name">
 //           {elementIcon}
 //           {element}
 //         </span>

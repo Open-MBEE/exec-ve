@@ -1,10 +1,10 @@
-import { ArtifactObject } from '@ve-types/mms/mms';
+import { ArtifactObject } from '@ve-types/mms/api';
 import { ValueObject } from '@ve-types/mms/valuesAndInstances';
 
 export * from './valuesAndInstances.d';
 export * from './views.d';
 export * from './orgsAndProjects.d';
-export * from './mms.d';
+export * from './api.d';
 export * from './classesAndProperties.d';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,4 +37,7 @@ export interface ElementObject extends DataObject {
     defaultValue?: ValueObject;
     documentation?: string;
     ownerId?: string;
+    generalizationIds?: string[];
+    targetIds?: string[];
+    sourceIds?: string[];
 }

@@ -10,7 +10,7 @@ import { ApiService, ElementService, PermissionService, ViewService, ValueServic
 
 import { veCore } from '@ve-core';
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { BasicResponse, ElementObject, ElementsResponse, MmsObject } from '@ve-types/mms';
 import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
@@ -193,7 +193,7 @@ export class EditorService {
                             this.cleanUpEdit(editKey);
                             resolve(element);
                         },
-                        (reason: VePromiseReason<ElementsResponse<T>>) => {
+                        (reason: VePromiseResponse<ElementsResponse<T>>) => {
                             if (reason.status === 409) {
                                 const latest = reason.data.elements[0];
                                 this.saveConflictDialog(latest).result.then(
@@ -362,7 +362,9 @@ export class EditorService {
         return Array.isArray(key) ? key.join('|') : key;
     }
 
-    public handleError<T>(reason: { message: string; type: 'error' | 'warning' | 'info' } | VePromiseReason<T>): void {
+    public handleError<T>(
+        reason: { message: string; type: 'error' | 'warning' | 'info' } | VePromiseResponse<T>
+    ): void {
         if (reason.type === 'info') this.growl.info(reason.message);
         else if (reason.type === 'warning') this.growl.warning(reason.message);
         else if (reason.type === 'error') this.growl.error(reason.message);

@@ -11,7 +11,7 @@ import {
 
 import { veUtils } from '@ve-utils';
 
-import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import { AuthRequest, AuthResponse, CheckAuthResponse } from '@ve-types/mms';
 
 /**
@@ -70,7 +70,7 @@ export class AuthService {
                 localStorage.setItem('token', this.token);
                 deferred.resolve(this.token);
             },
-            (fail: angular.IHttpResponse<AuthResponse>) => {
+            (fail: VeHttpResponse<AuthResponse>) => {
                 deferred.reject(this.uRLSvc.handleHttpStatus(fail));
             }
         );
@@ -117,7 +117,7 @@ export class AuthService {
                         resolve();
                     }
                 },
-                (fail: angular.IHttpResponse<CheckAuthResponse>) => {
+                (fail: VeHttpResponse<CheckAuthResponse>) => {
                     reject(fail);
                     this.removeToken();
                 }

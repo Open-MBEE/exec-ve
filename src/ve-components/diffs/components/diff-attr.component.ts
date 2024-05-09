@@ -7,7 +7,7 @@ import { handleChange } from '@ve-utils/utils';
 
 import { veComponents } from '@ve-components';
 
-import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { ElementObject, ElementsRequest, RequestObject } from '@ve-types/mms';
 
 /**
@@ -124,8 +124,8 @@ class DiffAttrController {
                     } else {
                         if (
                             respForBaseElement.reason &&
-                            (respForBaseElement.reason as VePromiseReason<ElementObject>).message &&
-                            (respForBaseElement.reason as VePromiseReason<ElementObject>).message
+                            (respForBaseElement.reason as VePromiseResponse<ElementObject>).message &&
+                            (respForBaseElement.reason as VePromiseResponse<ElementObject>).message
                                 .toLowerCase()
                                 .includes('deleted')
                         ) {
@@ -149,8 +149,8 @@ class DiffAttrController {
                     } else {
                         if (
                             respForComparedElement.reason &&
-                            (respForComparedElement.reason as VePromiseReason<ElementObject>).message &&
-                            (respForComparedElement.reason as VePromiseReason<ElementObject>).message
+                            (respForComparedElement.reason as VePromiseResponse<ElementObject>).message &&
+                            (respForComparedElement.reason as VePromiseResponse<ElementObject>).message
                                 .toLowerCase()
                                 .includes('deleted')
                         ) {

@@ -1,2 +1,3 @@
-import "./Docgen.service"
-import "./SVG.service"
+import './Docgen.service';
+
+export * from './Docgen.service';

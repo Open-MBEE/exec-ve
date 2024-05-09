@@ -3,21 +3,22 @@ import { ApiService, URLService, UserService } from '@ve-utils/mms-api-client';
 
 import { veUtils } from '@ve-utils';
 
-import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import {
-    PermissionLookupResponse,
     PermissionLookupObject,
-    UsersResponse,
-    PermissionResponse,
+    PermissionLookupResponse,
     PermissionMap,
+    PermissionResponse,
     PermissionUpdateRequest,
     PermissionUpdateResponse,
+    UsersResponse,
 } from '@ve-types/mms';
+import Role, { VeRole } from '@ve-types/mms/permissions';
 
 export interface PermissionCache {
-    org: { [id: string]: string };
-    project: { [id: string]: string };
-    ref: { [id: string]: string };
+    org: { [id: string]: VeRole['ANY'] };
+    project: { [id: string]: VeRole['ANY'] };
+    ref: { [id: string]: VeRole['ANY'] };
 }
 
 /**
@@ -103,7 +104,7 @@ export class PermissionService {
                             });
                         }
                     },
-                    (response: angular.IHttpResponse<PermissionLookupResponse>) => {
+                    (response: VeHttpResponse<PermissionLookupResponse>) => {
                         reject(this.uRLSvc.handleHttpStatus(response));
                     }
                 );
@@ -159,7 +160,7 @@ export class PermissionService {
                         });
                         resolve(this.cacheSvc.put<PermissionMap>(cacheKey, perms));
                     },
-                    (response: angular.IHttpResponse<PermissionResponse>) => {
+                    (response: VeHttpResponse<PermissionResponse>) => {
                         reject(this.uRLSvc.handleHttpStatus(response));
                     }
                 );
@@ -233,7 +234,10 @@ export class PermissionService {
         return this._updatePermissions(url, reqOb);
     }
 
-    public updateGroupPermissions(groupName: string, reqOb: PermissionUpdateRequest): VePromise<PermissionUpdateResponse> {
+    public updateGroupPermissions(
+        groupName: string,
+        reqOb: PermissionUpdateRequest
+    ): VePromise<PermissionUpdateResponse> {
         const url = this.uRLSvc.getGroupPermissionURL(groupName);
         return this._updatePermissions(url, reqOb);
     }
@@ -281,7 +285,8 @@ export class PermissionService {
             const org = this.getOrgPermission(orgId);
             const username = this.userSvc.getUsername();
             org.then((result) => {
-                this.permission.org[orgId] = result.users && result.users[username] ? result.users[username].role : 'READER';
+                this.permission.org[orgId] =
+                    result.users && result.users[username] ? result.users[username].role : Role.READ;
             }, reject);
             promises.push(org);
 
@@ -289,7 +294,7 @@ export class PermissionService {
                 const project = this.getProjectPermission(projectId);
                 project.then((result) => {
                     this.permission.project[projectId] =
-                        result.users && result.users[username] ? result.users[username].role : 'READER';
+                        result.users && result.users[username] ? result.users[username].role : Role.READ;
                 }, reject);
                 promises.push(project);
             }
@@ -298,7 +303,7 @@ export class PermissionService {
                 const ref = this.getRefPermission(projectId, refId);
                 ref.then((result) => {
                     this.permission.ref[projectId + '/' + refId] =
-                        result.users && result.users[username] ? result.users[username].role : 'READER';
+                        result.users && result.users[username] ? result.users[username].role : Role.READ;
                 }, reject);
                 promises.push(ref);
             }
@@ -310,17 +315,17 @@ export class PermissionService {
     }
 
     public hasOrgEditPermission = (orgId: string): boolean => {
-        return this.permission.org[orgId] == 'edit' || this.permission.org[orgId] == 'admin';
+        return this.permission.org[orgId] == Role.WRITE || this.permission.org[orgId] == Role.ADMIN;
     };
 
     public hasProjectEditPermission = (projectId: string): boolean => {
-        return this.permission.project[projectId] == 'edit' || this.permission.project[projectId] == 'admin';
+        return this.permission.project[projectId] == Role.WRITE || this.permission.project[projectId] == Role.ADMIN;
     };
 
     public hasBranchEditPermission = (projectId: string, refId: string): boolean => {
         return (
-            this.permission.ref[projectId + '/' + refId] == 'edit' ||
-            this.permission.ref[projectId + '/' + refId] == 'admin'
+            this.permission.ref[projectId + '/' + refId] == Role.WRITE ||
+            this.permission.ref[projectId + '/' + refId] == Role.ADMIN
         );
     };
 

@@ -11,7 +11,7 @@ import { ApiService, AuthService, ElementService, HttpService, URLService } from
 
 import { veApp } from '@ve-app';
 
-import { VeComponentOptions } from '@ve-types/angular';
+import { VeComponentOptions, VeHttpResponse, VeHttpService } from '@ve-types/angular';
 import { VeConfig } from '@ve-types/config';
 import { ParamsObject } from '@ve-types/mms';
 import { VeModalService } from '@ve-types/view-editor';
@@ -227,7 +227,7 @@ class MainController implements IComponentController {
             this.rootScopeSvc.veStateChanging(false);
             this.rootScopeSvc.veViewContentLoading(false);
             //check if error is ticket error
-            const error: angular.IHttpResponse<any> = trans.error().detail as angular.IHttpResponse<any>;
+            const error: VeHttpResponse<any> = trans.error().detail as VeHttpResponse<any>;
             if (
                 !error ||
                 error.status === 401 ||

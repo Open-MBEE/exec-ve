@@ -58,14 +58,14 @@ const ProjectHome: VeComponentOptions = {
     },
     template: `
       <div id="workspace">
-        <div className='workspace-header header-box-depth'>
-           <h2 className='workspace-title workspace-title-padding'>Projects</h2>
+        <div class="workspace-header header-box-depth">
+           <h2 class="workspace-title workspace-title-padding">Projects</h2>
            <div ng-if="$ctrl.write || $ctrl.admin">
             <button class="btn btn-outline-secondary" ng-click="$ctrl.handleToggle()">
            </div>
         </div>
-        <div id='workspace-body' className='extra-padding'>
-          <list class-name='main-workspace'>
+        <div id="workspace-body" class="extra-padding">
+          <list class-name="main-workspace">
             <list-item ng-repeat="project in $ctrl.orgs.projects" key="project-key-{{project.id}}" class-name="proj-org-header">{{project.name}}</list-item>
           </list>
       </div>

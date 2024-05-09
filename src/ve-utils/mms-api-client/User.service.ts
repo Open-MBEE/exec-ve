@@ -4,7 +4,7 @@ import { URLService } from '@ve-utils/mms-api-client/URL.service';
 
 import { veUtils } from '@ve-utils';
 
-import { VeHttpService, VePromise, VeQService } from '@ve-types/angular';
+import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import { UserObject, UsersResponse } from '@ve-types/mms';
 
 export class UserService extends BaseApiService {
@@ -51,13 +51,15 @@ export class UserService extends BaseApiService {
                                         reject({
                                             status: 404,
                                             message: 'User not found',
+                                            data: null,
+                                            headers: null,
                                         });
                                     } else {
                                         this.cacheSvc.put(key, response.data.users, false);
                                         resolve(this.cacheSvc.get<UserObject[]>(key));
                                     }
                                 },
-                                (response: angular.IHttpResponse<UsersResponse>) => {
+                                (response: VeHttpResponse<UsersResponse>) => {
                                     this.uRLSvc.handleHttpStatus(response);
                                     reject(response);
                                 }
@@ -98,7 +100,7 @@ export class UserService extends BaseApiService {
                                         resolve(this.cacheSvc.get<UserObject>(key));
                                     }
                                 },
-                                (response: angular.IHttpResponse<UsersResponse>) => {
+                                (response: VeHttpResponse<UsersResponse>) => {
                                     this.uRLSvc.handleHttpStatus(response);
                                     reject(response);
                                 }

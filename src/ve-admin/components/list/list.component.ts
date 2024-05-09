@@ -22,7 +22,7 @@ const ListComponent: VeComponentOptions = {
     },
     transclude: true,
     template: `
-    <div class={{$ctrl.appliedClasses}}>
+    <div class="{{$ctrl.appliedClasses}}">
     <ng-transclude></ng-transclude>
 </div>
     `,

@@ -423,7 +423,7 @@ veApp.config([
                         },
                     },
                     'pane-center@main': {
-                        component: 'orgInfo',
+                        component: 'informationPage',
                         bindings: {
                             mmsOrg: 'orgOb',
                         },
@@ -525,11 +525,10 @@ veApp.config([
                         },
                     },
                     'pane-center@main': {
-                        component: 'projectInfo',
+                        component: 'informationPage',
                         bindings: {
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
-                            mmsUser: 'userOb',
                         },
                     },
                 },
@@ -541,6 +540,47 @@ veApp.config([
                         component: 'membersPage',
                         bindings: {
                             mmsProject: 'projectOb',
+                        },
+                    },
+                },
+            })
+            .state('main.admin.project.ref', {
+                url: '/:refId',
+                params: {
+                    refId: {
+                        inherit: true,
+                        type: 'path',
+                    },
+                },
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params();
+                        },
+                    ],
+                    refOb: [
+                        'ResolveService',
+                        'params',
+                        (resolveSvc: ResolveService, params: ParamsObject): VePromise<RefObject, RefsResponse> => {
+                            return resolveSvc.getRef(params);
+                        },
+                    ],
+                    permissions: [
+                        'projectOb',
+                        'userOb',
+                        (projectOb: ProjectObject, userOb: UserObject): string => {
+                            return projectOb.permission.users[userOb.username].role;
+                        },
+                    ],
+                },
+                views: {
+                    'pane-center@main': {
+                        component: 'informationPage',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                            mmsProject: 'projectOb',
+                            mmsRef: 'refOb',
                         },
                     },
                 },

@@ -8,11 +8,12 @@ import { UserService } from '@ve-utils/mms-api-client';
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import { UserObject } from '@ve-types/mms';
+import Role from '@ve-types/mms/permissions';
 
 // Define component
 export class UserListItemController implements angular.IComponentController {
     //Bindings
-    user: UserObject;
+    user: UserObject | string;
     adminLabel: boolean;
     _key: string;
     adminState: boolean;
@@ -73,7 +74,7 @@ export class UserListItemController implements angular.IComponentController {
                         this.minimizeClass = 'spacing minimize';
                     }
                     // Verify which permissions user has
-                    if (perm === 'admin') {
+                    if (perm === Role.ADMIN) {
                         // Add read permission check
                         this.stats = [
                             {
@@ -104,7 +105,7 @@ export class UserListItemController implements angular.IComponentController {
                                 _key: `admin-${this.currentUser.username}`,
                             },
                         ];
-                    } else if (perm === 'write') {
+                    } else if (perm === Role.WRITE) {
                         this.stats = [
                             {
                                 title: 'Read',
@@ -134,7 +135,7 @@ export class UserListItemController implements angular.IComponentController {
                                 _key: `admin-${this.currentUser.username}`,
                             },
                         ];
-                    } else if (perm === 'read') {
+                    } else if (perm === Role.READ) {
                         // Add admin permission check
                         this.stats = [
                             {
@@ -187,15 +188,15 @@ export class UserListItemController implements angular.IComponentController {
     populateUserData = (): VePromise<void> => {
         return new this.$q((resolve, reject) => {
             if (!this.label) {
-                if (typeof this.user !== 'object') {
+                if (typeof this.user == 'string') {
                     // Set options for request
 
                     // Get user data
-                    this.userSvc.getUserData(this.user as string).then((response) => {
+                    this.userSvc.getUserData(this.user).then((response) => {
                         this.currentUser = response;
                         resolve();
                     }, reject);
-                } else if (this.currentUser !== this.user) {
+                } else {
                     this.currentUser = this.user;
                     resolve();
                 }
@@ -230,22 +231,22 @@ const UserListItemComponent: VeComponentOptions = {
     },
     template: `
     <div class="stats-list-item {{ $ctrl.className }}">
-    <div id='user-list-items' class={{ $ctrl.classNames }}>
+    <div id="user-list-items" class="{{ $ctrl.classNames }}">
         <span ng-if="$ctrl.link" ui-sref="$ctrl.link" n>{{ $ctrl.name }}</span>
         <span ng-if="!$ctrl.link" ng-click="$ctrl.handleClick($event)">{{ $ctrl.name }}</span>
-        <div ng-class={'grayed-out' : !$ctrl.user.enabled }>
+        <div ng-class="{'grayed-out' : !$ctrl.currentUser.enabled }">
             <span>{{ $ctrl.currentUser.username }}</span>
         </div>
         <div ng-if="$ctrl.adminState">
-            <div ng-class={'grayed-out' : !$ctrl.user.enabled }>
+            <div ng-class="{'grayed-out' : !$ctrl.currentUser.enabled }">
                 <span>{{ $ctrl.currentUser.firstName }}</span>
             </div>
-            <div ng-class={'grayed-out' : !$ctrl.user.enabled }>
+            <div ng-class="{'grayed-out' : !$ctrl.currentUser.enabled }">
                 <span>{{ $ctrl.currentUser.email }}</span>
             </div>
         </div>
     </div>
-    <stats-list className='stats-list-member' key='statlist-perms' ng-if="$ctrl.width > 600">
+    <stat-list class-name="stats-list-member" key="statlist-perms" ng-show="$ctrl.width > 600">
         <stat ng-repeat="stat in $ctrl.stats" 
                 stat-title="stat.title" 
                 stat-label="stat.label"
@@ -254,7 +255,7 @@ const UserListItemComponent: VeComponentOptions = {
                 class-name="stat.className" 
                 divider="stat.divider"
                 no-tooltip="stat.noTooltip"
-                ng-if="$ctrl.width && $ctrl.getTotalStatsWidth() <= $ctrl.width">
+                ng-show="$ctrl.width && $ctrl.getTotalStatsWidth() <= $ctrl.width">
         </stat>
     </stat-list>
 </div>
