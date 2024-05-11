@@ -87,12 +87,11 @@ const SidebarComponent: VeComponentOptions = {
     },
     transclude: true,
     template: `
-      <div id="sidebar" class="sidebar">
-        <sidebar-header title="$ctrl.title" ng-show="$ctrl.title && $ctrl.isExpanded"></sidebar-header>
-        <div class="sidebar-links">
-            <ng-transclude></ng-transclude>
-        </div>
-      </div>
+    <div id="sidebar" class="sidebar">
+    <sidebar-header title="$ctrl.title" ng-show="$ctrl.title && $ctrl.isExpanded"></sidebar-header>
+    <div ng-transclude class="sidebar-links">
+    </div>
+</div>
     `,
 };
 

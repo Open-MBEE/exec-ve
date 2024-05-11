@@ -1,3 +1,5 @@
+import { veAdmin } from '@ve-admin/ve-admin.module';
+
 import { VeComponentOptions } from '@ve-types/angular';
 
 export interface ListApi {
@@ -22,9 +24,10 @@ const ListComponent: VeComponentOptions = {
     },
     transclude: true,
     template: `
-    <div class="{{$ctrl.appliedClasses}}">
-    <ng-transclude></ng-transclude>
+    <div ng-transclude class="{{$ctrl.appliedClasses}}">
 </div>
     `,
     controller: ListComponentController,
 };
+
+veAdmin.component(ListComponent.selector, ListComponent);

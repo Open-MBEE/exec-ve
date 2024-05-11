@@ -2,8 +2,6 @@ import { IPane, IRegion } from '@openmbee/pane-layout';
 
 import { veAdmin } from '@ve-admin/ve-admin.module';
 
-import { IStatBindings } from '../stat/stat.component';
-
 import { VeComponentOptions } from '@ve-types/angular';
 import { ProjectObject } from '@ve-types/mms';
 
@@ -25,7 +23,8 @@ class ProjectListItemController implements IProjectListItemBindings {
     $pane: IPane;
     resizer: Rx.Disposable;
 
-    stats: IStatBindings[];
+    users: number;
+    groups: number;
 
     static $inject = ['$element'];
 
@@ -34,22 +33,8 @@ class ProjectListItemController implements IProjectListItemBindings {
     $onInit(): void {
         this.resizer = (this.$pane.$resized as Rx.Subject<IRegion>).subscribe(() => this.handleResize());
         this.handleResize();
-        this.stats = [
-            {
-                title: 'Users',
-                icon: 'fa-solid fa-users',
-                value: Object.keys(this.project.permission.users).length,
-            },
-            {
-                title: 'Groups',
-                icon: 'fa-solid fa-users-rectangle',
-                value: Object.keys(this.project.permission.groups).length,
-            },
-        ];
-
-        if (this.divider) {
-            this.stats.push({ divider: true });
-        }
+        this.users = Object.keys(this.project.permission.users).length;
+        this.groups = Object.keys(this.project.permission.groups).length;
     }
 
     $onDestroy(): void {
@@ -77,22 +62,26 @@ const ProjectListItemComponent: VeComponentOptions = {
     controller: ProjectListItemController,
     template: `
     <div class="stats-list-item {{$ctrl.className}}" ng-ref="$ctrl.ref">
-      <div class="list-header">
+    <div class="list-header">
         <a ng-class="$ctrl.project.archived ? 'archived-link' : ''" ui-sref="main.admin.project({ projectId: $ctrl.project.id })">{{$ctrl.project.name}}</a>
-      </div>
-      <stat-list ng-if="$ctrl.width > 600">
-        <stat ng-repeat="stat in $ctrl.stats" 
-                stat-title="stat.title" 
-                stat-label="stat.label"
-                stat-icon="stat.icon" 
-                stat-value="stat.value" 
-                class-name="stat.className" 
-                divider="stat.divider"
-                no-tooltip="stat.noTooltip"
-                ng-if="$ctrl.width && $ctrl.getTotalStatsWidth() <= $ctrl.width">
-        </stat>
-      </stat-list>
     </div>
+    <stat-list ng-if="$ctrl.width > 600">
+        <stat stat-title="Users"
+            stat-icon="fa-solid fa-users"
+            stat-value="$ctrl.users"
+            _key="org-{{$ctrl.project.id}}-users>
+        </stat>
+        <stat stat-title="Groups"
+            stat-icon="fa-solid fa-users-rectangle"
+            stat-value="$ctrl.groups"
+            _key="org-{{$ctrl.project.id}}-groups">
+        </stat>
+        <stat ng-if="$ctrl.divider"
+            divider="true" 
+            _key="org-{{$ctrl.project.id}}-divider">
+        </stat>
+    </stat-list>
+</div>
   `,
 };
 

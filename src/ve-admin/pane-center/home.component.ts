@@ -179,14 +179,16 @@ const HomeComponent: VeComponentOptions = {
   </div>
   <div class="extra-padding">
     <div ng-if="$ctrl.orgs.length === 0" class="list-item"><h3>No organizations.</h3></div>
-    <org-list ng-repeat="org in $ctrl.orgs" org="org"
-              key="{{'org-key-' + org.id}}"
-              user="$ctrl.user"
-              write="$ctrl.admin || $ctrl.orgPerms[org.id].admin || $ctrl.orgPerms[org.id].write"
-              admin="$ctrl.admin || $ctrl.orgPerms[org.id].admin"
-              show-projs="$ctrl.displayOrgs[org.id]"
-              list-api="$ctrl.listApi">
-    </org-list>
+      <list>
+        <org-list ng-repeat="org in $ctrl.orgs" org="org"
+                  key="{{'org-key-' + org.id}}"
+                  user="$ctrl.user"
+                  write="$ctrl.admin || $ctrl.orgPerms[org.id].admin || $ctrl.orgPerms[org.id].write"
+                  admin="$ctrl.admin || $ctrl.orgPerms[org.id].admin"
+                  show-projs="$ctrl.displayOrgs[org.id]"
+                  list-api="$ctrl.listApi">
+        </org-list>
+      </list>
   </div>
   <!-- <modal is-open="$ctrl.modalCreate" toggle="$ctrl.handleCreateToggle()">
     <modal-body>

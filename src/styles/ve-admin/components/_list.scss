@@ -76,6 +76,7 @@
 %stat-list-template {
   display: flex;
   align-items: center;
+  width: 60px;
 }
 
 .stats-list {
@@ -94,7 +95,7 @@
 
 .stats-item {
   @extend %stat-list-template;
-  justify-content: flex-start;
+  justify-content: center;
   padding-left: 1em;
   padding-right: 1em;
   i {

@@ -1,4 +1,5 @@
 import './list.component';
+import './list-item.component';
 
 import './org-list.component';
 import './org-list-item.component';

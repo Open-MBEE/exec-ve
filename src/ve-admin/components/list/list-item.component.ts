@@ -37,8 +37,7 @@ const ListItemComponent: VeComponentOptions = {
     selector: 'listItem',
     transclude: true,
     template: `
-    <div class="{{$ctrl.appliedClasses}}">
-    <ng-transclude></ng-transclude>
+    <div ng-transclude class="{{$ctrl.appliedClasses}}">
 </div>
     `,
     bindings: {

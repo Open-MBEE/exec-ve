@@ -4,35 +4,35 @@ import { StatListController } from './stat-list.component';
 
 import { VeComponentOptions } from '@ve-types/angular';
 
-export interface IStatBindings {
-    title?: string;
-    label?: boolean;
-    icon?: string;
-    value?: number;
-    className?: string;
-    divider?: boolean;
-    noTooltip?: boolean;
-    setChildWidth?: (title: string, width: number) => void;
-    key?: string;
-    _key?: string;
-}
+// export interface IStatBindings {
+//     title?: string;
+//     label?: boolean;
+//     icon?: string;
+//     value?: number;
+//     className?: string;
+//     divider?: boolean;
+//     noTooltip?: boolean;
+//     setChildWidth?: (title: string, width: number) => void;
+//     key?: string;
+//     _key?: string;
+// }
 
-interface IStatScope extends angular.IScope, IStatBindings {}
+// interface IStatScope extends angular.IScope, IStatBindings {}
 
-class StatController implements angular.IComponentController, IStatBindings {
+class StatController implements angular.IComponentController {
     title: string;
     _key?: string;
-    label?: boolean;
+    label?: boolean = false;
     icon: string;
     value: number;
     className?: string;
-    divider?: boolean;
-    noTooltip?: boolean;
-    setChildWidth: (title: string, width: number) => void;
+    divider?: boolean = false;
+    noTooltip?: boolean = false;
 
     ref: JQuery<HTMLElement>;
 
     statList: StatListController;
+    observer: MutationObserver;
 
     widthSet: boolean = false;
 
@@ -41,7 +41,15 @@ class StatController implements angular.IComponentController, IStatBindings {
     constructor(private $element: JQuery<HTMLElement>) {}
 
     $onInit(): void {
-        //this.ref = this.$element.find('div');
+        this.ref = this.$element.find('div');
+        this.observer = new MutationObserver(() => {
+            this.handleResize();
+        });
+        this.observer.observe(this.ref[0], { attributes: true });
+    }
+
+    handleResize(): void {
+        this.statList.setChildWidth(this.title, this.ref[0].clientWidth);
     }
 
     // $doCheck(): void {
@@ -54,9 +62,9 @@ class StatController implements angular.IComponentController, IStatBindings {
 
 const StatComponent: VeComponentOptions = {
     bindings: {
-        title: '<statTitle',
+        title: '@statTitle',
         label: '<?statLabel',
-        icon: '<statIcon',
+        icon: '@statIcon',
         value: '<statValue',
         className: '<?',
         divider: '<?',
@@ -72,16 +80,15 @@ const StatComponent: VeComponentOptions = {
         'stats-item': true,
         'stats-divider': $ctrl.divider,
         'bold-name': $ctrl.label,
-        '{{$ctrl.className}}': $ctrl.className
-      }" id="{{$ctrl._key || $ctrl.title}}" ng-ref="$ctrl.ref">
+      }" id="{{$ctrl._key || $ctrl.title}}" class="{{$ctrl.className}}">
         <div ng-show="!$ctrl.label && !$ctrl.divider && !$ctrl.noTooltip">
           <span uib-tooltip="{{$ctrl.title}}" tooltip-placement="top"
                 tooltip-append-to-body="true" tooltip-animation="false">
-                <i class="fa-solid {{$ctrl.icon}}"></i>
+                <i class="{{$ctrl.icon}}"></i>
           </span>
         </div>
-        <div ng-hide="!$ctrl.label && !$ctrl.divider && !$ctrl.noTooltip">
-          <i class="fa-solid {{$ctrl.icon}}"></i>
+        <div ng-show="!$ctrl.label && !$ctrl.divider && $ctrl.noTooltip">
+            <i class="{{$ctrl.icon}}"></i>
         </div>
         <p ng-if="!isNaN($ctrl.value)">{{$ctrl.value}}</p>
         <p ng-if="isNaN($ctrl.value)">?</p>

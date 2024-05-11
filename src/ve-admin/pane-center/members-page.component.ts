@@ -21,6 +21,8 @@ class MembersPageController implements angular.IComponentController {
         firstName: 'Name',
         lastName: 'Last Name',
         username: 'Username',
+        email: 'Email',
+        enabled: true,
     };
 
     // Define toggle function

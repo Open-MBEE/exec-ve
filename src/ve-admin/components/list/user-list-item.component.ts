@@ -1,6 +1,5 @@
 import { IPane, IRegion } from '@openmbee/pane-layout';
 
-import { IStatBindings } from '@ve-admin/components/stat/stat.component';
 import { veAdminEvents } from '@ve-admin/types';
 import { veAdmin } from '@ve-admin/ve-admin.module';
 import { EventService } from '@ve-utils/core';
@@ -30,9 +29,11 @@ export class UserListItemController implements angular.IComponentController {
     width: number = 0;
     classNames: string;
     minimizeClass: string;
-    perm: string;
 
-    stats: IStatBindings[];
+    write: boolean = false;
+    admin: boolean = false;
+
+    roles = Role;
 
     static $inject = ['$q', 'growl', 'UserService', 'EventService'];
 
@@ -57,116 +58,15 @@ export class UserListItemController implements angular.IComponentController {
                 if (this.label) {
                     this.classNames = 'template-item minimize';
                     this.minimizeClass = 'minimize';
+                } else {
+                    this.minimizeClass = 'spacing minimize';
                 }
 
-                if (this.adminLabel && this.currentUser.admin) {
-                    this.stats = [
-                        {
-                            title: 'Admin',
-                            icon: 'fa-solid fa-check',
-                            className: this.minimizeClass,
-                            label: this.label,
-                            _key: this._key,
-                        },
-                    ];
-                } else if (perm) {
-                    if (!this.label) {
-                        this.minimizeClass = 'spacing minimize';
-                    }
-                    // Verify which permissions user has
-                    if (perm === Role.ADMIN) {
-                        // Add read permission check
-                        this.stats = [
-                            {
-                                title: 'Read',
-                                icon: 'fa-solid fa-check',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `read-${this.currentUser.username}`,
-                                _key: `read-${this.currentUser.username}`,
-                            },
-                            {
-                                title: 'Write',
-                                icon: 'fa-solid fa-check',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `write-${this.currentUser.username}`,
-                                _key: `write-${this.currentUser.username}`,
-                            },
-                            {
-                                title: 'Admin',
-                                icon: 'fa-solid fa-check',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `admin-${this.currentUser.username}`,
-                                _key: `admin-${this.currentUser.username}`,
-                            },
-                        ];
-                    } else if (perm === Role.WRITE) {
-                        this.stats = [
-                            {
-                                title: 'Read',
-                                icon: 'fa-solid fa-check',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `read-${this.currentUser.username}`,
-                                _key: `read-${this.currentUser.username}`,
-                            },
-                            {
-                                title: 'Write',
-                                icon: 'fa-solid fa-check',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `write-${this.currentUser.username}`,
-                                _key: `write-${this.currentUser.username}`,
-                            },
-                            {
-                                title: 'Admin',
-                                icon: 'fa-solid fa-window-minimize',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `admin-${this.currentUser.username}`,
-                                _key: `admin-${this.currentUser.username}`,
-                            },
-                        ];
-                    } else if (perm === Role.READ) {
-                        // Add admin permission check
-                        this.stats = [
-                            {
-                                title: 'Read',
-                                icon: 'fa-solid fa-check',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `read-${this.currentUser.username}`,
-                                _key: `read-${this.currentUser.username}`,
-                            },
-                            {
-                                title: 'Write',
-                                icon: 'fa-solid fa-window-minimize',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `write-${this.currentUser.username}`,
-                                _key: `write-${this.currentUser.username}`,
-                            },
-                            {
-                                title: 'Admin',
-                                icon: 'fa-solid fa-window-minimize',
-                                className: this.minimizeClass,
-                                label: this.label,
-                                noTooltip: true,
-                                key: `admin-${this.currentUser.username}`,
-                                _key: `admin-${this.currentUser.username}`,
-                            },
-                        ];
-                    }
+                if (this.permission == Role.ADMIN) {
+                    this.write = true;
+                    this.admin = true;
+                } else if (this.permission == Role.WRITE) {
+                    this.write = true;
                 }
             },
             (reason) => {
@@ -200,6 +100,8 @@ export class UserListItemController implements angular.IComponentController {
                     this.currentUser = this.user;
                     resolve();
                 }
+            } else {
+                resolve();
             }
         });
     };
@@ -224,7 +126,7 @@ const UserListItemComponent: VeComponentOptions = {
         adminState: '<',
         label: '<',
         permission: '<',
-        className: '<',
+        className: '@',
     },
     require: {
         $pane: '^ngPane',
@@ -247,15 +149,29 @@ const UserListItemComponent: VeComponentOptions = {
         </div>
     </div>
     <stat-list class-name="stats-list-member" key="statlist-perms" ng-show="$ctrl.width > 600">
-        <stat ng-repeat="stat in $ctrl.stats" 
-                stat-title="stat.title" 
-                stat-label="stat.label"
-                stat-icon="stat.icon" 
-                stat-value="stat.value" 
-                class-name="stat.className" 
-                divider="stat.divider"
-                no-tooltip="stat.noTooltip"
-                ng-show="$ctrl.width && $ctrl.getTotalStatsWidth() <= $ctrl.width">
+        <stat stat-title="Read"
+            class-name="$ctrl.minimizeClass"
+            stat-label="$ctrl.label"
+            stat-icon="fa-solid fa-check"
+            no-tooltip="true"
+            key="read-{{$ctrl.currentUser.username}}"
+            _key="read-{{$ctrl.currentUser.username}}">
+        </stat>
+        <stat stat-title="Write"
+            class-name="$ctrl.minimizeClass"
+            stat-label="$ctrl.label"
+            stat-icon="fa-solid {{ $ctrl.write ? 'fa-check' : 'fa-window-minimize'}}"
+            no-tooltip="true"
+            key="write-{{$ctrl.currentUser.username}}"
+            _key="write-{{$ctrl.currentUser.username}}">
+        </stat>
+        <stat stat-title="Admin"
+            class-name="$ctrl.minimizeClass"
+            stat-label="$ctrl.label"
+            stat-icon="fa-solid {{ $ctrl.admin ? 'fa-check' : 'fa-window-minimize'}}"
+            no-tooltip="true"
+            key="admin-{{$ctrl.currentUser.username}}"
+            _key="admin-{{$ctrl.currentUser.username}}">
         </stat>
     </stat-list>
 </div>

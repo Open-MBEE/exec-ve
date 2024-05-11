@@ -2,8 +2,6 @@ import { IPane, IRegion } from '@openmbee/pane-layout';
 
 import { veAdmin } from '@ve-admin/ve-admin.module';
 
-import { IStatBindings } from '../stat/stat.component';
-
 import { VeComponentOptions } from '@ve-types/angular';
 import { OrgObject } from '@ve-types/mms';
 
@@ -25,36 +23,18 @@ class OrgListItemController implements IOrgListItemBindings {
     $pane: IPane;
     resizer: Rx.Disposable;
 
-    stats: IStatBindings[];
+    users: number;
+    groups: number;
 
     static $inject = ['$element'];
 
     constructor(private $element: ng.IRootElementService) {}
 
     $onInit(): void {
+        this.users = Object.keys(this.org.permission.users).length;
+        this.groups = Object.keys(this.org.permission.groups).length;
         this.resizer = (this.$pane.$resized as Rx.Subject<IRegion>).subscribe(() => this.handleResize());
         this.handleResize();
-        this.stats = [
-            {
-                title: 'Projects',
-                icon: 'fa-solid fa-boxes-stacked',
-                value: this.org.projects.length,
-            },
-            {
-                title: 'Users',
-                icon: 'fa-solid fa-users',
-                value: Object.keys(this.org.permission.users).length,
-            },
-            {
-                title: 'Groups',
-                icon: 'fa-solid fa-users-rectangle',
-                value: Object.keys(this.org.permission.groups).length,
-            },
-        ];
-
-        if (this.divider) {
-            this.stats.push({ divider: true });
-        }
     }
 
     $onDestroy(): void {
@@ -81,20 +61,28 @@ const OrgListItemComponent: VeComponentOptions = {
     },
     controller: OrgListItemController,
     template: `
-    <div class="stats-list-item {{$ctrl.className}}" ng-ref="$ctrl.ref">
+    <div class="stats-list-item {{$ctrl.className}}">
       <div class="list-header">
         <a ng-class="$ctrl.org.archived ? 'archived-link' : ''" ng-href="/admin/orgs/{{$ctrl.org.id}}">{{$ctrl.org.name}}</a>
       </div>
       <stat-list ng-if="$ctrl.width > 600">
-        <stat ng-repeat="stat in $ctrl.stats" 
-            stat-title="stat.title" 
-            stat-label="stat.label"
-            stat-icon="stat.icon" 
-            stat-value="stat.value" 
-            class-name="stat.className" 
-            divider="stat.divider"
-            no-tooltip="stat.noTooltip"
-            ng-if="$ctrl.width && $ctrl.getTotalStatsWidth() <= $ctrl.width">
+        <stat stat-title="Projects"
+            stat-icon="fa-solid fa-boxes-stacked"
+            stat-value="$ctrl.org.projects.length">
+        </stat>
+        <stat stat-title="Users"
+            stat-icon="fa-solid fa-users"
+            stat-value="$ctrl.users"
+            _key="org-{{$ctrl.org.id}}-users">
+        </stat>
+        <stat stat-title="Groups"
+            stat-icon="fa-solid fa-users-rectangle"
+            stat-value="$ctrl.groups"
+            _key="org-{{$ctrl.org.id}}-groups">
+        </stat>
+        <stat ng-if="$ctrl.divider"
+            divider="true"
+            _key="org-{{$ctrl.org.id}}-divider">
         </stat>
       </stat-list>
     </div>

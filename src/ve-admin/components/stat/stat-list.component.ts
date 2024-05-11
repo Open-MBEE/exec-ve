@@ -58,9 +58,8 @@ const StatList: VeComponentOptions = {
     controller: StatListController,
     transclude: true,
     template: `
-      <div class="{{$ctrl.className}}">
-        <ng-transclude></ng-transclude>
-      </div>
+    <div ng-transclude class="{{$ctrl.className}}">
+</div>
     `,
 };
 
