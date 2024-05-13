@@ -213,6 +213,13 @@ veApp.config([
                             return resolveSvc.getToken();
                         },
                     ],
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
                     bannerOb: [
                         'ResolveService',
                         (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
@@ -225,16 +232,17 @@ veApp.config([
                             return resolveSvc.getLoginBanner();
                         },
                     ],
-                    userOb: [
+                    currentUserOb: [
                         'ResolveService',
                         (resolveSvc: ResolveService): VePromise<UserObject, UsersResponse> => {
                             return resolveSvc.getCurrentUser();
                         },
                     ],
                     orgObs: [
+                        'refresh',
                         'ResolveService',
-                        (resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
-                            return resolveSvc.getOrgs();
+                        (refresh: boolean, resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
+                            return resolveSvc.getOrgs(refresh);
                         },
                     ],
                 },
@@ -282,6 +290,16 @@ veApp.config([
                             return resolveSvc.getBanner();
                         },
                     ],
+                    footerOb: [
+                        'ResolveService',
+                        'params',
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
+                        ): VePromise<BrandingStyle, ProjectsResponse> => {
+                            return resolveSvc.getFooter(params);
+                        },
+                    ],
                     projectObs: [
                         'refresh',
                         'ResolveService',
@@ -293,12 +311,13 @@ veApp.config([
                         },
                     ],
                     orgObs: [
+                        'refresh',
                         'ResolveService',
-                        (resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
-                            return resolveSvc.getOrgs();
+                        (refresh: boolean, resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
+                            return resolveSvc.getOrgs(refresh);
                         },
                     ],
-                    userOb: [
+                    currentUserOb: [
                         'ResolveService',
                         (resolveSvc: ResolveService): VePromise<UserObject, UsersResponse> => {
                             return resolveSvc.getCurrentUser();
@@ -331,6 +350,12 @@ veApp.config([
                             mmsOrgs: 'orgObs',
                         },
                     },
+                    'banner-bottom@main': {
+                        component: 'systemFooter',
+                        bindings: {
+                            mmsFooter: 'footerOb',
+                        },
+                    },
                     'toolbar-left@main': {
                         component: 'leftToolbar',
                         bindings: {
@@ -347,7 +372,35 @@ veApp.config([
                         component: 'adminHome',
                         bindings: {
                             mmsOrgs: 'orgObs',
-                            mmsUser: 'userOb',
+                            currentUser: 'currentUserOb',
+                        },
+                    },
+                },
+            })
+            .state('main.admin.user', {
+                url: '/users',
+                resolve: {
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
+                    userObs: [
+                        'refresh',
+                        'ResolveService',
+                        (refresh: boolean, resolveSvc: ResolveService): VePromise<UserObject[], UsersResponse> => {
+                            return resolveSvc.getUsers(refresh);
+                        },
+                    ],
+                },
+                views: {
+                    'pane-center@main': {
+                        component: 'userList',
+                        bindings: {
+                            mmsUsers: 'userObs',
+                            currentUser: 'currentUserOb',
                         },
                     },
                 },
@@ -387,10 +440,15 @@ veApp.config([
                         },
                     ],
                     orgOb: [
-                        'ResolveService',
+                        'refresh',
                         'params',
-                        (resolveSvc: ResolveService, params: ParamsObject): VePromise<OrgObject, OrgsResponse> => {
-                            return resolveSvc.getOrg(params.orgId);
+                        'ResolveService',
+                        (
+                            refresh: boolean,
+                            params: ParamsObject,
+                            resolveSvc: ResolveService
+                        ): VePromise<OrgObject, OrgsResponse> => {
+                            return resolveSvc.getOrg(params.orgId, refresh);
                         },
                     ],
                 },
@@ -417,15 +475,17 @@ veApp.config([
                         },
                     },
                     'toolbar-right@main': {
-                        component: 'orgSidebar',
+                        component: 'organizationSidebar',
                         bindings: {
                             mmsOrg: 'orgOb',
+                            currentUser: 'currentUserOb',
                         },
                     },
                     'pane-center@main': {
                         component: 'informationPage',
                         bindings: {
                             mmsOrg: 'orgOb',
+                            currentUser: 'currentUserOb',
                         },
                     },
                 },
@@ -437,6 +497,7 @@ veApp.config([
                         component: 'membersPage',
                         bindings: {
                             mmsOrg: 'orgOb',
+                            currentUser: 'currentUserOb',
                         },
                     },
                 },
@@ -478,18 +539,25 @@ veApp.config([
                     projectOb: [
                         'ResolveService',
                         'params',
+                        'refresh',
                         (
                             resolveSvc: ResolveService,
-                            params: ParamsObject
+                            params: ParamsObject,
+                            refresh: boolean
                         ): VePromise<ProjectObject, ProjectsResponse> => {
-                            return resolveSvc.getProject(params);
+                            return resolveSvc.getProject(params, refresh);
                         },
                     ],
                     orgOb: [
                         'ResolveService',
                         'projectOb',
-                        (resolveSvc: ResolveService, projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> => {
-                            return resolveSvc.getProjectOrg(projectOb);
+                        'refresh',
+                        (
+                            resolveSvc: ResolveService,
+                            projectOb: ProjectObject,
+                            refresh: boolean
+                        ): VePromise<OrgObject, OrgsResponse> => {
+                            return resolveSvc.getProjectOrg(projectOb, refresh);
                         },
                     ],
                 },
@@ -521,7 +589,7 @@ veApp.config([
                         bindings: {
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
-                            mmsUser: 'userOb',
+                            currentUser: 'currentUserOb',
                         },
                     },
                     'pane-center@main': {
@@ -540,6 +608,7 @@ veApp.config([
                         component: 'membersPage',
                         bindings: {
                             mmsProject: 'projectOb',
+                            currentUser: 'currentUserOb',
                         },
                     },
                 },
@@ -568,9 +637,9 @@ veApp.config([
                     ],
                     permissions: [
                         'projectOb',
-                        'userOb',
-                        (projectOb: ProjectObject, userOb: UserObject): string => {
-                            return projectOb.permission.users[userOb.username].role;
+                        'currentUserOb',
+                        (projectOb: ProjectObject, currentUserOb: UserObject): string => {
+                            return projectOb.permission.users[currentUserOb.username].role;
                         },
                     ],
                 },
@@ -581,67 +650,6 @@ veApp.config([
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                        },
-                    },
-                },
-            })
-            .state('main.admin.preview', {
-                url: '?viewId&type',
-                params: {
-                    viewId: {
-                        inherit: true,
-                        type: 'query',
-                    },
-                    type: {
-                        inherit: true,
-                        type: 'query',
-                    },
-                },
-                resolve: {
-                    params: [
-                        '$transition$',
-                        ($transition$: Transition): ParamsObject => {
-                            return $transition$.params();
-                        },
-                    ],
-                    token: [
-                        'ResolveService',
-                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
-                            return resolveSvc.getToken();
-                        },
-                    ],
-                    refresh: [
-                        '$transition$',
-                        ($transition$: Transition): boolean => {
-                            const options = $transition$.options();
-                            return options.reload === true || options.reload === 'true';
-                        },
-                    ],
-                    bannerOb: [
-                        'ResolveService',
-                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
-                            return resolveSvc.getBanner();
-                        },
-                    ],
-                },
-                views: {
-                    'banner-top@main': {
-                        component: 'systemBanner',
-                        bindings: {
-                            mmsBanner: 'bannerOb',
-                        },
-                    },
-                    'nav@main': {
-                        component: 'navBar',
-                    },
-                    'menu@main': {
-                        component: 'mainMenu',
-                    },
-                    'pane-center@main': {
-                        component: 'adminHome',
-                        bindings: {
-                            mmsOrgs: 'orgObs',
-                            mmsUser: 'userOb',
                         },
                     },
                 },
@@ -677,7 +685,7 @@ veApp.config([
                             return options.reload === true || options.reload === 'true';
                         },
                     ],
-                    userOb: [
+                    currentUserOb: [
                         'ResolveService',
                         (resolveSvc: ResolveService): VePromise<UserObject, UsersResponse> => {
                             return resolveSvc.getCurrentUser();
@@ -692,11 +700,13 @@ veApp.config([
                     projectOb: [
                         'ResolveService',
                         'params',
+                        'refresh',
                         (
                             resolveSvc: ResolveService,
-                            params: ParamsObject
+                            params: ParamsObject,
+                            refresh: boolean
                         ): VePromise<ProjectObject, ProjectsResponse> => {
-                            return resolveSvc.getProject(params);
+                            return resolveSvc.getProject(params, refresh);
                         },
                     ],
                     projectObs: [
@@ -714,14 +724,20 @@ veApp.config([
                     orgOb: [
                         'ResolveService',
                         'projectOb',
-                        (resolveSvc: ResolveService, projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> => {
-                            return resolveSvc.getProjectOrg(projectOb);
+                        'refresh',
+                        (
+                            resolveSvc: ResolveService,
+                            projectOb: ProjectObject,
+                            refresh: boolean
+                        ): VePromise<OrgObject, OrgsResponse> => {
+                            return resolveSvc.getProjectOrg(projectOb, refresh);
                         },
                     ],
                     orgObs: [
+                        'refresh',
                         'ResolveService',
-                        (resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
-                            return resolveSvc.getOrgs();
+                        (refresh: boolean, resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
+                            return resolveSvc.getOrgs(refresh);
                         },
                     ],
                     refObs: [
@@ -788,11 +804,13 @@ veApp.config([
                     projectOb: [
                         'ResolveService',
                         'params',
+                        'refresh',
                         (
                             resolveSvc: ResolveService,
-                            params: ParamsObject
+                            params: ParamsObject,
+                            refresh: boolean
                         ): VePromise<MountObject, ProjectsResponse> => {
-                            return resolveSvc.getProjectMounts(params);
+                            return resolveSvc.getProjectMounts(params, refresh);
                         },
                     ],
                     refOb: [
@@ -846,7 +864,7 @@ veApp.config([
                             return resolveSvc.getFooter(params);
                         },
                     ],
-                    userOb: [
+                    currentUserOb: [
                         'ResolveService',
                         (resolveSvc: ResolveService): VePromise<UserObject, UsersResponse> => {
                             return resolveSvc.getCurrentUser();
@@ -896,6 +914,13 @@ veApp.config([
             .state('main.project.ref.portal', {
                 url: '/portal',
                 resolve: {
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
                     documentOb: [
                         'params',
                         'refOb',

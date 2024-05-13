@@ -1,15 +1,17 @@
 import { veAdmin } from '@ve-admin/ve-admin.module';
+import { RootScopeService } from '@ve-utils/application';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { OrgObject, PermissionMap, ProjectObject, UserObject } from '@ve-types/mms';
-import Role from '@ve-types/mms/permissions';
+import Role, { VeRole } from '@ve-types/mms/permissions';
 
-class MembersPageController implements angular.IComponentController {
+export class MembersPageController implements angular.IComponentController {
     org?: OrgObject;
     project?: ProjectObject;
+    user: UserObject;
 
     //local
-    admin: boolean;
+    authority: VeRole['ANY'];
     modal: boolean;
     selectedUser: UserObject | string;
     title: string;
@@ -18,12 +20,15 @@ class MembersPageController implements angular.IComponentController {
     roles = Role;
 
     userTemplate = {
-        firstName: 'Name',
-        lastName: 'Last Name',
+        fullName: 'Name',
         username: 'Username',
         email: 'Email',
         enabled: true,
     };
+
+    static $inject = ['RootScopeService'];
+
+    constructor(private rootScopeSvc: RootScopeService) {}
 
     // Define toggle function
     handleToggle(username: string): void {
@@ -32,6 +37,7 @@ class MembersPageController implements angular.IComponentController {
     }
 
     $onInit(): void {
+        this.rootScopeSvc.veHideRight(true);
         if (this.org) {
             this.userperm = this.org.permission;
             this.users = Object.keys(this.org.permission.users);
@@ -41,6 +47,7 @@ class MembersPageController implements angular.IComponentController {
             this.users = Object.keys(this.project.permission.users);
             this.title = this.project.name;
         }
+        this.authority = this.userperm.users[this.user.username].role;
     }
 }
 
@@ -55,13 +62,11 @@ const MembersPageComponent: VeComponentOptions = {
         </div>
         <div id="workspace-body" class="extra-padding">
           <div class="main-workspace">
-            <div class="roles-box">
-              <member-edit ng-show="$ctrl.project && !$ctrl.org" project="$ctrl.project"
+            <div class="roles-box" ng-if="$ctrl.roles.ge($ctrl.authority, $ctrl.roles.WRITE)">
+              <member-edit project="$ctrl.project" org="$ctrl.org"
                 selected-user="$ctrl.selectedUser"
-                admin="$ctrl.admin"/>
-              <member-edit ng-hide="$ctrl.project && !$ctrl.org" org="$ctrl.org"
-                selected-user="$ctrl.selectedUser"
-                admin="$ctrl.admin"/>
+                current-user="$ctrl.user.username"
+                authority="$ctrl.authority"/>
             </div>
             <list class="members-box">
                 <div class="template-header" key="user-info-template">
@@ -75,9 +80,10 @@ const MembersPageComponent: VeComponentOptions = {
                   <user-list-item class-name="user-name"
                                 user="user"
                                 permission="$ctrl.userperm.users[user].role"
+                                inherited="$ctrl.userperm.users[user].inheritedRole"
                                 _key="key-{{user}}"></user-list-item>
-                  <span uib-tooltip="Edit" tooltip-placement="top">
-                      <i ng-click="$ctrl.handleEditToggle(user)" class="fas fa-user-edit add-btn"></i>
+                  <span uib-tooltip="Edit" tooltip-placement="top" ng-if="$ctrl.roles.ge($ctrl.authority, $ctrl.roles.WRITE) && !$ctrl.roles.eq($ctrl.userperm.users[user].inheritedRole,$ctrl.roles.ADMIN)">
+                      <i ng-click="$ctrl.handleToggle(user)" class="fas fa-user-edit add-btn"></i>
                   </span>
                 </div>
             </list>
@@ -89,6 +95,7 @@ const MembersPageComponent: VeComponentOptions = {
     bindings: {
         org: '<mmsOrg',
         project: '<mmsProject',
+        user: '<currentUser',
     },
 };
 

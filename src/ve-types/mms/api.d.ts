@@ -257,6 +257,7 @@ export interface PermissionRecord {
     name: string;
     role: VeRole['ANY'];
     inherited: boolean;
+    inheritedRole?: VeRole['ANY'];
 }
 
 export interface PermissionMap {

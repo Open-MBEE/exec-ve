@@ -153,7 +153,19 @@ export class PermissionService {
                             groups: {},
                         };
                         response.data.users.permissions.forEach((perm) => {
-                            perms.users[perm.name] = perm;
+                            if (!Object.prototype.hasOwnProperty.call(perms.users, perm.name)) {
+                                perms.users[perm.name] = perm;
+                                if (perm.inherited) {
+                                    perms.users[perm.name].inheritedRole = perm.role;
+                                }
+                            } else {
+                                if (perm.inherited) {
+                                    perms.users[perm.name].inherited = true;
+                                    perms.users[perm.name].inheritedRole = perm.role;
+                                } else {
+                                    perms.users[perm.name].role = perm.role;
+                                }
+                            }
                         });
                         response.data.groups.permissions.forEach((perm) => {
                             perms.groups[perm.name] = perm;

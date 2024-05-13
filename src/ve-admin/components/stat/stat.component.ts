@@ -28,6 +28,7 @@ class StatController implements angular.IComponentController {
     className?: string;
     divider?: boolean = false;
     noTooltip?: boolean = false;
+    tooltip: string;
 
     ref: JQuery<HTMLElement>;
 
@@ -42,6 +43,9 @@ class StatController implements angular.IComponentController {
 
     $onInit(): void {
         this.ref = this.$element.find('div');
+        if (!this.noTooltip && !this.tooltip) {
+            this.tooltip = this.title;
+        }
         this.observer = new MutationObserver(() => {
             this.handleResize();
         });
@@ -68,6 +72,7 @@ const StatComponent: VeComponentOptions = {
         value: '<statValue',
         className: '<?',
         divider: '<?',
+        tooltip: '@?',
         noTooltip: '<?',
     },
     controller: StatController,
@@ -82,7 +87,7 @@ const StatComponent: VeComponentOptions = {
         'bold-name': $ctrl.label,
       }" id="{{$ctrl._key || $ctrl.title}}" class="{{$ctrl.className}}">
         <div ng-show="!$ctrl.label && !$ctrl.divider && !$ctrl.noTooltip">
-          <span uib-tooltip="{{$ctrl.title}}" tooltip-placement="top"
+          <span uib-tooltip="{{$ctrl.tooltip}}" tooltip-placement="top"
                 tooltip-append-to-body="true" tooltip-animation="false">
                 <i class="{{$ctrl.icon}}"></i>
           </span>

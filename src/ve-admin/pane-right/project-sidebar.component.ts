@@ -9,7 +9,7 @@ import { OrgObject, ProjectObject, RefObject, UserObject } from '@ve-types/mms';
 class ProjectSidebarController implements angular.IComponentController {
     mmsProject: ProjectObject;
     mmsOrg: OrgObject;
-    mmsUser: UserObject;
+    currentUser: UserObject;
     mmsRef: RefObject;
 
     //Ng-Pane
@@ -55,7 +55,7 @@ const ProjectSidebarComponent: VeComponentOptions = {
     bindings: {
         mmsOrg: '<',
         mmsProject: '<',
-        mmsUser: '<',
+        currentUser: '<',
         mmsRef: '<',
     },
     template: `

@@ -105,19 +105,23 @@ export class ResolveService {
         return this.userSvc.getCurrentUser();
     }
 
-    public getOrg(orgId: string): VePromise<OrgObject, OrgsResponse> {
-        return this.orgSvc.getOrg(orgId);
+    public getUsers(refresh?: boolean): VePromise<UserObject[], UsersResponse> {
+        return this.userSvc.getUsers(refresh);
     }
 
-    public getProjectOrg(projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> {
-        return this.getOrg(projectOb.orgId);
+    public getOrg(orgId: string, refresh?: boolean): VePromise<OrgObject, OrgsResponse> {
+        return this.orgSvc.getOrg(orgId, refresh);
     }
 
-    public getOrgs(): VePromise<OrgObject[], OrgsResponse> {
-        return this.orgSvc.getOrgs();
+    public getProjectOrg(projectOb: ProjectObject, refresh?: boolean): VePromise<OrgObject, OrgsResponse> {
+        return this.getOrg(projectOb.orgId, refresh);
     }
-    public getProject(params: ParamsObject): VePromise<ProjectObject, ProjectsResponse> {
-        const promise = this.projectSvc.getProject(params.projectId);
+
+    public getOrgs(refresh?: boolean): VePromise<OrgObject[], OrgsResponse> {
+        return this.orgSvc.getOrgs(refresh);
+    }
+    public getProject(params: ParamsObject, refresh?: boolean): VePromise<ProjectObject, ProjectsResponse> {
+        const promise = this.projectSvc.getProject(params.projectId, refresh);
         promise.then(
             (result) => {
                 this.eventSvc.resolve('mmsProject', result);

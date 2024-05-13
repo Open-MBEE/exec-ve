@@ -18,6 +18,7 @@ export class UserListItemController implements angular.IComponentController {
     adminState: boolean;
     label: boolean;
     permission: string;
+    inherited: string = Role.NONE;
     className: string;
 
     //Parent Controllers
@@ -29,9 +30,6 @@ export class UserListItemController implements angular.IComponentController {
     width: number = 0;
     classNames: string;
     minimizeClass: string;
-
-    write: boolean = false;
-    admin: boolean = false;
 
     roles = Role;
 
@@ -51,22 +49,17 @@ export class UserListItemController implements angular.IComponentController {
         this.populateUserData().then(
             () => {
                 if (this.currentUser) {
-                    this.name = this.currentUser.fullName
-                        ? this.currentUser.fullName
-                        : `${this.currentUser.firstName} ${this.currentUser.lastName}`;
+                    if (this.currentUser.fullName != 'null null') {
+                        this.name = this.currentUser.fullName
+                            ? this.currentUser.fullName
+                            : `${this.currentUser.firstName} ${this.currentUser.lastName}`;
+                    }
                 }
                 if (this.label) {
                     this.classNames = 'template-item minimize';
                     this.minimizeClass = 'minimize';
                 } else {
                     this.minimizeClass = 'spacing minimize';
-                }
-
-                if (this.permission == Role.ADMIN) {
-                    this.write = true;
-                    this.admin = true;
-                } else if (this.permission == Role.WRITE) {
-                    this.write = true;
                 }
             },
             (reason) => {
@@ -101,6 +94,9 @@ export class UserListItemController implements angular.IComponentController {
                     resolve();
                 }
             } else {
+                if (typeof this.user != 'string') {
+                    this.currentUser = this.user;
+                }
                 resolve();
             }
         });
@@ -126,6 +122,7 @@ const UserListItemComponent: VeComponentOptions = {
         adminState: '<',
         label: '<',
         permission: '<',
+        inherited: '<',
         className: '@',
     },
     require: {
@@ -134,42 +131,52 @@ const UserListItemComponent: VeComponentOptions = {
     template: `
     <div class="stats-list-item {{ $ctrl.className }}">
     <div id="user-list-items" class="{{ $ctrl.classNames }}">
-        <span ng-if="$ctrl.link" ui-sref="$ctrl.link" n>{{ $ctrl.name }}</span>
-        <span ng-if="!$ctrl.link" ng-click="$ctrl.handleClick($event)">{{ $ctrl.name }}</span>
+        <span ng-class="{'placeholder': !$ctrl.name}">
+            <span ng-if="$ctrl.link" ui-sref="$ctrl.link" >{{ $ctrl.name ? $ctrl.name : '(none)' }}</span>
+            <span ng-if="!$ctrl.link" ng-click="$ctrl.handleClick($event)">{{ $ctrl.name ? $ctrl.name : '(none)' }}</span>
+        </span>
         <div ng-class="{'grayed-out' : !$ctrl.currentUser.enabled }">
             <span>{{ $ctrl.currentUser.username }}</span>
         </div>
-        <div ng-if="$ctrl.adminState">
-            <div ng-class="{'grayed-out' : !$ctrl.currentUser.enabled }">
-                <span>{{ $ctrl.currentUser.firstName }}</span>
-            </div>
+        <div ng-if="!$ctrl.adminState">
             <div ng-class="{'grayed-out' : !$ctrl.currentUser.enabled }">
                 <span>{{ $ctrl.currentUser.email }}</span>
             </div>
         </div>
     </div>
-    <stat-list class-name="stats-list-member" key="statlist-perms" ng-show="$ctrl.width > 600">
-        <stat stat-title="Read"
+    <stat-list class-name="stats-list-member" ng-if="$ctrl.adminLabel && $ctrl.currentUser.admin">
+        <stat stat-title="Admin"
             class-name="$ctrl.minimizeClass"
             stat-label="$ctrl.label"
             stat-icon="fa-solid fa-check"
-            no-tooltip="true"
+            _key="{{ $ctrl._key }}">
+        </stat>
+    </stat-list>
+    <stat-list class-name="stats-list-member" key="statlist-perms" ng-show="$ctrl.width > 600" ng-if="!($ctrl.adminLabel && $ctrl.currentUser.admin)">
+        <stat stat-title="Read"
+            class-name="$ctrl.minimizeClass"
+            stat-label="$ctrl.label"
+            stat-icon="fa-solid fa-check{{($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.READ) || $ctrl.currentUser.admin) ? ' grayed-out' : ''}}"
+            no-tooltip="!($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.READ) || $ctrl.currentUser.admin)"
+            tooltip="{{ ($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.READ) || $ctrl.currentUser.admin) ? ($ctrl.currentUser.admin) ? 'Server Admin (Read-Only)' : 'Inherited (Read-Only)' : '' }}"
             key="read-{{$ctrl.currentUser.username}}"
             _key="read-{{$ctrl.currentUser.username}}">
         </stat>
         <stat stat-title="Write"
             class-name="$ctrl.minimizeClass"
             stat-label="$ctrl.label"
-            stat-icon="fa-solid {{ $ctrl.write ? 'fa-check' : 'fa-window-minimize'}}"
-            no-tooltip="true"
+            stat-icon="fa-solid {{ $ctrl.roles.ge($ctrl.permission,$ctrl.roles.WRITE) ? 'fa-check' : 'fa-window-minimize'}}{{($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.WRITE) || $ctrl.currentUser.admin) ? ' grayed-out' : ''}}"
+            no-tooltip="!($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.WRITE) || $ctrl.currentUser.admin)"
+            tooltip="{{ ($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.WRITE) || $ctrl.currentUser.admin) ? ($ctrl.currentUser.admin) ? 'Server Admin (Read-Only)' : 'Inherited (Read-Only)' : ''  }}"
             key="write-{{$ctrl.currentUser.username}}"
             _key="write-{{$ctrl.currentUser.username}}">
         </stat>
         <stat stat-title="Admin"
             class-name="$ctrl.minimizeClass"
             stat-label="$ctrl.label"
-            stat-icon="fa-solid {{ $ctrl.admin ? 'fa-check' : 'fa-window-minimize'}}"
-            no-tooltip="true"
+            stat-icon="fa-solid {{ $ctrl.roles.ge($ctrl.permission,$ctrl.roles.ADMIN) ? 'fa-check' : 'fa-window-minimize'}}{{($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.ADMIN) || $ctrl.currentUser.admin) ? ' grayed-out' : ''}}"
+            no-tooltip="!($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.ADMIN) || $ctrl.currentUser.admin)"
+            tooltip="{{ ($ctrl.roles.ge($ctrl.inherited,$ctrl.roles.ADMIN) || $ctrl.currentUser.admin) ? ($ctrl.currentUser.admin) ? 'Server Admin (Read-Only)' : 'Inherited (Read-Only)' : '' }}"
             key="admin-{{$ctrl.currentUser.username}}"
             _key="admin-{{$ctrl.currentUser.username}}">
         </stat>

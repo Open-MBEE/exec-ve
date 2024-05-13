@@ -184,7 +184,7 @@ const InformationPageComponent: VeComponentOptions = {
           </tr>
           <tr ng-if="$ctrl.project || $ctrl.branch">
             <th>Org ID:</th>
-            <td><span ui-sref="main.admin.org({ orgId: $ctrl.org.id })">{{ $ctrl.orgId }}</Link></td>
+            <td><span ui-sref="main.admin.org({ orgId: $ctrl.org.id })">{{ $ctrl.orgId }}</span></td>
           </tr>
           <tr ng-if="!$ctrl.branch">
             <th>Public:</th>

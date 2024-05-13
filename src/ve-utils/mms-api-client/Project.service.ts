@@ -105,7 +105,7 @@ export class ProjectService extends BaseApiService {
         return this._getInProgress(url) as angular.IPromise<ProjectObject[]>;
     }
 
-    public getProject(projectId: string, updateCache?: string): VePromise<ProjectObject, ProjectsResponse> {
+    public getProject(projectId: string, updateCache?: boolean): VePromise<ProjectObject, ProjectsResponse> {
         const url = this.uRLSvc.getProjectURL(projectId);
         if (!this._isInProgress(url)) {
             this._addInProgress(

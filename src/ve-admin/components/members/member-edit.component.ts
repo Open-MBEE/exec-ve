@@ -1,11 +1,23 @@
+import { StateService } from '@uirouter/angularjs';
 import { IOnChangesObject } from 'angular';
 
 import { veAdmin } from '@ve-admin/ve-admin.module';
 import { PermissionService, UserService } from '@ve-utils/mms-api-client';
 
+import { WarningModalResolveFn } from '../../modals/warning.modal.component';
+import { MembersPageController } from '../../pane-center/members-page.component';
+
 import { VeComponentOptions, VePromise } from '@ve-types/angular';
-import { OrgObject, PermissionUpdateRequest, PermissionUpdateResponse, ProjectObject, UserObject } from '@ve-types/mms';
+import {
+    OrgObject,
+    PermissionUpdateRequest,
+    PermissionUpdateResponse,
+    ProjectObject,
+    UserGroupObject,
+    UserObject,
+} from '@ve-types/mms';
 import Role, { VeRole } from '@ve-types/mms/permissions';
+import { VeModalService } from '@ve-types/view-editor';
 
 // Define component
 export class MemberEditController implements angular.IComponentController {
@@ -19,8 +31,10 @@ export class MemberEditController implements angular.IComponentController {
     // const prevResults = usePrevious(props.results);
     org: OrgObject;
     project: ProjectObject;
+    group: UserGroupObject;
     selectedUser: string;
-    admin: boolean;
+    authority: VeRole['ANY'];
+    currentUser: string;
 
     results: UserObject[];
     username: string;
@@ -33,10 +47,15 @@ export class MemberEditController implements angular.IComponentController {
     notFound: string;
     roles = Role;
 
-    static $inject = ['growl', 'UserService', 'PermissionService'];
+    //Parent Controllers
+    membersPage: MembersPageController;
+
+    static $inject = ['growl', '$state', '$uibModal', 'UserService', 'PermissionService'];
 
     constructor(
         private growl: angular.growl.IGrowlService,
+        private $state: StateService,
+        private $uibModal: VeModalService,
         private userSvc: UserService,
         private permissionSvc: PermissionService
     ) {}
@@ -45,14 +64,13 @@ export class MemberEditController implements angular.IComponentController {
         this.title = this.org ? this.org.name : this.project.name;
 
         // Check if user is a member of the Org or Project
-        this.selectUser(this.selectedUser);
+        if (this.selectedUser) {
+            this.selectUser(this.selectedUser);
+        }
     }
 
     $onChanges(onChangesObj: IOnChangesObject): void {
-        if (
-            onChangesObj.selectedUser &&
-            onChangesObj.selectedUser.currentValue != onChangesObj.selectedUser.previousValue
-        ) {
+        if (onChangesObj.selectedUser) {
             this.selectUser(onChangesObj.selectedUser.currentValue as string);
         }
     }
@@ -67,7 +85,6 @@ export class MemberEditController implements angular.IComponentController {
             (Object.prototype.hasOwnProperty.call(this.project.permission.users, this.username) as boolean);
         if (orgMember) {
             this.permissions = this.org.permission.users[name].role;
-            this.inherited = this.org.permission.users[name].inherited;
         } else if (projMember) {
             this.permissions = this.project.permission.users[name].role;
             this.inherited = this.project.permission.users[name].inherited;
@@ -83,6 +100,33 @@ export class MemberEditController implements angular.IComponentController {
     };
 
     onSubmit = (): void => {
+        if ((this.username = this.currentUser)) {
+            this.$uibModal
+                .open<WarningModalResolveFn, void>({
+                    component: 'warningModal',
+                    backdrop: 'static',
+                    keyboard: false,
+                    windowTopClass: 'modal-center-override',
+                    resolve: {
+                        message: () => {
+                            return `This action will modify **YOUR** permissions to this ${
+                                this.org ? 'Organization' : 'Project'
+                            }, loss of access to data may occur.`;
+                        },
+                    },
+                })
+                .result.then(
+                    () => {
+                        this.updatePermissions();
+                    },
+                    () => {
+                        this.resetForm();
+                    }
+                );
+        }
+    };
+
+    updatePermissions = (): void => {
         const data: PermissionUpdateRequest = {
             users: {
                 permissions: [],
@@ -110,6 +154,7 @@ export class MemberEditController implements angular.IComponentController {
         patch.then(
             () => {
                 this.growl.success('User Permissions Successfully Updated!');
+                void this.$state.go('.', null, { reload: true });
             },
             (reason) => {
                 this.growl.error('Permissons not updated: ' + reason.message);
@@ -147,12 +192,18 @@ export class MemberEditController implements angular.IComponentController {
     resetForm = (): void => {
         this.username = '';
         this.permissions = Role.NONE;
+        this.inherited = false;
         this.results = null;
     };
 
     userChange = (): void => {
         this.doSearch();
         if (this.username.length === 0) this.resetForm();
+    };
+
+    cancel = (): void => {
+        this.resetForm();
+        this.membersPage.selectedUser = null;
     };
 }
 
@@ -161,7 +212,13 @@ const MemberEditComponent: VeComponentOptions = {
     bindings: {
         project: '<?',
         org: '<?',
-        selectedUser: '=',
+        group: '<?',
+        selectedUser: '<',
+        currentUser: '<',
+        authority: '<',
+    },
+    require: {
+        membersPage: '^',
     },
     controller: MemberEditController,
     template: `
@@ -196,23 +253,23 @@ const MemberEditComponent: VeComponentOptions = {
               <select
                      name="permissions"
                      id="permissions"
-                     data-ng-value="$ctrl.permissions"
-                     data-ng-model="$ctrl.permissions">
-                <option>Choose one...</option>
-                <option>{{ $ctrl.roles.READ }}</option>
-                <option>{{ $ctrl.roles.WRITE }}</option>
-                <option ng-if="$ctrl.admin">{{ $ctrl.roles.ADMIN }}</option>
-                <option>{{ $ctrl.roles.NONE }}</option>
+                     ng-value="$ctrl.permissions"
+                     ng-model="$ctrl.permissions">
+                <option ng-if="!$ctrl.inherited || $ctrl.inherited && $ctrl.roles.lt($ctrl.permissions,$ctrl.roles.READ)" value="{{ $ctrl.roles.READ }}">{{ $ctrl.roles.READ }}</option>
+                <option ng-if="!$ctrl.inherited || $ctrl.inherited && $ctrl.roles.lt($ctrl.permissions,$ctrl.roles.WRITE)" value="{{ $ctrl.roles.WRITE }}">{{ $ctrl.roles.WRITE }}</option>
+                <option ng-if="$ctrl.authority == $ctrl.roles.ADMIN" value="{{ $ctrl.roles.ADMIN }}">{{ $ctrl.roles.ADMIN }}</option>
+                <option ng-if="!$ctrl.inherited" value="{{ $ctrl.roles.NONE }}">{{ $ctrl.roles.NONE }}</option>
               </select>
-              <label for="inherited">Inherited</label>
-              <input type="checkbox" 
+              <label ng-if="$ctrl.org" for="inherited">Inherited</label>
+              <input ng-if="$ctrl.org" type="checkbox" 
                 name="inherited"
                 id="inherited"
 
               />
             </div>
           </form>
-          <button class="btn btn-primary" ng-click="$ctrl.onSubmit" ng-disabled="$ctrl.notFound.length > 0" >{{ $ctrl.btnTitle }}</button>
+          <button class="btn btn-primary" ng-click="$ctrl.onSubmit()" ng-disabled="$ctrl.notFound.length > 0" >{{ $ctrl.btnTitle }}</button>
+          <button class="btn btn-secondary" ng-click="$ctrl.cancel()" ng-disabled="!$ctrl.username" >Cancel</button>
       </div>`,
 };
 

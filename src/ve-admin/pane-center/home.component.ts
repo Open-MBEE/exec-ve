@@ -11,7 +11,7 @@ import Role from '@ve-types/mms/permissions';
 
 class HomeController {
     mmsOrgs: OrgObject[];
-    mmsUser: UserObject;
+    currentUser: UserObject;
 
     $pane: IPane;
     $resized: Rx.Disposable;
@@ -48,17 +48,17 @@ class HomeController {
             onRefresh: this.refresh,
         };
         this.handleResize();
-        this.init(this.mmsOrgs, this.mmsUser);
+        this.init(this.mmsOrgs, this.currentUser);
     }
 
     // $onChanges(onChangesObj: IOnChangesObject): void {
     //     if (
-    //         (onChangesObj['mmsOrgs'] && !onChangesObj['mmsOrgs'].isFirstChange() && this.mmsUser) ||
-    //         (onChangesObj['mmsUser'] && !onChangesObj['mmsUser'].isFirstChange() && this.mmsOrgs)
+    //         (onChangesObj['mmsOrgs'] && !onChangesObj['mmsOrgs'].isFirstChange() && this.currentUser) ||
+    //         (onChangesObj['currentUser'] && !onChangesObj['currentUser'].isFirstChange() && this.mmsOrgs)
     //     ) {
     //         this.init(
     //             onChangesObj['mmsOrgs'].currentValue as OrgObject[],
-    //             onChangesObj['mmsUser'].currentValue as UserObject
+    //             onChangesObj['currentUser'].currentValue as UserObject
     //         );
     //     }
     // }
@@ -149,7 +149,7 @@ const HomeComponent: VeComponentOptions = {
     },
     bindings: {
         mmsOrgs: '<',
-        mmsUser: '<',
+        currentUser: '<',
     },
     template: `
     <div class="home-space" ng-ref="$ctrl.homeRef">

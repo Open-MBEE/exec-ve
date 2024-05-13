@@ -9,7 +9,7 @@ import { OrgObject, ProjectObject, RefObject, UserObject } from '@ve-types/mms';
 class ProjectHomeController implements angular.IComponentController {
     mmsProject: ProjectObject;
     mmsOrg: OrgObject;
-    mmsUser: UserObject;
+    currentUser: UserObject;
     mmsRef: RefObject;
 
     //Ng-Pane
@@ -54,7 +54,7 @@ const ProjectHome: VeComponentOptions = {
     },
     bindings: {
         mmsOrg: '<',
-        mmsUser: '<',
+        currentUser: '<',
     },
     template: `
       <div id="workspace">
