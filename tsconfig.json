@@ -35,7 +35,9 @@
       "@ve-types": ["ve-types"],
       "@ve-types/*": ["ve-types/*"],
       "@ve-admin": ["ve-admin"],
-      "@ve-admin/*": ["ve-admin/*"]
+      "@ve-admin/*": ["ve-admin/*"],
+      "@ve-viewer": ["ve-viewer"],
+      "@ve-viewer/*": ["ve-viewer/*"]
     },
     "skipLibCheck": true
   },

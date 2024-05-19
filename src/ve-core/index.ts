@@ -10,5 +10,6 @@ import './button-bar';
 import './toolbar';
 import './editor';
 import './search';
+import './services';
 
 export * from './ve-core.module';

@@ -1,5 +1,6 @@
 import { IPane } from '@openmbee/pane-layout';
 import { StateService } from '@uirouter/angularjs';
+import { veViewer } from '@ve-viewer';
 import angular, { IComponentController } from 'angular';
 import _ from 'lodash';
 import Rx from 'rx-lite';
@@ -10,8 +11,6 @@ import { ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EditObject, EditService, EventService } from '@ve-utils/core';
 import { ElementService, PermissionService, ProjectService } from '@ve-utils/mms-api-client';
-
-import { veApp } from '@ve-app';
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import { ElementObject, RefObject, RefsResponse } from '@ve-types/mms';
@@ -264,4 +263,4 @@ const RightPaneComponent: VeComponentOptions = {
     controller: RightPaneController,
 };
 
-veApp.component(RightPaneComponent.selector, RightPaneComponent);
+veViewer.component(RightPaneComponent.selector, RightPaneComponent);

@@ -1,13 +1,12 @@
 import { IPaneScrollApi } from '@openmbee/pane-layout/lib/components/ng-pane';
 import { HookResult, Ng1Controller, StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
 import { Transition } from '@uirouter/core';
+import { veViewer } from '@ve-viewer';
+import { AppUtilsService, FullDocumentApi, FullDocumentService } from '@ve-viewer/services';
 import angular, { IComponentController } from 'angular';
 import Rx from 'rx-lite';
 
-import { veAppEvents } from '@ve-app/events';
-import { AppUtilsService, FullDocumentApi, FullDocumentService } from '@ve-app/main/services';
-import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config';
-import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
+import { veComponentEvents } from '@ve-components/events';
 import { TreeService } from '@ve-components/trees';
 import { IButtonBarButton, ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
@@ -15,7 +14,8 @@ import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/appli
 import { EventService } from '@ve-utils/core';
 import { PermissionService, ViewData, ViewService, URLService } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app';
+import { pane_center_buttons } from './pane-center-buttons.config';
+import { ContentWindowService } from './services/ContentWindow.service';
 
 import { VeComponentOptions, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
 import { DocumentObject, ElementObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms';
@@ -180,7 +180,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         );
 
         this.subs.push(
-            this.eventSvc.$on('view.added', (data: veAppEvents.viewAddedData) => {
+            this.eventSvc.$on('view.added', (data: veComponentEvents.viewAddedData) => {
                 this.fullDocumentApi.handleViewAdd(this._buildViewData(data.vId, data.curSec), data.prevSibId);
                 this._scroll(data.vId);
                 this.eventSvc.$broadcast('view.selected');
@@ -577,4 +577,4 @@ const DocumentComponent: VeComponentOptions = {
     controller: FullDocumentController,
 };
 
-veApp.component(DocumentComponent.selector, DocumentComponent);
+veViewer.component(DocumentComponent.selector, DocumentComponent);

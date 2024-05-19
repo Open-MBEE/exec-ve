@@ -1,9 +1,8 @@
 import { IPane } from '@openmbee/pane-layout';
 import { IPaneManagerService } from '@openmbee/pane-layout/lib/PaneManagerService';
 import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
+import { veViewer } from '@ve-viewer';
 
-import { veAppEvents } from '@ve-app/events';
-import { AppUtilsService } from '@ve-app/main/services';
 import { TreeService } from '@ve-components/trees';
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
@@ -12,8 +11,7 @@ import { RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { ApiService, ElementService, PermissionService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
-
-import { veApp } from '@ve-app';
+import { veViewerEvents } from 've-viewer/events';
 
 import { left_default_buttons } from './left-buttons.config';
 
@@ -79,7 +77,6 @@ class LeftPaneController implements angular.IComponentController {
         'SchemaService',
         'ViewService',
         'ProjectService',
-        'AppUtilsService',
         'TreeService',
         'PermissionService',
         'RootScopeService',
@@ -107,7 +104,6 @@ class LeftPaneController implements angular.IComponentController {
         private schemaSvc: SchemaService,
         private viewSvc: ViewService,
         private projectSvc: ProjectService,
-        private appUtilsSvc: AppUtilsService,
         private treeSvc: TreeService,
         private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
@@ -149,7 +145,7 @@ class LeftPaneController implements angular.IComponentController {
         // Start listening to change events
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.elementSelectedData>('view.selected', this.changeData),
-            this.eventSvc.$on<veAppEvents.viewDeletedData<ViewObject>>('view.deleted', (data) => {
+            this.eventSvc.$on<veViewerEvents.viewDeletedData<ViewObject>>('view.deleted', (data) => {
                 let goto = '^.currentState';
                 let documentId = this.treeApi.rootId;
                 let viewId: string;
@@ -607,7 +603,7 @@ class LeftPaneController implements angular.IComponentController {
                                             prevBranch,
                                             branch,
                                         };
-                                        this.eventSvc.$broadcast<veAppEvents.viewDeletedData>('view.deleted', data);
+                                        this.eventSvc.$broadcast<veViewerEvents.viewDeletedData>('view.deleted', data);
                                         if (this.$state.includes('**.present.**') && branch.type === 'view') {
                                             this.treeSvc.processDeletedViewBranch(branch);
                                         }
@@ -685,4 +681,4 @@ const LeftPaneComponent: VeComponentOptions = {
     controller: LeftPaneController,
 };
 
-veApp.component(LeftPaneComponent.selector, LeftPaneComponent);
+veViewer.component(LeftPaneComponent.selector, LeftPaneComponent);

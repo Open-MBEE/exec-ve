@@ -1,7 +1,7 @@
 import { MmsObject } from '@ve-types/mms';
 import { TreeBranch } from '@ve-types/tree';
 
-export namespace veAppEvents {
+export namespace veViewerEvents {
     interface viewAddedData {
         vId: string;
         curSec: string;

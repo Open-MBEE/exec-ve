@@ -2,7 +2,7 @@ import angular, { IComponentController } from 'angular';
 import _ from 'lodash';
 import Rx from 'rx-lite';
 
-import { veAppEvents } from '@ve-app/events';
+import { veComponentEvents } from '@ve-components/events';
 import { InsertViewData } from '@ve-components/insertions/components/insert-view.component';
 import { ExtensionService } from '@ve-components/services';
 import { TreeService } from '@ve-components/trees/services/Tree.service';
@@ -318,7 +318,7 @@ class TreesController implements IComponentController {
                         let num = 1;
                         for (let i = 0; i < node.children.length; i++) {
                             const cNode = node.children[i];
-                            const data: veAppEvents.viewAddedData = {
+                            const data: veComponentEvents.viewAddedData = {
                                 vId: cNode.data.id,
                                 curSec: `${curSection}.${num}`,
                                 prevSibId: lastChild,
@@ -371,13 +371,13 @@ class TreesController implements IComponentController {
                                                 }
                                             );
                                         if (!this.rootScopeSvc.veFullDocMode()) {
-                                            this.eventSvc.$broadcast<veAppEvents.viewAddedData>('view.added', {
+                                            this.eventSvc.$broadcast<veComponentEvents.viewAddedData>('view.added', {
                                                 vId: result.id,
                                                 curSec: curNum,
                                                 prevSibId: prevBranch.data.id,
                                             });
                                         } else {
-                                            this.eventSvc.$broadcast<veAppEvents.viewAddedData>('view.added', {
+                                            this.eventSvc.$broadcast<veComponentEvents.viewAddedData>('view.added', {
                                                 vId: result.id,
                                                 curSec: curNum,
                                                 prevSibId: prevBranch.data.id,
@@ -386,7 +386,7 @@ class TreesController implements IComponentController {
                                     },
                                     (reason) => {
                                         if (reason.status === 200) {
-                                            this.eventSvc.$broadcast<veAppEvents.viewAddedData>('view.added', {
+                                            this.eventSvc.$broadcast<veComponentEvents.viewAddedData>('view.added', {
                                                 vId: result.id,
                                                 curSec: curNum,
                                                 prevSibId: this.insertData.parentBranch.data.id,

@@ -1,9 +1,8 @@
 import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirouter/angularjs';
 import { Transition } from '@uirouter/core';
+import { veViewer } from '@ve-viewer';
+import { AppUtilsService } from '@ve-viewer/services';
 
-import { AppUtilsService } from '@ve-app/main/services';
-import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config';
-import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
 import { TreeService } from '@ve-components/trees';
 import { ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
@@ -11,7 +10,8 @@ import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/appli
 import { EventService } from '@ve-utils/core';
 import { PermissionService, ViewApi } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app';
+import { pane_center_buttons } from './pane-center-buttons.config';
+import { ContentWindowService } from './services/ContentWindow.service';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
 import {
@@ -498,4 +498,4 @@ const SlideshowComponent: VeComponentOptions = {
     controller: SlideshowController,
 };
 
-veApp.component(SlideshowComponent.selector, SlideshowComponent);
+veViewer.component(SlideshowComponent.selector, SlideshowComponent);

@@ -1,8 +1,8 @@
 import { StateService } from '@uirouter/angularjs';
+import { PrintConfirmResult, PrintModalResolveFn } from '@ve-viewer/modals/print-confirm-modal.component';
+import { TableExportModalResolveFn } from '@ve-viewer/modals/table-export-modal.component';
 import angular from 'angular';
 
-import { PrintConfirmResult, PrintModalResolveFn } from '@ve-app/main/modals/print-confirm-modal.component';
-import { TableExportModalResolveFn } from '@ve-app/main/modals/table-export-modal.component';
 import { Table2CSVService } from '@ve-components/presentations/services/Table2CSV.service';
 import { TreeService } from '@ve-components/trees';
 import { UtilsService } from '@ve-utils/application';

@@ -1,11 +1,10 @@
 import { StateService } from '@uirouter/angularjs';
+import { veViewer } from '@ve-viewer';
 
-import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
 import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-
-import { veApp } from '@ve-app';
+import { ContentWindowService } from 've-viewer/pane-center/services/ContentWindow.service';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { ElementObject, ParamsObject } from '@ve-types/mms';
@@ -83,4 +82,4 @@ const SearchComponent: VeComponentOptions = {
     controller: SearchController,
 };
 
-veApp.component(SearchComponent.selector, SearchComponent);
+veViewer.component(SearchComponent.selector, SearchComponent);

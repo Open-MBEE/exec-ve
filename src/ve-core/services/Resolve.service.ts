@@ -1,6 +1,5 @@
-import { UIRouter } from '@uirouter/angularjs';
-
-import { BrandingService, BrandingStyle, ShortUrlService } from '@ve-utils/application';
+import { veCore } from '@ve-core/ve-core.module';
+import { BrandingService, BrandingStyle } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import {
     AuthService,
@@ -12,8 +11,6 @@ import {
     UserService,
     ViewService,
 } from '@ve-utils/mms-api-client';
-
-import { veApp } from '@ve-app';
 
 import { VePromise, VeQService } from '@ve-types/angular';
 import {
@@ -37,16 +34,11 @@ import {
     UsersResponse,
     ViewObject,
 } from '@ve-types/mms';
-import { VeStorageService } from '@ve-types/view-editor';
 
 export class ResolveService {
     static $inject = [
-        '$localStorage',
         '$q',
         'growl',
-        '$cookies',
-        '$uiRouter',
-        'ShortUrlService',
         'BrandingService',
         'AuthService',
         'UserService',
@@ -59,12 +51,8 @@ export class ResolveService {
     ];
 
     constructor(
-        private $localStorage: VeStorageService,
         private $q: VeQService,
         private growl: angular.growl.IGrowlService,
-        private $cookies: angular.cookies.ICookiesService,
-        private $uiRouter: UIRouter,
-        private shortUrlSvc: ShortUrlService,
         private brandingSvc: BrandingService,
         private authSvc: AuthService,
         private userSvc: UserService,
@@ -103,6 +91,10 @@ export class ResolveService {
 
     public getCurrentUser(): VePromise<UserObject, UsersResponse> {
         return this.userSvc.getCurrentUser();
+    }
+
+    public getUser(username: string, refresh?: boolean): VePromise<UserObject, UsersResponse> {
+        return this.userSvc.getUserData(username, refresh);
     }
 
     public getUsers(refresh?: boolean): VePromise<UserObject[], UsersResponse> {
@@ -529,4 +521,4 @@ export class ResolveService {
     }
 }
 
-veApp.service('ResolveService', ResolveService);
+veCore.service('ResolveService', ResolveService);

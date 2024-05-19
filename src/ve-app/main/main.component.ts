@@ -1,10 +1,10 @@
 import 'angular-growl-v2';
 
 import { StateService, Transition, TransitionService, UIRouter, UIRouterGlobals } from '@uirouter/angularjs';
+import { WorkingTimeModalResolveFn, WorkingTimeObject } from '@ve-app/main/modals/working-modal.component';
 import angular, { IComponentController, IHttpResponse } from 'angular';
 import Rx from 'rx-lite';
 
-import { WorkingTimeModalResolveFn, WorkingTimeObject } from '@ve-app/main/modals/working-modal.component';
 import { ApplicationService, RootScopeService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { ApiService, AuthService, ElementService, HttpService, URLService } from '@ve-utils/mms-api-client';

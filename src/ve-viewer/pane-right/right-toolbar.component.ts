@@ -1,15 +1,15 @@
 import { StateService } from '@uirouter/angularjs';
+import { veViewer } from '@ve-viewer';
 import { IComponentController } from 'angular';
 import Rx from 'rx-lite';
 
-import { right_default_toolbar, right_dynamic_toolbar } from '@ve-app/pane-right/right-buttons.config';
 import { ExtensionService } from '@ve-components/services';
 import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { PermissionService } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app';
+import { right_default_toolbar, right_dynamic_toolbar } from './right-buttons.config';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { ElementObject, RefObject } from '@ve-types/mms';
@@ -134,4 +134,4 @@ const RightToolbarComponent: VeComponentOptions = {
 };
 /* Controllers */
 
-veApp.component(RightToolbarComponent.selector, RightToolbarComponent);
+veViewer.component(RightToolbarComponent.selector, RightToolbarComponent);

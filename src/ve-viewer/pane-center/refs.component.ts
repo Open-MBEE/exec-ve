@@ -1,17 +1,16 @@
 import { StateService } from '@uirouter/angularjs';
+import { veViewer } from '@ve-viewer';
+import { AppUtilsService } from '@ve-viewer/services';
 import angular, { IWindowService } from 'angular';
 import _ from 'lodash';
 import Rx from 'rx-lite';
 
-import { AppUtilsService } from '@ve-app/main/services';
-import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service';
 import { InsertRefData } from '@ve-components/insertions/components/insert-ref.component';
 import { ConfirmDeleteModalResolveFn } from '@ve-core/modals';
 import { ApplicationService, RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { ProjectService, ElementService } from '@ve-utils/mms-api-client';
-
-import { veApp } from '@ve-app';
+import { ContentWindowService } from 've-viewer/pane-center/services/ContentWindow.service';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
 import { InsertResolveFn } from '@ve-types/components';
@@ -355,4 +354,4 @@ const RefsComponent: VeComponentOptions = {
     controller: RefsController,
 };
 
-veApp.component(RefsComponent.selector, RefsComponent);
+veViewer.component(RefsComponent.selector, RefsComponent);

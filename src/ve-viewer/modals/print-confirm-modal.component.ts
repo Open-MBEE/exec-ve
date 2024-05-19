@@ -1,7 +1,7 @@
+import { AppUtilsService, DocumentStructure } from '@ve-viewer/services';
 import angular from 'angular';
 import _ from 'lodash';
 
-import { AppUtilsService, DocumentStructure } from '@ve-app/main/services';
 import { UtilsService } from '@ve-utils/application';
 import { EditService } from '@ve-utils/core';
 import { ElementService, ViewService, DocumentMetadata, ProjectService } from '@ve-utils/mms-api-client';

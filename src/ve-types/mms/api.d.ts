@@ -122,6 +122,7 @@ export interface ParamsObject {
     preview?: string;
     modify?: string;
     next?: string;
+    user?: string;
     [param: string]: string;
 }
 
@@ -290,6 +291,10 @@ export interface OrgsUpdateRequest extends BasicRequest {
 }
 
 export interface ProjectsResponse extends BasicResponse<ProjectObject> {
+    projects: ProjectObject[];
+}
+
+export interface ProjectsUpdateRequest extends BasicRequest {
     projects: ProjectObject[];
 }
 

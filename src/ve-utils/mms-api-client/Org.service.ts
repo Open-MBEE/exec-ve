@@ -5,7 +5,15 @@ import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 import { veUtils } from '@ve-utils';
 
 import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
-import { BasicResponse, MmsObject, OrgObject, OrgsResponse, OrgsUpdateRequest } from '@ve-types/mms';
+import {
+    BasicResponse,
+    MmsObject,
+    OrgObject,
+    OrgsResponse,
+    OrgsUpdateRequest,
+    ProjectObject,
+    ProjectsResponse,
+} from '@ve-types/mms';
 
 export class OrgService extends BaseApiService {
     static $inject = ['$q', '$http', 'CacheService', 'ProjectService', 'URLService', 'ApiService', 'PermissionService'];
@@ -137,63 +145,25 @@ export class OrgService extends BaseApiService {
         return this._getInProgress(key) as VePromise<OrgObject[], OrgsResponse>;
     }
 
-    // public getOrgsProjects(updateCache?: boolean): VePromise<OrgObject[], OrgsResponse | ProjectsResponse> {
-    //     const key = 'orgs';
-    //     return new this.$q((resolve, reject) => {
-    //         this.getOrgs(updateCache).then((orgs) => {
-    //             const promises: VePromise<ProjectObject[], ProjectsResponse>[] = [];
-    //             if (!orgs[0].projects && !updateCache) {
-    //                 orgs.forEach((org) => {
-    //                     const promise = this.projectSvc.getProjects(org.id);
-    //                     promises.push(promise);
-    //                     promise.then(
-    //                         (projs) => {
-    //                             org.projects = projs;
-    //                             this.cacheSvc.put(['org', org.id], org, true);
-    //                         },
-    //                         () => {
-    //                             org.projects = [];
-    //                         }
-    //                     );
-    //                 });
-    //                 this.$q.all(promises).finally(() => {
-    //                     resolve(this.cacheSvc.put(key, orgs, true));
-    //                 });
-    //             } else {
-    //                 resolve(this.cacheSvc.get(key));
-    //             }
-    //         }, reject);
-    //     });
-    // }
-
-    // public getOrgsPermission(updateCache?: boolean): VePromise<OrgObject[], OrgsResponse | PermissionResponse> {
-    //     const key = 'orgs';
-    //     return new this.$q((resolve, reject) => {
-    //         this.getOrgs(updateCache).then((orgs) => {
-    //             if (!orgs[0].permission && !updateCache) {
-    //                 const promises: VePromise<PermissionMap, PermissionResponse>[] = [];
-    //                 orgs.forEach((org) => {
-    //                     const promise = this.permissionSvc.getOrgPermission(org.id);
-    //                     promises.push(promise);
-    //                     promise.then(
-    //                         (perms) => {
-    //                             org.permissons = perms;
-    //                             this.cacheSvc.put(['org', org.id], org, true);
-    //                         },
-    //                         () => {
-    //                             org.permission = { users: {}, groups: {} };
-    //                         }
-    //                     );
-    //                 });
-    //                 this.$q.all(promises).finally(() => {
-    //                     resolve(this.cacheSvc.put(key, orgs, true));
-    //                 });
-    //             } else {
-    //                 resolve(this.cacheSvc.get(key));
-    //             }
-    //         }, reject);
-    //     });
-    // }
+    public getOrgHome(orgId: string, updateCache?: boolean): VePromise<ProjectObject, ProjectsResponse> {
+        return new this.$q((resolve, reject) => {
+            this.projectSvc.getProject(`${orgId}-home`, updateCache).then(resolve, (reason) => {
+                if (reason.status == 404) {
+                    this.getOrg(orgId, updateCache).then((org) => {
+                        const reqOb: ProjectObject = {
+                            id: `${orgId}-home`,
+                            orgId: orgId,
+                            name: `${org.name ? org.name : org.id} Home`,
+                            public: false,
+                        };
+                        this.projectSvc.createProject(reqOb).then(resolve, reject);
+                    }, reject);
+                } else {
+                    reject(reason);
+                }
+            });
+        });
+    }
 
     public createOrg(orgObj: OrgObject): VePromise<OrgObject, OrgsResponse> {
         return new this.$q<OrgObject, OrgsResponse>((resolve, reject) => {

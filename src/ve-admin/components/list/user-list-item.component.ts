@@ -144,15 +144,15 @@ const UserListItemComponent: VeComponentOptions = {
             </div>
         </div>
     </div>
-    <stat-list class-name="stats-list-member" ng-if="$ctrl.adminLabel && $ctrl.currentUser.admin">
+    <stat-list class-name="stats-list-member" ng-if="$ctrl.adminLabel">
         <stat stat-title="Admin"
             class-name="$ctrl.minimizeClass"
             stat-label="$ctrl.label"
-            stat-icon="fa-solid fa-check"
+            stat-icon="fa-solid {{ $ctrl.currentUser.admin ? 'fa-check' : 'fa-window-minimize' }}"
             _key="{{ $ctrl._key }}">
         </stat>
     </stat-list>
-    <stat-list class-name="stats-list-member" key="statlist-perms" ng-show="$ctrl.width > 600" ng-if="!($ctrl.adminLabel && $ctrl.currentUser.admin)">
+    <stat-list class-name="stats-list-member" key="statlist-perms" ng-show="$ctrl.width > 600" ng-if="!$ctrl.adminLabel">
         <stat stat-title="Read"
             class-name="$ctrl.minimizeClass"
             stat-label="$ctrl.label"

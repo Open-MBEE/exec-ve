@@ -39,14 +39,11 @@ import '@ve-utils';
 import '@ve-core';
 import '@ve-components';
 import '@ve-admin';
+import '@ve-viewer';
 
 import './ve-app.module';
 
-import './main';
-
 import './login';
-import './pane-center';
-import './pane-left';
-import './pane-right';
+import './main';
 
 export * from './ve-app.module';

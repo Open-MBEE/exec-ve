@@ -16,6 +16,7 @@ import {
     MountObject,
     ProjectObject,
     ProjectsResponse,
+    ProjectsUpdateRequest,
     RefObject,
     RefsResponse,
     RefsUpdateRequest,
@@ -230,6 +231,30 @@ export class ProjectService extends BaseApiService {
         getMountsArray(mounts, projectsList);
         return projectsList;
     };
+
+    public createProject(projectOb: ProjectObject): VePromise<ProjectObject, ProjectsResponse> {
+        return new this.$q<ProjectObject, ProjectsResponse>((resolve, reject) => {
+            const url = this.uRLSvc.getProjectsURL();
+            const projects: ProjectObject[] = [];
+            projects.push(projectOb);
+            this.$http
+                .post<ProjectsResponse, ProjectsUpdateRequest>(url, {
+                    projects: projects,
+                    source: `ve-${this.apiSvc.getVeVersion()}`,
+                })
+                .then(
+                    (response) => {
+                        const project = response.data.projects[0];
+                        const key = ['project', project.id];
+                        this.cacheSvc.put(key, project, true);
+                        resolve(this.cacheSvc.get<ProjectObject>(key));
+                    },
+                    (response: VeHttpResponse<ProjectsResponse>) => {
+                        this.apiSvc.handleErrorCallback(response, reject);
+                    }
+                );
+        });
+    }
 
     public getRefs(projectId: string): VePromise<RefObject[], RefsResponse> {
         const cacheKey = this.apiSvc.makeCacheKey(null, projectId, false, 'refs');

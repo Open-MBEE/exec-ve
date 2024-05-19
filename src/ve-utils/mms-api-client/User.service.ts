@@ -4,11 +4,14 @@ import { URLService } from '@ve-utils/mms-api-client/URL.service';
 
 import { veUtils } from '@ve-utils';
 
+import { OrgService } from './Org.service';
+import { ProjectService } from './Project.service';
+
 import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
-import { UserObject, UsersResponse } from '@ve-types/mms';
+import { OrgObject, OrgsResponse, ProjectObject, ProjectsResponse, UserObject, UsersResponse } from '@ve-types/mms';
 
 export class UserService extends BaseApiService {
-    static $inject = ['$q', '$http', 'CacheService', 'URLService'];
+    static $inject = ['$q', '$http', 'CacheService', 'OrgService', 'ProjectService', 'URLService'];
 
     private username: string;
 
@@ -16,6 +19,8 @@ export class UserService extends BaseApiService {
         private $q: VeQService,
         private $http: VeHttpService,
         private cacheSvc: CacheService,
+        private orgSvc: OrgService,
+        private projectSvc: ProjectService,
         private uRLSvc: URLService
     ) {
         super();
@@ -96,6 +101,14 @@ export class UserService extends BaseApiService {
                                             message: 'User not found',
                                         });
                                     } else {
+                                        const user = response.data.users[0];
+                                        if (user.fullName != 'null null') {
+                                            user.fullName = user.fullName
+                                                ? user.fullName
+                                                : `${user.firstName} ${user.lastName}`;
+                                        } else {
+                                            user.fullName = '';
+                                        }
                                         this.cacheSvc.put(key, response.data.users[0], false);
                                         resolve(this.cacheSvc.get<UserObject>(key));
                                     }
@@ -118,6 +131,50 @@ export class UserService extends BaseApiService {
 
     getCurrentUser(updateCache?: boolean): VePromise<UserObject, UsersResponse> {
         return this.getUserData(this.username, updateCache);
+    }
+
+    getUserOrg(updateCache?: boolean): VePromise<OrgObject, OrgsResponse> {
+        return new this.$q((resolve, reject) => {
+            this.orgSvc.getOrg(this.username, updateCache).then(
+                (data) => {
+                    resolve(data);
+                },
+                (reason) => {
+                    if (reason.status == 404) {
+                        this.getUserData(this.username).then((user) => {
+                            const reqOb: OrgObject = {
+                                id: `${this.username}-personal`,
+                                name: `${user.fullName != '' ? user.fullName : user.username}'s Personal Org`,
+                                public: false,
+                            };
+                            this.orgSvc.createOrg(reqOb).then(resolve, reject);
+                        }, reject);
+                    } else {
+                        reject(reason);
+                    }
+                }
+            );
+        });
+    }
+
+    getUserHome(updateCache?: boolean): VePromise<ProjectObject, ProjectsResponse> {
+        return new this.$q((resolve, reject) => {
+            this.projectSvc.getProject(`${this.username}-home`, updateCache).then(resolve, (reason) => {
+                if (reason.status == 404) {
+                    this.getUserData(this.username).then((user) => {
+                        const reqOb: ProjectObject = {
+                            id: `${this.username}-home`,
+                            orgId: `${this.username}-personal`,
+                            name: `${user.fullName != '' ? user.fullName : user.username}'s Home`,
+                            public: false,
+                        };
+                        this.projectSvc.createProject(reqOb).then(resolve, reject);
+                    }, reject);
+                } else {
+                    reject(reason);
+                }
+            });
+        });
     }
 
     reset = (): void => {

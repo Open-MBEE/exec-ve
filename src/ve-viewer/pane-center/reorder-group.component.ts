@@ -1,12 +1,11 @@
 import { StateService } from '@uirouter/angularjs';
+import { veViewer } from '@ve-viewer';
 import { IComponentController } from 'angular';
 import _ from 'lodash';
 
 import { TreeService } from '@ve-components/trees';
 import { CacheService } from '@ve-utils/core';
 import { ElementService } from '@ve-utils/mms-api-client';
-
-import { veApp } from '@ve-app';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
 import { DocumentObject, ElementObject, GroupObject, ParamsObject, ProjectObject, RefObject } from '@ve-types/mms';
@@ -335,4 +334,4 @@ const ReorderGroupComponent: VeComponentOptions = {
     controller: ReorderGroupController,
 };
 
-veApp.component(ReorderGroupComponent.selector, ReorderGroupComponent);
+veViewer.component(ReorderGroupComponent.selector, ReorderGroupComponent);

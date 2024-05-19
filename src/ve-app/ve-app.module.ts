@@ -24,7 +24,7 @@ import angular, {
 } from 'angular';
 
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component';
-import { ResolveService } from '@ve-app/main/services';
+import { ResolveService } from '@ve-core/services';
 import { ApplicationService, BrandingStyle, RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { AuthService, URLService, PermissionCache, ViewService, DocumentMetadata } from '@ve-utils/mms-api-client';
@@ -400,6 +400,57 @@ veApp.config([
                         component: 'userList',
                         bindings: {
                             mmsUsers: 'userObs',
+                            currentUser: 'currentUserOb',
+                        },
+                    },
+                },
+            })
+            .state('main.admin.user.profile', {
+                url: '?user',
+                params: {
+                    user: {
+                        type: 'query',
+                        inherit: true,
+                    },
+                },
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params();
+                        },
+                    ],
+                    token: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
+                            return resolveSvc.getToken();
+                        },
+                    ],
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
+                    userOb: [
+                        'params',
+                        'refresh',
+                        'ResolveService',
+                        (
+                            params: ParamsObject,
+                            refresh: boolean,
+                            resolveSvc: ResolveService
+                        ): VePromise<UserObject, UsersResponse> => {
+                            return resolveSvc.getUser(params.user, refresh);
+                        },
+                    ],
+                },
+                views: {
+                    'pane-center@main': {
+                        component: 'userProfile',
+                        bindings: {
+                            mmsUser: 'userOb',
                             currentUser: 'currentUserOb',
                         },
                     },

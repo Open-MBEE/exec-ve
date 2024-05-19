@@ -1,13 +1,12 @@
 import { StateService } from '@uirouter/angularjs';
+import { veViewer } from '@ve-viewer';
+import { AppUtilsService } from '@ve-viewer/services';
 import angular, { IComponentController } from 'angular';
 import _ from 'lodash';
 
-import { AppUtilsService } from '@ve-app/main/services';
 import { TreeService } from '@ve-components/trees';
 import { EventService } from '@ve-utils/core';
 import { ViewService, ElementService } from '@ve-utils/mms-api-client';
-
-import { veApp } from '@ve-app';
 
 import { VeComponentOptions, VePromise } from '@ve-types/angular';
 import { DocumentObject, ViewObject } from '@ve-types/mms';
@@ -15,7 +14,7 @@ import { AngularUITree, TreeBranch, VeTreeNodeScope, View2NodeMap } from '@ve-ty
 
 /* Controllers */
 /**
- * @name veApp/ReorderController * Controller for reordering view's in the tree
+ * @name veViewer/ReorderController * Controller for reordering view's in the tree
  *
  *
  * @requires StateService
@@ -317,4 +316,4 @@ const ReorderComponent: VeComponentOptions = {
     controller: ReorderController,
 };
 
-veApp.component(ReorderComponent.selector, ReorderComponent);
+veViewer.component(ReorderComponent.selector, ReorderComponent);

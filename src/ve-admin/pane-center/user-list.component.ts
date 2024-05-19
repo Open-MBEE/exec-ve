@@ -1,4 +1,7 @@
+import { IPane, IRegion } from '@openmbee/pane-layout';
+
 import { veAdmin } from '@ve-admin/ve-admin.module';
+import { RootScopeService } from '@ve-utils/application';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { UserObject } from '@ve-types/mms';
@@ -8,12 +11,37 @@ class UserListController implements angular.IComponentController {
     user: UserObject;
     users: UserObject[];
 
+    width: number;
+
+    //Ng-Pane
+    $pane: IPane;
+    $resized: Rx.Disposable;
+
     userTemplate = {
         fullName: 'Name',
         username: 'Username',
         email: 'Email',
         admin: true,
         enabled: true,
+    };
+
+    static $inject = ['RootScopeService'];
+
+    constructor(private rootScopeSvc: RootScopeService) {}
+
+    $onInit(): void {
+        this.rootScopeSvc.rightPaneClosed(true);
+        this.rootScopeSvc.leftPaneClosed(true);
+        this.$resized = (this.$pane.$resized as Rx.Subject<IRegion>).subscribe(() => this.handleResize());
+
+        this.handleResize();
+    }
+
+    handleResize = (): void => {
+        if (this.$pane.$region) {
+            this.width = this.$pane.$region.width;
+        }
+        //this.$scope.$apply();
     };
 }
 
@@ -23,6 +51,9 @@ const UserListComponent: VeComponentOptions = {
     bindings: {
         user: '<currentUser',
         users: '<mmsUsers',
+    },
+    require: {
+        $pane: '^ngPane',
     },
     template: `
     <div class="workspace-header home-header">
@@ -34,7 +65,7 @@ const UserListComponent: VeComponentOptions = {
             <span ng-if="$ctrl.width > 600">Create</span>
             <i ng-if="$ctrl.width <= 600" class="fas fa-plus add-btn"></i>
         </button>
-        <button class="btn btn-danger" ng-click="$ctrl.handleDeleteToggle()">
+        <button class="btn btn-danger" ng-click="$ctrl.handleDeleteToggle()" ng-if="$ctrl.user.admin">
             <span ng-if="$ctrl.width > 600">Delete</span>
             <i ng-if="$ctrl.width <= 600" class="fas fa-trash-alt delete-btn"></i>
         </button>
@@ -59,7 +90,7 @@ const UserListComponent: VeComponentOptions = {
                 label="true"
                 key="user-template"/>
         </div>
-        <div ng-repeat="user in $ctrl.users" class="user-info" key="user-info-{{user}}">
+        <div ng-repeat="user in $ctrl.users" class="user-info" key="user-info-{{user.username}}">
             <user-list-item class-name="user-name"
                 admin-state="true"
                 admin-label="true"
@@ -69,13 +100,13 @@ const UserListComponent: VeComponentOptions = {
             </user-list-item>
             <span uib-tooltip="Edit" tooltip-placement="top" ng-if="$ctrl.user.username == user.username || $ctrl.user.admin" target="edit-user-{{user.username}}">
                 <i id="edit-user-{{user.username}}"
-                    ng-click={() => $ctrl.handleEditToggle(user)}
-                    class="fas fa-user-edit add-btn"/>
+                    ng-click="$ctrl.handleEditToggle(user)"
+                    class="fas fa-user-edit add-btn"></i>
             </span>
             <span uib-tooltip="Delete" tooltip-placement="top" target="delete-{{user.username}}" ng-if="$ctrl.user.admin">
                 <i id="delete-{{user.username}}"
                     class="fas fa-trash-alt delete-btn"
-                    ng-click=$ctrl.handleDeleteToggle(user.username)/>
+                    ng-click="$ctrl.handleDeleteToggle(user.username)"></i>
             </span>
         </div>
     </list>
