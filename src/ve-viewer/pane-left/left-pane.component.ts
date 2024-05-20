@@ -1,7 +1,6 @@
 import { IPane } from '@openmbee/pane-layout';
 import { IPaneManagerService } from '@openmbee/pane-layout/lib/PaneManagerService';
 import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
-import { veViewer } from '@ve-viewer';
 
 import { TreeService } from '@ve-components/trees';
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
@@ -11,6 +10,7 @@ import { RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { ApiService, ElementService, PermissionService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
+import { veViewer } from '@ve-viewer';
 import { veViewerEvents } from 've-viewer/events';
 
 import { left_default_buttons } from './left-buttons.config';

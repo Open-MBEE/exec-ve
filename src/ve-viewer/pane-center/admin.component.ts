@@ -1,6 +1,5 @@
 import { HookResult, Ng1Controller } from '@uirouter/angularjs';
 import { Transition } from '@uirouter/core';
-import { veViewer } from '@ve-viewer';
 
 import { TreeService } from '@ve-components/trees';
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
@@ -8,6 +7,7 @@ import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { ViewApi } from '@ve-utils/mms-api-client';
+import { veViewer } from '@ve-viewer';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
 import { AdminObject, ElementObject, ParamsObject, PermissionLookupObject } from '@ve-types/mms';
