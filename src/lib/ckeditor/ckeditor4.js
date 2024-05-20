@@ -32121,8 +32121,61 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
                 }
             },
         })
-    })()
-    ;(function () {
+    })();
+    CKEDITOR.plugins.add("html5video", {
+        requires: "widget", lang: "en", init: function (b) {
+            b.widgets.add("html5video", {
+                button: b.lang.html5video.button,
+                template: '\x3cdiv class\x3d"ckeditor-html5-video"\x3e\x3c/div\x3e',
+                allowedContent: "div[data-responsive](!ckeditor-html5-video){text-align,float,margin-left,margin-right}; video[src,poster,controls,autoplay,width, height,loop]{max-width,height};",
+                requiredContent: "div(ckeditor-html5-video); video[src];",
+                upcast: function (a) {
+                    return "div" === a.name && a.hasClass("ckeditor-html5-video")
+                },
+                dialog: "html5video",
+                init: function () {
+                    var a = "", b = "", g = "", c = "", h = this.element.getStyle("text-align"), d = "", e = "", f = "";
+                    this.element.getChild(0) && (a = this.element.getChild(0).getAttribute("src"), d = this.element.getChild(0).getAttribute("width"), e = this.element.getChild(0).getAttribute("height"), b = this.element.getChild(0).getAttribute("autoplay"), allowdownload = !this.element.getChild(0).getAttribute("controlslist"), g = this.element.getChild(0).getAttribute("loop"),
+                        advisorytitle = this.element.getChild(0).getAttribute("title"), c = this.element.getChild(0).getAttribute("controls"), responsive = this.element.getAttribute("data-responsive"), f = this.element.getChild(0).getAttribute("poster"));
+                    a && (this.setData("src", a), h ? this.setData("align", h) : this.setData("align", "none"), d && this.setData("width", d), e && this.setData("height", e), b && this.setData("autoplay", "yes"), allowdownload && this.setData("allowdownload", "yes"), g && this.setData("loop", "yes"), advisorytitle && this.setData("advisorytitle",
+                        advisorytitle), responsive && this.setData("responsive", responsive), c && this.setData("controls", c), f && this.setData("poster", f))
+                },
+                data: function () {
+                    if (this.data.src) {
+                        if (!this.element.getChild(0)) {
+                            var a = new CKEDITOR.dom.element("video");
+                            this.data.controls && a.setAttribute("controls", "controls");
+                            this.element.append(a)
+                        }
+                        this.element.getChild(0).setAttribute("src", this.data.src);
+                        this.data.width && this.element.getChild(0).setAttribute("width", this.data.width);
+                        this.data.height && this.element.getChild(0).setAttribute("height",
+                            this.data.height);
+                        this.data.responsive ? (this.element.setAttribute("data-responsive", this.data.responsive), this.element.getChild(0).setStyle("max-width", "100%"), this.element.getChild(0).setStyle("height", "auto")) : (this.element.removeAttribute("data-responsive"), this.element.getChild(0).removeStyle("max-width"), this.element.getChild(0).removeStyle("height"));
+                        this.data.poster && this.element.getChild(0).setAttribute("poster", this.data.poster)
+                    }
+                    this.element.removeStyle("float");
+                    this.element.removeStyle("margin-left");
+                    this.element.removeStyle("margin-right");
+                    "none" === this.data.align ? this.element.removeStyle("text-align") : this.element.setStyle("text-align", this.data.align);
+                    "left" === this.data.align ? (this.element.setStyle("float", this.data.align), this.element.setStyle("margin-right", "10px")) : "right" === this.data.align && (this.element.setStyle("float", this.data.align), this.element.setStyle("margin-left", "10px"));
+                    this.element.getChild(0) && ("yes" === this.data.autoplay ? this.element.getChild(0).setAttribute("autoplay", "autoplay") :
+                        this.element.getChild(0).removeAttribute("autoplay"), "yes" === this.data.loop ? this.element.getChild(0).setAttribute("loop", "loop") : this.element.getChild(0).removeAttribute("loop"), "yes" === this.data.allowdownload ? this.element.getChild(0).removeAttribute("controlslist") : this.element.getChild(0).setAttribute("controlslist", "nodownload"), this.data.advisorytitle ? this.element.getChild(0).setAttribute("title", this.data.advisorytitle) : this.element.getChild(0).removeAttribute("title"), this.data.controls ? this.element.getChild(0).setAttribute("controls",
+                        "controls") : this.element.getChild(0).removeAttribute("controls"))
+                }
+            });
+            b.contextMenu && (b.addMenuGroup("html5videoGroup"), b.addMenuItem("html5videoPropertiesItem", {
+                label: b.lang.html5video.videoProperties,
+                icon: "html5video",
+                command: "html5video",
+                group: "html5videoGroup"
+            }), b.contextMenu.addListener(function (a) {
+                if (a && a.getChild(0) && a.getChild(0).hasClass && a.getChild(0).hasClass("ckeditor-html5-video")) return {html5videoPropertiesItem: CKEDITOR.TRISTATE_OFF}
+            }));
+            CKEDITOR.dialog.add("html5video", this.path + "dialogs/html5video.js")
+        }
+    })
+;(function () {
         CKEDITOR.plugins.liststyle = {
             requires: 'dialog,contextmenu',
             init: function (a) {
@@ -32432,7 +32485,7 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
         })
     })()
     CKEDITOR.config.plugins =
-        'dialogui,dialog,a11yhelp,notification,button,toolbar,clipboard,textmatch,fakeobjects,link,autolink,basicstyles,blockquote,lineutils,widgetselection,widget,codesnippet,panelbutton,panel,floatpanel,colorbutton,menu,contextmenu,wysiwygarea,easykeymap,elementspath,enterkey,entities,popup,filetools,filebrowser,find,listblock,richcombo,font,format,horizontalrule,htmlwriter,iframe,image2,indent,indentblock,indentlist,justify,list,magicline,mathjax,maximize,pagebreak,xml,ajax,pastetools,pastefromword,pastetext,removeformat,resize,showborders,sourcedialog,specialchar,tab,table,tabletools,tableresize,tableselection,undo,notificationaggregator,uploadwidget,uploadimage,liststyle,colordialog,autogrow,stylescombo'
+        'dialogui,dialog,a11yhelp,notification,button,toolbar,clipboard,textmatch,fakeobjects,link,autolink,basicstyles,blockquote,lineutils,widgetselection,widget,codesnippet,panelbutton,panel,floatpanel,colorbutton,menu,contextmenu,wysiwygarea,easykeymap,elementspath,enterkey,entities,popup,filetools,filebrowser,find,listblock,richcombo,font,format,horizontalrule,htmlwriter,iframe,image2,html5video,indent,indentblock,indentlist,justify,list,magicline,mathjax,maximize,pagebreak,xml,ajax,pastetools,pastefromword,pastetext,removeformat,resize,showborders,sourcedialog,specialchar,tab,table,tabletools,tableresize,tableselection,undo,notificationaggregator,uploadwidget,uploadimage,liststyle,colordialog,autogrow,stylescombo'
     CKEDITOR.config.skin = 'moono-lisa'
     ;(function () {
         var setIcons = function (icons, strip) {
@@ -32447,12 +32500,12 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
         }
         if (CKEDITOR.env.hidpi)
             setIcons(
-                'copy-rtl,0,copy,24,cut-rtl,48,cut,72,paste-rtl,96,paste,120,anchor-rtl,144,anchor,168,link,192,unlink,216,bold,240,italic,264,strike,288,subscript,312,superscript,336,underline,360,blockquote,384,codesnippet,408,bgcolor,432,textcolor,456,find-rtl,480,find,504,replace,528,horizontalrule,552,iframe,576,image,600,indent-rtl,624,indent,648,outdent-rtl,672,outdent,696,justifyblock,720,justifycenter,744,justifyleft,768,justifyright,792,bulletedlist-rtl,816,bulletedlist,840,numberedlist-rtl,864,numberedlist,888,mathjax,912,maximize,936,pagebreak-rtl,960,pagebreak,984,pastefromword-rtl,1008,pastefromword,1032,pastetext-rtl,1056,pastetext,1080,removeformat,1104,sourcedialog-rtl,1128,sourcedialog,1152,specialchar,1176,table,1200,redo-rtl,1224,redo,1248,undo-rtl,1272,undo,1296,',
+                'copy-rtl,0,copy,24,cut-rtl,48,cut,72,paste-rtl,96,paste,120,anchor-rtl,144,anchor,168,link,192,unlink,216,bold,240,italic,264,strike,288,subscript,312,superscript,336,underline,360,blockquote,384,codesnippet,408,bgcolor,432,textcolor,456,find-rtl,480,find,504,replace,528,horizontalrule,552,iframe,576,image,600,video,0,indent-rtl,624,indent,648,outdent-rtl,672,outdent,696,justifyblock,720,justifycenter,744,justifyleft,768,justifyright,792,bulletedlist-rtl,816,bulletedlist,840,numberedlist-rtl,864,numberedlist,888,mathjax,912,maximize,936,pagebreak-rtl,960,pagebreak,984,pastefromword-rtl,1008,pastefromword,1032,pastetext-rtl,1056,pastetext,1080,removeformat,1104,sourcedialog-rtl,1128,sourcedialog,1152,specialchar,1176,table,1200,redo-rtl,1224,redo,1248,undo-rtl,1272,undo,1296,',
                 'icons_hidpi.png'
             )
         else
             setIcons(
-                'copy-rtl,0,auto,copy,24,auto,cut-rtl,48,auto,cut,72,auto,paste-rtl,96,auto,paste,120,auto,anchor-rtl,144,auto,anchor,168,auto,link,192,auto,unlink,216,auto,bold,240,auto,italic,264,auto,strike,288,auto,subscript,312,auto,superscript,336,auto,underline,360,auto,blockquote,384,auto,codesnippet,408,auto,bgcolor,432,auto,textcolor,456,auto,find-rtl,480,auto,find,504,auto,replace,528,auto,horizontalrule,552,auto,iframe,576,auto,image,600,auto,indent-rtl,624,auto,indent,648,auto,outdent-rtl,672,auto,outdent,696,auto,justifyblock,720,auto,justifycenter,744,auto,justifyleft,768,auto,justifyright,792,auto,bulletedlist-rtl,816,auto,bulletedlist,840,auto,numberedlist-rtl,864,auto,numberedlist,888,auto,mathjax,912,auto,maximize,936,auto,pagebreak-rtl,960,auto,pagebreak,984,auto,pastefromword-rtl,1008,auto,pastefromword,1032,auto,pastetext-rtl,1056,auto,pastetext,1080,auto,removeformat,1104,auto,sourcedialog-rtl,1128,auto,sourcedialog,1152,auto,specialchar,1176,auto,table,1200,auto,redo-rtl,1224,auto,redo,1248,auto,undo-rtl,1272,auto,undo,1296,auto',
+                'copy-rtl,0,auto,copy,24,auto,cut-rtl,48,auto,cut,72,auto,paste-rtl,96,auto,paste,120,auto,anchor-rtl,144,auto,anchor,168,auto,link,192,auto,unlink,216,auto,bold,240,auto,italic,264,auto,strike,288,auto,subscript,312,auto,superscript,336,auto,underline,360,auto,blockquote,384,auto,codesnippet,408,auto,bgcolor,432,auto,textcolor,456,auto,find-rtl,480,auto,find,504,auto,replace,528,auto,horizontalrule,552,auto,iframe,576,auto,image,600,auto,video,0,auto,indent-rtl,624,auto,indent,648,auto,outdent-rtl,672,auto,outdent,696,auto,justifyblock,720,auto,justifycenter,744,auto,justifyleft,768,auto,justifyright,792,auto,bulletedlist-rtl,816,auto,bulletedlist,840,auto,numberedlist-rtl,864,auto,numberedlist,888,auto,mathjax,912,auto,maximize,936,auto,pagebreak-rtl,960,auto,pagebreak,984,auto,pastefromword-rtl,1008,auto,pastefromword,1032,auto,pastetext-rtl,1056,auto,pastetext,1080,auto,removeformat,1104,auto,sourcedialog-rtl,1128,auto,sourcedialog,1152,auto,specialchar,1176,auto,table,1200,auto,redo-rtl,1224,auto,redo,1248,auto,undo-rtl,1272,auto,undo,1296,auto',
                 'icons.png'
             )
     })()

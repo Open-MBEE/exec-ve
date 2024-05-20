@@ -384,7 +384,7 @@ export class EditorController implements IComponentController {
                     element
                         .find((el: CKEDITOR.htmlParser.element) => {
                             return (
-                                el.name == 'img' &&
+                                (el.name == 'img' || el.name == 'source') &&
                                 el.attributes['data-cke-saved-src'] &&
                                 (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1 ||
                                     el.attributes['data-cke-saved-src'].indexOf('http') < 0)
@@ -428,7 +428,7 @@ export class EditorController implements IComponentController {
                     element
                         .find((el: CKEDITOR.htmlParser.element) => {
                             return (
-                                el.name == 'img' &&
+                                (el.name == 'img' || el.name == 'source') &&
                                 el.attributes['data-cke-saved-src'] &&
                                 el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
                             );

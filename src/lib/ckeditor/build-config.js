@@ -74,6 +74,7 @@ var CKBUILDER_CONFIG = {
 		'format' : 1,
 		'horizontalrule' : 1,
 		'htmlwriter' : 1,
+		'html5video': 1,
 		'iframe' : 1,
 		'image2' : 1,
 		'indentblock' : 1,
