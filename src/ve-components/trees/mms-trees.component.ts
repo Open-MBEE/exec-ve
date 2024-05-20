@@ -17,7 +17,7 @@ import { veComponents } from '@ve-components';
 
 import { VeComponentOptions, VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
 import { InsertResolveFn } from '@ve-types/components';
-import { DocumentObject, GroupObject, ViewObject } from '@ve-types/mms';
+import { DocumentObject, ProjectGroupObject, ViewObject } from '@ve-types/mms';
 import { TreeBranch } from '@ve-types/tree';
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
@@ -255,7 +255,7 @@ class TreesController implements IComponentController {
                 }
             );
         } else if (itemType === 'Group') {
-            this.addGroup(branch as TreeBranch<GroupObject>).then(
+            this.addGroup(branch as TreeBranch<ProjectGroupObject>).then(
                 (result) => {
                     this.insertModal(result);
                     deferred.resolve();

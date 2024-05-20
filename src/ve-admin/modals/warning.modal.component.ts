@@ -1,6 +1,6 @@
 import { IComponentController } from 'angular';
 
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
 import { VeModalComponent, VeModalInstanceService, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';

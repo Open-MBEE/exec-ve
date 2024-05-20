@@ -15,7 +15,7 @@ import {
     ElementObject,
     ElementsRequest,
     ExpressionObject,
-    GroupObject,
+    ProjectGroupObject,
     InstanceSpecObject,
     InstanceValueObject,
     LiteralObject,
@@ -1026,11 +1026,11 @@ export class ViewService extends BaseApiService {
      * @param {string} orgId parent orgId
      * @returns {Promise} The promise will be resolved with the new group object.
      */
-    public createGroup(name: string, ownerOb: ViewObject): VePromise<GroupObject> {
-        return new this.$q<GroupObject>((resolve, reject) => {
+    public createGroup(name: string, ownerOb: ViewObject): VePromise<ProjectGroupObject> {
+        return new this.$q<ProjectGroupObject>((resolve, reject) => {
             const PACKAGE_ID = this.apiSvc.createUniqueId();
             // Our Group package element
-            const group: GroupObject = new Package({
+            const group: ProjectGroupObject = new Package({
                 id: PACKAGE_ID,
                 _projectId: ownerOb._projectId,
                 _refId: ownerOb._refId,
@@ -1081,7 +1081,7 @@ export class ViewService extends BaseApiService {
      * @param {object} packageOb group to remove
      * @returns {Promise} The promise will be resolved with the updated group object.
      */
-    public removeGroup(packageOb: GroupObject): VePromise<PackageObject> {
+    public removeGroup(packageOb: ProjectGroupObject): VePromise<PackageObject> {
         return new this.$q<PackageObject>((resolve, reject) => {
             const updatedPackage: PackageObject = {
                 id: packageOb.id,
@@ -1608,8 +1608,8 @@ export class ViewService extends BaseApiService {
         return;
     };
 
-    public isGroup(ob: InstanceSpecObject | GroupObject): boolean {
-        if (ob._isGroup) return (ob as GroupObject)._isGroup;
+    public isGroup(ob: InstanceSpecObject | ProjectGroupObject): boolean {
+        if (ob._isGroup) return (ob as ProjectGroupObject)._isGroup;
         else {
             return (
                 ob.appliedStereotypeIds !== undefined &&

@@ -1,7 +1,7 @@
 import { IPane, IRegion } from '@openmbee/pane-layout';
 
 import { ListApi } from '@ve-admin/components/list/list.component';
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 import { RootScopeService } from '@ve-utils/application';
 import { OrgService, UserService } from '@ve-utils/mms-api-client';
 

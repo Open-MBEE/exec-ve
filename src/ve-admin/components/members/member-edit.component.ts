@@ -1,7 +1,7 @@
 import { StateService } from '@uirouter/angularjs';
 import { IOnChangesObject } from 'angular';
 
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 import { PermissionService, UserService } from '@ve-utils/mms-api-client';
 
 import { WarningModalResolveFn } from '../../modals/warning.modal.component';
@@ -13,7 +13,7 @@ import {
     PermissionUpdateRequest,
     PermissionUpdateResponse,
     ProjectObject,
-    UserGroupObject,
+    GroupObject,
     UserObject,
 } from '@ve-types/mms';
 import Role, { VeRole } from '@ve-types/mms/permissions';
@@ -31,7 +31,7 @@ export class MemberEditController implements angular.IComponentController {
     // const prevResults = usePrevious(props.results);
     org: OrgObject;
     project: ProjectObject;
-    group: UserGroupObject;
+    group: GroupObject;
     selectedUser: string;
     authority: VeRole['ANY'];
     currentUser: string;

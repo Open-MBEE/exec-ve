@@ -8,7 +8,7 @@ import { onChangesCallback } from '@ve-utils/utils';
 import { veApp } from '@ve-app';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
-import { DocumentObject, GroupObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms';
+import { DocumentObject, ParamsObject, ProjectGroupObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms';
 
 interface BreadcrumbObject {
     name: string;
@@ -22,17 +22,17 @@ class MenuController implements IComponentController {
     public params: ParamsObject;
     public mmsProject: ProjectObject;
     public mmsProjects: ProjectObject[];
-    public mmsGroup: GroupObject;
-    public mmsGroups: GroupObject[];
+    public mmsGroup: ProjectGroupObject;
+    public mmsGroups: ProjectGroupObject[];
     public mmsRef: RefObject;
     public mmsRefs: RefObject[];
     public mmsDocument: DocumentObject;
 
     //Locals
     spin: boolean;
-    public child: DocumentObject | GroupObject;
+    public child: DocumentObject | ProjectGroupObject;
     crumbs: BreadcrumbObject[] = [];
-    groups: GroupObject[];
+    groups: ProjectGroupObject[];
     projects: ProjectObject[];
     refs: RefObject[];
     tags: RefObject[];
@@ -155,7 +155,7 @@ class MenuController implements IComponentController {
                     link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', keywords: undefined})",
                 });
                 if (this.child._parentId) {
-                    parentId = (this.child as GroupObject)._parentId;
+                    parentId = (this.child as ProjectGroupObject)._parentId;
                 }
             } else {
                 this.crumbs.push({
@@ -247,8 +247,8 @@ class MenuController implements IComponentController {
     }
 }
 
-const MainMenuComponent: VeComponentOptions = {
-    selector: 'mainMenu',
+const ContextBarComponent: VeComponentOptions = {
+    selector: 'contextBar',
     template: `
     <nav class="project-level-header navbar navbar-inverse navbar-fixed-top block" role="navigation">
     <i ng-show="$ctrl.spin && !$ctrl.isRefsView" class="fa fa-spin fa-spinner nav-spin"></i>
@@ -334,4 +334,4 @@ const MainMenuComponent: VeComponentOptions = {
     controller: MenuController,
 };
 
-veApp.component(MainMenuComponent.selector, MainMenuComponent);
+veApp.component(ContextBarComponent.selector, ContextBarComponent);

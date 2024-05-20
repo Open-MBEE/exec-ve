@@ -4,6 +4,7 @@ export interface AdminObject extends DataObject {
     name?: string;
     permission?: PermissionMap;
     description?: string;
+    archived?: boolean;
 }
 
 export interface OrgObject extends AdminObject {

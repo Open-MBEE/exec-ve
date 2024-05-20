@@ -1,7 +1,7 @@
 import {
     CommitObject,
     ElementObject,
-    GroupObject,
+    ProjectGroupObject,
     DataObject,
     MmsObject,
     OrgObject,
@@ -24,10 +24,12 @@ export interface UserObject extends MmsObject {
     fullName?: string;
 }
 
-export interface UserGroupObject extends MmsObject {
+export interface GroupObject extends MmsObject {
     name: string;
     type: string;
-    users?: string[];
+    public?: boolean;
+    created?: string;
+    modified?: string;
 }
 
 export interface CommitObject extends DataObject {
@@ -311,10 +313,25 @@ export interface CommitResponse extends BasicResponse<CommitObject> {
     commits: CommitObject[];
 }
 
-export interface GroupsResponse extends BasicResponse<ElementObject> {
-    groups: GroupObject[];
+export interface ProjectGroupsResponse extends BasicResponse<ElementObject> {
+    groups: ProjectGroupObject[];
+}
+
+export interface GroupsResponse extends BasicResponse<GroupObject> {
+    groups: UserGroupObject[];
 }
 
 export interface UsersResponse extends BasicResponse<UserObject> {
     users: UserObject[];
+}
+
+export interface UserGroupsResponse {
+    user: string;
+    groups: string[];
+    admin: boolean;
+}
+
+export interface GroupUsersResponse {
+    users: string[];
+    group: string;
 }

@@ -4,6 +4,7 @@ import { EventService } from '@ve-utils/core';
 import {
     AuthService,
     ElementService,
+    GroupService,
     OrgService,
     PermissionCache,
     PermissionService,
@@ -18,8 +19,7 @@ import {
     CheckAuthResponse,
     DocumentObject,
     GenericResponse,
-    GroupObject,
-    GroupsResponse,
+    ProjectGroupObject,
     MountObject,
     OrgObject,
     OrgsResponse,
@@ -30,9 +30,12 @@ import {
     ProjectsResponse,
     RefObject,
     RefsResponse,
+    UserGroupsResponse,
     UserObject,
     UsersResponse,
     ViewObject,
+    ProjectGroupsResponse,
+    GroupObject,
 } from '@ve-types/mms';
 
 export class ResolveService {
@@ -42,6 +45,7 @@ export class ResolveService {
         'BrandingService',
         'AuthService',
         'UserService',
+        'GroupService',
         'ProjectService',
         'OrgService',
         'ViewService',
@@ -56,6 +60,7 @@ export class ResolveService {
         private brandingSvc: BrandingService,
         private authSvc: AuthService,
         private userSvc: UserService,
+        private groupSvc: GroupService,
         private projectSvc: ProjectService,
         private orgSvc: OrgService,
         private viewSvc: ViewService,
@@ -94,7 +99,17 @@ export class ResolveService {
     }
 
     public getUser(username: string, refresh?: boolean): VePromise<UserObject, UsersResponse> {
-        return this.userSvc.getUserData(username, refresh);
+        return this.userSvc.getUser(username, refresh);
+    }
+
+    public getUserGroups(username: string, refresh?: boolean): VePromise<GroupObject[], UserGroupsResponse> {
+        return new this.$q((resolve, reject) => {
+            this.userSvc.getUserGroups(username, refresh).then((result) => {
+                this.groupSvc.getGroups(result).then((groups) => {
+                    resolve(groups);
+                }, reject);
+            }, reject);
+        });
     }
 
     public getUsers(refresh?: boolean): VePromise<UserObject[], UsersResponse> {
@@ -179,8 +194,11 @@ export class ResolveService {
         return promise;
     }
 
-    public getGroups(params: ParamsObject, refresh?: boolean): VePromise<GroupObject[], GroupsResponse> {
-        return this.$q<GroupObject[], GroupsResponse>((resolve, reject) => {
+    public getProjectGroups(
+        params: ParamsObject,
+        refresh?: boolean
+    ): VePromise<ProjectGroupObject[], ProjectGroupsResponse> {
+        return this.$q<ProjectGroupObject[], ProjectGroupsResponse>((resolve, reject) => {
             this.projectSvc.getGroups(params.projectId, params.refId, refresh).then(
                 (result) => {
                     resolve(result);
@@ -193,8 +211,8 @@ export class ResolveService {
         });
     }
 
-    public getGroup(groupObs: GroupObject[], documentOb: DocumentObject): GroupObject {
-        let group: GroupObject = null;
+    public getProjectGroup(groupObs: ProjectGroupObject[], documentOb: DocumentObject): ProjectGroupObject {
+        let group: ProjectGroupObject = null;
         if (documentOb) {
             for (let i = 0; i < groupObs.length; i++) {
                 if (groupObs[i].id == documentOb._groupId) {

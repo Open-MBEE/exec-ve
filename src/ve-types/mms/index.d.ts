@@ -10,6 +10,15 @@ export * from './classesAndProperties.d';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MmsObject = Record<string, any>;
 
+export interface JsonWebToken {
+    sub: string;
+    created: number;
+    id: string;
+    enabled: boolean;
+    authorities: string[];
+    exp: number;
+}
+
 export interface DataObject extends MmsObject {
     id: string;
     name?: string;

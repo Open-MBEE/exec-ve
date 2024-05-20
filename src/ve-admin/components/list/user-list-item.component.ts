@@ -1,7 +1,7 @@
 import { IPane, IRegion } from '@openmbee/pane-layout';
 
+import { veAdmin } from '@ve-admin';
 import { veAdminEvents } from '@ve-admin/types';
-import { veAdmin } from '@ve-admin/ve-admin.module';
 import { EventService } from '@ve-utils/core';
 import { UserService } from '@ve-utils/mms-api-client';
 
@@ -85,7 +85,7 @@ export class UserListItemController implements angular.IComponentController {
                     // Set options for request
 
                     // Get user data
-                    this.userSvc.getUserData(this.user).then((response) => {
+                    this.userSvc.getUser(this.user).then((response) => {
                         this.currentUser = response;
                         resolve();
                     }, reject);

@@ -52,7 +52,7 @@ export class URLService {
         this.url.pathname = this.veConfig.basePath ? this.veConfig.basePath : '/';
 
         this.root = `${this.apiUrl}${this.basePath ? this.basePath : ''}`;
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         this.token = `${token}`;
     }
 
@@ -74,7 +74,7 @@ export class URLService {
 
     getAuthorizationHeader = (headers: angular.HttpHeaderType): angular.HttpHeaderType => {
         if (!this.token) {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 return headers;
             } else {
@@ -164,6 +164,10 @@ export class URLService {
 
     getGroupURL = (groupName: string): string => {
         return `${this.getGroupsURL()}/${groupName}`;
+    };
+
+    getGroupUsersURL = (groupName: string): string => {
+        return `${this.getGroupURL(groupName)}/users`;
     };
 
     getGroupPermissionURL = (groupName: string): string => {
@@ -439,7 +443,11 @@ export class URLService {
     };
 
     getUserURL = (username: string): string => {
-        return `${this.getUsersURL()}?username=${username}`;
+        return `${this.getUsersURL()}/${username}`;
+    };
+
+    getUserGroupsURL = (username: string): string => {
+        return `${this.getUserURL(username)}/groups`;
     };
 
     /**

@@ -35,7 +35,7 @@ export interface PackageObject extends ElementObject {
     profileApplicationIds?: string[];
 }
 
-export interface GroupObject extends PackageObject {
+export interface ProjectGroupObject extends PackageObject {
     _isGroup?: boolean;
     _parentId?: string;
 }

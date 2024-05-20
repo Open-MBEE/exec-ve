@@ -1,6 +1,6 @@
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
+import { veViewer } from '@ve-viewer';
 
-import { veApp } from '@ve-app';
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor';
@@ -69,4 +69,4 @@ const TableExportModalComponent: VeComponentOptions = {
     controller: TableExportModalController,
 };
 
-veApp.component(TableExportModalComponent.selector, TableExportModalComponent);
+veViewer.component(TableExportModalComponent.selector, TableExportModalComponent);

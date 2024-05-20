@@ -1,13 +1,14 @@
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 import { RootScopeService } from '@ve-utils/application';
 
 import { VeComponentOptions } from '@ve-types/angular';
-import { OrgObject, PermissionMap, ProjectObject, UserObject } from '@ve-types/mms';
+import { GroupObject, OrgObject, PermissionMap, ProjectObject, UserObject } from '@ve-types/mms';
 import Role, { VeRole } from '@ve-types/mms/permissions';
 
 export class MembersPageController implements angular.IComponentController {
     org?: OrgObject;
     project?: ProjectObject;
+    group?: GroupObject;
     user: UserObject;
 
     //local

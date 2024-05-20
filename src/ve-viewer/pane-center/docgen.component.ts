@@ -1,12 +1,11 @@
-import { veViewer } from '@ve-viewer';
-
 import { RootScopeService } from '@ve-utils/application';
 import { DocgenService } from '@ve-utils/docgen/Docgen.service';
 import { ElementService, ViewService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
+import { veViewer } from '@ve-viewer';
 
 import { VeComponentOptions } from '@ve-types/angular';
-import { ElementsRequest, GroupObject, OrgObject, ParamsObject, ProjectObject, RefObject } from '@ve-types/mms';
+import { ElementsRequest, ProjectGroupObject, OrgObject, ParamsObject, ProjectObject, RefObject } from '@ve-types/mms';
 
 class DocgenController {
     //Bindings
@@ -14,7 +13,7 @@ class DocgenController {
     mmsOrg: OrgObject;
     mmsProject: ProjectObject;
     mmsRef: RefObject;
-    mmsGroup: GroupObject;
+    mmsGroup: ProjectGroupObject;
 
     viewId: string = 'docgen-test';
     parentId: string;

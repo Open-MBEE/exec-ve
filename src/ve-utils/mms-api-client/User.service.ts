@@ -4,27 +4,23 @@ import { URLService } from '@ve-utils/mms-api-client/URL.service';
 
 import { veUtils } from '@ve-utils';
 
-import { OrgService } from './Org.service';
-import { ProjectService } from './Project.service';
-
 import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
-import { OrgObject, OrgsResponse, ProjectObject, ProjectsResponse, UserObject, UsersResponse } from '@ve-types/mms';
+import { UserGroupsResponse, UserObject, UsersResponse } from '@ve-types/mms';
 
 export class UserService extends BaseApiService {
-    static $inject = ['$q', '$http', 'CacheService', 'OrgService', 'ProjectService', 'URLService'];
+    static $inject = ['$q', '$http', 'CacheService', 'URLService'];
 
     private username: string;
+
+    private authorities: string[];
 
     constructor(
         private $q: VeQService,
         private $http: VeHttpService,
         private cacheSvc: CacheService,
-        private orgSvc: OrgService,
-        private projectSvc: ProjectService,
         private uRLSvc: URLService
     ) {
         super();
-        this.username = localStorage.getItem('username');
     }
 
     getUsername(): string {
@@ -32,8 +28,15 @@ export class UserService extends BaseApiService {
     }
 
     setUsername(username: string): void {
-        localStorage.setItem('username', username);
         this.username = username;
+    }
+
+    getAuthorities(): string[] {
+        return this.authorities;
+    }
+
+    setAuthorities(authorities: string[]): void {
+        this.authorities = authorities;
     }
 
     getUsers(updateCache?: boolean): VePromise<UserObject[], UsersResponse> {
@@ -79,7 +82,7 @@ export class UserService extends BaseApiService {
         return this._getInProgress(url) as VePromise<UserObject[], UsersResponse>;
     }
 
-    getUserData(username: string, updateCache?: boolean): VePromise<UserObject, UsersResponse> {
+    getUser(username: string, updateCache?: boolean): VePromise<UserObject, UsersResponse> {
         const url = this.uRLSvc.getUserURL(username);
 
         if (!this._isInProgress(url)) {
@@ -129,59 +132,37 @@ export class UserService extends BaseApiService {
         return this._getInProgress(url) as VePromise<UserObject, UsersResponse>;
     }
 
-    getCurrentUser(updateCache?: boolean): VePromise<UserObject, UsersResponse> {
-        return this.getUserData(this.username, updateCache);
-    }
-
-    getUserOrg(updateCache?: boolean): VePromise<OrgObject, OrgsResponse> {
-        return new this.$q((resolve, reject) => {
-            this.orgSvc.getOrg(this.username, updateCache).then(
-                (data) => {
-                    resolve(data);
-                },
-                (reason) => {
-                    if (reason.status == 404) {
-                        this.getUserData(this.username).then((user) => {
-                            const reqOb: OrgObject = {
-                                id: `${this.username}-personal`,
-                                name: `${user.fullName != '' ? user.fullName : user.username}'s Personal Org`,
-                                public: false,
-                            };
-                            this.orgSvc.createOrg(reqOb).then(resolve, reject);
-                        }, reject);
+    getUserGroups(username: string, updateCache?: boolean): VePromise<string[], UserGroupsResponse> {
+        const url = this.uRLSvc.getUserGroupsURL(username);
+        if (!this._isInProgress(url)) {
+            this._addInProgress(
+                url,
+                new this.$q<string[], UserGroupsResponse>((resolve, reject) => {
+                    const key = ['user', username, 'groups'];
+                    if (this.cacheSvc.exists(key) && !updateCache) {
+                        resolve(this.cacheSvc.get<string[]>(key));
+                        this._removeInProgress(url);
                     } else {
-                        reject(reason);
+                        this.$http.get<UserGroupsResponse>(url).then((response) => {
+                            resolve(this.cacheSvc.put(key, response.data.groups));
+                        }, reject);
                     }
-                }
+                })
             );
-        });
+        }
+
+        return this._getInProgress(url) as VePromise<string[], UserGroupsResponse>;
     }
 
-    getUserHome(updateCache?: boolean): VePromise<ProjectObject, ProjectsResponse> {
-        return new this.$q((resolve, reject) => {
-            this.projectSvc.getProject(`${this.username}-home`, updateCache).then(resolve, (reason) => {
-                if (reason.status == 404) {
-                    this.getUserData(this.username).then((user) => {
-                        const reqOb: ProjectObject = {
-                            id: `${this.username}-home`,
-                            orgId: `${this.username}-personal`,
-                            name: `${user.fullName != '' ? user.fullName : user.username}'s Home`,
-                            public: false,
-                        };
-                        this.projectSvc.createProject(reqOb).then(resolve, reject);
-                    }, reject);
-                } else {
-                    reject(reason);
-                }
-            });
-        });
+    getCurrentUser(updateCache?: boolean): VePromise<UserObject, UsersResponse> {
+        return this.getUser(this.username, updateCache);
     }
 
-    reset = (): void => {
-        this.inProgress = {};
+    reset(): void {
         this.username = null;
-        localStorage.removeItem('username');
-    };
+        this.authorities = [];
+        super.reset();
+    }
 }
 
 veUtils.service('UserService', UserService);

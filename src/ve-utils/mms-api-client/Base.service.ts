@@ -1,7 +1,7 @@
 import { VePromise } from '@ve-types/angular';
 import { BasicResponse, MmsObject } from '@ve-types/mms';
 
-export class BaseApiService {
+export abstract class BaseApiService {
     protected inProgress: {
         [key: string]: VePromise<MmsObject | MmsObject[], BasicResponse<MmsObject>>;
     } = {};
@@ -26,7 +26,7 @@ export class BaseApiService {
         delete this.inProgress[key];
     };
 
-    public reset = (): void => {
+    public reset(): void {
         this.inProgress = {};
-    };
+    }
 }

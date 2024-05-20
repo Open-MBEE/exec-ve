@@ -1,4 +1,4 @@
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 
 import { ListApi } from './list.component';
 

@@ -35,8 +35,6 @@ import {
     CheckAuthResponse,
     DocumentObject,
     GenericResponse,
-    GroupObject,
-    GroupsResponse,
     MountObject,
     OrgObject,
     OrgsResponse,
@@ -44,12 +42,16 @@ import {
     ParamsObject,
     PermissionResponse,
     ProjectObject,
+    ProjectGroupObject,
     ProjectsResponse,
     RefObject,
     RefsResponse,
+    UserGroupsResponse,
     UserObject,
     UsersResponse,
     ViewObject,
+    ProjectGroupsResponse,
+    GroupObject,
 } from '@ve-types/mms';
 import { VeModalService } from '@ve-types/view-editor';
 
@@ -345,7 +347,7 @@ veApp.config([
                         },
                     },
                     'menu@main': {
-                        component: 'mainMenu',
+                        component: 'contextBar',
                         bindings: {
                             mmsOrgs: 'orgObs',
                         },
@@ -445,12 +447,25 @@ veApp.config([
                             return resolveSvc.getUser(params.user, refresh);
                         },
                     ],
+                    userGroupObs: [
+                        'params',
+                        'refresh',
+                        'ResolveService',
+                        (
+                            params: ParamsObject,
+                            refresh: boolean,
+                            resolveSvc: ResolveService
+                        ): VePromise<GroupObject[], UserGroupsResponse> => {
+                            return resolveSvc.getUserGroups(params.user, refresh);
+                        },
+                    ],
                 },
                 views: {
                     'pane-center@main': {
                         component: 'userProfile',
                         bindings: {
                             mmsUser: 'userOb',
+                            mmsGroups: 'userGroupObs',
                             currentUser: 'currentUserOb',
                         },
                     },
@@ -513,7 +528,7 @@ veApp.config([
                         },
                     },
                     'menu@main': {
-                        component: 'mainMenu',
+                        component: 'contextBar',
                         bindings: {
                             mmsOrgs: 'orgObs',
                             mmsOrg: 'orgOb',
@@ -622,7 +637,7 @@ veApp.config([
                         },
                     },
                     'menu@main': {
-                        component: 'mainMenu',
+                        component: 'contextBar',
                         bindings: {
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
@@ -817,12 +832,12 @@ veApp.config([
                         },
                     },
                     'menu@main': {
-                        component: 'mainMenu',
+                        component: 'contextBar',
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsProjects: 'projectObs',
-                            mmsGroup: 'groupOb',
-                            mmsGroups: 'groupObs',
+                            mmsProjectGroup: 'projectGroupOb',
+                            mmsProjectGroups: 'projectGroupObs',
                             mmsRefs: 'refObs',
                             mmsRef: 'refOb',
                         },
@@ -871,7 +886,7 @@ veApp.config([
                             return resolveSvc.getRef(params);
                         },
                     ],
-                    groupObs: [
+                    projectGroupObs: [
                         'ResolveService',
                         'params',
                         'refresh',
@@ -879,8 +894,8 @@ veApp.config([
                             resolveSvc: ResolveService,
                             params: ParamsObject,
                             refresh: boolean
-                        ): VePromise<GroupObject[], GroupsResponse> => {
-                            return resolveSvc.getGroups(params, refresh);
+                        ): VePromise<ProjectGroupObject[], ProjectGroupsResponse> => {
+                            return resolveSvc.getProjectGroups(params, refresh);
                         },
                     ],
                     documentObs: [
@@ -988,16 +1003,16 @@ veApp.config([
                             return resolveSvc.getCoverDocument(params, refOb, projectOb, refresh);
                         },
                     ],
-                    groupOb: [
-                        'groupObs',
+                    projectGroupOb: [
+                        'projectGroupObs',
                         'documentOb',
                         'ResolveService',
                         (
-                            groupObs: GroupObject[],
+                            projectGroupObs: ProjectGroupObject[],
                             documentOb: DocumentObject,
                             resolveSvc: ResolveService
-                        ): GroupObject => {
-                            return resolveSvc.getGroup(groupObs, documentOb);
+                        ): ProjectGroupObject => {
+                            return resolveSvc.getProjectGroup(projectGroupObs, documentOb);
                         },
                     ],
                     rootOb: [
@@ -1026,12 +1041,12 @@ veApp.config([
                         },
                     },
                     'menu@main': {
-                        component: 'mainMenu',
+                        component: 'contextBar',
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsProjects: 'projectObs',
-                            mmsGroup: 'groupOb',
-                            mmsGroups: 'groupObs',
+                            mmsGroup: 'projectGroupOb',
+                            mmsGroups: 'projectGroupObs',
                             mmsRef: 'refOb',
                             mmsRefs: 'refObs',
                         },
@@ -1048,7 +1063,7 @@ veApp.config([
                             mmsParams: 'params',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                            mmsGroup: 'groupOb',
+                            mmsGroup: 'projectGroupOb',
                             mmsDocument: 'documentOb',
                         },
                     },
@@ -1112,16 +1127,16 @@ veApp.config([
                             return resolveSvc.getPreviewDocument(params, refOb, refresh);
                         },
                     ],
-                    groupOb: [
-                        'groupObs',
+                    projectGroupOb: [
+                        'projectGroupObs',
                         'documentOb',
                         'ResolveService',
                         (
-                            groupObs: GroupObject[],
+                            projectGroupObs: ProjectGroupObject[],
                             documentOb: DocumentObject,
                             resolveSvc: ResolveService
-                        ): GroupObject => {
-                            return resolveSvc.getGroup(groupObs, documentOb);
+                        ): ProjectGroupObject => {
+                            return resolveSvc.getProjectGroup(projectGroupObs, documentOb);
                         },
                     ],
                 },
@@ -1132,7 +1147,7 @@ veApp.config([
                             mmsParams: 'params',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                            mmsGroup: 'groupOb',
+                            mmsGroup: 'projectGroupOb',
                             mmsDocument: 'documentOb',
                         },
                     },
@@ -1167,16 +1182,16 @@ veApp.config([
                             return resolveSvc.getPreviewDocument(params, refOb, refresh);
                         },
                     ],
-                    groupOb: [
-                        'groupObs',
+                    projectGroupOb: [
+                        'projectGroupObs',
                         'documentOb',
                         'ResolveService',
                         (
-                            groupObs: GroupObject[],
+                            projectGroupObs: ProjectGroupObject[],
                             documentOb: DocumentObject,
                             resolveSvc: ResolveService
-                        ): GroupObject => {
-                            return resolveSvc.getGroup(groupObs, documentOb);
+                        ): ProjectGroupObject => {
+                            return resolveSvc.getProjectGroup(projectGroupObs, documentOb);
                         },
                     ],
                 },
@@ -1187,7 +1202,7 @@ veApp.config([
                             mmsParams: 'params',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                            mmsGroup: 'groupOb',
+                            mmsGroup: 'projectGroupOb',
                             mmsDocument: 'documentOb',
                         },
                     },
@@ -1211,7 +1226,7 @@ veApp.config([
                     'pane-center@main': {
                         component: 'reorderGroup',
                         bindings: {
-                            mmsGroups: 'groupObs',
+                            mmsGroups: 'projectGroupObs',
                             mmsDocuments: 'documentObs',
                         },
                     },
@@ -1279,12 +1294,12 @@ veApp.config([
                         },
                     },
                     'menu@main': {
-                        component: 'mainMenu',
+                        component: 'contextBar',
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsProjects: 'projectObs',
-                            mmsGroup: 'groupOb',
-                            mmsGroups: 'groupObs',
+                            mmsGroup: 'projectGroupOb',
+                            mmsGroups: 'projectGroupObs',
                             mmsRef: 'refOb',
                             mmsRefs: 'refObs',
                             mmsRoot: 'documentOb',

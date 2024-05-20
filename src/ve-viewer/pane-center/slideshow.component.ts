@@ -1,7 +1,5 @@
 import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirouter/angularjs';
 import { Transition } from '@uirouter/core';
-import { veViewer } from '@ve-viewer';
-import { AppUtilsService } from '@ve-viewer/services';
 
 import { TreeService } from '@ve-components/trees';
 import { ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar';
@@ -9,6 +7,8 @@ import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { PermissionService, ViewApi } from '@ve-utils/mms-api-client';
+import { veViewer } from '@ve-viewer';
+import { AppUtilsService } from '@ve-viewer/services';
 
 import { pane_center_buttons } from './pane-center-buttons.config';
 import { ContentWindowService } from './services/ContentWindow.service';
@@ -17,7 +17,7 @@ import { VeComponentOptions, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
     ElementObject,
-    GroupObject,
+    ProjectGroupObject,
     ParamsObject,
     ProjectObject,
     RefObject,
@@ -33,7 +33,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
     mmsParams: ParamsObject;
     mmsProject: ProjectObject;
     mmsRef: RefObject;
-    mmsGroup: GroupObject;
+    mmsGroup: ProjectGroupObject;
     mmsDocument: DocumentObject;
     mmsView: ViewObject;
 

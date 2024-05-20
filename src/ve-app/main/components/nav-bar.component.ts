@@ -210,6 +210,15 @@ const NavBarComponent: VeComponentOptions = {
                             <div>{{ $ctrl.userBadge }}</div>
                         </a>
                         <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap" role="login-menu">
+                            <li>
+                                <a ui-sref="main.admin.user.profile({ user: $ctrl.user.username })">User Profile</a>
+                            </li>
+                            <li>
+                                <a ui-sref="main.admin.user.settings({ user: $ctrl.user.username })">User Settings</a>
+                            </li>
+                            <li>
+                                <a ui-sref="main.admin">Admin</a>
+                            </li>
                             <li ng-if="$ctrl.username" class="ve-secondary">
                                 Logged in as <b ng-if="$ctrl.user.firstName !== undefined">{{ $ctrl.user.firstName }} {{ $ctrl.user.lastName }}</b> ({{ $ctrl.username }})
                             </li>

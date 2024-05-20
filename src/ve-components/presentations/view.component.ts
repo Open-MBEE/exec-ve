@@ -201,7 +201,7 @@ export class ViewController implements angular.IComponentController {
             if (elem._modified > this.modified && type !== 'Comment') {
                 this.modified = elem._modified;
                 if (elem._modifier) {
-                    this.userSvc.getUserData(elem._modifier).then(
+                    this.userSvc.getUser(elem._modifier).then(
                         (result) => {
                             this.modifier = result;
                         },
@@ -289,7 +289,7 @@ export class ViewController implements angular.IComponentController {
                         //getting cached individual elements should be faster
                         this.view = data;
                         this.modified = data._modified;
-                        this.userSvc.getUserData(data._modifier).then(
+                        this.userSvc.getUser(data._modifier).then(
                             (result) => {
                                 this.modifier = result;
                             },
@@ -302,7 +302,7 @@ export class ViewController implements angular.IComponentController {
                     this.viewSvc.getViewElements(this.reqOb, 1).finally(() => {
                         this.view = data;
                         this.modified = data._modified;
-                        this.userSvc.getUserData(data._modifier).then(
+                        this.userSvc.getUser(data._modifier).then(
                             (result) => {
                                 this.modifier = result;
                             },

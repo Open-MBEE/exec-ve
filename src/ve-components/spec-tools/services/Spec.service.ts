@@ -239,7 +239,7 @@ export class SpecService implements angular.Injectable<any> {
                     }
                     this.values = this.valueSvc.getValues(data);
                     promises.push(
-                        this.userSvc.getUserData(data._modifier).then((result) => {
+                        this.userSvc.getUser(data._modifier).then((result) => {
                             this.modifier = result;
                         })
                     );

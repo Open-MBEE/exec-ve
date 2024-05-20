@@ -1,4 +1,4 @@
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 import { RootScopeService } from '@ve-utils/application';
 import { UserService } from '@ve-utils/mms-api-client';
 

@@ -1,5 +1,5 @@
 import { CacheService } from '@ve-utils/core';
-import { ApiService, PermissionService, ProjectService, URLService } from '@ve-utils/mms-api-client';
+import { ApiService, PermissionService, ProjectService, URLService, UserService } from '@ve-utils/mms-api-client';
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service';
 
 import { veUtils } from '@ve-utils';
@@ -14,14 +14,25 @@ import {
     ProjectObject,
     ProjectsResponse,
 } from '@ve-types/mms';
+import Role from '@ve-types/mms/permissions';
 
 export class OrgService extends BaseApiService {
-    static $inject = ['$q', '$http', 'CacheService', 'ProjectService', 'URLService', 'ApiService', 'PermissionService'];
+    static $inject = [
+        '$q',
+        '$http',
+        'CacheService',
+        'ProjectService',
+        'UserService',
+        'URLService',
+        'ApiService',
+        'PermissionService',
+    ];
     constructor(
         private $q: VeQService,
         private $http: VeHttpService,
         private cacheSvc: CacheService,
         private projectSvc: ProjectService,
+        private userSvc: UserService,
         private uRLSvc: URLService,
         private apiSvc: ApiService,
         private permissionSvc: PermissionService
@@ -150,13 +161,20 @@ export class OrgService extends BaseApiService {
             this.projectSvc.getProject(`${orgId}-home`, updateCache).then(resolve, (reason) => {
                 if (reason.status == 404) {
                     this.getOrg(orgId, updateCache).then((org) => {
-                        const reqOb: ProjectObject = {
-                            id: `${orgId}-home`,
-                            orgId: orgId,
-                            name: `${org.name ? org.name : org.id} Home`,
-                            public: false,
-                        };
-                        this.projectSvc.createProject(reqOb).then(resolve, reject);
+                        if (Role.ge(org.permission.users[this.userSvc.getUsername()].role, Role.WRITE)) {
+                            const reqOb: ProjectObject = {
+                                id: `${orgId}-home`,
+                                orgId: orgId,
+                                name: `${org.name ? org.name : org.id} Home`,
+                                public: false,
+                            };
+                            this.projectSvc.createProject(reqOb).then(resolve, reject);
+                        } else {
+                            reject({
+                                status: 500,
+                                message: 'Org Home does not exist, contact Org Admin to have them create one',
+                            });
+                        }
                     }, reject);
                 } else {
                     reject(reason);
@@ -178,9 +196,15 @@ export class OrgService extends BaseApiService {
                 .then(
                     (response) => {
                         const org = response.data.orgs[0];
-                        const key = ['org', org.id];
-                        this.cacheSvc.put(key, response.data.orgs[0], true);
-                        resolve(this.cacheSvc.get<OrgObject>(key));
+                        const reqOb: ProjectObject = {
+                            id: `${org.id}-home`,
+                            orgId: orgObj.id,
+                            name: `${org.name ? org.name : org.id} Home`,
+                            public: false,
+                        };
+                        this.projectSvc.createProject(reqOb).then(() => {
+                            this.getOrg(org.id).then(resolve, reject);
+                        }, reject);
                     },
                     (response: VeHttpResponse<OrgsResponse>) => {
                         this.apiSvc.handleErrorCallback(response, reject);

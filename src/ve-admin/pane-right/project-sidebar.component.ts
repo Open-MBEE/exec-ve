@@ -1,6 +1,6 @@
 import { IPane } from '@openmbee/pane-layout';
 
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 import { RootScopeService } from '@ve-utils/application';
 
 import { VeComponentOptions } from '@ve-types/angular';
@@ -20,7 +20,6 @@ class ProjectSidebarController implements angular.IComponentController {
     projectId: string;
     project: ProjectObject;
     admin = false;
-    permissions: any;
     error: string | null = null;
     refId: string;
 

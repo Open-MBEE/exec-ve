@@ -9,6 +9,7 @@ import './View.service';
 import './User.service';
 import './Value.service';
 import './Org.service';
+import './Group.service';
 
 export * from './URL.service';
 export * from './Authorization.service';
@@ -21,3 +22,4 @@ export * from './Api.service';
 export * from './User.service';
 export * from './Value.service';
 export * from './Org.service';
+export * from './Group.service';

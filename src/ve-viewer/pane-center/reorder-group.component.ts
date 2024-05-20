@@ -1,18 +1,25 @@
 import { StateService } from '@uirouter/angularjs';
-import { veViewer } from '@ve-viewer';
 import { IComponentController } from 'angular';
 import _ from 'lodash';
 
 import { TreeService } from '@ve-components/trees';
 import { CacheService } from '@ve-utils/core';
 import { ElementService } from '@ve-utils/mms-api-client';
+import { veViewer } from '@ve-viewer';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
-import { DocumentObject, ElementObject, GroupObject, ParamsObject, ProjectObject, RefObject } from '@ve-types/mms';
+import {
+    DocumentObject,
+    ElementObject,
+    ProjectGroupObject,
+    ParamsObject,
+    ProjectObject,
+    RefObject,
+} from '@ve-types/mms';
 import { AngularUITree, VeTreeNodeScope } from '@ve-types/tree';
 
 interface ReorderGroupNode {
-    data: GroupObject | DocumentObject;
+    data: ProjectGroupObject | DocumentObject;
     children: ReorderGroupNode[];
     name: string;
     id: string;
@@ -29,11 +36,11 @@ class ReorderGroupController implements IComponentController {
     params: ParamsObject;
     mmsProject: ProjectObject;
     mmsRef: RefObject;
-    mmsGroups: GroupObject[];
+    mmsGroups: ProjectGroupObject[];
     mmsDocuments: DocumentObject[];
 
     //Locals
-    groups: GroupObject[];
+    groups: ProjectGroupObject[];
     documents: DocumentObject[];
     isSaving = false;
     targetId = '';
@@ -156,7 +163,7 @@ class ReorderGroupController implements IComponentController {
         name: string,
         type: string,
         children: ReorderGroupNode[],
-        data: GroupObject | DocumentObject
+        data: ProjectGroupObject | DocumentObject
     ): ReorderGroupNode {
         return {
             name: name,
@@ -241,7 +248,7 @@ class ReorderGroupController implements IComponentController {
             this.params.projectId,
             this.params.refId,
         ]);
-        const listOfGroupInCache = this.cacheSvc.get<GroupObject[]>([
+        const listOfGroupInCache = this.cacheSvc.get<ProjectGroupObject[]>([
             'groups',
             this.params.projectId,
             this.params.refId,

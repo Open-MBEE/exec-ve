@@ -11,6 +11,7 @@ import {
     PermissionResponse,
     PermissionUpdateRequest,
     PermissionUpdateResponse,
+    UserGroupsResponse,
     UsersResponse,
 } from '@ve-types/mms';
 import Role, { VeRole } from '@ve-types/mms/permissions';
@@ -152,6 +153,7 @@ export class PermissionService {
                             users: {},
                             groups: {},
                         };
+                        const username = this.userSvc.getUsername();
                         response.data.users.permissions.forEach((perm) => {
                             if (!Object.prototype.hasOwnProperty.call(perms.users, perm.name)) {
                                 perms.users[perm.name] = perm;
@@ -177,6 +179,24 @@ export class PermissionService {
                     }
                 );
             }
+        });
+    }
+
+    public handleGroupPermission(
+        username: string,
+        role: VeRole['ANY'],
+        permissionMap: PermissionMap
+    ): VePromise<VeRole['ANY'], UserGroupsResponse> {
+        return new this.$q((resolve, reject) => {
+            let finalRole: VeRole['ANY'] = role;
+            this.userSvc.getUserGroups(username).then((response) => {
+                Object.keys(permissionMap.groups).forEach((group) => {
+                    if (response.includes(group) && Role.gt(finalRole, permissionMap.groups[group].role)) {
+                        finalRole = permissionMap.groups[group].role;
+                    }
+                });
+                resolve(finalRole);
+            }, reject);
         });
     }
 
@@ -343,7 +363,7 @@ export class PermissionService {
 
     public hasAdminPermission = (username: string): VePromise<boolean, UsersResponse> => {
         return new this.$q((resolve, reject) => {
-            this.userSvc.getUserData(username).then(
+            this.userSvc.getUser(username).then(
                 (user) => {
                     resolve(user.admin);
                 },

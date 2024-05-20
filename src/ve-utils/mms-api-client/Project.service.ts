@@ -10,8 +10,8 @@ import {
     CommitObject,
     CommitResponse,
     ElementObject,
-    GroupObject,
-    GroupsResponse,
+    ProjectGroupObject,
+    ProjectGroupsResponse,
     MmsObject,
     MountObject,
     ProjectObject,
@@ -526,18 +526,18 @@ export class ProjectService extends BaseApiService {
         projectId: string,
         refId: string,
         updateCache?: boolean
-    ): VePromise<GroupObject[], GroupsResponse> {
+    ): VePromise<ProjectGroupObject[], ProjectGroupsResponse> {
         const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'groups');
         const url = this.uRLSvc.getProjectGroupsURL(projectId, refId);
         if (!this._isInProgress(url)) {
             this._addInProgress(
                 url,
-                new this.$q<GroupObject[], GroupsResponse>((resolve, reject) => {
+                new this.$q<ProjectGroupObject[], ProjectGroupsResponse>((resolve, reject) => {
                     if (this.cacheSvc.exists(cacheKey) && !updateCache) {
-                        resolve(this.cacheSvc.get<GroupObject[]>(cacheKey));
+                        resolve(this.cacheSvc.get<ProjectGroupObject[]>(cacheKey));
                     } else {
                         this.$http
-                            .get<GroupsResponse>(url)
+                            .get<ProjectGroupsResponse>(url)
                             .then(
                                 (response) => {
                                     if (!Array.isArray(response.data.groups)) {
@@ -549,7 +549,7 @@ export class ProjectService extends BaseApiService {
                                         });
                                         return;
                                     }
-                                    const groups: GroupObject[] = [];
+                                    const groups: ProjectGroupObject[] = [];
                                     const reqOb = {
                                         projectId: projectId,
                                         refId: refId,
@@ -557,18 +557,18 @@ export class ProjectService extends BaseApiService {
                                         elementId: '',
                                     };
                                     for (let i = 0; i < response.data.groups.length; i++) {
-                                        let group: GroupObject = response.data.groups[i];
+                                        let group: ProjectGroupObject = response.data.groups[i];
                                         reqOb.elementId = group.id;
                                         group = this.elementSvc.cacheElement(reqOb, group);
                                         this.cacheSvc.put(['group', projectId, refId, group.id], group, true);
                                         groups.push(
-                                            this.cacheSvc.get<GroupObject>(['group', projectId, refId, group.id])
+                                            this.cacheSvc.get<ProjectGroupObject>(['group', projectId, refId, group.id])
                                         );
                                     }
                                     this.cacheSvc.put(cacheKey, groups, false);
-                                    resolve(this.cacheSvc.get<GroupObject[]>(cacheKey));
+                                    resolve(this.cacheSvc.get<ProjectGroupObject[]>(cacheKey));
                                 },
-                                (response: VeHttpResponse<GroupsResponse>) => {
+                                (response: VeHttpResponse<ProjectGroupsResponse>) => {
                                     this.apiSvc.handleErrorCallback(response, reject);
                                 }
                             )
@@ -579,11 +579,15 @@ export class ProjectService extends BaseApiService {
                 })
             );
         }
-        return this._getInProgress(url) as VePromise<GroupObject[], GroupsResponse>;
+        return this._getInProgress(url) as VePromise<ProjectGroupObject[], ProjectGroupsResponse>;
     }
 
-    public getGroup(id: string, projectId: string, refId: string): VePromise<GroupObject, GroupsResponse> {
-        return new this.$q<GroupObject, GroupsResponse>((resolve, reject) => {
+    public getGroup(
+        id: string,
+        projectId: string,
+        refId: string
+    ): VePromise<ProjectGroupObject, ProjectGroupsResponse> {
+        return new this.$q<ProjectGroupObject, ProjectGroupsResponse>((resolve, reject) => {
             this.getGroups(projectId, refId).then(
                 (data) => {
                     const result = this.cacheSvc.get<ElementObject>(['group', projectId, refId, id]);

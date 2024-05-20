@@ -1,6 +1,6 @@
 import { RawParams, StateService } from '@uirouter/angularjs';
 
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 import { parseStateRef } from '@ve-utils/utils';
 
 import { VeComponentOptions } from '@ve-types/angular';

@@ -1,12 +1,20 @@
 import { IQResolveReject } from 'angular';
 
-import { ApplicationService, RootScopeService, UserSettingsObject } from '@ve-utils/application';
+import { SettingsService, UserSettingsObject } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { ApiService, ElementService, OrgService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
+import {
+    ApiService,
+    ElementService,
+    OrgService,
+    ProjectService,
+    UserService,
+    ViewService,
+} from '@ve-utils/mms-api-client';
 
 import { veCore } from '@ve-core';
 
 import { VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
+import Icon from '@ve-types/icons';
 import {
     AdminObject,
     DataObject,
@@ -21,7 +29,6 @@ import {
     ViewObject,
 } from '@ve-types/mms';
 import { TreeApi, TreeBranch, TreeRow } from '@ve-types/tree';
-import Icon from '@ve-types/icons';
 
 export class TreeService {
     public selectedBranch: TreeBranch = null;
@@ -83,29 +90,27 @@ export class TreeService {
 
     static $inject = [
         '$q',
-        '$timeout',
         'growl',
         'ApiService',
+        'UserService',
         'ProjectService',
         'OrgService',
         'ElementService',
         'ViewService',
-        'ApplicationService',
-        'RootScopeService',
+        'SettingsService',
         'EventService',
     ];
 
     constructor(
         private $q: VeQService,
-        private $timeout: angular.ITimeoutService,
         private growl: angular.growl.IGrowlService,
         private apiSvc: ApiService,
+        private userSvc: UserService,
         private projectSvc: ProjectService,
         private orgSvc: OrgService,
         private elementSvc: ElementService,
         private viewSvc: ViewService,
-        private applicationSvc: ApplicationService,
-        private rootScopeSvc: RootScopeService,
+        private settingsSvc: SettingsService,
         private eventSvc: EventService
     ) {}
 
@@ -679,11 +684,11 @@ export class TreeService {
             if (this.treeData.length > 0) {
                 if (this.treeApi.projectId) {
                     const userReqOb: UsersRequest = {
-                        username: this.applicationSvc.getState().user,
+                        username: this.userSvc.getUsername(),
                         projectId: this.treeApi.projectId,
                         refId: this.treeApi.refId,
                     };
-                    this.applicationSvc.getUserSettings(userReqOb).then((result) => {
+                    this.settingsSvc.getUserSettings(userReqOb).then((result) => {
                         this.userSettings = result;
                         this.treeData.forEach((branch) => {
                             this._addBranchData(1, [], branch, true, {});
@@ -811,7 +816,7 @@ export class TreeService {
                 let number = '';
                 if (this.treeApi.sectionNumbering) {
                     if (branch.data && branch.data._veNumber) {
-                        number = branch.data._veNumber;
+                        number = branch.data._veNumber as string;
                     }
                 }
 
@@ -915,7 +920,7 @@ export class TreeService {
                             },
                             reject
                         );
-                    });
+                    }, reject);
                 } else {
                     this.projectSvc.getGroups(this.treeApi.projectId, this.treeApi.refId).then(
                         (groups) => {

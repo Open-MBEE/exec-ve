@@ -1,5 +1,5 @@
 import { TreeService, TreeController } from '@ve-components/trees';
-import { ApplicationService, RootScopeService, UserSettingsObject, UtilsService } from '@ve-utils/application';
+import { RootScopeService, SettingsService, UserSettingsObject, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 
 import { veComponents } from '@ve-components';
@@ -8,7 +8,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import { TreeBranch } from '@ve-types/tree';
 
 class TreeOfDocumentsController extends TreeController {
-    static $inject = [...TreeController.$inject, 'ApplicationService'];
+    static $inject = [...TreeController.$inject, 'SettingsService'];
     constructor(
         $q: VeQService,
         $scope: angular.IScope,
@@ -19,7 +19,7 @@ class TreeOfDocumentsController extends TreeController {
         treeSvc: TreeService,
         rootScopeSvc: RootScopeService,
         eventSvc: EventService,
-        private applicationSvc: ApplicationService
+        private settingsSvc: SettingsService
     ) {
         super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc);
         this.id = 'tree-of-documents';
@@ -39,12 +39,12 @@ class TreeOfDocumentsController extends TreeController {
         $event.stopPropagation();
         let promise: VePromise<UserSettingsObject>;
         if (!branch.favorite) {
-            promise = this.applicationSvc.addPins(this.treeSvc.treeApi.projectId, this.treeSvc.treeApi.refId, [
-                branch.data.id as string,
+            promise = this.settingsSvc.addPins(this.treeSvc.treeApi.projectId, this.treeSvc.treeApi.refId, [
+                branch.data.id,
             ]);
         } else {
-            promise = this.applicationSvc.removePins(this.treeSvc.treeApi.projectId, this.treeSvc.treeApi.refId, [
-                branch.data.id as string,
+            promise = this.settingsSvc.removePins(this.treeSvc.treeApi.projectId, this.treeSvc.treeApi.refId, [
+                branch.data.id,
             ]);
         }
 

@@ -1,3 +1,4 @@
+import { veViewer } from '@ve-viewer';
 import { AppUtilsService, DocumentStructure } from '@ve-viewer/services';
 import angular from 'angular';
 import _ from 'lodash';
@@ -6,8 +7,6 @@ import { UtilsService } from '@ve-utils/application';
 import { EditService } from '@ve-utils/core';
 import { ElementService, ViewService, DocumentMetadata, ProjectService } from '@ve-utils/mms-api-client';
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
-
-import { veApp } from '@ve-app';
 
 import { VePromise } from '@ve-types/angular';
 import { CommitObject, CommitResponse, RefObject, ViewObject } from '@ve-types/mms';
@@ -393,4 +392,4 @@ const PrintConfirmModalComponent: VeModalComponent = {
     controller: PrintConfirmModalController,
 };
 
-veApp.component(PrintConfirmModalComponent.selector, PrintConfirmModalComponent);
+veViewer.component(PrintConfirmModalComponent.selector, PrintConfirmModalComponent);

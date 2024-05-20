@@ -1,6 +1,6 @@
 import { IPane, IRegion } from '@openmbee/pane-layout';
 
-import { veAdmin } from '@ve-admin/ve-admin.module';
+import { veAdmin } from '@ve-admin';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { OrgObject } from '@ve-types/mms';
