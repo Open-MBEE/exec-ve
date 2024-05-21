@@ -7,7 +7,7 @@ import { SchemaService } from '@ve-utils/model-schema';
 import { veUtils } from '@ve-utils';
 
 import { VeHttpResponse, VeHttpService, VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 import {
     BasicResponse,
     ElementObject,
@@ -38,8 +38,6 @@ export class ApiService {
 
     schema: string = 'cameo';
 
-    public veConfig: VeConfig = window.__env;
-
     static $inject = ['$q', '$http', 'URLService', 'SchemaService'];
 
     constructor(
@@ -63,7 +61,7 @@ export class ApiService {
     }
 
     public getVeVersion = (): string => {
-        return this.veConfig.version ? this.veConfig.version : 've-app';
+        return veConfig.version ? veConfig.version : 've-app';
     };
 
     /**

@@ -1,10 +1,10 @@
 import 'angular-growl-v2';
 
 import { StateService, Transition, TransitionService, UIRouter, UIRouterGlobals } from '@uirouter/angularjs';
-import { WorkingTimeModalResolveFn, WorkingTimeObject } from '@ve-app/main/modals/working-modal.component';
 import angular, { IComponentController, IHttpResponse } from 'angular';
 import Rx from 'rx-lite';
 
+import { WorkingTimeModalResolveFn, WorkingTimeObject } from '@ve-app/main/modals/working-modal.component';
 import { ApplicationService, RootScopeService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { ApiService, AuthService, ElementService, HttpService, URLService } from '@ve-utils/mms-api-client';
@@ -12,7 +12,7 @@ import { ApiService, AuthService, ElementService, HttpService, URLService } from
 import { veApp } from '@ve-app';
 
 import { VeComponentOptions, VeHttpResponse, VeHttpService } from '@ve-types/angular';
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 import { ParamsObject } from '@ve-types/mms';
 import { VeModalService } from '@ve-types/view-editor';
 
@@ -45,7 +45,6 @@ class MainController implements IComponentController {
     //local
     public subs: Rx.IDisposable[];
     openEdits = {};
-    readonly veConfig: VeConfig;
 
     private hidePanes: boolean = false;
     private closePanes: boolean = false;
@@ -85,9 +84,7 @@ class MainController implements IComponentController {
         private rootScopeSvc: RootScopeService,
         private editSvc: EditService,
         private eventSvc: EventService
-    ) {
-        this.veConfig = window.__env;
-    }
+    ) {}
 
     $onInit(): void {
         this.eventSvc.$init(this);
@@ -246,7 +243,7 @@ class MainController implements IComponentController {
                     next: trans.$to().url,
                 });
             }
-            if (this.veConfig.enableDebug) {
+            if (veConfig.enableDebug) {
                 this.growl.warning('Error: ' + trans.error().message, {
                     ttl: 1000,
                 });

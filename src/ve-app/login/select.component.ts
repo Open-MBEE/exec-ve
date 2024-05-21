@@ -9,6 +9,7 @@ import { ProjectService, AuthService, OrgService } from '@ve-utils/mms-api-clien
 import { veApp } from '@ve-app';
 
 import { VeComponentOptions } from '@ve-types/angular';
+import veConfig from '@ve-types/config';
 import { OrgObject, ParamsObject, ProjectObject } from '@ve-types/mms';
 import { VeStorageService } from '@ve-types/view-editor';
 
@@ -87,8 +88,14 @@ class SelectController implements IComponentController {
         this.rootScopeSvc.veTitle('Projects');
         this.pageTitle = 'View Editor';
         this.fromLogin = (this.$uiRouterGlobals.params as ParamsObject).fromLogin;
+        this.orgs =
+            veConfig.profiles && veConfig.profiles.hideOrg
+                ? this.mmsOrgs.filter((org) => {
+                      return org.id == veConfig.profiles.orgId;
+                  })
+                : this.mmsOrgs;
         this.$localStorage.$default({ org: this.mmsOrgs[0] });
-        this.orgs = this.mmsOrgs;
+
         if (this.$localStorage.org) {
             this.selectOrg(this.$localStorage.org);
         }

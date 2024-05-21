@@ -4,6 +4,7 @@ import { OrgService } from '@ve-utils/mms-api-client';
 
 import { veApp } from '@ve-app';
 
+import veConfig from '@ve-types/config';
 import { OrgObject, ProjectObject } from '@ve-types/mms';
 import {
     VeModalComponent,
@@ -45,7 +46,12 @@ class SelectModalController implements VeModalController {
     constructor(private $state: StateService, private orgSvc: OrgService) {}
 
     $onInit(): void {
-        this.orgs = this.resolve.mmsOrgs;
+        this.orgs =
+            veConfig.profiles && veConfig.profiles.hideOrg
+                ? this.resolve.mmsOrgs.filter((org) => {
+                      return org.id == veConfig.profiles.orgId;
+                  })
+                : this.resolve.mmsOrgs;
 
         this.org = this.resolve.mmsOrg;
         this.project = this.resolve.mmsProject;

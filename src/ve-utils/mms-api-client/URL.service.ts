@@ -1,7 +1,7 @@
 import { veUtils } from '@ve-utils';
 
 import { VeHttpResponse, VePromiseResponse } from '@ve-types/angular';
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 import {
     ArtifactsRequest,
     BasicResponse,
@@ -37,19 +37,18 @@ export class URLService {
     readonly root: string;
     readonly url: URL;
     private token: string;
-    private veConfig: VeConfig = window.__env;
 
     static $inject = [];
 
     constructor(readonly basePath?: string, readonly apiUrl?: string) {
         if (!this.apiUrl) {
-            this.apiUrl = this.veConfig.apiUrl;
+            this.apiUrl = veConfig.apiUrl;
         }
         if (!this.apiUrl) {
             throw new Error('Unable to find "apiUrl" configuration for MMS. Please check your configuration file.');
         }
         this.url = new URL(this.apiUrl);
-        this.url.pathname = this.veConfig.basePath ? this.veConfig.basePath : '/';
+        this.url.pathname = veConfig.basePath ? veConfig.basePath : '/';
 
         this.root = `${this.apiUrl}${this.basePath ? this.basePath : ''}`;
         const token = sessionStorage.getItem('token');
@@ -147,7 +146,7 @@ export class URLService {
      * @returns {string} The url
      */
     getExportHtmlUrl = (): string => {
-        return this.veConfig.printUrl;
+        return veConfig.printUrl;
     };
 
     getAuthenticationUrl = (): string => {

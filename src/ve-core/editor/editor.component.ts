@@ -14,7 +14,7 @@ import eventDataTypes = CKEDITOR.eventDataTypes;
 
 import { VeComponentOptions, VeNgModelController, VePromise, VeQService } from '@ve-types/angular';
 import { InsertData, InsertResolveFn } from '@ve-types/components';
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 import { ElementObject, ElementsResponse, TransclusionObject } from '@ve-types/mms';
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
 
@@ -44,7 +44,6 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
    </pre>
  */
 export class EditorController implements IComponentController {
-    private veConfig: VeConfig = window.__env;
     private ckEditor = window.CKEDITOR;
 
     private ngModelCtrl: VeNgModelController<string>;
@@ -386,7 +385,7 @@ export class EditorController implements IComponentController {
                             return (
                                 el.name == 'img' &&
                                 el.attributes['data-cke-saved-src'] &&
-                                (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1 ||
+                                (el.attributes['data-cke-saved-src'].indexOf(veConfig.apiUrl) > -1 ||
                                     el.attributes['data-cke-saved-src'].indexOf('http') < 0)
                             );
                         }, true)
@@ -430,7 +429,7 @@ export class EditorController implements IComponentController {
                             return (
                                 el.name == 'img' &&
                                 el.attributes['data-cke-saved-src'] &&
-                                el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
+                                el.attributes['data-cke-saved-src'].indexOf(veConfig.apiUrl) > -1
                             );
                         }, true)
                         .forEach((el: CKEDITOR.htmlParser.element) => {

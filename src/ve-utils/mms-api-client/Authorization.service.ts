@@ -43,6 +43,7 @@ export class AuthService {
         'EditService',
         'UserService',
         'OrgService',
+        'GroupService',
     ];
     constructor(
         private $q: VeQService,

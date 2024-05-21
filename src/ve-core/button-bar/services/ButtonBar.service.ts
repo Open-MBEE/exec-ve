@@ -4,7 +4,7 @@ import { EventService } from '@ve-utils/core';
 import { veUtils } from '@ve-utils';
 
 import { VePromise, VeQService } from '@ve-types/angular';
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 import { EditorActions } from '@ve-types/core/editor';
 import { VeApiObject } from '@ve-types/view-editor';
 
@@ -33,17 +33,15 @@ export class ButtonBarService {
     private barCounter: { [id: string]: number } = {};
     private buttons: { [key: string]: IButtonBarButton } = {};
     private buttonBars: VeApiObject<ButtonBarApi> = {};
-    private veConfig: VeConfig;
 
     constructor(private $q: VeQService, private eventSvc: EventService) {
         for (const button of default_buttons) {
             this.buttons[button.id] = button;
         }
-        this.veConfig = window.__env;
-        if (this.veConfig.expConfig) {
-            for (const ext of Object.keys(this.veConfig.expConfig)) {
-                if (this.veConfig.expConfig[ext] && this.veConfig.expConfig[ext].length > 0) {
-                    for (const tool of this.veConfig.expConfig[ext]) {
+        if (veConfig.expConfig) {
+            for (const ext of Object.keys(veConfig.expConfig)) {
+                if (veConfig.expConfig[ext] && veConfig.expConfig[ext].length > 0) {
+                    for (const tool of veConfig.expConfig[ext]) {
                         if (tool.barButtons) {
                             this.registerButtons(tool.barButtons);
                         }

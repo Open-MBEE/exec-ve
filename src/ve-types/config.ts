@@ -4,6 +4,10 @@ import { BrandingStyle } from '@ve-utils/application';
 export interface VeConfig {
     version?: string;
     apiUrl: string;
+    profiles?: {
+        orgId: string;
+        hideOrg: boolean;
+    };
     printUrl: string;
     basePath: string;
     enableDebug?: boolean;
@@ -16,3 +20,7 @@ export interface VeConfig {
     experimental?: VeExperimentDescriptor[];
     expConfig?: VeExperimentConfig;
 }
+
+const veConfig = window.__env;
+
+export default veConfig;

@@ -1,5 +1,4 @@
 import { StateService } from '@uirouter/angularjs';
-import { veViewer } from '@ve-viewer';
 import { IComponentController } from 'angular';
 import Rx from 'rx-lite';
 
@@ -8,6 +7,7 @@ import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { PermissionService } from '@ve-utils/mms-api-client';
+import { veViewer } from '@ve-viewer';
 
 import { right_default_toolbar, right_dynamic_toolbar } from './right-buttons.config';
 

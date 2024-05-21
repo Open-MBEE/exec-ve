@@ -1,7 +1,7 @@
 import { veUtils } from '@ve-utils';
 
 import { VePromise, VeQService } from '@ve-types/angular';
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 import { ParamsObject, ProjectsResponse } from '@ve-types/mms';
 
 export interface BrandingStyle {
@@ -37,7 +37,6 @@ export class BrandingService {
         labels: ['opensource', 'unclassified'],
         disabled: false,
     };
-    config: VeConfig = window.__env;
     banner: BrandingStyle = {
         labels: ['pi'],
         background: '#0D47A1',
@@ -62,25 +61,25 @@ export class BrandingService {
     static $inject = ['$q'];
 
     constructor(private $q: VeQService) {
-        if (this.config.customLabels) {
-            this.labels = Object.assign(this.defaultLabels, this.config.customLabels);
+        if (veConfig.customLabels) {
+            this.labels = Object.assign(this.defaultLabels, veConfig.customLabels);
         }
 
-        if (this.config.banner) {
-            this.banner = Object.assign(this.banner, this.config.banner);
+        if (veConfig.banner) {
+            this.banner = Object.assign(this.banner, veConfig.banner);
         }
         this.createMessage(this.banner);
 
-        if (this.config.loginBanner) {
-            this.loginBanner = Object.assign(this.loginBanner, this.config.loginBanner);
+        if (veConfig.loginBanner) {
+            this.loginBanner = Object.assign(this.loginBanner, veConfig.loginBanner);
         }
         this.createMessage(this.loginBanner);
-        if (this.config.footer) {
-            this.footer = Object.assign(this.footer, this.config.footer);
+        if (veConfig.footer) {
+            this.footer = Object.assign(this.footer, veConfig.footer);
         }
         this.createMessage(this.footer);
-        if (this.config.loginWarning) {
-            this.loginWarning = Object.assign(this.loginWarning, this.config.loginWarning);
+        if (veConfig.loginWarning) {
+            this.loginWarning = Object.assign(this.loginWarning, veConfig.loginWarning);
         }
         this.createMessage(this.loginWarning);
     }

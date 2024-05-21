@@ -60,6 +60,7 @@ export const veApp = angular.module('ve-app', [
     've-core',
     've-components',
     've-admin',
+    've-viewer',
     'ui.bootstrap',
     uiRouter,
     ngPane,

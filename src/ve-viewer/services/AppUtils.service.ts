@@ -1,6 +1,4 @@
 import { StateService } from '@uirouter/angularjs';
-import { PrintConfirmResult, PrintModalResolveFn } from '@ve-viewer/modals/print-confirm-modal.component';
-import { TableExportModalResolveFn } from '@ve-viewer/modals/table-export-modal.component';
 import angular from 'angular';
 
 import { Table2CSVService } from '@ve-components/presentations/services/Table2CSV.service';
@@ -8,8 +6,9 @@ import { TreeService } from '@ve-components/trees';
 import { UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { ElementService, ViewService } from '@ve-utils/mms-api-client';
-
-import { veApp } from '@ve-app';
+import { PrintConfirmResult, PrintModalResolveFn } from '@ve-viewer/modals/print-confirm-modal.component';
+import { TableExportModalResolveFn } from '@ve-viewer/modals/table-export-modal.component';
+import { veViewer } from '@ve-viewer/ve-viewer.module';
 
 import { VePromise, VeQService } from '@ve-types/angular';
 import { RefObject, ViewObject } from '@ve-types/mms';
@@ -482,4 +481,4 @@ Save CSV</button></div>
     }
 }
 
-veApp.service('AppUtilsService', AppUtilsService);
+veViewer.service('AppUtilsService', AppUtilsService);

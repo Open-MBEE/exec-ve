@@ -30,5 +30,4 @@ veAdmin
             return n as string;
         };
     })
-    .constant('CKEDITOR', window.CKEDITOR)
-    .constant('veConfig', window.__env);
+    .constant('CKEDITOR', window.CKEDITOR);
