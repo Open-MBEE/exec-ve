@@ -6,7 +6,7 @@ import { BaseApiService } from './Base.service';
 import { URLService } from './URL.service';
 
 import { VeHttpResponse, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
-import { GroupObject, GroupsResponse } from '@ve-types/mms';
+import { GroupObject, GroupUsersResponse, GroupsResponse } from '@ve-types/mms';
 
 export class GroupService extends BaseApiService {
     static $inject = ['$q', '$http', 'URLService', 'CacheService'];
@@ -111,6 +111,28 @@ export class GroupService extends BaseApiService {
         }
 
         return this._getInProgress(url) as VePromise<GroupObject, GroupsResponse>;
+    }
+
+    getGroupUsers(groupname: string, updateCache?: boolean): VePromise<string[], GroupUsersResponse> {
+        const url = this.uRLSvc.getGroupUsersURL(groupname);
+        if (!this._isInProgress(url)) {
+            this._addInProgress(
+                url,
+                new this.$q<string[], GroupUsersResponse>((resolve, reject) => {
+                    const key = ['group', groupname, 'users'];
+                    if (this.cacheSvc.exists(key) && !updateCache) {
+                        resolve(this.cacheSvc.get<string[]>(key));
+                        this._removeInProgress(url);
+                    } else {
+                        this.$http.get<GroupUsersResponse>(url).then((response) => {
+                            resolve(this.cacheSvc.put(key, response.data.users));
+                        }, reject);
+                    }
+                })
+            );
+        }
+
+        return this._getInProgress(url) as VePromise<string[], GroupUsersResponse>;
     }
 }
 

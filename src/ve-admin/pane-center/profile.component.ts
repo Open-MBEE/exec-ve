@@ -159,7 +159,7 @@ const ProfileComponent: VeComponentOptions = {
     <div id='workspace-body'>
         <div class='main-workspace extra-padding'>
             <table class='table-width'>
-                <tbody>
+                <tbody ng-if="$ctrl.user">
                     <tr>
                         <th>Username:</th>
                         <td>{{$ctrl.user.username}}</td>
@@ -176,7 +176,25 @@ const ProfileComponent: VeComponentOptions = {
                         <th>Groups:</th>
                         <td>
                             <ul>
-                                <li ng-repeat="group in $ctrl.groups"><a ui-sref="main.admin.group.profile({ group: group })">{{ group }}</a></li>
+                                <li ng-repeat="group in $ctrl.groups"><a ui-sref="main.admin.group.profile({ groupname: group.name })">{{ group.name }}</a></li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody ng-if="$ctrl.group">
+                    <tr>
+                        <th>Group Name:</th>
+                        <td>{{$ctrl.group.name}}</td>
+                    </tr>
+                    <tr>
+                        <th>Source:</th>
+                        <td>{{$ctrl.group.type}}</td>
+                    </tr>
+                    <tr>
+                        <th>Users:</th>
+                        <td>
+                            <ul>
+                                <li ng-repeat="user in $ctrl.users"><a ui-sref="main.admin.user.profile({ username: user.username })">{{ user.fullName != '(none)' ? user.fullName : user.username }}</a></li>
                             </ul>
                         </td>
                     </tr>

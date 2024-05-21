@@ -45,5 +45,6 @@ import './ve-app.module';
 
 import './login';
 import './main';
+import './home';
 
 export * from './ve-app.module';

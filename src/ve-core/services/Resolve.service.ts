@@ -36,6 +36,8 @@ import {
     ViewObject,
     ProjectGroupsResponse,
     GroupObject,
+    GroupsResponse,
+    GroupUsersResponse,
 } from '@ve-types/mms';
 
 export class ResolveService {
@@ -113,7 +115,21 @@ export class ResolveService {
     }
 
     public getUsers(refresh?: boolean): VePromise<UserObject[], UsersResponse> {
-        return this.userSvc.getUsers(refresh);
+        return this.userSvc.getAllUsers(refresh);
+    }
+
+    public getGroup(groupname: string, refresh?: boolean): VePromise<GroupObject, GroupsResponse> {
+        return this.groupSvc.getGroup(groupname, refresh);
+    }
+
+    public getGroupUsers(groupname: string, refresh?: boolean): VePromise<UserObject[], GroupUsersResponse> {
+        return new this.$q((resolve, reject) => {
+            this.groupSvc.getGroupUsers(groupname, refresh).then((result) => {
+                this.userSvc.getUsers(result).then((groups) => {
+                    resolve(groups);
+                }, reject);
+            }, reject);
+        });
     }
 
     public getOrg(orgId: string, refresh?: boolean): VePromise<OrgObject, OrgsResponse> {

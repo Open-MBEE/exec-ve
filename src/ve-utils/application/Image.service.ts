@@ -2,10 +2,9 @@ import { AuthService } from '@ve-utils/mms-api-client';
 
 import { veUtils } from '@ve-utils';
 
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 
 export class ImageService {
-    public veConfig: VeConfig = window.__env;
 
     static $inject = ['AuthService'];
 
@@ -16,7 +15,7 @@ export class ImageService {
         if (src) {
             if (src) {
                 if (src.indexOf('http') < 0) {
-                    src = this.veConfig.apiUrl + src;
+                    src = veConfig.apiUrl + src;
                 }
                 imgDom.attr('src', src + '?token=' + this.authSvc.getToken());
             }

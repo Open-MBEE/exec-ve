@@ -124,7 +124,7 @@ export interface ParamsObject {
     preview?: string;
     modify?: string;
     next?: string;
-    user?: string;
+    username?: string;
     [param: string]: string;
 }
 

@@ -158,7 +158,7 @@ const OrgListComponent: VeComponentOptions = {
       <div class="org-icon" ng-click="$ctrl.handleShowProjsToggle()">
         <i class="{{$ctrl.showProjs ? 'fa-solid fa-angle-down' : 'fa-solid fa-angle-right'}}"></i>
       </div>
-      <org-list-item class="org-info" org="$ctrl.org" divider="true"></org-list-item>
+      <org-list-item class-name="org-info" org="$ctrl.org" divider="true"></org-list-item>
       <div class="controls-container" ng-if="$ctrl.admin || $ctrl.write">
         <i id="newproj-{{ $ctrl.org.id }}" class="fas fa-plus add-btn" data-toggle="tooltip" data-placement="top" title="New Project" ng-click="$ctrl.openCreateProjModal()"></i>
         <i id="delete-{{ $ctrl.org.id }}" class="fas fa-trash-alt transparent" ng-if="!$ctrl.admin || $ctrl.org.id === 'default'" data-toggle="tooltip" data-placement="top" title="Delete"></i>

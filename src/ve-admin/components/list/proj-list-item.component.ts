@@ -69,7 +69,7 @@ const ProjectListItemComponent: VeComponentOptions = {
         <stat stat-title="Users"
             stat-icon="fa-solid fa-users"
             stat-value="$ctrl.users"
-            _key="org-{{$ctrl.project.id}}-users>
+            _key="org-{{$ctrl.project.id}}-users">
         </stat>
         <stat stat-title="Groups"
             stat-icon="fa-solid fa-users-rectangle"

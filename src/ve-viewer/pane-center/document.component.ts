@@ -1,8 +1,6 @@
 import { IPaneScrollApi } from '@openmbee/pane-layout/lib/components/ng-pane';
 import { HookResult, Ng1Controller, StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
 import { Transition } from '@uirouter/core';
-import { veViewer } from '@ve-viewer';
-import { AppUtilsService, FullDocumentApi, FullDocumentService } from '@ve-viewer/services';
 import angular, { IComponentController } from 'angular';
 import Rx from 'rx-lite';
 
@@ -13,6 +11,8 @@ import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
 import { PermissionService, ViewData, ViewService, URLService } from '@ve-utils/mms-api-client';
+import { veViewer } from '@ve-viewer';
+import { AppUtilsService, FullDocumentApi, FullDocumentService } from '@ve-viewer/services';
 
 import { pane_center_buttons } from './pane-center-buttons.config';
 import { ContentWindowService } from './services/ContentWindow.service';

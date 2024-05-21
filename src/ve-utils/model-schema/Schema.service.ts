@@ -1,6 +1,6 @@
 import { veUtils } from '@ve-utils';
 
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 
 export interface SchemaMapping {
     [key: string]: unknown;
@@ -16,7 +16,6 @@ export interface Schema {
 export class SchemaService {
     static $inject = ['$q', '$injector'];
 
-    public veConfig: VeConfig = window.__env;
     public defaultSchema: 'cameo';
     public schemaList: { [key: string]: string } = {
         cameo: 'CameoSchema',
@@ -105,7 +104,7 @@ export class SchemaService {
 
     private _schemaError = (name: string, schemaName?: string): void => {
         schemaName = schemaName ? schemaName : this.defaultSchema;
-        if (this.veConfig.enableDebug) {
+        if (veConfig.enableDebug) {
             console.log(schemaName + ' does not have table' + name + 'or it is not properly configured');
         }
     };

@@ -52,6 +52,8 @@ import {
     ViewObject,
     ProjectGroupsResponse,
     GroupObject,
+    GroupsResponse,
+    GroupUsersResponse,
 } from '@ve-types/mms';
 import { VeModalService } from '@ve-types/view-editor';
 
@@ -265,6 +267,23 @@ veApp.config([
                     },
                 },
             })
+            .state('main.home', {
+                url: '/home',
+                views: {
+                    'nav@main': {
+                        component: 'navBar',
+                    },
+                    'menu@main': {
+                        component: 'contextBar',
+                    },
+                    'pane-left@main': {
+                        component: 'orgTree',
+                    },
+                    'pane-center@main': {
+                        component: 'orgHome',
+                    },
+                },
+            })
             .state('main.admin', {
                 url: '/admin',
                 resolve: {
@@ -409,10 +428,10 @@ veApp.config([
                 },
             })
             .state('main.admin.user.profile', {
-                url: '?user',
+                url: '/:username',
                 params: {
-                    user: {
-                        type: 'query',
+                    username: {
+                        type: 'path',
                         inherit: true,
                     },
                 },
@@ -445,7 +464,7 @@ veApp.config([
                             refresh: boolean,
                             resolveSvc: ResolveService
                         ): VePromise<UserObject, UsersResponse> => {
-                            return resolveSvc.getUser(params.user, refresh);
+                            return resolveSvc.getUser(params.username, refresh);
                         },
                     ],
                     userGroupObs: [
@@ -457,13 +476,13 @@ veApp.config([
                             refresh: boolean,
                             resolveSvc: ResolveService
                         ): VePromise<GroupObject[], UserGroupsResponse> => {
-                            return resolveSvc.getUserGroups(params.user, refresh);
+                            return resolveSvc.getUserGroups(params.username, refresh);
                         },
                     ],
                 },
                 views: {
                     'pane-center@main': {
-                        component: 'userProfile',
+                        component: 'profile',
                         bindings: {
                             mmsUser: 'userOb',
                             mmsGroups: 'userGroupObs',
@@ -472,8 +491,133 @@ veApp.config([
                     },
                 },
             })
+            .state('main.admin.group', {
+                url: '/groups',
+                resolve: {
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
+                    groupObs: [
+                        'refresh',
+                        'ResolveService',
+                        (refresh: boolean, resolveSvc: ResolveService): VePromise<UserObject[], UsersResponse> => {
+                            return resolveSvc.getUsers(refresh);
+                        },
+                    ],
+                },
+                views: {
+                    'pane-center@main': {
+                        component: 'groupList',
+                        bindings: {
+                            mmsUsers: 'groupObs',
+                            currentUser: 'currentUserOb',
+                        },
+                    },
+                },
+            })
+            .state('main.admin.group.profile', {
+                url: '/:groupname',
+                params: {
+                    groupname: {
+                        type: 'path',
+                        inherit: true,
+                    },
+                },
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params();
+                        },
+                    ],
+                    token: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
+                            return resolveSvc.getToken();
+                        },
+                    ],
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
+                    groupOb: [
+                        'params',
+                        'refresh',
+                        'ResolveService',
+                        (
+                            params: ParamsObject,
+                            refresh: boolean,
+                            resolveSvc: ResolveService
+                        ): VePromise<GroupObject, GroupsResponse> => {
+                            return resolveSvc.getGroup(params.groupname, refresh);
+                        },
+                    ],
+                    groupUsersObs: [
+                        'params',
+                        'refresh',
+                        'ResolveService',
+                        (
+                            params: ParamsObject,
+                            refresh: boolean,
+                            resolveSvc: ResolveService
+                        ): VePromise<UserObject[], GroupUsersResponse> => {
+                            return resolveSvc.getGroupUsers(params.groupname, refresh);
+                        },
+                    ],
+                },
+                views: {
+                    'pane-center@main': {
+                        component: 'profile',
+                        bindings: {
+                            mmsGroup: 'groupOb',
+                            mmsUsers: 'groupUsersObs',
+                            currentUser: 'currentUserOb',
+                        },
+                    },
+                },
+            })
             .state('main.admin.org', {
-                url: '/orgs/:orgId',
+                url: '/orgs',
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params();
+                        },
+                    ],
+                    token: [
+                        'ResolveService',
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
+                            return resolveSvc.getToken();
+                        },
+                    ],
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options();
+                            return options.reload === true || options.reload === 'true';
+                        },
+                    ],
+                },
+                views: {
+                    'pane-center@main': {
+                        component: 'adminHome',
+                        bindings: {
+                            mmsOrgs: 'orgObs',
+                            currentUser: 'currentUserOb',
+                        },
+                    },
+                },
+            })
+            .state('main.admin.org.home', {
+                url: '/:orgId',
                 params: {
                     orgId: {
                         inherit: true,

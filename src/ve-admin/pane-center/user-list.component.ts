@@ -95,7 +95,7 @@ const UserListComponent: VeComponentOptions = {
                 admin-state="true"
                 admin-label="true"
                 user="user"
-                link="admin.user.profile({ userId: user.username})
+                link="main.admin.user.profile({ username: '{{ user.username }}' })"
                 _key="key-{{user}}">
             </user-list-item>
             <span uib-tooltip="Edit" tooltip-placement="top" ng-if="$ctrl.user.username == user.username || $ctrl.user.admin" target="edit-user-{{user.username}}">

@@ -255,10 +255,17 @@ class MainController implements IComponentController {
             if (this.$uiRouterGlobals.$current.name === 'main.share') {
                 this.rootScopeSvc.veHidePanes(true);
                 this.rootScopeSvc.veShowLogin(true);
+            } else if (this.$state.includes('main.login')) {
+                this.rootScopeSvc.veHidePanes(true);
+                this.rootScopeSvc.veShowLogin(true);
+            } else if (this.$state.includes('main.project.refs')) {
+                this.rootScopeSvc.veHidePanes(true);
+                this.rootScopeSvc.veShowLogin(false);
             } else {
                 this.rootScopeSvc.veHidePanes(false);
                 this.rootScopeSvc.veShowLogin(false);
             }
+
             if (
                 this.rootScopeSvc.veRedirect() &&
                 this.$uiRouterGlobals.$current.name === this.rootScopeSvc.veRedirect().toState.name
@@ -266,13 +273,6 @@ class MainController implements IComponentController {
                 this.rootScopeSvc.veRedirect(null);
             }
 
-            if (this.$state.includes('main.login')) {
-                this.rootScopeSvc.veHidePanes(true);
-                this.rootScopeSvc.veShowLogin(true);
-            }
-            if (this.$state.includes('main.project.refs')) {
-                this.rootScopeSvc.veHidePanes(true);
-            }
             // if (this.$state.includes('main.project.ref.portal')) {
             //     this.rootScopeSvc.treeInitialSelection(
             //         (trans.params() as ParamsObject).projectId + '_cover'

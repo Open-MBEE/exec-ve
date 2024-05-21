@@ -20,6 +20,7 @@ export class UserListItemController implements angular.IComponentController {
     permission: string;
     inherited: string = Role.NONE;
     className: string;
+    link: string;
 
     //Parent Controllers
     $pane: IPane;
@@ -124,6 +125,7 @@ const UserListItemComponent: VeComponentOptions = {
         permission: '<',
         inherited: '<',
         className: '@',
+        link: '@',
     },
     require: {
         $pane: '^ngPane',
@@ -132,7 +134,7 @@ const UserListItemComponent: VeComponentOptions = {
     <div class="stats-list-item {{ $ctrl.className }}">
     <div id="user-list-items" class="{{ $ctrl.classNames }}">
         <span ng-class="{'placeholder': !$ctrl.name}">
-            <span ng-if="$ctrl.link" ui-sref="$ctrl.link" >{{ $ctrl.name ? $ctrl.name : '(none)' }}</span>
+            <span ng-if="$ctrl.link" ><a ui-sref="{{ $ctrl.link }}" >{{ $ctrl.name ? $ctrl.name : '(none)' }}</a></span>
             <span ng-if="!$ctrl.link" ng-click="$ctrl.handleClick($event)">{{ $ctrl.name ? $ctrl.name : '(none)' }}</span>
         </span>
         <div ng-class="{'grayed-out' : !$ctrl.currentUser.enabled }">

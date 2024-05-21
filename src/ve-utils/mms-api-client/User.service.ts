@@ -39,7 +39,7 @@ export class UserService extends BaseApiService {
         this.authorities = authorities;
     }
 
-    getUsers(updateCache?: boolean): VePromise<UserObject[], UsersResponse> {
+    getAllUsers(updateCache?: boolean): VePromise<UserObject[], UsersResponse> {
         const url = this.uRLSvc.getUsersURL();
 
         if (!this._isInProgress(url)) {
@@ -80,6 +80,24 @@ export class UserService extends BaseApiService {
             );
         }
         return this._getInProgress(url) as VePromise<UserObject[], UsersResponse>;
+    }
+
+    getUsers(usernames: string[], updateCache?: boolean): VePromise<UserObject[], UsersResponse> {
+        return new this.$q((resolve, reject) => {
+            this.getAllUsers(updateCache).then((result) => {
+                const users: UserObject[] = result.filter((user) => {
+                    return usernames.includes(user.username);
+                });
+                if (users.length != usernames.length) {
+                    reject({
+                        status: 404,
+                        message: 'Not All Users found',
+                    });
+                } else {
+                    resolve(users);
+                }
+            }, reject);
+        });
     }
 
     getUser(username: string, updateCache?: boolean): VePromise<UserObject, UsersResponse> {

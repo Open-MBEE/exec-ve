@@ -14,7 +14,7 @@ import {
     ProjectObject,
     ProjectsResponse,
 } from '@ve-types/mms';
-import Role from '@ve-types/mms/permissions';
+import { Role } from '@ve-types/mms/permissions';
 
 export class OrgService extends BaseApiService {
     static $inject = [

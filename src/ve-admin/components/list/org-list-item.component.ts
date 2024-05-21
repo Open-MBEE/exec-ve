@@ -63,7 +63,7 @@ const OrgListItemComponent: VeComponentOptions = {
     template: `
     <div class="stats-list-item {{$ctrl.className}}">
       <div class="list-header">
-        <a ng-class="$ctrl.org.archived ? 'archived-link' : ''" ui-sref="main.admin.org({ orgId: $ctrl.org.id })">{{$ctrl.org.name}}</a>
+        <a ng-class="$ctrl.org.archived ? 'archived-link' : ''" ui-sref="main.admin.org.home({ orgId: $ctrl.org.id })">{{$ctrl.org.name}}</a>
       </div>
       <stat-list ng-if="$ctrl.width > 600">
         <stat stat-title="Projects"

@@ -73,7 +73,7 @@ export class PermissionService {
         type: string,
         lookups: PermissionLookupObject[]
     ): VePromise<string, PermissionLookupResponse> {
-        const url = this.uRLSvc.getPermissionLookupURL();
+        const url: string = this.uRLSvc.getPermissionLookupURL();
         return new this.$q((resolve, reject) => {
             this.$http
                 .put<PermissionLookupResponse>(url, {

@@ -6,7 +6,7 @@ import { veCore } from '@ve-core';
 import { ToolbarApi } from './Toolbar.api';
 
 import { VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
-import { VeConfig } from '@ve-types/config';
+import veConfig from '@ve-types/config';
 import { VeApiObject } from '@ve-types/view-editor';
 
 export interface IToolBarButton {
@@ -65,16 +65,14 @@ export class ToolbarService {
     private toolbars: VeApiObject<ToolbarApi> = {};
     private buttons: { [key: string]: IToolBarButton } = {};
     private dynamicButtons: { [key: string]: IToolBarButton } = {};
-    private veConfig: VeConfig;
 
     static $inject = ['$q', 'EventService'];
 
     constructor(private $q: VeQService, private eventSvc: EventService) {
-        this.veConfig = window.__env;
-        if (this.veConfig.expConfig) {
-            for (const ext of Object.keys(this.veConfig.expConfig)) {
-                if (this.veConfig.expConfig[ext] && this.veConfig.expConfig[ext].length > 0) {
-                    for (const tool of this.veConfig.expConfig[ext]) {
+        if (veConfig.expConfig) {
+            for (const ext of Object.keys(veConfig.expConfig)) {
+                if (veConfig.expConfig[ext] && veConfig.expConfig[ext].length > 0) {
+                    for (const tool of veConfig.expConfig[ext]) {
                         if (tool.toolButton) {
                             this.registerToolbarButtons(tool.toolButton);
                         }

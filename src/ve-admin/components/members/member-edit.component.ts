@@ -173,7 +173,7 @@ export class MemberEditController implements angular.IComponentController {
             return;
         }
 
-        this.userSvc.getUsers().then(
+        this.userSvc.getAllUsers().then(
             (users) => {
                 const searchData = users.filter((user) => {
                     return user.username.includes(this.username);

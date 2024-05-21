@@ -82,6 +82,7 @@ const MembersPageComponent: VeComponentOptions = {
                                 user="user"
                                 permission="$ctrl.userperm.users[user].role"
                                 inherited="$ctrl.userperm.users[user].inheritedRole"
+                                link="main.admin.user.profile({ username: {{ user }} })"
                                 _key="key-{{user}}"></user-list-item>
                   <span uib-tooltip="Edit" tooltip-placement="top" ng-if="$ctrl.roles.ge($ctrl.authority, $ctrl.roles.WRITE) && !$ctrl.roles.eq($ctrl.userperm.users[user].inheritedRole,$ctrl.roles.ADMIN)">
                       <i ng-click="$ctrl.handleToggle(user)" class="fas fa-user-edit add-btn"></i>
