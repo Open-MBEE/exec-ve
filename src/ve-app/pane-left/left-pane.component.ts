@@ -434,10 +434,11 @@ class LeftPaneController implements angular.IComponentController {
                 });
             }
         } else if (this.$state.includes('**.present.**')) {
-            const viewId = branch.type !== 'view' ? branch.viewId : branch.data.id;
+            let viewId = '';
 
             // If clicked on a PE send the element.selected event for Tool Pane
             if (!(branch.type === 'view' || branch.type === 'section')) {
+                viewId = branch.viewId;
                 const data = {
                     elementId: branch.data.id,
                     projectId: branch.data._projectId,
@@ -445,6 +446,8 @@ class LeftPaneController implements angular.IComponentController {
                     commitId: 'latest',
                 };
                 this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data);
+            } else {
+                viewId = branch.data.id;
             }
 
             void this.$state.go(
