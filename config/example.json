@@ -27,6 +27,12 @@
     "labels": ["opensource"]
   },
   "loginTimout": 600000,
+  "viewLink": {
+    "sectionPrefix": "Section ",
+    "appendixPrefix": "Appendix ",
+    "hidePrefixForSections": false,
+    "alwaysKeepCurrentDoc": false
+  },
   "experimental": [
     {
       "id": "experimental-magic",

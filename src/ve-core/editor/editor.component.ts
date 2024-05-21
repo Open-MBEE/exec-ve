@@ -430,7 +430,8 @@ export class EditorController implements IComponentController {
                             return (
                                 el.name == 'img' &&
                                 el.attributes['data-cke-saved-src'] &&
-                                el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
+                                (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1 ||
+                                        el.attributes['data-cke-saved-src'].indexOf('http') < 0)
                             );
                         }, true)
                         .forEach((el: CKEDITOR.htmlParser.element) => {

@@ -147,7 +147,14 @@ a > img {
 	background-color: rgba(255, 0, 0, 0.05);
 	margin: 10px;
 }
-
+table {
+	border: 1px solid #ddd;
+	border-collapse: collapse;
+}
+table th, table td {
+	border: 1px solid #ddd;
+	padding: 5px;
+}
 .image-clean
 {
 	border: 0;

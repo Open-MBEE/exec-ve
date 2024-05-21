@@ -1,3 +1,4 @@
 *.json
+!omg.json
 !example.json
 !config.js

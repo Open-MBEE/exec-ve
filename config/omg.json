@@ -1,0 +1,42 @@
+{
+  "apiUrl": "https://mms4.openmbee.org",
+  "printUrl": "https://mms4.openmbee.org/convert",
+  "basePath": "",
+  "enableDebug": false,
+  "customLabels": {
+    "pi": "PROPRIETARY: Proprietary Information",
+    "export_ctrl": "EXPORT WARNING: No export controlled documents allowed on this server",
+    "no_public_release": "Not for Public Release or Redistribution",
+    "unclassified": "CLASSIFICATION: This system is UNCLASSIFIED"
+  },
+  "loginBanner": {
+    "labels": [["opensource"]],
+    "separator": " ",
+    "background": "#0D47A1",
+    "color": "#e8e8e8"
+  },
+  "loginWarning": {
+    "message": [
+      "By accessing and using this information system, you acknowledge and consent to the following:\n THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+    ]
+  },
+  "banner": {
+    "labels": []
+  },
+  "footer": {
+    "labels": ["opensource"]
+  },
+  "loginTimout": 600000,
+  "viewLink": {
+    "sectionPrefix": "Clause ",
+    "appendixPrefix": "Annex ",
+    "hidePrefixForSections": true,
+    "alwaysKeepCurrentDoc": true
+  },
+  "experimental": [
+    {
+      "id": "experimental-magic",
+      "name": "Content Magic"
+    }
+  ]
+}

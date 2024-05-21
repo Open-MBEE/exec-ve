@@ -11,6 +11,8 @@ import { veComponents } from '@ve-components';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { ElementObject, ElementsRequest } from '@ve-types/mms';
+import {VeConfig} from "@ve-types/config";
+import {StateService} from "@uirouter/angularjs";
 
 /**
  * @ngdoc directive
@@ -64,6 +66,7 @@ class ViewLinkController implements angular.IComponentController {
         '$scope',
         '$element',
         '$compile',
+        '$state',
         'growl',
         'ElementService',
         'ApiService',
@@ -77,18 +80,22 @@ class ViewLinkController implements angular.IComponentController {
     private docid: string;
     showNum: boolean;
     vid: string;
+    private veConfig: VeConfig;
 
     constructor(
         private $scope: angular.IScope,
         private $element: JQuery<HTMLElement>,
         private $compile: angular.ICompileService,
+        private $state: StateService,
         private growl: angular.growl.IGrowlService,
         private elementSvc: ElementService,
         private apiSvc: ApiService,
         private viewSvc: ViewService,
         private applicationSvc: ApplicationService,
         private extensionSvc: ExtensionService
-    ) {}
+    ) {
+        this.veConfig = window.__env;
+    }
 
     $onInit(): void {
         this.target = this.linkTarget ? this.linkTarget : '_self';
@@ -146,7 +153,7 @@ class ViewLinkController implements angular.IComponentController {
                 (data: ElementObject) => {
                     this.element = data;
                     this.elementName = data.name;
-                    this.type = 'Section ';
+                    this.type = this.veConfig.viewLink.sectionPrefix;
                     this.suffix = '';
                     this.hash = '#' + data.id;
                     if (this.mmsPeId && this.mmsPeId !== '') {
@@ -168,6 +175,8 @@ class ViewLinkController implements angular.IComponentController {
                                 } else if (this.viewSvc.isEquation(pe)) {
                                     this.type = 'Eq. (';
                                     this.suffix = ')';
+                                } else if (this.viewSvc.isSection(pe) && this.veConfig.viewLink.hidePrefixForSections) {
+                                    this.type = '';
                                 }
                                 if (this.applicationSvc.getState().fullDoc) {
                                     this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`;
@@ -179,6 +188,15 @@ class ViewLinkController implements angular.IComponentController {
                                 this.growl.warning(`Unable to retrieve element: ${reason.message}`);
                             }
                         );
+                    } else {
+                        if (data._veNumber) {
+                            let numbers = data._veNumber.split('.');
+                            if (numbers.length > 1 && this.veConfig.viewLink.hidePrefixForSections) {
+                                this.type = '';
+                            } else if (isNaN(parseInt(numbers[0]))) {
+                                this.type = this.veConfig.viewLink.appendixPrefix;
+                            }
+                        }
                     }
                     if (this.apiSvc.isDocument(data)) {
                         docid = data.id;
@@ -192,6 +210,10 @@ class ViewLinkController implements angular.IComponentController {
                         this.vid = data.id;
                     } else {
                         this.$element.html('<span class="ve-error">view link doesn\'t refer to a view</span>');
+                    }
+                    if (this.veConfig.viewLink.alwaysKeepCurrentDoc && this.applicationSvc.getState().currentDoc &&
+                            this.$state.includes('**.present.**')) {
+                        this.docid = this.applicationSvc.getState().currentDoc;
                     }
                     if (this.applicationSvc.getState().fullDoc) {
                         this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`;
