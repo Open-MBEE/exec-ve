@@ -104,7 +104,7 @@ const InsertCommentComponent: VeComponentOptions = {
 <div class="modal-footer">
     <button class="btn btn-primary" ng-click="$ctrl.ok()">Create <i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i>
     </button>
-    <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
 </div> 
 `,
     bindings: {

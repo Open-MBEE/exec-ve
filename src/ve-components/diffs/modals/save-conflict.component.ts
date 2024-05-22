@@ -59,7 +59,7 @@ const SaveConflictComponent: VeComponentOptions = {
     <button class="btn btn-warning" ng-click="ok()">Discard Edits</button>
     <button class="btn btn-warning" ng-click="force()">Force Save</button>
     <!--<button class="btn btn-sm btn-primary" ng-click="merge()">Try Merge Edits</button>-->
-    <button class="btn btn-default" ng-click="cancel()">Cancel (Do nothing)</button>
+    <button class="btn btn-secondary" ng-click="cancel()">Cancel (Do nothing)</button>
 </div>
 `,
     bindings: {

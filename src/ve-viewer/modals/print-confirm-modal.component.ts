@@ -371,8 +371,8 @@ const PrintConfirmModalComponent: VeModalComponent = {
                 <p class="help-block">
                     <a target="_blank" href="https://wiki.jpl.nasa.gov/display/opencae/View+Editor+User+Guide%3A+8+PDF+Customization">Example CSS customizations</a>
                 </p>
-                <button class="btn btn-default" type="submit"><i class="fa fa-save"></i>Save CSS for document<span ng-if="$ctrl.elementSaving"><i class="fa fa-spinner fa-spin"></i></span></button>
-                <button class="btn btn-default" type="button" ng-click="$ctrl.preview()">Preview</button>
+                <button class="btn btn-secondary" type="submit"><i class="fa fa-save"></i>Save CSS for document<span ng-if="$ctrl.elementSaving"><i class="fa fa-spinner fa-spin"></i></span></button>
+                <button class="btn btn-secondary" type="button" ng-click="$ctrl.preview()">Preview</button>
             </form>
         </div>
     </div>
@@ -382,7 +382,7 @@ const PrintConfirmModalComponent: VeModalComponent = {
 <div class="modal-footer">
     <button ng-if="$ctrl.type == 'VIEW' && $ctrl.docOption" class="btn btn-primary" ng-click="$ctrl.fulldoc()">Go to full document</button>
     <button class="btn btn-primary" ng-click="$ctrl.print()">{{$ctrl.action | uppercase}}</button>
-    <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
 </div>
 `,
     bindings: {

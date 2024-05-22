@@ -197,7 +197,7 @@ const SelectModalComponent: VeModalComponent = {
         <button class="btn btn-primary" type="button" ng-click="$ctrl.continue()" ng-disabled="!$ctrl.project || !$ctrl.org">
             Continue<span ng-if="$ctrl.spin"><i class="fa fa-spin fa-spinner"></i></span>
         </button>
-        <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()">Cancel</button>
+        <button class="btn btn-secondary" type="button" ng-click="$ctrl.cancel()">Cancel</button>
     </div>
 </div>
 `,

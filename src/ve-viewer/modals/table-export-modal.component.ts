@@ -57,7 +57,7 @@ const TableExportModalComponent: VeComponentOptions = {
 <div class="modal-footer">
     <button class="btn btn-primary" ng-click="$ctrl.export()">Export to CSV</button>
     <!--<button ng-if="type == 'VIEW'" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>-->
-    <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
 </div>
 
     

@@ -80,7 +80,7 @@ const MergeConfirmModalComponent: VeModalComponent = {
 
 <div class="modal-footer">
     <button class="btn btn-warning" ng-click="$ctrl.ok()">Pull</button>
-    <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
 </div>
 `,
     bindings: {

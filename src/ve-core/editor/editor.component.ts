@@ -5,7 +5,7 @@ import _, { DebouncedFunc } from 'lodash';
 import { InsertTransclusionData } from '@ve-components/transclusions';
 import { MentionService } from '@ve-core/editor';
 import { EditorService } from '@ve-core/editor/services/Editor.service';
-import { ImageService } from '@ve-utils/application';
+import { ImageService } from '@ve-core/image';
 import { ApiService, ElementService, URLService, ViewService } from '@ve-utils/mms-api-client';
 
 import { veCore } from '@ve-core';

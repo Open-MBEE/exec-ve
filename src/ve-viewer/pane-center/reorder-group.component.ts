@@ -321,8 +321,8 @@ const ReorderGroupComponent: VeComponentOptions = {
     </script>
 
     <div class="container-tree-reorder container-fluid">
-        <button class="btn-tree-reorder-save btn btn-primary" ng-click="saveReorder()">Save <i ng-If="isSaving" class="fa fa-spin fa-spinner"></i></button>
-        <button class="btn-tree-reorder-save btn btn-default" ng-click="cancelReorder()">Cancel</button>
+        <button class="btn-tree-reorder-save btn btn-primary" ng-click="saveReorder()">Save <i ng-If="isSaving" class='fa fa-spin fa-spinner'></i></button>
+        <button class="btn-tree-reorder-save btn btn-secondary" ng-click="cancelReorder()">Cancel</button>
         <br>
         <p>Move group/document to/from a group. Only Grouping is preserved. Ordering is not.</p>
         <div class="well" ui-tree="treeOptions">

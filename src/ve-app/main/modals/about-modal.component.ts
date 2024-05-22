@@ -20,7 +20,7 @@ const AboutModalComponent: VeComponentOptions = {
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-default" ng-click="$ctrl.cancel()">Close</button>
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Close</button>
 </div>
 `,
     bindings: {

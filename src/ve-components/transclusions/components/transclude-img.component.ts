@@ -2,7 +2,8 @@ import { ExtensionService, ComponentService } from '@ve-components/services';
 import { Transclusion, ITransclusion } from '@ve-components/transclusions';
 import { ButtonBarService } from '@ve-core/button-bar';
 import { EditorService } from '@ve-core/editor';
-import { UtilsService, MathService, ImageService, SVGService } from '@ve-utils/application';
+import { ImageService } from '@ve-core/image';
+import { UtilsService, MathService, SVGService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { ElementService, URLService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
@@ -51,6 +52,7 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
     svg: { url: string; image: boolean; ext: string }[];
     png: { url: string; image: boolean; ext: string }[];
     artifacts: { url: string; image: boolean; ext: string }[];
+    showZoom: boolean;
 
     static $inject: string[] = [...Transclusion.$inject, 'URLService', 'SVGService'];
 
@@ -105,6 +107,12 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
 
         //     e.stopPropagation();
         // });
+        this.$element.on('mouseover', (e) => {
+            this.showZoom = true;
+        });
+        this.$element.on('mouseleave', (e) => {
+            this.showZoom = false;
+        });
     }
 
     public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
@@ -133,6 +141,15 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
             resolve(
                 `<div id=${this.mmsElementId}-svg class=mms-svg></div><img ng-hide=true class="mms-png" ng-src="${this.png[0].url}"  alt="${this.element.name}"/>`
             );
+            // const result = `
+            //     <div ng-mouseover="showZoom=true" ng-mouseleave="showZoom=false" ng-init="showZoom=false">
+            //     <img class="zoom-img mms-svg" ng-src="{{$ctrl.svg[0].url}}" alt="{{$ctrl.element.name}}"/>
+            //     <!--<img class="mms-png" ng-src="{{$ctrl.png[0].url}}"  alt="{{$ctrl.element.name}}"/>-->
+            //     <a ng-show="showZoom" ng-click="$ctrl.openZoom($ctrl.svg[0].url)" class="no-print">
+            //       <i class="zoom-icon fa-solid fa-magnifying-glass-plus"></i>
+            //     </a>
+            //     </div>
+            // `;
         });
     };
 
@@ -158,6 +175,10 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
                 );
         }
     };
+
+    private openZoom(src: string): void {
+        this.imageSvc.zoomImg(src);
+    }
 }
 
 export const TranscludeImgComponent: VeComponentOptions = {

@@ -4,7 +4,7 @@ import { Presentation, PresentationService, ViewHtmlService } from '@ve-componen
 import { Table2CSVService } from '@ve-components/presentations/services/Table2CSV.service';
 import { ComponentService, ExtensionService } from '@ve-components/services';
 import { ButtonBarService } from '@ve-core/button-bar';
-import { ImageService } from '@ve-utils/application';
+import { ImageService } from '@ve-core/image';
 import { EventService } from '@ve-utils/core';
 import { SchemaService } from '@ve-utils/model-schema';
 
@@ -608,14 +608,14 @@ class PresentTableController extends Presentation {
 const PresentTableComponent: IPresentationComponentOptions = {
     selector: 'presentTable',
     template: `
-    <div class="tableSearch ve-table-filter">
-    <button class="btn btn-sm export-csv-button btn-default" ng-click="$ctrl.makeCsv()">Export CSV</button> 
-    <button class="btn btn-sm filter-table-button btn-default" ng-click="$ctrl.showFilter = !$ctrl.showFilter">Filter table</button> 
-    <label class="btn btn-sm btn-default table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="$ctrl.fixedHeaders" ng-change="$ctrl.makeFixedHeader()" /> Freeze Headers</label> 
-    <label class="btn btn-sm btn-default table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="$ctrl.fixedColumns" ng-change="$ctrl.makeFixedColumn()" /> Freeze Columns</label> 
+    <div class="table-search ve-table-filter">
+    <button class="btn btn-sm export-csv-button btn-secondary" ng-click="$ctrl.makeCsv()">Export CSV</button> 
+    <button class="btn btn-sm filter-table-button btn-secondary" ng-click="$ctrl.showFilter = !$ctrl.showFilter">Filter table</button> 
+    <label class="btn btn-sm btn-secondary table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="$ctrl.fixedHeaders" ng-change="$ctrl.makeFixedHeader()" /> Freeze Headers</label> 
+    <label class="btn btn-sm btn-secondary table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="$ctrl.fixedColumns" ng-change="$ctrl.makeFixedColumn()" /> Freeze Columns</label> 
     <label class="btn btn-sm table-button column-input-label" ng-show="$ctrl.fixedColumns">Columns to Freeze <input type="text" ng-show="$ctrl.fixedColumns" size="3" class="column-input" ng-model="$ctrl.numFixedColumns" /></label> 
-    <button class="btn btn-sm btn-default table-button" ng-show="$ctrl.fixedColumns" ng-click="$ctrl.updateFixedColumns()">Update</button> 
-    <button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="$ctrl.showSortReset" ng-click="$ctrl.resetSort()">Reset Sort</button>
+    <button class="btn btn-sm btn-secondary table-button" ng-show="$ctrl.fixedColumns" ng-click="$ctrl.updateFixedColumns()">Update</button> 
+    <button class="btn btn-sm reset-sort-button btn-secondary reset-sort-fade" ng-show="$ctrl.showSortReset" ng-click="$ctrl.resetSort()">Reset Sort</button>
     <span class="ve-show-filter" ng-show="$ctrl.showFilter">
         <form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model="$ctrl.searchTerm" ng-model-options="$ctrl.ngModelOptions" ng-change="$ctrl.fullTableFilter()"></form>
         <span class="ve-filter-status">Showing <strong>{{$ctrl.numFiltered}}</strong> of <strong>{{$ctrl.numTotal}}</strong> Rows: </span>

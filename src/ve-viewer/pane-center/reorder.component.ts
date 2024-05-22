@@ -299,7 +299,7 @@ const ReorderComponent: VeComponentOptions = {
 
 <div class="container-tree-reorder container-fluid">
     <button class="btn-tree-reorder-save btn btn-primary" ng-click="$ctrl.save()">Save <i class="{{$ctrl.saveClass}}"></i></button>
-    <button class="btn-tree-reorder-save btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button class="btn-tree-reorder-save btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
     <br>
     <!--<p>Note: you cannot reorder views under a view that's labeled (none) - these views may have children but are not shown and is not part of this document</p>-->
     <p>To reorder text, tables, images, equations, and sections, use the <i class="fa fa-arrows-v"></i> in the right pane.</p>

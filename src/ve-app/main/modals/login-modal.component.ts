@@ -85,7 +85,7 @@ const LoginModalComponent: VeModalComponent = {
         <button class="btn btn-block btn-primary" type="submit">
             LOG IN <span ng-if="$ctrl.spin" ><i class="fa fa-spin fa-spinner"></i></span>
         </button>
-        <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+        <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
     </form>
 </div>
 `,

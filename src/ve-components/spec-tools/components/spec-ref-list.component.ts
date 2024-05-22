@@ -184,12 +184,12 @@ const SpecRefListComponent: VeComponentOptions = {
             <td class="ve-secondary-text">{{tag._created | date:'M/d/yy h:mm a'}}</td>
             <td ng-if="isDoc && docEditable && showMerge">
                 <div class="btn-group" uib-dropdown is-open="status.isopen">
-                    <button type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled" title="Tag actions">
+                    <button type="button" class="btn btn-secondary" uib-dropdown-toggle ng-disabled="disabled" title="Tag actions">
                         <i class="fa fa-ellipsis-v"></i>
                     </button>
                     <ul class="dropdown-menu pull-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
                         <li role="menuitem" style="padding:10px;">
-                            <button class="btn btn-default btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(tag)">
+                            <button class="btn btn-secondary btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(tag)">
                                 Pull In<i ng-show="!$ctrl.runCleared" class="fa fa-spin fa-spinner"></i>
                             </button> to this document on current branch
                         </li>
@@ -217,12 +217,12 @@ const SpecRefListComponent: VeComponentOptions = {
             <td class="ve-secondary-text">{{branch._created | date:'M/d/yy h:mm a'}}</td>
             <td ng-if="isDoc && docEditable && showMerge">
                 <div class="btn-group" uib-dropdown is-open="status.isopen">
-                    <button type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled" title="Branch actions">
+                    <button type="button" class="btn btn-secondary" uib-dropdown-toggle ng-disabled="disabled" title="Branch actions">
                         <i class="fa fa-ellipsis-v"></i>
                     </button>
                     <ul class="dropdown-menu pull-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
                         <li role="menuitem" style="padding:10px;">
-                            <button class="btn btn-default btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(branch)">
+                            <button class="btn btn-secondary btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(branch)">
                                 Pull In<i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
                             </button> to this document on current branch
                         </li>

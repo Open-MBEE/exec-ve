@@ -565,7 +565,7 @@ const DocumentComponent: VeComponentOptions = {
     <p id="ve-short-url">
         {{($ctrl.shortUrl)}}
     </p>
-    <button ng-click="$ctrl.copyToClipboard($event)" class="btn btn-sm btn-default"><i class="fa fa-copy"></i>Copy</button>
+    <button ng-click="$ctrl.copyToClipboard($event)" class="btn btn-sm btn-secondary"><i class="fa fa-copy"></i>Copy</button>
 </script>    
 `,
     bindings: {

@@ -30,11 +30,10 @@
   letter-spacing: 0.05em;
   font-size: 14px;
   z-index: 200;
-
-  // position: relative;
+  position: relative;
   width: 100%;
-  height: globals.$nav-height;
-  top: globals.$nav-banner;
+  height: auto;
+  top: globals.$nav-offset;
   min-height: 30px;
   border: 0;
   background-color: globals.$ve-slate-base;
@@ -239,8 +238,8 @@ ul.global-menu {
 
 nav.project-level-header {
   background-color: globals.$ve-slate-darker-2;
-  top: globals.$nav-project;
   z-index: 150;
+  justify-content: flex-start;
 
   .navbar-nav {
     margin: 0;
@@ -254,6 +253,7 @@ nav.project-level-header {
 .navbar {
   .breadcrumbs {
     display: inline-block;
+    float: left !important;
 
     ul {
       list-style: none;
@@ -265,7 +265,7 @@ nav.project-level-header {
 
     li {
       display: inline;
-      line-height: globals.$nav-height;
+      //line-height: globals.$nav-height;
 
       a {
         padding: 0 7px 0 5px;
@@ -293,6 +293,10 @@ nav.project-level-header {
       position: relative;
     }
   }
+
+  .navbar-right {
+    float: right;
+  }
 }
 
 /* Hide breadcrumbs for mobile */
@@ -310,12 +314,6 @@ nav.project-level-header {
       a {
         display: inline-block;
       }
-    }
-  }
-
-  .project-level-header {
-    .navbar-right {
-      float: right;
     }
   }
 }
@@ -396,7 +394,7 @@ nav.nav-level-banner {
   background-color: globals.$ve-slate-darker-2;
   color: white;
   float: none;
-  height: globals.$nav-banner;
+  height: auto;
 
   .navbar-nav {
     margin: 0;

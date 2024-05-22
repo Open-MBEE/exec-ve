@@ -61,7 +61,7 @@ const ExtensionErrorComponent: VeComponentOptions = {
     <p id="tooltipElementId" style="position: absolute; left: -1000px; top: -1000px; ">
         {{$ctrl.mmsElementId}}
     </p>
-    <button ng-click="$ctrl.copyToClipboard($event)" class="btn btn-sm btn-default"><i class="fa fa-copy"></i>Copy Element ID</button>
+    <button ng-click="$ctrl.copyToClipboard($event)" class="btn btn-sm btn-secondary"><i class="fa fa-copy"></i>Copy Element ID</button>
 </script>
 `,
     bindings: {

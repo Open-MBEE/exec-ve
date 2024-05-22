@@ -1,7 +1,7 @@
 import { Presentation, PresentationService, ViewHtmlService } from '@ve-components/presentations';
 import { ComponentService, ExtensionService } from '@ve-components/services';
 import { ButtonBarService } from '@ve-core/button-bar';
-import { ImageService } from '@ve-utils/application';
+import { ImageService } from '@ve-core/image';
 import { EventService } from '@ve-utils/core';
 import { SchemaService } from '@ve-utils/model-schema';
 

@@ -361,13 +361,10 @@ const MainComponent: VeComponentOptions = {
     transclude: true,
     template: `
     <div growl></div>
-
 <div id="outer-wrap">
-    <!--<div id="login-overlay" ng-show="showLogin" style="height: 100vh">-->
     <div id="login-overlay" ng-show="$ctrl.showLogin">
         <ui-view name="login"></ui-view>
     </div>
-
     <div id="inner-wrap">
         <ui-view name="banner-top"></ui-view>
         <ui-view name="nav"></ui-view>

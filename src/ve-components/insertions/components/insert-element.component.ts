@@ -165,7 +165,7 @@ const InsertComponent: VeComponentOptions = {
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" ng-show="!$ctrl.searchExisting" type="button" ng-click="$ctrl.ok()">Create<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
-    <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
 </div>
 `,
     bindings: {

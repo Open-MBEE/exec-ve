@@ -305,7 +305,7 @@ const RefsComponent: VeComponentOptions = {
                         <div class="panels-detail-title clearfix">
                             <h3 class="{{$ctrl.refSelected.type}}-icon">{{$ctrl.refSelected.name}}</h3>
                             <div class="ref-button-options" style="float:right">
-                            <button class="btn btn-default" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.deleteRef($event)" ng-if="$ctrl.refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
+                            <button class="btn btn-secondary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.deleteRef($event)" ng-if="$ctrl.refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
                             <button class="btn btn-primary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addTag($event)"><i class="fa fa-plus"></i> Tag</button>
                             <button class="btn btn-primary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addBranch($event)"><i class="fa fa-plus"></i> Branch</button>
                             </div>

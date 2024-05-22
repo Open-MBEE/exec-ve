@@ -60,7 +60,7 @@ class ContextBarController implements IComponentController {
     public currentBranch: string;
     public currentTag: string;
     public breadcrumbs: BreadcrumbObject[];
-    public truncateStyle;
+    public truncateStyle: { [key: string]: unknown };
     public subs: Rx.IDisposable[];
 
     static $inject = [
@@ -322,7 +322,7 @@ const ContextBarComponent: VeComponentOptions = {
     </div>
     <div ng-hide="$ctrl.spin || $ctrl.isRefsView" class="breadcrumbs">
         <ul>
-            <li ng-style="$ctrl.truncateStyle">
+            <li ng-style="{{ $ctrl.truncateStyle }}">
                 <a type="button" class="back-to-proj" ng-click="$ctrl.goHome()" uib-tooltip="{{ $ctrl.currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i class="fa-solid fa-home fa-1x" aria-hidden="true"></i>
                 </a>

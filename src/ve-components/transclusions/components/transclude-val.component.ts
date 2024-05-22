@@ -5,7 +5,8 @@ import { SpecTool } from '@ve-components/spec-tools';
 import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions';
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
 import { EditorService, editor_buttons } from '@ve-core/editor';
-import { MathService, UtilsService, ImageService } from '@ve-utils/application';
+import { ImageService } from '@ve-core/image';
+import { UtilsService, MathService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { ElementService, ValueService } from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
@@ -98,7 +99,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         <div ng-if="!$ctrl.propertySpec.isEnumeration">
             <div ng-if="$ctrl.editValues.length == 0">
                 <select ng-model="$ctrl.addValueType" ng-options="key for (key, value) in $ctrl.valueSvc.addValueTypes"></select>
-                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue($event, addValueType)">Add</button>
+                <button class="btn btn-sm btn-secondary" ng-click="$ctrl.addValue($event, addValueType)">Add</button>
             </div>
             <div ng-repeat="value in $ctrl.editValues" ng-switch on="value.type" ng-form="valForm">
                 <div ng-switch-when="LiteralInteger" ng-class="{'has-error': valForm.$error.pattern}">
@@ -137,7 +138,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
                 <div ng-switch-default>Editing not supported for now</div>
             </div>
             <div ng-if="$ctrl.editValues.length != 0 && ($ctrl.propertySpec.isSlot || $ctrl.propertySpec.isTaggedValue)">
-                <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue($event, editValues[0].type)">Add</button>
+                <button class="btn btn-sm btn-secondary" ng-click="$ctrl.addValue($event, editValues[0].type)">Add</button>
             </div>
         </div>
         <div ng-if="$ctrl.propertySpec.isEnumeration && $ctrl.propertySpec.isSlot" ng-repeat="val in $ctrl.editValues">
@@ -149,7 +150,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             </select><a ng-if="!$first" ng-click="$ctrl.removeVal($event, $index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="($ctrl.propertySpec.isSlot || $ctrl.propertySpec.isTaggedValue || $ctrl.editValues.length == 0) && $ctrl.propertySpec.isEnumeration">
-            <button class="btn btn-sm btn-default" ng-click="$ctrl.addEnumerationValue($event)">Add</button>
+            <button class="btn btn-sm btn-secondary" ng-click="$ctrl.addEnumerationValue($event)">Add</button>
         </div>
     </div>
 

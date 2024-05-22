@@ -257,7 +257,7 @@ const CreateTransclusionModal: VeModalComponent = {
         <div >
           <button class="btn btn-primary" ng-disabled="!$ctrl.element" type="button" ng-click="$ctrl.choose()">Create {{$ctrl.viewLink ? 'Link': 'Transclusion'}}<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
         </div>
-        <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
+        <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
     </div>
 </div>
 `,
