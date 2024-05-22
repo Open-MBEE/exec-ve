@@ -17,13 +17,13 @@
   }
 }
 
-.btn-secondary {
-  @include button-variant(globals.$brand-base, globals.$white, globals.$white);
-}
+// .btn-secondary {
+//   @include button-variant(globals.$brand-base, globals.$white, globals.$white);
+// }
 
 // Toolbar button style
 .btn-tools {
-  @include button-outline-variant(globals.$base-grey);
+  //@include button-variant(globals.$base-grey, globals.$white, globals.$white);
 
   .fa,
   .fa-solid,

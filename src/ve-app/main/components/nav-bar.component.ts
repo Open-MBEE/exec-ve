@@ -155,21 +155,19 @@ const NavBarComponent: VeComponentOptions = {
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="block">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle main-nav-toggle" ng-click="$ctrl.isNavCollapsed = !$ctrl.isNavCollapsed">
-                <span class="sr-only">Toggle navigation</span>
-                <i class="fa fa-bars" aria-hidden="true"></i>
-            </button>
-            <span>
             <a class="navbar-brand" ui-sref="main.login.select">
                 <img src="img/logo.svg" alt="View Editor Logo">
             </a>
             <a ng-if="!$ctrl.orgLink" class="org-title" ui-sref="'main.project.ref.portal({projectId: $ctrl.project.id, refId: $ctrl.mmsRef.id})">{{ $ctrl.org.name }}</a>
             <a ng-if="$ctrl.orgLink" class="org-title" ng-href="{{$ctrl.orgLink}}">{{ $ctrl.org.name }}</a>
             <a class="switch-org" ng-click="$ctrl.updateOrg()">Switch Org</a>
-            </span>
+            <button type="button" class="navbar-toggler main-nav-toggle" ng-click="$ctrl.isNavCollapsed = !$ctrl.isNavCollapsed">
+                <span class="sr-only">Toggle navigation</span>
+                <i class="fa fa-bars" aria-hidden="true"></i>
+            </button>
         </div>
-        <div class="collapse navbar-collapse" uib-collapse="$ctrl.isNavCollapsed" id="global-navigation">
-            <form id="global-search" ng-show="$ctrl.showSearch" ng-submit="$ctrl.search(searchText)" class="navbar-form navbar-left" role="search">
+        <div class="collapse navbar-collapse" id="global-navigation">
+            <form id="global-search" ng-show="$ctrl.showSearch" ng-submit="$ctrl.search(searchText)" class="form-inline navbar-form navbar-left" role="search">
                 <div class="form-group">
                     <input placeholder="Search selected project" ng-model="searchText"/>
                     <button ng-click="$ctrl.search(searchText)">
@@ -178,7 +176,7 @@ const NavBarComponent: VeComponentOptions = {
                 </div>
             </form>
             <ul class="nav navbar-nav global-menu">
-                <li class="dropdown">
+                <li class="nav-item dropdown">
                     <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown" uib-dropdown on-toggle="$ctrl.toggled(open)">
                         <a href id="help-dropdown" class="dropdown-toggle" uib-dropdown-toggle>
                         Help <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -204,7 +202,7 @@ const NavBarComponent: VeComponentOptions = {
                          </ul>
                     </span>
                 </li>
-                <li class="dropdown">
+                <li class="nav-item dropdown">
                     <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown user-profile" uib-dropdown on-toggle="$ctrl.toggled(open)">
                         <a href id="login-dropdown" class="dropdown-toggle" uib-dropdown-toggle>
                             <div>{{ $ctrl.userBadge }}</div>
