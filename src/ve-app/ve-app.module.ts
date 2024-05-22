@@ -322,16 +322,6 @@ veApp.config([
                             return resolveSvc.getFooter(params);
                         },
                     ],
-                    projectObs: [
-                        'refresh',
-                        'ResolveService',
-                        (
-                            refresh: boolean,
-                            resolveSvc: ResolveService
-                        ): VePromise<ProjectObject[], ProjectsResponse> => {
-                            return resolveSvc.getProjects(null, refresh);
-                        },
-                    ],
                     orgObs: [
                         'refresh',
                         'ResolveService',
@@ -385,10 +375,7 @@ veApp.config([
                         },
                     },
                     'toolbar-right@main': {
-                        component: 'rightToolbar',
-                        bindings: {
-                            disabled: 'noOp',
-                        },
+                        component: 'adminSidebar',
                     },
                     'pane-center@main': {
                         component: 'adminHome',
@@ -399,7 +386,7 @@ veApp.config([
                     },
                 },
             })
-            .state('main.admin.user', {
+            .state('main.admin.users', {
                 url: '/users',
                 resolve: {
                     refresh: [
@@ -427,7 +414,7 @@ veApp.config([
                     },
                 },
             })
-            .state('main.admin.user.profile', {
+            .state('main.admin.user', {
                 url: '/:username',
                 params: {
                     username: {
@@ -491,7 +478,7 @@ veApp.config([
                     },
                 },
             })
-            .state('main.admin.group', {
+            .state('main.admin.groups', {
                 url: '/groups',
                 resolve: {
                     refresh: [
@@ -519,7 +506,7 @@ veApp.config([
                     },
                 },
             })
-            .state('main.admin.group.profile', {
+            .state('main.admin.group', {
                 url: '/:groupname',
                 params: {
                     groupname: {
@@ -583,7 +570,7 @@ veApp.config([
                     },
                 },
             })
-            .state('main.admin.org', {
+            .state('main.admin.orgs', {
                 url: '/orgs',
                 resolve: {
                     params: [
@@ -608,7 +595,7 @@ veApp.config([
                 },
                 views: {
                     'pane-center@main': {
-                        component: 'adminHome',
+                        component: 'organizationList',
                         bindings: {
                             mmsOrgs: 'orgObs',
                             currentUser: 'currentUserOb',
@@ -616,7 +603,7 @@ veApp.config([
                     },
                 },
             })
-            .state('main.admin.org.home', {
+            .state('main.admin.org', {
                 url: '/:orgId',
                 params: {
                     orgId: {
@@ -668,8 +655,6 @@ veApp.config([
                         component: 'navBar',
                         bindings: {
                             mmsOrg: 'orgOb',
-                            mmsProject: 'projectOb',
-                            mmsProjects: 'projectObs',
                         },
                     },
                     'menu@main': {
@@ -701,6 +686,18 @@ veApp.config([
                     },
                 },
             })
+            .state('main.admin.org.projects', {
+                url: '/projects',
+                views: {
+                    'pane-center@main': {
+                        component: 'membersPage',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                            currentUser: 'currentUserOb',
+                        },
+                    },
+                },
+            })
             .state('main.admin.org.users', {
                 url: '/users',
                 views: {
@@ -709,6 +706,17 @@ veApp.config([
                         bindings: {
                             mmsOrg: 'orgOb',
                             currentUser: 'currentUserOb',
+                        },
+                    },
+                },
+            })
+            .state('main.admin.projects', {
+                url: '/projects',
+                views: {
+                    'pane-center@main': {
+                        component: 'projectList',
+                        bindings: {
+                            mmsOrgs: 'orgObs',
                         },
                     },
                 },
@@ -769,6 +777,18 @@ veApp.config([
                             refresh: boolean
                         ): VePromise<OrgObject, OrgsResponse> => {
                             return resolveSvc.getProjectOrg(projectOb, refresh);
+                        },
+                    ],
+                    projectObs: [
+                        'projectOb',
+                        'refresh',
+                        'ResolveService',
+                        (
+                            projectOb: ProjectObject,
+                            refresh: boolean,
+                            resolveSvc: ResolveService
+                        ): VePromise<ProjectObject[], ProjectsResponse> => {
+                            return resolveSvc.getProjects(projectOb, refresh);
                         },
                     ],
                 },
@@ -1579,7 +1599,6 @@ veApp.config([
                     },
                 },
             })
-
             .state('main.project.ref.search', {
                 url: '/search?keywords&field',
                 params: {

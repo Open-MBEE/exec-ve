@@ -25,6 +25,7 @@ class OrgListItemController implements IOrgListItemBindings {
 
     users: number;
     groups: number;
+    colorClass: string;
 
     static $inject = ['$element'];
 
@@ -34,6 +35,7 @@ class OrgListItemController implements IOrgListItemBindings {
         this.users = Object.keys(this.org.permission.users).length;
         this.groups = Object.keys(this.org.permission.groups).length;
         this.resizer = (this.$pane.$resized as Rx.Subject<IRegion>).subscribe(() => this.handleResize());
+        this.colorClass = this.org.archived ? 'archived-link' : '';
         this.handleResize();
     }
 
@@ -51,8 +53,8 @@ class OrgListItemController implements IOrgListItemBindings {
 const OrgListItemComponent: VeComponentOptions = {
     bindings: {
         org: '<',
-        className: '<?',
-        link: '<',
+        className: '@?',
+        link: '@',
         divider: '<',
     },
     selector: 'orgListItem',
@@ -63,7 +65,7 @@ const OrgListItemComponent: VeComponentOptions = {
     template: `
     <div class="stats-list-item {{$ctrl.className}}">
       <div class="list-header">
-        <a ng-class="$ctrl.org.archived ? 'archived-link' : ''" ui-sref="main.admin.org.home({ orgId: $ctrl.org.id })">{{$ctrl.org.name}}</a>
+        <a class="{{$ctrl.colorClass}}" ui-sref="{{$ctrl.link}}">{{$ctrl.org.name}}</a>
       </div>
       <stat-list ng-if="$ctrl.width > 600">
         <stat stat-title="Projects"

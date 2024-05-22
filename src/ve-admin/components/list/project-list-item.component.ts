@@ -19,9 +19,12 @@ class ProjectListItemController implements IProjectListItemBindings {
     divider: boolean;
     width: number = 0;
     ref: ng.IAugmentedJQuery;
+    archiveProj: boolean;
 
     $pane: IPane;
     resizer: Rx.Disposable;
+
+    colorClass: string;
 
     users: number;
     groups: number;
@@ -35,6 +38,7 @@ class ProjectListItemController implements IProjectListItemBindings {
         this.handleResize();
         this.users = Object.keys(this.project.permission.users).length;
         this.groups = Object.keys(this.project.permission.groups).length;
+        this.colorClass = this.archiveProj || this.project.archived ? 'archived-link' : '';
     }
 
     $onDestroy(): void {
@@ -51,11 +55,12 @@ class ProjectListItemController implements IProjectListItemBindings {
 const ProjectListItemComponent: VeComponentOptions = {
     bindings: {
         project: '<',
-        className: '<?',
-        link: '<',
+        className: '@?',
+        link: '@',
         divider: '<',
+        archiveProj: '<',
     },
-    selector: 'projListItem',
+    selector: 'projectListItem',
     require: {
         $pane: '^ngPane',
     },
@@ -63,10 +68,11 @@ const ProjectListItemComponent: VeComponentOptions = {
     template: `
     <div class="stats-list-item {{$ctrl.className}}" ng-ref="$ctrl.ref">
     <div class="list-header">
-        <a ng-class="$ctrl.project.archived ? 'archived-link' : ''" ui-sref="main.admin.project({ projectId: $ctrl.project.id })">{{$ctrl.project.name}}</a>
+        <a class="{{ $ctrl.colorClass }}" ui-sref="{{ $ctrl.link }}">{{$ctrl.project.name}}</a>
     </div>
     <stat-list ng-if="$ctrl.width > 600">
         <stat stat-title="Users"
+            class-name="{{ $ctrl.colorClass }}"
             stat-icon="fa-solid fa-users"
             stat-value="$ctrl.users"
             _key="org-{{$ctrl.project.id}}-users">

@@ -20,7 +20,7 @@ export class ListComponentController implements angular.IComponentController {
 const ListComponent: VeComponentOptions = {
     selector: 'list',
     bindings: {
-        className: '<',
+        className: '@',
     },
     transclude: true,
     template: `

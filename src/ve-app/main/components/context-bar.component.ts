@@ -1,5 +1,6 @@
 import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
 import angular, { IComponentController } from 'angular';
+import _ from 'lodash';
 
 import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
@@ -8,18 +9,29 @@ import { onChangesCallback } from '@ve-utils/utils';
 import { veApp } from '@ve-app';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
-import { DocumentObject, ParamsObject, ProjectGroupObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms';
+import Icon from '@ve-types/icons';
+import {
+    DataObject,
+    DocumentObject,
+    OrgObject,
+    ParamsObject,
+    ProjectGroupObject,
+    ProjectObject,
+    RefObject,
+    ViewObject,
+} from '@ve-types/mms';
 
 interface BreadcrumbObject {
     name: string;
     id: string;
-    type: string;
+    icon: string;
     link: string;
 }
 
-class MenuController implements IComponentController {
+class ContextBarController implements IComponentController {
     //bindings
     public params: ParamsObject;
+    public mmsOrg: OrgObject;
     public mmsProject: ProjectObject;
     public mmsProjects: ProjectObject[];
     public mmsGroup: ProjectGroupObject;
@@ -30,7 +42,7 @@ class MenuController implements IComponentController {
 
     //Locals
     spin: boolean;
-    public child: DocumentObject | ProjectGroupObject;
+    public child: DataObject;
     crumbs: BreadcrumbObject[] = [];
     groups: ProjectGroupObject[];
     projects: ProjectObject[];
@@ -94,9 +106,11 @@ class MenuController implements IComponentController {
                 this.currentTag = this.mmsRef.name;
             }
         }
-        this.tags = this.mmsRefs.filter((ref) => {
-            return ref.type === 'Tag';
-        });
+        if (this.mmsRefs) {
+            this.tags = this.mmsRefs.filter((ref) => {
+                return ref.type === 'Tag';
+            });
+        }
         this.updateGroups();
 
         this.$transitions.onSuccess({}, () => {
@@ -125,91 +139,133 @@ class MenuController implements IComponentController {
 
     public updateBreadcrumbs: onChangesCallback<undefined> = () => {
         let parentId = '';
-        let oldChild = null;
-        if (this.child) oldChild = this.child;
+        let title = '';
+        const oldChild = this.child;
+        if (this.$state.includes('**.admin.**') || this.$state.includes('**.home.**')) {
+            this.child = this.mmsRef ? this.mmsRef : this.mmsProject ? this.mmsProject : this.mmsOrg;
 
-        if (this.mmsDocument) {
-            this.child = this.mmsDocument;
-            this.rootScopeSvc.veTitle(this.mmsDocument.name);
-        } else if (this.mmsGroup) {
-            this.rootScopeSvc.veTitle(this.mmsGroup.name);
-            this.child = this.mmsGroup;
-        } else {
-            this.rootScopeSvc.veTitle(this.currentProject);
-        }
-
-        // Check for Refs View, Skip the rest if it is
-        if (this.$state.includes('main.project.ref.refs')) {
-            this.isRefsView = true;
-            return;
-        }
-
-        if (this.child && this.child != oldChild) {
-            this.crumbs = [];
-            if (this.child.type === 'Package') {
-                //Object.prototype.hasOwnProperty.call(child, '_id')) {
-                this.crumbs.push({
-                    name: this.child.name,
-                    id: this.child.id,
-                    type: 'group',
-                    link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', keywords: undefined})",
-                });
-                if (this.child._parentId) {
-                    parentId = (this.child as ProjectGroupObject)._parentId;
-                }
+            if (this.child) {
+                title = this.child.name ? this.child.name : this.child.id + ' Admin';
             } else {
-                this.crumbs.push({
-                    name: this.child.name,
-                    id: this.child.id,
-                    type: 'doc',
-                    link: 'main.project.ref.view.present({documentId: breadcrumb.id, keywords: undefined})',
-                });
-                if (this.child._groupId) {
-                    parentId = (this.child as DocumentObject)._groupId;
-                }
+                title = 'Admin';
             }
-            if (parentId) {
-                while (this.groupsMap[parentId] !== undefined) {
-                    const id = this.groupsMap[parentId].id;
+            if (this.child && this.child != oldChild) {
+                this.crumbs = [];
+                if (this.mmsRef) {
                     this.crumbs.push({
-                        name: this.groupsMap[id].name,
-                        id: id,
-                        type: 'group',
+                        name: this.mmsRef.name ? this.mmsRef.name : this.mmsRef.id,
+                        id: this.child.id,
+                        icon: Icon(_.lowerCase(this.mmsRef.type)),
+                        link: 'main.admin.project.ref({ projectId: $ctrl.mmsProject.id, refId: breadcrumb.id })',
+                    });
+                }
+                if (this.mmsProject) {
+                    this.crumbs.push({
+                        name: this.mmsProject.name,
+                        id: this.mmsProject.id,
+                        icon: Icon('project'),
+                        link: 'main.admin.project({ projectId: $ctrl.mmsProject.id })',
+                    });
+                }
+                if (this.mmsOrg) {
+                    this.crumbs.push({
+                        name: this.mmsOrg.name,
+                        id: this.mmsOrg.id,
+                        icon: Icon('org'),
+                        link: 'main.admin.org.projects({ orgId: $ctrl.mmsOrg.id })',
+                    });
+                }
+                this.formatBreadcrumbs();
+            }
+        } else {
+            this.child = this.mmsDocument ? this.mmsDocument : this.mmsGroup;
+            if (this.child) {
+                title = this.child.name ? this.child.name : this.child.id;
+            }
+
+            if (this.child && this.child != oldChild) {
+                this.crumbs = [];
+                if (this.child.type === 'Package') {
+                    //Object.prototype.hasOwnProperty.call(child, '_id')) {
+                    this.crumbs.push({
+                        name: this.child.name,
+                        id: this.child.id,
+                        icon: Icon('group'),
                         link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', keywords: undefined})",
                     });
-                    parentId = this.groupsMap[id].parentId;
+                    if (this.child._parentId) {
+                        parentId = (this.child as ProjectGroupObject)._parentId;
+                    }
+                } else {
+                    this.crumbs.push({
+                        name: this.child.name,
+                        id: this.child.id,
+                        icon: Icon('document'),
+                        link: 'main.project.ref.view.present({documentId: breadcrumb.id, keywords: undefined})',
+                    });
+                    if (this.child._groupId) {
+                        parentId = (this.child as DocumentObject)._groupId;
+                    }
+                }
+                if (parentId) {
+                    while (this.groupsMap[parentId] !== undefined) {
+                        const id = this.groupsMap[parentId].id;
+                        this.crumbs.push({
+                            name: this.groupsMap[id].name,
+                            id: id,
+                            icon: Icon('group'),
+                            link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', keywords: undefined})",
+                        });
+                        parentId = this.groupsMap[id].parentId;
+                    }
                 }
             }
-            this.breadcrumbs = this.crumbs.reverse();
-            void this.$timeout(() => {
-                const eltChildren = this.$element.children().children();
-                const eltParent = this.$element.parent()[0];
-                const eltWidth = eltParent.clientWidth - eltChildren[1].scrollWidth - eltChildren[3].scrollWidth;
-                const crumbcount = this.breadcrumbs.length;
-                const liWidth = (eltWidth * 0.85) / crumbcount;
-                this.truncateStyle = {
-                    'max-width': liWidth,
-                    'white-space': 'nowrap',
-                    overflow: 'hidden',
-                    'text-overflow': 'ellipsis',
-                    display: 'inline-block',
-                };
-            });
+            this.formatBreadcrumbs();
         }
+
+        this.rootScopeSvc.veTitle(title);
         this.spin = false;
     };
 
+    formatBreadcrumbs(): void {
+        this.breadcrumbs = this.crumbs.reverse();
+        void this.$timeout(() => {
+            const eltChildren = this.$element.children().children();
+            const eltParent = this.$element.parent()[0];
+            const eltWidth = eltParent.clientWidth - eltChildren[1].scrollWidth - eltChildren[3].scrollWidth;
+            const crumbcount = this.breadcrumbs.length;
+            const liWidth = (eltWidth * 0.85) / crumbcount;
+            this.truncateStyle = {
+                'max-width': liWidth,
+                'white-space': 'nowrap',
+                overflow: 'hidden',
+                'text-overflow': 'ellipsis',
+                display: 'inline-block',
+            };
+        });
+    }
+
     updateProject(project: ProjectObject): void {
         if (project) {
-            void this.$state.go(
-                'main.project.ref.portal',
-                {
-                    projectId: project.id,
-                    refId: 'master',
-                    keywords: undefined,
-                },
-                { reload: true }
-            );
+            if (this.$state.includes('**.admin.**') || this.$state.includes('**.home.**')) {
+                void this.$state.go(
+                    'main.admin.project',
+                    {
+                        projectId: project.id,
+                    },
+                    { reload: true }
+                );
+            } else {
+                void this.$state.go(
+                    'main.project.ref.portal',
+                    {
+                        projectId: project.id,
+                        refId: 'master',
+                        keywords: undefined,
+                    },
+                    { reload: true }
+                );
+            }
         }
     }
 
@@ -274,7 +330,7 @@ const ContextBarComponent: VeComponentOptions = {
             <li ng-style="$ctrl.truncateStyle" ng-show="!$ctrl.isRefsView" ng-repeat="breadcrumb in $ctrl.breadcrumbs track by $index">
                 <span><i class="fa-solid fa-angle-right"></i></span>
                 <a ui-sref="{{ breadcrumb.link }}" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
-                    <i ng-class="{'fa-solid fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true"></i>{{ breadcrumb.name }}
+                    <i class="{{ breadcrumb.icon }}" aria-hidden="true"></i>{{ breadcrumb.name }}
                 </a>
             </li>
         </ul>
@@ -323,6 +379,7 @@ const ContextBarComponent: VeComponentOptions = {
 `,
     bindings: {
         params: '<',
+        mmsOrg: '<',
         mmsProject: '<',
         mmsProjects: '<',
         mmsGroup: '<',
@@ -331,7 +388,7 @@ const ContextBarComponent: VeComponentOptions = {
         mmsRefs: '<',
         mmsDocument: '<',
     },
-    controller: MenuController,
+    controller: ContextBarController,
 };
 
 veApp.component(ContextBarComponent.selector, ContextBarComponent);

@@ -1,0 +1,1 @@
+import './proj-list.component';

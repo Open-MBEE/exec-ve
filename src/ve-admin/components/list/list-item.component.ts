@@ -1,4 +1,7 @@
-import { StateService } from '@uirouter/angularjs';
+import { RawParams, StateService } from '@uirouter/angularjs';
+
+import { veAdmin } from '@ve-admin/ve-admin.module';
+import { parseStateRef } from '@ve-utils/utils';
 
 import { VeComponentOptions } from '@ve-types/angular';
 
@@ -9,41 +12,39 @@ class ListItemController implements angular.IComponentController {
 
     appliedClasses: string;
 
-    innerScope: angular.IScope & { $ctrl?: ListItemController; $transclude?: JQLite };
+    static $inject = ['$scope', '$state'];
 
-    static $inject = ['$scope', '$transclude', '$state'];
-
-    constructor(
-        private $scope: angular.IScope,
-        private $transclude: angular.ITranscludeFunction,
-        private $state: StateService
-    ) {}
+    constructor(private $scope: angular.IScope, private $state: StateService) {}
 
     $onInit(): void {
         this.appliedClasses = `list ${this.className ? this.className : ''}`;
-        let clone = this.$transclude();
-        if (this.link) {
-            const link = $(`<span ui-sref="${this.link}" ng-click="$ctrl.onClick()"></span>`);
-            link.append(clone);
-            clone = link;
-        }
-        this.innerScope = this.$scope.$new();
-        this.innerScope.$ctrl = this;
-        this.innerScope.$transclude = clone;
     }
+
+    handleClick = (e: JQuery.ClickEvent): void => {
+        if (this.link) {
+            e.stopPropagation();
+            const parsedState = parseStateRef(this.link);
+            void this.$state.go(parsedState.state, this.$scope.$eval(parsedState.paramExpr) as RawParams);
+        } else if (this.onClick) {
+            e.stopPropagation();
+            this.onClick();
+        }
+    };
 }
 
 const ListItemComponent: VeComponentOptions = {
     selector: 'listItem',
     transclude: true,
+    controller: ListItemController,
     template: `
-    <div ng-transclude class="{{$ctrl.appliedClasses}}">
-</div>
+    <div ng-transclude class="{{$ctrl.appliedClasses}}" ng-click="$ctrl.handleClick($event)"></div>
     `,
     bindings: {
-        key: '<',
-        className: '<',
+        key: '@',
+        className: '@',
         onClick: '&',
-        link: '<',
+        link: '@',
     },
 };
+
+veAdmin.component(ListItemComponent.selector, ListItemComponent);

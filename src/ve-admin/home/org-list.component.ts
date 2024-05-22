@@ -1,6 +1,5 @@
 import { veAdmin } from '@ve-admin';
-
-import { ListApi } from './list.component';
+import { ListApi } from '@ve-admin/components/list/list.component';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { OrgObject, ProjectObject, UserObject } from '@ve-types/mms';

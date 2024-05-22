@@ -163,8 +163,8 @@ const NavBarComponent: VeComponentOptions = {
             <a class="navbar-brand" ui-sref="main.login.select">
                 <img src="img/logo.svg" alt="View Editor Logo">
             </a>
-            <a ng-if="!$ctrl.org.homeLink" class="org-title" ui-sref="'main.project.ref.portal({projectId: $ctrl.project.id, refId: $ctrl.mmsRef.id})">{{ $ctrl.org.name }}</a>
-            <a ng-if="$ctrl.org.homeLink" class="org-title" ng-href="{{$ctrl.org.homeLink}}">{{ $ctrl.org.name }}</a>
+            <a ng-if="!$ctrl.orgLink" class="org-title" ui-sref="'main.project.ref.portal({projectId: $ctrl.project.id, refId: $ctrl.mmsRef.id})">{{ $ctrl.org.name }}</a>
+            <a ng-if="$ctrl.orgLink" class="org-title" ng-href="{{$ctrl.orgLink}}">{{ $ctrl.org.name }}</a>
             <a class="switch-org" ng-click="$ctrl.updateOrg()">Switch Org</a>
             </span>
         </div>
@@ -211,13 +211,13 @@ const NavBarComponent: VeComponentOptions = {
                         </a>
                         <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap" role="login-menu">
                             <li>
-                                <a ui-sref="main.admin.user.profile({ user: $ctrl.user.username })">User Profile</a>
+                                <a ui-sref="main.admin.user({ user: $ctrl.user.username })">User Profile</a>
                             </li>
                             <li>
                                 <a ui-sref="main.admin.user.settings({ user: $ctrl.user.username })">User Settings</a>
                             </li>
                             <li>
-                                <a ui-sref="main.admin">Admin</a>
+                                <a ui-sref="main.admin.orgs">Admin</a>
                             </li>
                             <li ng-if="$ctrl.username" class="ve-secondary">
                                 Logged in as <b ng-if="$ctrl.user.firstName !== undefined">{{ $ctrl.user.firstName }} {{ $ctrl.user.lastName }}</b> ({{ $ctrl.username }})

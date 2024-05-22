@@ -70,7 +70,7 @@ const StatComponent: VeComponentOptions = {
         label: '<?statLabel',
         icon: '@statIcon',
         value: '<statValue',
-        className: '<?',
+        className: '@?',
         divider: '<?',
         tooltip: '@?',
         noTooltip: '<?',

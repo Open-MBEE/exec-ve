@@ -176,7 +176,7 @@ const ProfileComponent: VeComponentOptions = {
                         <th>Groups:</th>
                         <td>
                             <ul>
-                                <li ng-repeat="group in $ctrl.groups"><a ui-sref="main.admin.group.profile({ groupname: group.name })">{{ group.name }}</a></li>
+                                <li ng-repeat="group in $ctrl.groups"><a ui-sref="main.admin.group({ groupname: group.name })">{{ group.name }}</a></li>
                             </ul>
                         </td>
                     </tr>

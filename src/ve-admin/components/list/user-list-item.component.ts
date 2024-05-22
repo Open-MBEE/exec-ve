@@ -119,7 +119,7 @@ const UserListItemComponent: VeComponentOptions = {
     bindings: {
         user: '<',
         adminLabel: '<',
-        _key: '<',
+        _key: '@',
         adminState: '<',
         label: '<',
         permission: '<',

@@ -1,7 +1,5 @@
 import { veAdmin } from '@ve-admin';
 
-import { ListApi } from './list.component';
-
 import { VeComponentOptions } from '@ve-types/angular';
 import { ProjectObject } from '@ve-types/mms';
 import { VeModalService } from '@ve-types/view-editor';
@@ -10,9 +8,6 @@ class ProjectListController {
     //bindings
     private project: ProjectObject;
     private className: string;
-
-    //Parent Controllers
-    private listApi: ListApi;
 
     public width: number;
     public modalProjCreate: boolean;
@@ -71,11 +66,11 @@ const ProjectListComponent: VeComponentOptions = {
         project: '<',
         admin: '<',
         listApi: '<',
-        className: '<',
+        className: '@',
     },
     template: `
     <div class="proj-list">
-      <proj-list-item project="$ctrl.project" divider="true"></project-list-item>
+      <project-list-item project="$ctrl.project" divider="true"></project-list-item>
       <div class="controls-container" ng-if="$ctrl.admin">
         <span uib-tooltip="{{$ctrl.title}}" tooltip-placement="top"
         tooltip-append-to-body="true" tooltip-animation="false">
