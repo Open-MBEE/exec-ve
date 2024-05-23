@@ -29,7 +29,7 @@ const LoginComponent: VeComponentOptions = {
                 </button>
             </form>
         </div>
-        
+        </br>
         <login-banner mms-login-banner="$ctrl.loginBanner"></login-banner>
     </div>
 </div>

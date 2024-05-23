@@ -148,49 +148,53 @@ const SelectModalComponent: VeModalComponent = {
         <h4 class="modal-title">Switch Org</h4>
     </div>
     <div class="modal-body ve-dark-dropdown-wide" id="modal-body">
-        <span class="label-dropdown">Org:</span>
-        <div class="btn-toolbar select-toolbar" role="toolbar">
-            <div class="btn-group ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
-                <button id="org-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
-                    <span ng-hide="$ctrl.org">No selected Org</span>
-                    <span>{{ $ctrl.org.name }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
-                </button>
-                <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
-                    aria-labelledby="org-btn-keyboard-nav">
-                    <li ng-repeat="org in $ctrl.orgs | orderBy: 'name'" ng-click="$ctrl.selectOrg(org)"
-                        ng-class="{'checked-list-item': org.name === $ctrl.org.name }">{{ org.name }}
-                    </li>
-                </ul>
+        <div class="ve-dark-dropdown-wide">
+            <span class="label-dropdown">Org:</span>
+            <div class="input-group select-toolbar" role="toolbar">
+                <div class="input-group-prepend ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
+                    <button id="org-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                        <span ng-hide="$ctrl.org">No selected Org</span>
+                        <span>{{ $ctrl.org.name }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                    </button>
+                    <div class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
+                        aria-labelledby="org-btn-keyboard-nav">
+                        <a ng-repeat="org in $ctrl.orgs | orderBy: 'name'" ng-click="$ctrl.selectOrg(org)"
+                            ng-class="{'checked-list-item': org.name === $ctrl.org.name, 'dropdown-item': true}">{{ org.name }}
+                        </a>
+                    </div>
+                </div>
+                <div class="input-group-append" role="group">
+                    <button class="btn btn-info" uib-tooltip="Refresh Orgs" ng-click="$ctrl.refreshOrgs()">
+                        <i ng-show="!$ctrl.orgSpin" class="fa fa-refresh"></i>
+                        <i ng-show="$ctrl.orgSpin" class="fa fa-spin fa-refresh"></i>
+                    </button>
+                </div>      
             </div>
-            <div class="btn-group" role="group">
-                <button class="btn btn-info" uib-tooltip="Refresh Orgs" ng-click="$ctrl.refreshOrgs()">
-                    <i ng-show="!$ctrl.orgSpin" class="fa fa-refresh"></i>
-                    <i ng-show="$ctrl.orgSpin" class="fa fa-spin fa-refresh"></i>
-                </button>
-            </div>      
         </div>
-        <span class="label-dropdown">Project:</span>
-        <div class="btn-toolbar select-toolbar" role="toolbar">
-            <div class="btn-group ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
+        <div class="ve-dark-dropdown-wide">
+            <span class="label-dropdown">Project:</span>
+            <div class="input-group select-toolbar" role="toolbar">
+                <div class="input-group-prepend ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
                 <button id="proj-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle
                         ng-disabled="!$ctrl.org || !$ctrl.org.projects.length">
                     <span ng-hide="$ctrl.org && $ctrl.org.projects.length">No Projects for selected Org</span>
                     <span ng-hide="!$ctrl.org || $ctrl.project">No selected Project</span>
                     <span ng-show="$ctrl.org && $ctrl.org.projects.length">{{ $ctrl.project.name }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                 </button>
-                <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
-                    aria-labelledby="proj-btn-keyboard-nav">
-                    <li ng-repeat="project in $ctrl.org.projects | orderBy: 'name'" ng-click="$ctrl.selectProject(project)"
-                        ng-class="{'checked-list-item': project.name === $ctrl.project.name}">{{ project.name }}
-                    </li>
-                </ul>
+                <div class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
+                        aria-labelledby="proj-btn-keyboard-nav">
+                        <a ng-repeat="project in $ctrl.projects | orderBy: 'name'" ng-click="$ctrl.selectProject(project)">
+                            <span ng-class="{'checked-list-item': project.name === $ctrl.selectedProject}">{{ project.name }}</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="input-group-append" role="group">
+                    <button class="btn btn-info" uib-tooltip="Refresh Projects" ng-click="$ctrl.refreshProjects()">
+                        <i ng-show="!$ctrl.projSpin" class="fa fa-refresh"></i>
+                        <i ng-show="$ctrl.projSpin" class="fa fa-spin fa-refresh"></i>
+                    </button>
+                </div>  
             </div>
-            <div class="btn-group" role="group">
-                <button class="btn btn-info" uib-tooltip="Refresh Projects" ng-click="$ctrl.refreshProjects()">
-                    <i ng-show="!$ctrl.projSpin" class="fa fa-refresh"></i>
-                    <i ng-show="$ctrl.projSpin" class="fa fa-spin fa-refresh"></i>
-                </button>
-            </div>  
         </div>
     </div>
     <div class="modal-footer ng-scope">

@@ -35,7 +35,7 @@
 .dropdown-menu {
   // Standardize font size across VE
   font-size: 14px;
-
+  
   // Indicate selected list item - secondary
   .secondary-checked-list-item::before {
     @include fa-menu-content("\f00c", globals.$ve-silver-darker-1);
@@ -56,8 +56,7 @@
   }
 
   a.checked-list-item,
-  li.checked-list-item,
-  li.secondary-checked-list-item {
+  a.secondary-checked-list-item {
     position: relative;
   }
 
@@ -101,7 +100,7 @@
 .ve-dark-dropdown-wide,
 .ve-dark-dropdown-nav {
   button.dropdown-toggle {
-    display: inline;
+    //display: inline;
     color: white;
     border: none;
     border-radius: 2px !important;
@@ -112,6 +111,7 @@
 
     /* overwriting user agent stylesheet */
     background-color: globals.$ve-slate-base;
+    background-image: none;
 
     .fa-caret-down {
       padding: 2px 4px 2px 10px;
@@ -125,11 +125,11 @@
   }
 
   /* Darken button when open */
-  &.btn-group.open button.dropdown-toggle {
+  &.show button.dropdown-toggle {
     background-color: globals.$ve-slate-darker-1;
   }
-
-  ul.dropdown-menu {
+  
+  div.dropdown-menu {
     background-color: globals.$ve-slate-lighter-1;
     border: none;
     border-radius: 3px;
@@ -141,7 +141,7 @@
     overflow-x: hidden;
     overflow-y: auto;
 
-    li.dropdown-item {
+    a.dropdown-item {
       color: white;
       padding: 6px 8px;
       word-wrap: normal;
@@ -152,25 +152,25 @@
       cursor: pointer;
 
       &:hover {
-        background-color: globals.$ve-slate-lighter-2;
-        color: globals.$ve-slate-darker-2;
-      }
-
-      &.divider {
-        height: 1px;
-        margin: 6px 0;
-        background-color: globals.$ve-slate-lighter-2;
-        padding: 0;
+        background: globals.$ve-slate-lighter-2;
       }
     }
 
+    div.dropdown-divider {
+      height: 1px;
+      margin: 6px 0;
+      border-color: globals.$ve-slate-lighter-2;
+      padding: 0;
+    }
+    
+
     /* Clearing bootstrap styling */
-    >li > a,
-    >li > span {
+    > a,
+    > span {
       padding: 1px 10px;
     }
 
-    >li > a {
+    > a {
       color: white;
 
       &:hover {
@@ -242,7 +242,7 @@
     }
   }
 
-  li.ve-secondary {
+  div.ve-secondary {
     color: globals.$ve-white-text-lighter-2;
 
     &:hover {
@@ -253,7 +253,7 @@
 
 @media (max-width: 767px) {
   .ve-dark-dropdown-nav {
-    .dropdown-menu li.divider {
+    .dropdown-menu div.dropdown-divider {
       background-color: globals.$ve-slate-lighter-2 !important;
     }
   }
@@ -293,12 +293,12 @@
     background-color: globals.$ve-silver-darker-1;
   }
 
-  ul {
+  div {
     border-color: globals.$ve-silver-base;
     min-width: 100%;
   }
 
-  li {
+  .dropdown-menu {
     &.dropdown-input {
       border-bottom: 1px solid globals.$ve-silver-base;
       padding: 6px 0;
@@ -328,7 +328,11 @@
     margin: 0 0 18px;
   }
 
-  button.dropdown-toggle {
+  &.input-group-prepend {
+    flex-grow: 1;
+  }
+
+  button.dropdown-toggle, .btn-info {
     width: 100%;
     text-align: left;
     font-size: 16px;
@@ -351,6 +355,8 @@
 
   .select-toolbar {
     display: flex;
+    padding-top: 10px;
+    padding-bottom: 30px;
   }
 }
 
@@ -377,7 +383,7 @@
   }
 
   /* over write bootstrap */
-  li {
+  a {
     font-size: 14px;
   }
 
@@ -393,7 +399,7 @@
 span.fixed-content-dropdown {
   padding-bottom: 12px;
 
-  ul.dropdown-menu {
+  div.dropdown-menu {
     overflow-y: auto !important;
     border: 1px solid globals.$ve-slate-lighter-2;
   }

@@ -217,64 +217,65 @@ const SelectComponent: VeComponentOptions = {
     template: `
     <div id="ve-origin-select" class="row">
     <div class="account-wall">
-        <div ng-class="{'fade-in': $ctrl.fromLogin}">
-            <a class="select-logout-button" ng-click="$ctrl.logout()">
-                <div>
-                    <span ng-if="$ctrl.logout_spin"><i class="fa fa-spin fa-spinner"></i></span>
-                    <span ng-if="!$ctrl.logout_spin"><i class="fa fa-arrow-left back-to-account" aria-hidden="true"></i>
-                </div>
-            </a>
-            <img src="img/logo-large.svg" alt="Program Logo">
-        </div>
         <div ng-class="{'animated-fade-in-slide': $ctrl.fromLogin}">
-                <div class="ve-dark-dropdown-wide">
-                    <span class="label-dropdown">Org:</span>
-                    <div class="btn-toolbar select-toolbar" role="toolbar">
-                        <div class="btn-group ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
-                            <button id="org-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
-                                <span>{{ $ctrl.selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
-                            </button>
-                            <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
+            <div>
+                <a class="select-logout-button" ng-click="$ctrl.logout()" uib-tooltip="Return to Login">
+                        <span ng-if="$ctrl.logout_spin"><i class="fa fa-spin fa-spinner"></i></span>
+                        <span ng-if="!$ctrl.logout_spin"><i class="fa fa-arrow-left" aria-hidden="true"></i></span>
+                </a>
+            </div>
+            <div>
+                <img src="img/logo-large.svg" alt="Program Logo">
+            </div>
+            <div class="ve-dark-dropdown-wide">
+                <span class="label-dropdown">Org:</span>
+                <div class="input-group select-toolbar" role="toolbar">
+                    <div class="input-group-prepend ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
+                        <button id="org-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
+                            <span>{{ $ctrl.selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                        </button>
+                        <div class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                                 aria-labelledby="org-btn-keyboard-nav">
-                                <li ng-repeat="org in $ctrl.orgs | orderBy: 'name'" ng-click="$ctrl.selectOrg(org)"
-                                    ng-class="{'checked-list-item': org.name === $ctrl.selectedOrg, 'dropdown-item': true}">{{ org.name }}
-                                </li>
-                            </ul>
+                            <a ng-repeat="org in $ctrl.orgs | orderBy: 'name'" ng-click="$ctrl.selectOrg(org)" class="dropdown-item"
+                                    ng-class="{'checked-list-item': org.name === $ctrl.selectedOrg}">{{ org.name }}
+                            </a>
                         </div>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-info" uib-tooltip="Refresh Orgs" ng-click="$ctrl.refreshOrgs()">
-                                <i ng-show="!$ctrl.orgSpin" class="fa fa-refresh"></i>
-                                <i ng-show="$ctrl.orgSpin" class="fa fa-spin fa-refresh"></i>
-                            </button>
-                        </div>      
                     </div>
-                    <span class="label-dropdown">Project:</span>
-                    <div class="btn-toolbar select-toolbar" role="toolbar">
-                        <div class="btn-group ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
-                            <button id="proj-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle
-                                    ng-disabled="!$ctrl.selectedOrg || !$ctrl.projects.length">
-                                <span ng-hide="$ctrl.projects.length">No Projects for selected Org</span>
-                                <span ng-show="$ctrl.projects.length">{{ $ctrl.selectedProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
-                            </button>
-                            <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
-                                aria-labelledby="proj-btn-keyboard-nav">
-                                <li ng-repeat="project in $ctrl.projects | orderBy: 'name'" ng-click="$ctrl.selectProject(project)"
-                                    ng-class="{'checked-list-item': project.name === $ctrl.selectedProject}">{{ project.name }}
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-info" uib-tooltip="Refresh Projects" ng-click="$ctrl.refreshProjects()">
-                                <i ng-show="!$ctrl.projSpin" class="fa fa-refresh"></i>
-                                <i ng-show="$ctrl.projSpin" class="fa fa-spin fa-refresh"></i>
-                            </button>
-                        </div>  
-                    </div>
+                    <div class="input-group-append" role="group">
+                        <button class="btn btn-info" uib-tooltip="Refresh Orgs" ng-click="$ctrl.refreshOrgs()">
+                            <i ng-show="!$ctrl.orgSpin" class="fa fa-refresh"></i>
+                            <i ng-show="$ctrl.orgSpin" class="fa fa-spin fa-refresh"></i>
+                        </button>
+                    </div>      
                 </div>
-                <button class="btn btn-block btn-primary" type="submit" ng-disabled="!$ctrl.selectedProject || !$ctrl.selectedOrg" ng-click="$ctrl.continue()">Continue
-                    <span ng-if="$ctrl.spin"><i class="fa fa-spin fa-spinner"></i></span>
-                </button>
-            </form>
+            </div>
+            <div class="ve-dark-dropdown-wide">
+                <span class="label-dropdown">Project:</span>
+                <div class="input-group select-toolbar" role="toolbar">
+                    <div class="input-group-prepend ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
+                        <button id="proj-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle
+                                ng-disabled="!$ctrl.selectedOrg || !$ctrl.projects.length">
+                            <span ng-hide="$ctrl.projects.length">No Projects for selected Org</span>
+                            <span ng-show="$ctrl.projects.length">{{ $ctrl.selectedProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                        </button>
+                        <div class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
+                                aria-labelledby="proj-btn-keyboard-nav">
+                            <a ng-repeat="project in $ctrl.projects | orderBy: 'name'" ng-click="$ctrl.selectProject(project)" class="dropdown-item">
+                                <span ng-class="{'checked-list-item': project.name === $ctrl.selectedProject}">{{ project.name }}</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="input-group-append" role="group">
+                        <button class="btn btn-info" uib-tooltip="Refresh Projects" ng-click="$ctrl.refreshProjects()">
+                            <i ng-show="!$ctrl.projSpin" class="fa fa-refresh"></i>
+                            <i ng-show="$ctrl.projSpin" class="fa fa-spin fa-refresh"></i>
+                        </button>
+                    </div>  
+                </div>
+            </div>
+            <button class="btn btn-block btn-primary" type="submit" ng-disabled="!$ctrl.selectedProject || !$ctrl.selectedOrg" ng-click="$ctrl.continue()">Continue
+                <span ng-if="$ctrl.spin"><i class="fa fa-spin fa-spinner"></i></span>
+            </button>
         </div>   
         <br/>
         <login-banner mms-login-banner="$ctrl.loginBanner"></login-banner>

@@ -17,42 +17,42 @@
 // MBEE modules
 @import '../utils/_variables';
 
-.mbee-navbar {
-  height: 36px;
-  background-color: $mbee-navbar-color;
-  width: 100%;
-  padding-top: 5px;
-  padding-bottom: 3px;
-  box-shadow: 2px 2px 4px rgba(0,0,0,0.25);
-}
+// .mbee-navbar {
+//   height: 36px;
+//   background-color: $mbee-navbar-color;
+//   width: 100%;
+//   padding-top: 5px;
+//   padding-bottom: 3px;
+//   box-shadow: 2px 2px 4px rgba(0,0,0,0.25);
+// }
 
-.navbar-brand {
-  height: 100%;
-  color: $mbee-navbar-text;
-  display:flex;
-  font-size: 16px;
-  align-items: center;
-  img {
-    height: 28px;
-    padding-right: .5em;
-    position: relative;
-    top: -2px;
-  }
-}
+// .navbar-brand {
+//   height: 100%;
+//   color: $mbee-navbar-text;
+//   display: flex;
+//   font-size: 16px;
+//   align-items: center;
+//   img {
+//     height: globals.$nav-height;
+//     padding-right: .5em;
+//     position: relative;
+//     top: -2px;
+//   }
+// }
 
-.navbar-toggler-icon {
-  font-size: x-small;
-}
+// .navbar-toggler-icon {
+//   font-size: x-small;
+// }
 
-.nav-link {
-  height: 100%;
-  color: $mbee-navbar-text;
-  font-size: 16px;
-}
+// .nav-link {
+//   height: 100%;
+//   color: $mbee-navbar-text;
+//   font-size: 16px;
+// }
 
-.small-screen-navbar {
-  background-color: $mbee-navbar-color;
-  width: 100%;
-  padding-top: 5px;
-  padding-bottom: 3px;
-}
+// .small-screen-navbar {
+//   background-color: $mbee-navbar-color;
+//   width: 100%;
+//   padding-top: 5px;
+//   padding-bottom: 3px;
+// }

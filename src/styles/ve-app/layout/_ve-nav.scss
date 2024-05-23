@@ -75,7 +75,6 @@ a.switch-org:hover {
   padding: 5px 7px;
   font-size: 20px;
   line-height: 22px;
-  height: globals.$nav-height;
 
   img {
     height: 26px;
@@ -228,7 +227,7 @@ ul.global-menu {
   color: white;
 
   &:hover {
-    background-color: globals.$ve-accent-darker;
+    background: globals.$ve-accent-darker;
   }
 }
 

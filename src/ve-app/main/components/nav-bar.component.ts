@@ -152,54 +152,43 @@ const NavBarComponent: VeComponentOptions = {
         mmsRef: '<',
     },
     template: `
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="block">
-        <div class="navbar-header">
-            <a class="navbar-brand" ui-sref="main.login.select">
-                <img src="img/logo.svg" alt="View Editor Logo">
-            </a>
-            <a ng-if="!$ctrl.orgLink" class="org-title" ui-sref="'main.project.ref.portal({projectId: $ctrl.project.id, refId: $ctrl.mmsRef.id})">{{ $ctrl.org.name }}</a>
-            <a ng-if="$ctrl.orgLink" class="org-title" ng-href="{{$ctrl.orgLink}}">{{ $ctrl.org.name }}</a>
-            <a class="switch-org" ng-click="$ctrl.updateOrg()">Switch Org</a>
-            <button type="button" class="navbar-toggler main-nav-toggle" ng-click="$ctrl.isNavCollapsed = !$ctrl.isNavCollapsed">
-                <span class="sr-only">Toggle navigation</span>
-                <i class="fa fa-bars" aria-hidden="true"></i>
-            </button>
+    <nav class="navbar navbar-inverse navbar-expand navbar-fixed-top" role="navigation">
+    <a class="navbar-brand" ui-sref="main.login.select">
+        <img src="img/logo.svg" alt="View Editor Logo">
+    </a>
+    <a ng-if="!$ctrl.orgLink" class="navbar-text org-title" ui-sref="'main.project.ref.portal({projectId: $ctrl.project.id, refId: $ctrl.mmsRef.id})">{{ $ctrl.org.name }}</a>
+    <a ng-if="$ctrl.orgLink" class="navbar-text org-title" ng-href="{{$ctrl.orgLink}}">{{ $ctrl.org.name }}</a>
+    <a class="switch-org" ng-click="$ctrl.updateOrg()">Switch Org</a>
+    <button type="button" class="navbar-toggler" 
+            ng-click="$ctrl.isNavCollapsed = !$ctrl.isNavCollapsed"
+            aria-controls="global-navigation"
+            data-toggle="collapse" 
+            data-target="#global-navigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="navbar-toggler-icon"></span>
+    </button>
         </div>
-        <div class="collapse navbar-collapse" id="global-navigation">
-            <form id="global-search" ng-show="$ctrl.showSearch" ng-submit="$ctrl.search(searchText)" class="form-inline navbar-form navbar-left" role="search">
-                <div class="form-group">
-                    <input placeholder="Search selected project" ng-model="searchText"/>
+        <div class="collapse navbar-collapse" uib-collapse="$ctrl.isNavCollapsed" id="global-navigation">
+            <form id="global-search" ng-show="$ctrl.showSearch" ng-submit="$ctrl.search(searchText)" class="form-inline ml-auto" role="search">
+                    <input placeholder="Search selected project" ng-model="searchText" class="form-control" />
                     <button ng-click="$ctrl.search(searchText)">
                         <i class="fa fa-search" aria-hidden="true"></i>
                     </button>
-                </div>
             </form>
             <ul class="nav navbar-nav global-menu">
                 <li class="nav-item dropdown">
                     <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown" uib-dropdown on-toggle="$ctrl.toggled(open)">
                         <a href id="help-dropdown" class="dropdown-toggle" uib-dropdown-toggle>
-                        Help <i class="fa fa-caret-down" aria-hidden="true"></i>
+                            Help <i class="fa fa-caret-down" aria-hidden="true"></i>
                         </a>
-                        <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="help-dropdown">
-                            <li>
-                                <a href="" ng-click="$ctrl.toggleHelp()">Keyboard Shortcuts</a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="https://docs.openmbee.org/projects/ve" target="_blank">View Editor Help</a>
-                            </li>
-                            <li>
-                                <a href="https://github.com/Open-MBEE/ve/issues" target="_blank">Report Issue</a>
-                            </li>
-                            <li class="divider"></li>
-                            <li ng-if="$ctrl.user && $ctrl.user.admin">
-                                <a ng-click="$ctrl.toggleAbout()" href="">About View Editor</a>
-                            </li>
-                            <li class="list-section-bottom">
-                                <a ng-click="$ctrl.toggleAbout()" href="">About View Editor</a>
-                            </li>
-                         </ul>
+                        <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu aria-labelledby="help-dropdown">
+                            <a class="dropdown-item" href="" ng-click="$ctrl.toggleHelp()">Keyboard Shortcuts</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="https://docs.openmbee.org/projects/ve" target="_blank">View Editor Help</a>
+                            <a class="dropdown-item" href="https://github.com/Open-MBEE/ve/issues" target="_blank">Report Issue</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" ng-click="$ctrl.toggleAbout()" href="">About View Editor</a>
+                        </div>
                     </span>
                 </li>
                 <li class="nav-item dropdown">
@@ -207,28 +196,19 @@ const NavBarComponent: VeComponentOptions = {
                         <a href id="login-dropdown" class="dropdown-toggle" uib-dropdown-toggle>
                             <div>{{ $ctrl.userBadge }}</div>
                         </a>
-                        <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap" role="login-menu">
-                            <li>
-                                <a ui-sref="main.admin.user({ user: $ctrl.user.username })">User Profile</a>
-                            </li>
-                            <li>
-                                <a ui-sref="main.admin.user.settings({ user: $ctrl.user.username })">User Settings</a>
-                            </li>
-                            <li>
-                                <a ui-sref="main.admin.orgs">Admin</a>
-                            </li>
-                            <li ng-if="$ctrl.username" class="ve-secondary">
+                        <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap" role="login-menu">
+                            <a class="dropdown-item" ui-sref="main.admin.user({ user: $ctrl.user.username })">User Profile</a>
+                            <a class="dropdown-item" ui-sref="main.admin.user.settings({ user: $ctrl.user.username })">User Settings</a>
+                            <a class="dropdown-item" ui-sref="main.admin.orgs">Admin</a>
+                            <div ng-if="$ctrl.username" class="ve-secondary dropdown-item-text">
                                 Logged in as <b ng-if="$ctrl.user.firstName !== undefined">{{ $ctrl.user.firstName }} {{ $ctrl.user.lastName }}</b> ({{ $ctrl.username }})
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a ng-click="$ctrl.logout()">Log Out</a>
-                            </li>
-                         </ul>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" ng-click="$ctrl.logout()">Log Out</a>
+                        </div>
                     </span>
                 </li>
             </ul>
-        </div>
     </div>
 </nav>
 `,

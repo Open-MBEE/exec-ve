@@ -6,7 +6,7 @@
 @import "~angular-growl-v2/src/growl.css";
 @import "~@fortawesome/fontawesome-free/css/all.css";
 @import "~@openmbee/pane-layout/styles/styles.css";
-@import "~bootstrap/scss/bootstrap";
+
 
 /* Local Bootstrap */
 $enable-gradients: true;
@@ -16,7 +16,7 @@ $theme-colors: (
 );
 $enable-caret: false;
 
-
+@import "~bootstrap/scss/bootstrap";
 
 /* Import VE Directive Styles */
 @import "ve-components";
