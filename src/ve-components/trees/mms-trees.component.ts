@@ -537,7 +537,7 @@ const TreesComponent: VeComponentOptions = {
     selector: 'mmsTrees',
     template: `
 
-<ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
+
     <div class="tree-view" style="display:table;">
         <!--
         <div class="container-fluid">
@@ -549,7 +549,6 @@ const TreesComponent: VeComponentOptions = {
         </div>
         <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>
     </div>
-</ng-pane>
 `,
     bindings: {
         toolbarId: '@',

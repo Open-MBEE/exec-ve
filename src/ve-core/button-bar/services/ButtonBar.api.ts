@@ -1,4 +1,4 @@
-import { BarButton } from '@ve-core/button-bar';
+import { BarButton, IButtonBarButton } from '@ve-core/button-bar';
 
 export interface ButtonWrapEvent {
     oldSize: number;
@@ -63,7 +63,7 @@ export class ButtonBarApi {
         });
     };
 
-    public addButton = (button: BarButton): void => {
+    public addButton = (button: IButtonBarButton): void => {
         if (this.buttons.length === 0) {
             button.placement = 'bottom-left';
         } else if (!button.placement) {

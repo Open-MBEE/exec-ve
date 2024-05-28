@@ -1,4 +1,4 @@
-export * from './services/BarButton.api';
+export * from './bar-button.component';
 export * from './services/ButtonBar.api';
 
 //Service

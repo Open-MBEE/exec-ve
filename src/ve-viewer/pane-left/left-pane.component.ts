@@ -3,7 +3,7 @@ import { IPaneManagerService } from '@openmbee/pane-layout/lib/PaneManagerServic
 import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
 
 import { TreeService } from '@ve-components/trees';
-import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
+import { ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
 import { ConfirmDeleteModalResolveFn } from '@ve-core/modals';
 import { RootScopeService } from '@ve-utils/application';
@@ -40,6 +40,7 @@ class LeftPaneController implements angular.IComponentController {
     public bars: string[];
     private headerSize: string = '83px';
     protected squishSize: number = 250;
+    private buttons: IButtonBarButton[];
 
     //Bindings
     private mmsProject: ProjectObject;
@@ -215,47 +216,48 @@ class LeftPaneController implements angular.IComponentController {
             })
         )
 */
-        this.bbApi = this.buttonBarSvc.initApi(this.buttonId, this.bbInit, left_default_buttons);
-        this.buttonBarSvc.waitForApi(this.buttonId).then(
-            (api) => {
-                this.bbApi = api;
-                this.subs.push(
-                    this.eventSvc.$on<veCoreEvents.buttonClicked>(this.buttonId, (data) => {
-                        switch (data.clicked) {
-                            case 'tree-reorder-view': {
-                                this.bbApi.toggleButton('tree-full-document', false);
-                                void this.$state.go('main.project.ref.view.reorder', {
-                                    search: undefined,
-                                });
-                                break;
-                            }
-                            case 'tree-reorder-group': {
-                                void this.$state.go('main.project.ref.groupReorder');
-                                break;
-                            }
-                            case 'tree-full-document': {
-                                this.fullDocMode();
-                                break;
-                            }
-                            case 'tree-refresh': {
-                                this.reloadData();
-                                break;
-                            }
-                            case 'tree-delete': {
-                                this.deleteItem();
-                                break;
-                            }
-                            case 'tree-show-pe': {
-                                this.bbApi.toggleButton('tree-show-pe');
-                            }
-                        }
-                    })
-                );
-            },
-            (reason) => {
-                console.log(reason.message);
-            }
-        );
+        //this.bbApi = this.buttonBarSvc.initApi(this.buttonId, this.bbInit, left_default_buttons);
+        this.buttonBarSvc.registerButtons(left_default_buttons);
+        // this.buttonBarSvc.waitForApi(this.buttonId).then(
+        //     (api) => {
+        //         this.bbApi = api;
+        //         this.subs.push(
+        //             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.buttonId, (data) => {
+        //                 switch (data.clicked) {
+        //                     case 'tree-reorder-view': {
+        //                         this.bbApi.toggleButton('tree-full-document', false);
+        //                         void this.$state.go('main.project.ref.view.reorder', {
+        //                             search: undefined,
+        //                         });
+        //                         break;
+        //                     }
+        //                     case 'tree-reorder-group': {
+        //                         void this.$state.go('main.project.ref.groupReorder');
+        //                         break;
+        //                     }
+        //                     case 'tree-full-document': {
+        //                         this.fullDocMode();
+        //                         break;
+        //                     }
+        //                     case 'tree-refresh': {
+        //                         this.reloadData();
+        //                         break;
+        //                     }
+        //                     case 'tree-delete': {
+        //                         this.deleteItem();
+        //                         break;
+        //                     }
+        //                     case 'tree-show-pe': {
+        //                         this.bbApi.toggleButton('tree-show-pe');
+        //                     }
+        //                 }
+        //             })
+        //         );
+        //     },
+        //     (reason) => {
+        //         console.log(reason.message);
+        //     }
+        // );
     }
 
     $onDestroy(): void {
@@ -264,9 +266,12 @@ class LeftPaneController implements angular.IComponentController {
     }
 
     bbInit = (api: ButtonBarApi): void => {
+        this.buttons = [];
         api.buttons.length = 0;
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-expand'));
+        this.buttons.push(this.buttonBarSvc.getButtonBarButton('tree-expand'));
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-collapse'));
+        this.buttons.push('tree-collapse');
         /*api.addButton(this.buttonBarSvc.getButtonBarButton('tree-add'))
         api.setPermission('tree-add', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-delete'))
@@ -286,7 +291,9 @@ class LeftPaneController implements angular.IComponentController {
 
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-view'))*/
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-full-document'));
+        this.buttons.push('tree-full-document');
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-show-pe'));
+        this.buttons.push('tree-show-pe');
         //api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
         if (this.rootScopeSvc.veFullDocMode()) {
             api.toggleButton('tree-full-document', true);
@@ -656,7 +663,9 @@ const LeftPaneComponent: VeComponentOptions = {
             
             <i ng-hide="$ctrl.bbApi" class="fa fa-spinner fa-spin" style="margin: 5px 50%"></i>
             <div ng-show="$ctrl.bbApi" class="tree-view-buttons" role="toolbar">
-                <button-bar button-id="$ctrl.buttonId"></button-bar>
+                <button-bar button-id="$ctrl.buttonId" buttons="left_default_buttons">
+                    <bar-button ng-repeat="button in $ctrl.buttons" button-id="tree-expand"></bar-button>
+                </button-bar>
             </div>
             <div class="tree-options">
                 <input ng-hide="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
@@ -665,7 +674,9 @@ const LeftPaneComponent: VeComponentOptions = {
             </div>
         </div>
     </ng-pane>
-    <mms-trees toolbar-id="{{$ctrl.toolbarId}}" button-id="{{$ctrl.buttonId}}"></mms-trees>
+    <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
+        <mms-trees toolbar-id="{{$ctrl.toolbarId}}" button-id="{{$ctrl.buttonId}}"></mms-trees>
+    </ng-pane>
 </div>
   
   

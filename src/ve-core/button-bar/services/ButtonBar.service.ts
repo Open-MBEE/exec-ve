@@ -1,4 +1,6 @@
-import { BarButton, ButtonBarApi, IButtonBarButton } from '@ve-core/button-bar';
+import _ from 'lodash';
+
+import { ButtonBarApi, IButtonBarButton } from '@ve-core/button-bar';
 import { EventService } from '@ve-utils/core';
 
 import { veUtils } from '@ve-utils';
@@ -111,9 +113,9 @@ export class ButtonBarService {
         });
     }
 
-    getButtonBarButton = (buttonId: string, ctrl?: EditorActions): BarButton => {
+    getButtonBarButton = (buttonId: string, ctrl?: EditorActions): IButtonBarButton => {
         if (Object.prototype.hasOwnProperty.call(this.buttons, buttonId)) {
-            const newButton = new BarButton(buttonId, this.buttons[buttonId]);
+            const newButton = _.cloneDeep(this.buttons[buttonId]);
             if (this.buttons[buttonId].dropdown) {
                 newButton.dropdown_buttons = [];
                 for (const id of this.buttons[buttonId].dropdown.ids) {
@@ -121,14 +123,14 @@ export class ButtonBarService {
                 }
             }
             if (this.buttons[buttonId].api && ctrl && ctrl[this.buttons[buttonId].api]) {
-                newButton.setAction((event): void => {
+                newButton.action = (event): void => {
                     if (event) event.stopPropagation();
                     (ctrl[this.buttons[buttonId].api] as () => void)();
-                });
+                };
             }
             return newButton;
         } else {
-            return new BarButton(buttonId);
+            return _.cloneDeep(default_buttons[0]);
         }
     };
 
