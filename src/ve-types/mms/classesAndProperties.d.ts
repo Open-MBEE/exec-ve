@@ -1,5 +1,9 @@
 import { ElementObject } from '@ve-types/mms';
 
+export interface ClassObject extends ElementObject {
+    ownedAttributes: PropertyObject[];
+}
+
 export interface AssociationObject extends ElementObject {
     memberEnds: PropertyObject[];
     ownedEnds: string[];
@@ -9,7 +13,9 @@ export interface AssociationObject extends ElementObject {
 export interface PropertyObject extends ElementObject {
     propertyType: ElementObject;
     association?: AssociationObject;
-    aggregation: 'composite' | 'shared' | 'none';
+    aggregation: AggregationKind;
     upperValue?: string;
     lowerValue?: string;
 }
+
+export type AggregationKind = 'composite' | 'shared' | 'none';

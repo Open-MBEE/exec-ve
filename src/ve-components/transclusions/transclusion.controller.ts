@@ -356,7 +356,7 @@ export class Transclusion implements ITransclusion, EditorActions {
             commitId: this.commitId,
             //includeRecentVersionElement: true,
         };
-        const successCallback = <T extends ElementObject>(element: T) => {
+        const successCallback = <T extends ElementObject>(element: T): void => {
             this.element = element;
             if (!this.panelTitle) {
                 this.panelTitle = this.element.name + ' ' + this.cfTitle;
