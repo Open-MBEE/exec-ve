@@ -1,5 +1,4 @@
 import { StateService } from '@uirouter/angularjs';
-import { veViewer } from '@ve-viewer';
 import { IComponentController } from 'angular';
 import Rx from 'rx-lite';
 
@@ -8,6 +7,7 @@ import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
 import { PermissionService } from '@ve-utils/mms-api-client';
+import { veViewer } from '@ve-viewer';
 
 import { left_default_toolbar, left_dynamic_toolbar } from './left-buttons.config';
 
@@ -118,7 +118,7 @@ class LeftToolbarController implements IComponentController {
         }
         if (toggleDeactivateFlag) {
             this.toolbarSvc.waitForApi(this.toolbarId).then(
-                (api) => api.deactivate(button.id),
+                (api) => api.deactivate(button.toolId),
                 (reason) => this.growl.error(ToolbarService.error(reason))
             );
         }

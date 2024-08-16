@@ -1,7 +1,8 @@
 import { ComponentService, ExtensionService } from '@ve-components/services';
 import { Transclusion } from '@ve-components/transclusions';
-import { ButtonBarService } from '@ve-core/button-bar';
+import { BarButton, ButtonBarService } from '@ve-core/button-bar';
 import { EditorService } from '@ve-core/editor';
+import { veCoreEvents } from '@ve-core/events';
 import { ImageService } from '@ve-core/image';
 import { UtilsService, MathService } from '@ve-utils/application';
 import { EditService, EventService } from '@ve-utils/core';
@@ -54,11 +55,10 @@ export class DeletableTransclusion extends Transclusion {
 
     $onInit(): void {
         super.$onInit();
+
         if (this.mmsViewPresentationElemCtrl) {
             // delete is used for transclude doc, com, or section
-            this.delete = (): void => {
-                this.deleteAction();
-            };
+
             const instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec();
             const presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement();
             const isOpaque =
@@ -80,13 +80,24 @@ export class DeletableTransclusion extends Transclusion {
         }
     }
 
-    protected deleteAction = (): void => {
+    protected bbInit(): void {
+        super.bbInit();
+        if (this.isDeletable) {
+            this.subs.push(
+                this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
+                    if (data.clicked == 'editor-delete') {
+                        this.deleteAction(data.button as BarButton);
+                    }
+                })
+            );
+        }
+    }
+
+    protected deleteAction = (button: BarButton): void => {
         if (this.elementSaving) {
             this.growl.info('Please Wait...');
             return;
         }
-
-        this.bbApi.toggleButtonSpinner('editor-delete');
 
         this.editorSvc
             .deleteConfirmModal(this.edit)
@@ -116,7 +127,7 @@ export class DeletableTransclusion extends Transclusion {
                 );
             })
             .finally(() => {
-                this.bbApi.toggleButtonSpinner('editor-delete');
+                button.handleSpin(false);
             });
     };
 }

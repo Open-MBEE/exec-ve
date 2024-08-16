@@ -3,12 +3,19 @@ import { IPaneManagerService } from '@openmbee/pane-layout/lib/PaneManagerServic
 import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs';
 
 import { TreeService } from '@ve-components/trees';
-import { ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar';
+import { BarButton, ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
 import { ConfirmDeleteModalResolveFn } from '@ve-core/modals';
 import { RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { ApiService, ElementService, PermissionService, ProjectService, ViewService } from '@ve-utils/mms-api-client';
+import {
+    ApiService,
+    DocumentMetadata,
+    ElementService,
+    PermissionService,
+    ProjectService,
+    ViewService,
+} from '@ve-utils/mms-api-client';
 import { SchemaService } from '@ve-utils/model-schema';
 import { veViewer } from '@ve-viewer';
 import { veViewerEvents } from 've-viewer/events';
@@ -29,6 +36,12 @@ import {
 import { TreeApi, TreeBranch } from '@ve-types/tree';
 import { VeModalService } from '@ve-types/view-editor';
 
+interface ILeftPaneControllerBindings {
+    mmsProject: ProjectObject;
+    mmsRef: RefObject;
+    mmsRoot: ElementObject;
+}
+
 class LeftPaneController implements angular.IComponentController {
     //Scope
     public subs: Rx.IDisposable[];
@@ -43,19 +56,27 @@ class LeftPaneController implements angular.IComponentController {
     private buttons: IButtonBarButton[];
 
     //Bindings
+    private bindings: ILeftPaneControllerBindings;
     private mmsProject: ProjectObject;
     private mmsRef: RefObject;
     private mmsRoot: ElementObject;
+    private mmsDocMeta: DocumentMetadata;
 
     //Tree Api
     private treeApi: TreeApi;
 
     //Local Variables
     toolbarId: string = 'left-toolbar';
-    buttonId: string = 'tree-button-bar';
+    barId: string = 'tree-button-bar';
+
+    treeOptionsEl: JQuery<HTMLElement>;
+    treeOptionsSize: number = 0;
+    treeOptionsPx: string = '1px';
 
     schema = 'cameo';
     filterInputPlaceholder = 'Filter';
+    filterShow: boolean = false;
+    filterToggleEvent = 'tree-filter';
     treeFilter = '';
 
     static $inject = [
@@ -116,22 +137,18 @@ class LeftPaneController implements angular.IComponentController {
         //Init/Reset Tree Updated Subject
         this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false);
 
-        this.transitionCallback();
-
         this.eventSvc.$init(this);
 
         this.bbSize = '83px';
-
-        this.$transitions.onSuccess({}, () => {
-            this.transitionCallback();
-        });
 
         //Init Pane Toggle Controls
         this.rootScopeSvc.leftPaneClosed(this.$pane.closed);
 
         this.subs.push(
-            this.$pane.$toggled.subscribe(() => {
-                this.rootScopeSvc.leftPaneClosed(this.$pane.closed);
+            this.$paneManager.$onToggled.subscribe((e) => {
+                if (e.pane === this.$pane.id) {
+                    this.rootScopeSvc.leftPaneClosed(e.closed);
+                }
             })
         );
 
@@ -196,82 +213,69 @@ class LeftPaneController implements angular.IComponentController {
                 );
             })
         );
-        /*
+
+        this.buttonBarSvc.registerButtons(left_default_buttons);
+        this.bbInit();
+
+        this.eventSvc.resolve<boolean>(this.filterToggleEvent, this.filterShow);
+
         this.subs.push(
-            this.eventSvc.$on('tree.ready', () => {
-                if (!this.bbApi) {
-                    this.bbApi = this.buttonBarSvc.initApi(this.buttonId, this.bbInit, left_default_buttons)
-                    this.subs.push(
-                        this.eventSvc.$on(this.bbApi.WRAP_EVENT, (data: ButtonWrapEvent) => {
-                            if (data.oldSize != data.newSize) {
-                                const treeOptions = $('.tree-options').outerHeight()
-                                const buttonSize = $('.tree-view-buttons').outerHeight()
-                                const calcSize = Math.round(treeOptions + buttonSize)
-                                this.headerSize = calcSize.toString(10) + 'px'
-                                this.$scope.$apply()
-                            }
-                        })
-                    )
+            this.eventSvc.$on<veCoreEvents.buttonClicked>(this.barId, (data) => {
+                switch (data.clicked) {
+                    case 'tree-reorder-view': {
+                        void this.$state.go('main.project.ref.view.reorder', {
+                            search: undefined,
+                        });
+                        break;
+                    }
+                    case 'tree-reorder-group': {
+                        void this.$state.go('main.project.ref.groupReorder');
+                        break;
+                    }
+                    case 'tree-full-document': {
+                        this.fullDocMode(data.button);
+                        break;
+                    }
+                    case 'tree-refresh': {
+                        this.reloadData(data.button);
+                        break;
+                    }
+                    case 'tree-delete': {
+                        this.deleteItem();
+                        break;
+                    }
+                    case 'tree-show-pe': {
+                        break;
+                    }
+                    case 'tree-filter': {
+                        this.filterShow = !this.filterShow;
+                        this.eventSvc.resolve<boolean>(this.filterToggleEvent, this.filterShow);
+                    }
                 }
             })
-        )
-*/
-        //this.bbApi = this.buttonBarSvc.initApi(this.buttonId, this.bbInit, left_default_buttons);
-        this.buttonBarSvc.registerButtons(left_default_buttons);
-        // this.buttonBarSvc.waitForApi(this.buttonId).then(
-        //     (api) => {
-        //         this.bbApi = api;
-        //         this.subs.push(
-        //             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.buttonId, (data) => {
-        //                 switch (data.clicked) {
-        //                     case 'tree-reorder-view': {
-        //                         this.bbApi.toggleButton('tree-full-document', false);
-        //                         void this.$state.go('main.project.ref.view.reorder', {
-        //                             search: undefined,
-        //                         });
-        //                         break;
-        //                     }
-        //                     case 'tree-reorder-group': {
-        //                         void this.$state.go('main.project.ref.groupReorder');
-        //                         break;
-        //                     }
-        //                     case 'tree-full-document': {
-        //                         this.fullDocMode();
-        //                         break;
-        //                     }
-        //                     case 'tree-refresh': {
-        //                         this.reloadData();
-        //                         break;
-        //                     }
-        //                     case 'tree-delete': {
-        //                         this.deleteItem();
-        //                         break;
-        //                     }
-        //                     case 'tree-show-pe': {
-        //                         this.bbApi.toggleButton('tree-show-pe');
-        //                     }
-        //                 }
-        //             })
-        //         );
-        //     },
-        //     (reason) => {
-        //         console.log(reason.message);
-        //     }
-        // );
+        );
+    }
+
+    $postLink(): void {
+        this.treeOptionsEl = $('#tree-options');
+    }
+
+    $doCheck(): void {
+        if (this.treeOptionsEl && this.treeOptionsSize != this.treeOptionsEl.height()) {
+            this.treeOptionsSize = this.treeOptionsEl.height();
+            this.treeOptionsPx = this.treeOptionsSize.toFixed(0) + 'px';
+        }
     }
 
     $onDestroy(): void {
         this.eventSvc.$destroy(this.subs);
-        this.buttonBarSvc.destroy(this.buttonId);
     }
 
-    bbInit = (api: ButtonBarApi): void => {
+    bbInit = (): void => {
         this.buttons = [];
-        api.buttons.length = 0;
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-expand'));
-        this.buttons.push(this.buttonBarSvc.getButtonBarButton('tree-expand'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-collapse'));
-        this.buttons.push('tree-collapse');
+
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('tree-expand'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('tree-collapse'));
         /*api.addButton(this.buttonBarSvc.getButtonBarButton('tree-add'))
         api.setPermission('tree-add', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-delete'))
@@ -290,19 +294,22 @@ class LeftPaneController implements angular.IComponentController {
         api.setPermission('tree-add.view', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
 
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-view'))*/
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-full-document'));
-        this.buttons.push('tree-full-document');
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-show-pe'));
-        this.buttons.push('tree-show-pe');
-        //api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
-        if (this.rootScopeSvc.veFullDocMode()) {
-            api.toggleButton('tree-full-document', true);
-        }
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-refresh'));
-        api.checkActive((state: string) => {
-            return this.$state.includes(state);
-        });
+        const fullTree = this.buttonBarSvc.getButtonDefinition('tree-full-document');
+        fullTree.toggleEvent = this.rootScopeSvc.constants.VEFULLDOCMODE;
+        this.buttons.push(fullTree);
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('tree-show-pe'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('tree-refresh'));
+        const filterTree = this.buttonBarSvc.getButtonDefinition('tree-filter');
+        filterTree.toggleEvent = this.filterToggleEvent;
+        this.buttons.push(filterTree);
+        // api.checkActive((state: string) => {
+        //     return this.$state.includes(state);
+        // });
     };
+
+    bbCallback(state: string): boolean {
+        return this.$state.includes(state);
+    }
 
     changeData = (data: veCoreEvents.elementSelectedData): void => {
         //If the transitioning state detects a refresh, it will let us know to regenerate the tree
@@ -357,39 +364,21 @@ class LeftPaneController implements angular.IComponentController {
 
                     new this.$q<ElementObject, ElementsResponse<ElementObject>>((resolve, reject) => {
                         if (this.$state.includes('**.present.**')) {
+                            if (this.mmsDocMeta) {
+                                this.treeApi.numberingDepth = this.mmsDocMeta.numberingDepth;
+                                this.treeApi.numberingSeparator = this.mmsDocMeta.numberingSeparator;
+                                this.treeApi.startChapter = 1;
+                            } else {
+                                this.treeApi.numberingDepth = 0;
+                                this.treeApi.numberingSeparator = '.';
+                                this.treeApi.startChapter = 1;
+                            }
                             const reqOb: ElementsRequest<string> = {
                                 elementId: this.treeApi.rootId,
                                 refId: this.treeApi.refId,
                                 projectId: this.treeApi.projectId,
                             };
-                            this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
-                                // TODO this call is taking a long time that keeps the tree from being visible, need
-                                // to see if it can be moved to a resolve or faster
-                                /*if (this.apiSvc.isDocument(root) && this.$state.includes('**.present.**')) {
-                                    this.viewSvc
-                                        .getDocumentMetadata({
-                                            elementId: root.id,
-                                            refId: root._refId,
-                                            projectId: root._projectId,
-                                        })
-                                        .then((result) => {
-                                            this.treeApi.numberingDepth = result.numberingDepth
-                                            this.treeApi.numberingSeparator = result.numberingSeparator
-                                            this.treeApi.startChapter = (root as DocumentObject)._startChapter
-                                                ? (root as DocumentObject)._startChapter
-                                                : 1
-
-                                            if (!(root as DocumentObject)._childViews)
-                                                (root as DocumentObject)._childViews = []
-                                            resolve(root)
-                                        }, reject)
-                                } else {*/
-                                this.treeApi.numberingDepth = 0;
-                                this.treeApi.numberingSeparator = '.';
-                                this.treeApi.startChapter = 1;
-                                resolve(root);
-                                //}
-                            }, reject);
+                            this.elementSvc.getElement<ViewObject>(reqOb).then(resolve, reject);
                         } else {
                             resolve(null);
                         }
@@ -415,17 +404,6 @@ class LeftPaneController implements angular.IComponentController {
                 this.growl.error(TreeService.treeError(reason));
             });
         }
-    };
-
-    transitionCallback = (): void => {
-        this.buttonBarSvc.waitForApi(this.buttonId).then(
-            (api) => {
-                this.bbApi = api;
-            },
-            (reason) => {
-                console.log(reason.message);
-            }
-        );
     };
 
     treeClickCallback = (branch: TreeBranch<ElementObject>): void => {
@@ -487,12 +465,9 @@ class LeftPaneController implements angular.IComponentController {
         this.eventSvc.$broadcast<string>(TreeService.events.FILTER, this.treeFilter);
     };
 
-    public fullDocMode = (): void => {
+    public fullDocMode = (button: BarButton): void => {
         let display = '';
-        this.bbApi.toggleButton(
-            'tree-full-document',
-            this.rootScopeSvc.veFullDocMode(!this.rootScopeSvc.veFullDocMode())
-        );
+        button.handleToggle(this.rootScopeSvc.veFullDocMode(!this.rootScopeSvc.veFullDocMode()));
         if (this.rootScopeSvc.veFullDocMode()) {
             display = 'document';
         } else {
@@ -504,8 +479,7 @@ class LeftPaneController implements angular.IComponentController {
         });
     };
 
-    reloadData = (): void => {
-        this.bbApi.toggleButtonSpinner('tree-refresh');
+    reloadData = (button: BarButton): void => {
         this.treeSvc.processedRoot = '';
         const data: veCoreEvents.elementSelectedData = {
             rootId: this.treeApi.rootId,
@@ -517,7 +491,7 @@ class LeftPaneController implements angular.IComponentController {
         };
         this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data);
         const finished = this.eventSvc.$on('tree.ready', () => {
-            this.bbApi.toggleButtonSpinner('tree-refresh');
+            button.handleSpin(false);
             finished.dispose();
         });
     };
@@ -658,19 +632,42 @@ const LeftPaneComponent: VeComponentOptions = {
     transclude: true,
     template: `
     <div class="pane-left">
-    <ng-pane pane-anchor="north" pane-size="{{ $ctrl.headerSize }}" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false" parent-ctrl="$ctrl">
-        <div class="tree-view">
-            
-            <i ng-hide="$ctrl.bbApi" class="fa fa-spinner fa-spin" style="margin: 5px 50%"></i>
-            <div ng-show="$ctrl.bbApi" class="tree-view-buttons" role="toolbar">
-                <button-bar button-id="$ctrl.buttonId" buttons="left_default_buttons">
-                    <bar-button ng-repeat="button in $ctrl.buttons" button-id="tree-expand"></bar-button>
+    <ng-pane pane-id="left-top" 
+            pane-anchor="north" 
+            pane-size="{{ $ctrl.treeOptionsPx }}" 
+            pane-no-toggle="true" 
+            pane-no-scroll="true" 
+            pane-closed="false" 
+            parent-ctrl="$ctrl">
+        <div class="tree-options" id="tree-options">
+            <div class="tree-option-buttons" role="toolbar">
+                <button-bar bar-id="{{$ctrl.barId}}" menu="true">
+                    <bar-button ng-repeat="button in $ctrl.buttons"
+                        activation-cb="$ctrl.$state.includes(state)"
+                        button-id="{{button.buttonId}}"
+                        icon="{{button.icon}}"
+                        placement="{{button.placement}}"
+                        selectable="button.selectable"
+                        spinnable="button.spinnable"
+                        tooltip="{{button.tooltip}}"
+                        toggleable="button.toggleable"
+                        toggled-tooltip="{{button.toggledTooltip}}"
+                        caret="button.caret"
+                        dropdown-ids="button.dropdownIds"
+                        api="{{button.api ? buton.api : ''}}"
+                        action="button.action"
+                        class-name="{{button.className ? button.className : ''}}"
+                        label="button.label"
+                        enabled-for="button.enabledFor"
+                        disabled-for="button.disabledFor"
+                    ></bar-button>
                 </button-bar>
             </div>
-            <div class="tree-options">
-                <input ng-hide="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
+            <div class="tree-filter" uib-collapse="!$ctrl.filterShow">
+                <input class="ve-plain-input" ng-model-options="{debounce: 1000}" 
                     ng-model="$ctrl.treeFilter" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
                     ng-change="$ctrl.filterInputChangeHandler();" style="flex:2">
+                </input>
             </div>
         </div>
     </ng-pane>
@@ -685,6 +682,7 @@ const LeftPaneComponent: VeComponentOptions = {
         mmsProject: '<',
         mmsRef: '<',
         mmsRoot: '<',
+        mmsDocMeta: '<',
     },
     require: {
         $pane: '^ngPane',

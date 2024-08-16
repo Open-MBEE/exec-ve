@@ -5,6 +5,9 @@ metadata:
   namespace: {{ include "ve.namespace" . }}
   labels:
     {{- include "ve.labels" . | nindent 4 }}
+{{- if .Values.service.labels }}
+    {{ toYaml .Values.service.labels | indent 4}}
+{{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:

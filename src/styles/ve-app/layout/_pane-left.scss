@@ -8,7 +8,7 @@
 
 $pane-left-btn-group-width: 244px;
 
-#main-pane {
+.pane-main {
   > .west-pane {
     &.ng-pane-orientation-horizontal {
       .ng-pane-handle > .ng-pane-toggle {
@@ -33,38 +33,27 @@ $pane-left-btn-group-width: 244px;
   width: 100%;
   background: globals.$ve-silver-lighter-1;
 
-  .tree-view,
-  .pane-left {
+  .tree-options {
     width: 100%;
-    height: 100%;
+    height: auto;
+    border-bottom: 1px solid globals.$ve-silver-darker-1;
     //min-width: $pane-left-btn-group-width;
-    padding-block-end: 40px;
 
-    .tree-spinner {
-      margin: 50%;
-    }
-
-    .tree-view-buttons {
+    .tree-option-buttons {
       padding: 5px 4px;
       background: globals.$white;
     }
 
-    h4.tree-view-title {
-      display: block;
-      margin: 20px 0;
-    }
-
-    hr.tree-title-divider {
-      margin: 0 -18px;
-      border-color: globals.$ve-silver-darker-2;
-    }
-
-    .tree-options {
+    .tree-filter {
       display: flex;
       padding: 4px 5px;
       background: globals.$white;
       border-top: 1px solid globals.$ve-silver-darker-1;
-      border-bottom: 1px solid globals.$ve-silver-darker-1;
+
+      &.collapse:not(.show) {
+        display: none;
+        padding: 0;
+      }
 
       .ve-plain-input {
         margin: 0 2px;
@@ -76,6 +65,26 @@ $pane-left-btn-group-width: 244px;
         background: transparent;
       }
     }
+  }
+
+  .tree-view {
+    .tree-spinner {
+      margin: 50%;
+    }
+
+    
+
+    h4.tree-view-title {
+      display: block;
+      margin: 20px 0;
+    }
+
+    hr.tree-title-divider {
+      margin: 0 -18px;
+      border-color: globals.$ve-silver-darker-2;
+    }
+
+    
 
     .fa-folder {
       color: color.scale(globals.$ve-accent, $lightness: 12%);

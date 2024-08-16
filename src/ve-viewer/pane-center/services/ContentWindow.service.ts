@@ -1,7 +1,6 @@
-import { veViewer } from '@ve-viewer';
-
 import { RootScopeService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
+import { veViewer } from '@ve-viewer';
 
 export class ContentWindowService {
     static $inject = ['RootScopeService', 'EventService'];

@@ -369,5 +369,6 @@ export const TreeOfAnyComponent: VeComponentOptions = {
         toolbarId: '@',
         buttonId: '@',
         showPe: '<',
+        title: '@',
     },
 };

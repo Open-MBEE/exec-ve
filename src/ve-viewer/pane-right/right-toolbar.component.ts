@@ -114,7 +114,7 @@ class RightToolbarController implements IComponentController {
         }
         if (toggleDeactivateFlag) {
             this.toolbarSvc.waitForApi(this.toolbarId).then(
-                (api) => api.deactivate(button.id),
+                (api) => api.deactivate(button.toolId),
                 (reason) => this.growl.error(ToolbarService.error(reason))
             );
         }

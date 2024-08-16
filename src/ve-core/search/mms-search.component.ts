@@ -1,7 +1,7 @@
 import { StateService } from '@uirouter/angularjs';
 import _ from 'lodash';
 
-import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
+import { ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
 import { search_default_buttons } from '@ve-core/search/mms-search-buttons.config';
 import { UtilsService } from '@ve-utils/application';
@@ -14,7 +14,8 @@ import { veCore } from '@ve-core';
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import {
     DocumentObject,
-    ElementObject, ElementsRequest,
+    ElementObject,
+    ElementsRequest,
     MountObject,
     ProjectObject,
     QueryObject,
@@ -157,6 +158,7 @@ export class SearchController implements angular.IComponentController {
 
     bbId: string;
     bbApi: ButtonBarApi;
+    buttons: IButtonBarButton[];
     private filterList: QueryObject[] = [];
 
     private schema = 'cameo';
@@ -199,10 +201,10 @@ export class SearchController implements angular.IComponentController {
         this.showFilterOptions = !this.mmsOptions.hideFilterOptions;
         if (this.showFilterOptions) {
             this.bbId = this.buttonBarSvc.generateBarId('mms-search');
-            this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, search_default_buttons);
+            this.bbInit();
+            //this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, search_default_buttons);
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
-                this.bbApi.toggleButton(data.clicked);
-                this.filterSearchResults(this.buttonBarSvc.getButtonDefinition(data.clicked).type);
+                this.filterSearchResults(data.clicked);
             });
         }
         this.refId = this.mmsRefId ? this.mmsRefId : 'master';
@@ -312,16 +314,17 @@ export class SearchController implements angular.IComponentController {
         });
     };
 
-    bbInit = (api: ButtonBarApi): void => {
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-document'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-paragraph'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-table'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-image'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-equation'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-comment'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-section'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-view'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-req'));
+    bbInit = (): void => {
+        this.buttonBarSvc.registerButtons(search_default_buttons);
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-document'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-paragraph'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-table'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-image'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-equation'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-comment'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-section'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-view'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('search-filter-req'));
     };
 
     public qualifiedNameFormatter = (qualifiedName: string): string => {
@@ -388,8 +391,9 @@ export class SearchController implements angular.IComponentController {
         return _.includes(this.activeFilter, item);
     };
 
-    public filterSearchResults = (type: string): void => {
-        const tempArr = _.clone(this.activeFilter);
+    public filterSearchResults = (buttonClicked: string): void => {
+        const type: string = buttonClicked.split('-')[2];
+        //const tempArr = _.clone(this.activeFilter);
         if (_.includes(this.activeFilter, type)) {
             _.pull(this.activeFilter, type);
         } else {
@@ -650,7 +654,7 @@ export class SearchController implements angular.IComponentController {
                 if (type.id !== 'all') {
                     const queryOb: QueryObject = { params: {} };
                     if (type.id === 'value') {
-                        queryObs.push({params: {'value.value': query.searchText}});
+                        queryObs.push({ params: { 'value.value': query.searchText } });
                         queryOb.params['defaultValue.value'] = query.searchText;
                     } else {
                         queryOb.params[type.id] = query.searchText;
@@ -661,7 +665,7 @@ export class SearchController implements angular.IComponentController {
         } else {
             const queryOb: QueryObject = { params: {} };
             if (query.searchField.id === 'value') {
-                queryObs.push({params: {'value.value': query.searchText}});
+                queryObs.push({ params: { 'value.value': query.searchText } });
                 queryOb.params['defaultValue.value'] = query.searchText;
             } else {
                 queryOb.params[query.searchField.id] = query.searchText;

@@ -4,7 +4,7 @@ import { SelectModalResolveFn } from '@ve-app/main/modals/select-modal.component
 import { EventService } from '@ve-utils/core';
 import { AuthService, UserService } from '@ve-utils/mms-api-client';
 
-import { veApp } from '@ve-app';
+import { veCore } from '@ve-core';
 
 import { VeComponentOptions } from '@ve-types/angular';
 import { OrgObject, ProjectObject, RefObject, UserObject } from '@ve-types/mms';
@@ -211,4 +211,4 @@ const NavBarComponent: VeComponentOptions = {
     controller: NavBarController,
 };
 
-veApp.component(NavBarComponent.selector, NavBarComponent);
+veCore.component(NavBarComponent.selector, NavBarComponent);

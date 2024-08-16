@@ -154,7 +154,7 @@ export class SpecTool implements ISpecTool {
         this.toolbarSvc.waitForApi(this.toolbarId).then(
             (api) => {
                 if (
-                    api.buttons.map((value) => value.id).filter((value) => value === this.specType).length < 1 &&
+                    api.buttons.map((value) => value.toolId).filter((value) => value === this.specType).length < 1 &&
                     window.__env &&
                     window.__env.enableDebug
                 ) {

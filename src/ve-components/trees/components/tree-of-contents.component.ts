@@ -54,7 +54,17 @@ const TreeOfContentsComponent: VeComponentOptions = {
                         <i ng-hide="row.branch.loading || row.visibleChild" class="fa fa-lg fa-fw"></i>
                         <i ng-hide="row.branch.loading" class="indented tree-icon {{ row.typeIcon }}" ></i>
                         <i ng-show="row.branch.loading" class="indented tree-icon fa-solid fa-spinner fa-spin"></i>
-                        <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
+                        <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">
+                            {{row.section + " "}}
+                            <mms-cf 
+                                    mms-element-id="{{ row.branch.data.id }}" 
+                                    mms-project-id="{{ row.branch.data._projectId }}"
+                                    mms-ref-id="{{ row.branch.data._refId }}"
+                                    mms-commit-id="{{ row.branch.data._commitId }}" 
+                                    mms-cf-type="name"
+                                    no-click="true">
+                            </mms-cf>
+                        </span>
                     </div>
                 </div>
             </div>

@@ -1215,10 +1215,10 @@
     ent "2.2.0"
     htmlparser2 "^6.1.0"
 
-"@openmbee/pane-layout@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.npmjs.org/@openmbee/pane-layout/-/pane-layout-1.1.1.tgz"
-  integrity sha512-/QyyW3mTkznXJ9/GhC7sBHS0mOGrvhP7Tfoohg6oYwu6DzxDH69KCHytvVQUfU8K4SOsVya78zAXYBzGhq4Kmg==
+"@openmbee/pane-layout@../pane-layout/openmbee-pane-layout-1.2.7.tgz":
+  version "1.2.7"
+  resolved "file:../pane-layout/openmbee-pane-layout-1.2.7.tgz"
+  integrity sha512-7b/JrLY2fv5mJalDyrJkQ7CCo006vUhcbsSOmn7nLL4XUGBfOZfwhCR9C/KKKY7cAhW85i1hHvbZpeKNBC/m7A==
   dependencies:
     "@uirouter/angularjs" "^1.0.30"
     angular "^1.8.2"

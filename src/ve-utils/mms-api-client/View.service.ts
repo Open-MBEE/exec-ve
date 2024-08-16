@@ -1587,6 +1587,79 @@ export class ViewService extends BaseApiService {
         });
     }
 
+    public createMetadata(
+        reqOb: ElementsRequest<string>,
+        metadata: DocumentMetadata,
+        weight?: number
+    ): VePromise<DocumentMetadata> {
+        return new this.$q((resolve, reject) => {
+            const elementIds = [
+                `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'Header', this.schema)}`, //header
+                `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'Footer', this.schema)}`, //footer
+                `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>(
+                    'DOCUMENT_IDS',
+                    'NumDepth',
+                    this.schema
+                )}`, //numbering depth
+                `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>('DOCUMENT_IDS', 'NumSep', this.schema)}`, //numbering separator
+            ];
+            const metaReqOb: ElementsRequest<string[]> = Object.assign(reqOb, {
+                elementId: elementIds,
+            });
+            this.elementSvc
+                .getElements<SlotObject>(metaReqOb, weight)
+                .then(
+                    (data) => {
+                        if (data.length === 0) {
+                            return;
+                        }
+                        for (let i = 0; i < data.length; i++) {
+                            const prop = data[i];
+                            const feature: string = prop.definingFeatureId ? prop.definingFeatureId : null;
+                            const value: LiteralObject<unknown>[] = prop.value ? prop.value : null;
+                            if (!feature || !value || !Array.isArray(value)) {
+                                continue;
+                            }
+                            let result: string[] | number[] = [];
+                            if (feature === this.schemaSvc.getValue('DOCUMENT_IDS', 'Header', this.schema, prop.id)) {
+                                //header
+                                result = this.processSlotStrings(value);
+                                metadata.top = result.length > 0 ? result[0] : '';
+                                metadata['top-left'] = result.length > 1 ? result[1] : '';
+                                metadata['top-right'] = result.length > 2 ? result[2] : '';
+                            } else if (
+                                feature == this.schemaSvc.getValue('DOCUMENT_IDS', 'Footer', this.schema, prop.id)
+                            ) {
+                                //footer
+                                result = this.processSlotStrings(value);
+                                metadata.bottom = result.length > 0 ? result[0] : '';
+                                metadata['bottom-left'] = result.length > 1 ? result[1] : '';
+                                metadata['bottom-right'] = result.length > 2 ? result[2] : '';
+                            } else if (
+                                feature == this.schemaSvc.getValue('DOCUMENT_IDS', 'NumDepth', this.schema, prop.id)
+                            ) {
+                                //depth
+                                result = this.processSlotIntegers(value);
+                                metadata.numberingDepth = result.length > 0 ? result[0] : 0;
+                            } else if (
+                                feature == this.schemaSvc.getValue('DOCUMENT_IDS', 'NumSep', this.schema, prop.id)
+                            ) {
+                                //separator
+                                result = this.processSlotStrings(value);
+                                metadata.numberingSeparator = result.length > 0 ? result[0] : '.';
+                            }
+                        }
+                    },
+                    () => {
+                        /* Do nothing */
+                    }
+                )
+                .finally(() => {
+                    resolve(metadata);
+                });
+        });
+    }
+
     public getPresentationElementType = (instanceSpec: ViewInstanceSpec): string => {
         if (instanceSpec.type === 'InstanceSpecification') {
             if (this.isSection(instanceSpec)) {

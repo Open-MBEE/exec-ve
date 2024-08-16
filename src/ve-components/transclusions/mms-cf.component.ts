@@ -2,6 +2,7 @@ import angular, { IComponentController } from 'angular';
 
 import { ViewController } from '@ve-components/presentations/view.component';
 import { ExtensionService } from '@ve-components/services';
+import { TreesController } from '@ve-components/trees/mms-trees.component';
 
 import { veComponents } from '@ve-components';
 
@@ -38,10 +39,12 @@ export class CrossReferenceController implements IComponentController {
     mmsGenerateForDiff: boolean;
     mmsAttr: string;
     mmsCfLabel: boolean = false;
+    noClick: boolean = false;
 
     //Deps
     transclusionCtrl: CrossReferenceController;
     mmsViewCtrl: ViewController;
+    mmsTreeCtrl: TreesController;
 
     //Local
     projectId: string;
@@ -83,13 +86,13 @@ export class CrossReferenceController implements IComponentController {
             if (!projectId) projectId = cfVersion.projectId;
             if (!refId) refId = cfVersion.refId;
             if (!commitId) commitId = cfVersion.commitId;
-        }
-        if (this.mmsViewCtrl) {
+        } else if (this.mmsViewCtrl) {
             const viewVersion = this.mmsViewCtrl.getElementOrigin();
             if (!projectId) projectId = viewVersion.projectId;
             if (!refId) refId = viewVersion.refId;
             if (!commitId) commitId = viewVersion.commitId;
         }
+
         if (!projectId) {
             return;
         }
@@ -110,7 +113,7 @@ export class CrossReferenceController implements IComponentController {
                         tag +
                         (this.mmsGenerateForDiff ? ' mms-generate-for-diff="$ctrl.mmsGenerateForDiff"' : '') +
                         (this.mmsAttr ? ' mms-attr={{$ctrl.mmsAttr}}' : '') +
-                        ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" mms-cf-label="$ctrl.mmsCfLabel" non-editable="$ctrl.nonEditable"></' +
+                        ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" mms-cf-label="$ctrl.mmsCfLabel" non-editable="$ctrl.nonEditable" no-click="$ctrl.noClick"></' +
                         tag +
                         '>'
                 );
@@ -136,10 +139,12 @@ const MmsCfComponent: VeComponentOptions = {
         mmsGenerateForDiff: '<',
         mmsAttr: '@',
         mmsCfLabel: '<',
+        noClick: '<',
     },
     require: {
         transclusionCtrl: '?^^mmsCf',
         mmsViewCtrl: '?^^view',
+        mmsTreeCtrl: '?^^mmsTree',
     },
     controller: CrossReferenceController,
 };

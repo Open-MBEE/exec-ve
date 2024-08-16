@@ -1,4 +1,5 @@
 import { IQResolveReject } from 'angular';
+import _ from 'lodash';
 
 import { SettingsService, UserSettingsObject } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
@@ -208,7 +209,7 @@ export class TreeService {
     private getTypeIcon = (type: string): string => {
         let t = type;
         if (!t) t = 'unknown';
-        t = t.toLowerCase();
+        t = _.camelCase(t);
         return Icon(t);
     };
 
@@ -724,7 +725,6 @@ export class TreeService {
         } else {
             branch.favorite = false;
         }
-
         let number = '';
         if (section) number = section.join('.');
 
@@ -732,7 +732,7 @@ export class TreeService {
         if (!this.defaultSectionTypes.includes(branch.type)) {
             if (!peNums[branch.type]) peNums[branch.type] = 0;
             peNums[branch.type]++;
-            if (this.treeApi.numberingDepth === 0 && !this.defaultSectionTypes.includes(branch.type)) {
+            if (this.treeApi.numberingDepth === 0) {
                 number = peNums[branch.type].toString(10);
             } else if (section.length >= this.treeApi.numberingDepth) {
                 number = `${section.slice(0, this.treeApi.numberingDepth).join('.')}${this.treeApi.numberingSeparator}${
@@ -796,7 +796,7 @@ export class TreeService {
         treeRows.length = 0;
         return new this.$q<TreeRow[], void>((resolve, reject) => {
             const addBranchToList = (level: number, branch: TreeBranch, visible: boolean): void => {
-                let typeIcon = this.defaultIcon;
+                let icon = this.defaultIcon;
                 let visibleChild = false;
                 let aggr = branch.aggr;
                 if (!aggr) aggr = '';
@@ -809,9 +809,9 @@ export class TreeService {
                     }
                 }
                 if (this.getTypeIcon(branch.type.toLowerCase() + aggr)) {
-                    typeIcon = this.getTypeIcon(branch.type.toLowerCase() + aggr);
+                    icon = this.getTypeIcon(branch.type.toLowerCase() + aggr);
                 } else if (this.getTypeIcon('default')) {
-                    typeIcon = this.getTypeIcon('default');
+                    icon = this.getTypeIcon('default');
                 }
                 let number = '';
                 if (this.treeApi.sectionNumbering) {
@@ -832,7 +832,9 @@ export class TreeService {
                         label: branch.label,
                         visibleChild,
                         visible,
-                        typeIcon,
+                        typeIcon: this.getTypeIcon(branch.type.toLowerCase() + aggr)
+                            ? this.getTypeIcon(branch.type.toLowerCase() + aggr)
+                            : this.getTypeIcon('default'),
                         children: branch.children,
                     };
                     treeRows.push(treeRow);

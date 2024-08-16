@@ -12,6 +12,7 @@ const Icons: { [icon: string]: string } = {
     section: 'section-icon', //"fa-file-o";
     group: 'fa-solid fa-folder',
     snapshot: 'fa-solid fa-camera',
+    paragraph: 'fa-solid fa-paragraph',
     view: 'fa-solid fa-file',
     viewComposite: 'fa-solid fa-file',
     viewShared: 'fa-regular fa-file',

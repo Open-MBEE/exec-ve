@@ -44,10 +44,8 @@ class SelectController implements IComponentController {
     logout_spin: boolean = false;
     orgs: OrgObject[];
     projects: ProjectObject[];
-    orgId: string;
-    projectId: string;
-    selectedOrg: string;
-    selectedProject: string;
+    org: OrgObject;
+    project: ProjectObject;
     loginBanner: BrandingStyle;
     protected orgSpin: boolean;
     protected projSpin: boolean;
@@ -103,45 +101,56 @@ class SelectController implements IComponentController {
 
     public selectOrg = (org: OrgObject): void => {
         if (org) {
-            this.$localStorage.org = org;
-            this.orgId = org.id;
-            this.$localStorage.org.orgName = org.name;
-            this.selectedOrg = this.$localStorage.org.name;
-            this.selectedProject = '$resolve.Ob'; // default here?
-            this.projectSvc.getProjects(this.orgId).then(
-                (data) => {
-                    this.projects = data;
-                    if (data && data.length > 0) {
-                        if (this.$localStorage.project && this.checkForProject(data, this.$localStorage.project)) {
-                            this.selectedProject = this.$localStorage.project.name;
-                            this.projectId = this.$localStorage.project.id;
-                        } else {
-                            this.selectProject(data[0]);
-                        }
-                    }
-                },
-                (reason) => {
-                    this.growl.error('Error getting project data: ' + reason.message);
-                }
-            );
+            this.org = org;
+            if (this.org.projects &&this.org.projects.length > 0) {
+                this.project = this.org.projects[0];
+            } else {
+                this.project = null;
+            }
         }
     };
 
     public selectProject = (project: ProjectObject): void => {
         if (project) {
-            this.$localStorage.project = project;
-            this.selectedProject = this.$localStorage.project.name;
-            this.projectId = this.$localStorage.project.id;
+            this.project = project;
+        }
+    };
+
+    public continue = (): void => {
+        if (this.org && this.project) {
+            this.spin = true;
+            this.rootScopeSvc.veRedirectFromOld(false);
+            void this.$state
+                .go('main.project.ref.portal', {
+                    orgId: this.org.id,
+                    projectId: this.project.id,
+                    refId: 'master',
+                })
+                .finally(() => (this.spin = false));
         }
     };
 
     public refreshOrgs = (): void => {
         this.orgSpin = true;
+        const projId = this.project ? this.project.id : null;
+        this.project = null;
+        const orgId = this.org ? this.org.id : null;
+        this.org = null;
         this.orgs.length = 0;
         this.orgSvc
             .getOrgs(true)
             .then((data) => {
                 this.orgs.push(...data);
+                if (this.orgs.length > 0) {
+                    for (const org of this.orgs) {
+                        if (org.id == orgId) {
+                            this.org = org;
+                        }
+                    }
+                    if (!this.org) {
+                        this.selectOrg(this.orgs[0]);
+                    }
+                }
             })
             .finally(() => {
                 this.orgSpin = false;
@@ -150,21 +159,26 @@ class SelectController implements IComponentController {
 
     public refreshProjects = (): void => {
         this.projSpin = true;
-        this.projects.length = 0;
-        this.projectSvc
-            .getProjects(this.orgId, true)
+        const id = this.project ? this.project.id : null;
+        this.project = null;
+        this.orgSvc
+            .getOrg(this.org.id, true)
             .then((data) => {
-                this.projects.push(...data);
-                if (
-                    data &&
-                    data.length > 0 &&
-                    this.projects.filter((p) => {
-                        return p.id === this.projectId;
-                    }).length === 0
-                ) {
-                    this.selectProject(data[0]);
-                } else {
-                    //no projects
+                this.org = data;
+                this.orgs = this.orgs.filter((org) => {
+                    org.id != this.org.id;
+                });
+                this.orgs.push(data);
+                if (data && data.projects.length > 0) {
+                    for (const project of data.projects) {
+                        if (project.id == id) {
+                            this.selectProject(project);
+                            break;
+                        }
+                    }
+                    if (!this.project) {
+                        this.selectProject(data.projects[0]);
+                    }
                 }
             })
             .finally(() => {
@@ -172,28 +186,6 @@ class SelectController implements IComponentController {
             });
     };
 
-    public checkForProject(projectArray: ProjectObject[], project: ProjectObject): boolean {
-        for (let i = 0; i < projectArray.length; i++) {
-            if (projectArray[i].id === project.id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public continue = (): void => {
-        if (this.orgId && this.projectId) {
-            this.spin = true;
-            this.rootScopeSvc.veRedirectFromOld(false);
-            void this.$state
-                .go('main.project.ref.portal', {
-                    orgId: this.orgId,
-                    projectId: this.projectId,
-                    refId: 'master',
-                })
-                .finally(() => (this.spin = false));
-        }
-    };
     public logout = (): void => {
         this.logout_spin = true;
         this.authSvc
@@ -232,12 +224,12 @@ const SelectComponent: VeComponentOptions = {
                 <div class="input-group select-toolbar" role="toolbar">
                     <div class="input-group-prepend ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
                         <button id="org-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle>
-                            <span>{{ $ctrl.selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                            <span>{{ $ctrl.org.name }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                         </button>
                         <div class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                                 aria-labelledby="org-btn-keyboard-nav">
                             <a ng-repeat="org in $ctrl.orgs | orderBy: 'name'" ng-click="$ctrl.selectOrg(org)" class="dropdown-item"
-                                    ng-class="{'checked-list-item': org.name === $ctrl.selectedOrg}">{{ org.name }}
+                                    ng-class="{'checked-list-item': org.name === $ctrl.org.name}">{{ org.name }}
                             </a>
                         </div>
                     </div>
@@ -254,14 +246,18 @@ const SelectComponent: VeComponentOptions = {
                 <div class="input-group select-toolbar" role="toolbar">
                     <div class="input-group-prepend ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
                         <button id="proj-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle
-                                ng-disabled="!$ctrl.selectedOrg || !$ctrl.projects.length">
-                            <span ng-hide="$ctrl.projects.length">No Projects for selected Org</span>
-                            <span ng-show="$ctrl.projects.length">{{ $ctrl.selectedProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                                ng-disabled="!$ctrl.org.name || !$ctrl.org.projects.length">
+                            <span ng-show="$ctrl.org && !$ctrl.org.projects.length">No Projects for selected Org</span>
+                            <span ng-show="$ctrl.org && $ctrl.org.projects.length && !$ctrl.project">No selected Project<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                            <span ng-show="$ctrl.org && $ctrl.org.projects.length && $ctrl.project">{{ $ctrl.project.name }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                         </button>
                         <div class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                                 aria-labelledby="proj-btn-keyboard-nav">
-                            <a ng-repeat="project in $ctrl.projects | orderBy: 'name'" ng-click="$ctrl.selectProject(project)" class="dropdown-item">
-                                <span ng-class="{'checked-list-item': project.name === $ctrl.selectedProject}">{{ project.name }}</span>
+                            <a ng-class="{'checked-list-item': project.name === $ctrl.project.name}" 
+                                    ng-repeat="project in $ctrl.org.projects | orderBy: 'name'" 
+                                    ng-click="$ctrl.selectProject(project)"
+                                    class="dropdown-item">
+                                {{ project.name }}
                             </a>
                         </div>
                     </div>
@@ -273,7 +269,7 @@ const SelectComponent: VeComponentOptions = {
                     </div>  
                 </div>
             </div>
-            <button class="btn btn-block btn-primary" type="submit" ng-disabled="!$ctrl.selectedProject || !$ctrl.selectedOrg" ng-click="$ctrl.continue()">Continue
+            <button class="btn btn-block btn-primary" type="submit" ng-disabled="!$ctrl.project || !$ctrl.org" ng-click="$ctrl.continue()">Continue
                 <span ng-if="$ctrl.spin"><i class="fa fa-spin fa-spinner"></i></span>
             </button>
         </div>   

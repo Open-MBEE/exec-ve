@@ -1,6 +1,6 @@
 import 'angular-growl-v2';
 
-import { StateService, Transition, TransitionService, UIRouter, UIRouterGlobals } from '@uirouter/angularjs';
+import { StateService, Transition, TransitionService, UIRouter } from '@uirouter/angularjs';
 import angular, { IComponentController, IHttpResponse } from 'angular';
 import Rx from 'rx-lite';
 
@@ -47,19 +47,23 @@ class MainController implements IComponentController {
     openEdits = {};
 
     private hidePanes: boolean = false;
-    private closePanes: boolean = false;
     private hideRight: boolean = false;
     private closeRight: boolean = false;
     private hideLeft: boolean = false;
     private closeLeft: boolean = false;
-    showManageRefs: boolean = false;
+
     showLogin: boolean = true;
     mmsWorkingTime: WorkingTimeObject;
     workingModalOpen = false;
 
-    readonly paneClosed: boolean = false;
+    topSize: number = 0;
+    topPx: string = '1px';
+    bannerTopEl: JQuery<HTMLElement>;
+    navEl: JQuery<HTMLElement>;
+    bannerBottomEl: JQuery<HTMLElement>;
+    menuEl: JQuery<HTMLElement>;
 
-    $uiRouterGlobals: UIRouterGlobals = this.$uiRouter.globals;
+    readonly paneClosed: boolean = false;
 
     constructor(
         private $scope: angular.IScope,
@@ -111,18 +115,12 @@ class MainController implements IComponentController {
         this.subs.push(
             this.eventSvc.binding(this.rootScopeSvc.constants.VEHIDELEFT, (value: boolean) => {
                 this.hideLeft = value;
-                if (value) {
-                    this.closeLeft = true;
-                }
             })
         );
 
         this.subs.push(
             this.eventSvc.binding(this.rootScopeSvc.constants.VEHIDERIGHT, (value: boolean) => {
                 this.hideRight = value;
-                if (value) {
-                    this.closeRight = true;
-                }
             })
         );
 
@@ -252,7 +250,7 @@ class MainController implements IComponentController {
 
         this.$transitions.onSuccess({}, (trans: Transition) => {
             this.rootScopeSvc.veStateChanging(false);
-            if (this.$uiRouterGlobals.$current.name === 'main.share') {
+            if (this.$state.is('main.share')) {
                 this.rootScopeSvc.veHidePanes(true);
                 this.rootScopeSvc.veShowLogin(true);
             } else if (this.$state.includes('main.login')) {
@@ -266,52 +264,10 @@ class MainController implements IComponentController {
                 this.rootScopeSvc.veShowLogin(false);
             }
 
-            if (
-                this.rootScopeSvc.veRedirect() &&
-                this.$uiRouterGlobals.$current.name === this.rootScopeSvc.veRedirect().toState.name
-            ) {
+            if (this.rootScopeSvc.veRedirect() && this.$state.is(this.rootScopeSvc.veRedirect().toState.name)) {
                 this.rootScopeSvc.veRedirect(null);
             }
 
-            // if (this.$state.includes('main.project.ref.portal')) {
-            //     this.rootScopeSvc.treeInitialSelection(
-            //         (trans.params() as ParamsObject).projectId + '_cover'
-            //     )
-            // } else if (
-            //     this.$uiRouterGlobals.$current.name ===
-            //     'main.project.ref.portal.preview'
-            // ) {
-            //     const index = (
-            //         trans.params() as ParamsObject
-            //     ).documentId.indexOf('_cover')
-            //     if (index > 0)
-            //         this.rootScopeSvc.treeInitialSelection(
-            //             (
-            //                 trans.params() as ParamsObject
-            //             ).documentId.substring(5, index)
-            //         )
-            //     else
-            //         this.rootScopeSvc.treeInitialSelection(
-            //             (trans.params() as ParamsObject).documentId
-            //         )
-            // } else if (
-            //     this.$state.includes('main.project.ref.view.present') &&
-            //     this.$uiRouterGlobals.$current.name !==
-            //         'main.project.ref.view.reorder'
-            // ) {
-            //     if ((trans.params() as ParamsObject).viewId !== undefined)
-            //         this.rootScopeSvc.treeInitialSelection(
-            //             (trans.params() as ParamsObject).viewId
-            //         )
-            //     else if (trans.params()['#'] !== undefined)
-            //         this.rootScopeSvc.treeInitialSelection(
-            //             (trans.params() as ParamsObject)['#']
-            //         )
-            //     else
-            //         this.rootScopeSvc.treeInitialSelection(
-            //             (trans.params() as ParamsObject).documentId
-            //         )
-            // }
             if (this.$state.includes('main.project.ref.view.present')) {
                 this.applicationSvc.getState().inDoc = true;
                 this.applicationSvc.getState().currentDoc = (trans.params() as ParamsObject).documentId;
@@ -350,8 +306,26 @@ class MainController implements IComponentController {
             }
         });
 
-        if (this.$uiRouterGlobals.$current.name == 'main') {
+        if (this.$state.is('main')) {
             void this.$state.go('main.login');
+        }
+    }
+
+    $postLink(): void {
+        this.bannerTopEl = $('#banner-top');
+        this.navEl = $('#nav-top');
+        this.menuEl = $('#menu-top');
+        console.log(this.bannerTopEl.height());
+    }
+
+    $doCheck(): void {
+        if (!this.showLogin && this.bannerTopEl && this.navEl && this.menuEl) {
+            const size = this.bannerTopEl.height() + this.navEl.height() + this.menuEl.height();
+            if (size != this.topSize) {
+                this.topSize = size;
+                this.topPx = size.toString() + 'px';
+                //console.log(this.topSize.toString() + 'px');
+            }
         }
     }
 }
@@ -365,34 +339,34 @@ const MainComponent: VeComponentOptions = {
     <div id="login-overlay" ng-show="$ctrl.showLogin">
         <ui-view name="login"></ui-view>
     </div>
-    <div id="inner-wrap">
-        <ui-view name="banner-top"></ui-view>
-        <ui-view name="nav"></ui-view>
-        <ui-view name="menu"></ui-view>
-        <ui-view name="banner-bottom"></ui-view>
-        <div ng-hide="$ctrl.hidePanes">
-            <ng-pane pane-id="main" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="ng-pane" id="main-pane" parent-ctrl="$ctrl">
-                <ng-pane pane-id="left-toolbar" pane-anchor="west" pane-size="41px" pane-no-toggle="true" parent-ctrl="$ctrl" pane-closed="$ctrl.paneClosed">
-                    <ui-view name="toolbar-left"></ui-view>
+    <ng-pane pane-id="global" pane-anchor="center" pane-closed="$ctrl.showLogin" parent-ctrl="$ctrl" pane-no-scroll="true" pane-no-toggle="true" ng-hide="$ctrl.showLogin">
+        <ng-pane pane-id="top" pane-anchor="north" pane-closed="$ctrl.paneClosed" pane-size="{{ $ctrl.topPx }}" parent-ctrl="$ctrl" pane-no-toggle="true">
+            <ui-view name="banner-top" id="banner-top"></ui-view>
+            <ui-view name="nav" id="nav-top"></ui-view>
+            <ui-view name="menu" id="menu-top"></ui-view>
+        </ng-pane>
+        <ng-pane pane-id="main" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="ng-pane" id="main-pane" parent-ctrl="$ctrl" ng-hide="$ctrl.hidePanes">
+            <ng-pane pane-id="left-toolbar" pane-anchor="west" pane-size="41px" pane-no-toggle="true" parent-ctrl="$ctrl" pane-closed="$ctrl.paneClosed">
+                <ui-view name="toolbar-left"></ui-view>
+            </ng-pane>
+            <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-pane" pane-closed="$ctrl.closeLeft" ng-hide="$ctrl.hideLeft">
+                <ui-view name="pane-left" class="container-pane-left"></ui-view>
+            </ng-pane>
+            <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-no-toggle="true" parent-ctrl="$ctrl" pane-closed="$ctrl.paneClosed">
+                <ui-view name="toolbar-right"></ui-view>
+            </ng-pane>
+            <ng-pane pane-id="content" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="content-pane" parent-ctrl="$ctrl">
+                <ng-pane pane-id="right" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="$ctrl.closeRight" class="pane-right" ng-hide="$ctrl.hideRight">
+                    <ui-view name="pane-right"></ui-view>
                 </ng-pane>
-                <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-pane" pane-closed="$ctrl.closeLeft" ng-hide="$ctrl.hideLeft">
-                    <ui-view name="pane-left" class="container-pane-left"></ui-view>
-                </ng-pane>
-                <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-no-toggle="true" parent-ctrl="$ctrl" pane-closed="$ctrl.paneClosed">
-                    <ui-view name="toolbar-right"></ui-view>
-                </ng-pane>
-                <ng-pane pane-id="content" pane-anchor="center" pane-closed="$ctrl.hidePanes" class="content-pane" parent-ctrl="$ctrl">
-                    <ng-pane pane-id="right" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="$ctrl.closeRight" class="pane-right" ng-hide="$ctrl.hideRight">
-                        <ui-view name="pane-right"></ui-view>
-                    </ng-pane>
-                    <ng-pane pane-id="center" pane-anchor="center" class="pane-center" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
-                        <ui-view name="pane-center"></ui-view>
-                    </ng-pane>
+                <ng-pane pane-id="center" pane-anchor="center" class="pane-center" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
+                    <ui-view name="pane-center"></ui-view>
                 </ng-pane>
             </ng-pane>
-        </div>
+        </ng-pane>
+        <ui-view name="banner-bottom"></ui-view>
         <i ng-show="$ctrl.hidePanes" class="pane-center-spinner fa fa-5x fa-spinner fa-spin"></i>
-    </div>
+    </ng-pane>
 </div>
 `,
     controller: MainController,

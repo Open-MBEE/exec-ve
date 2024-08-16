@@ -12,7 +12,7 @@ import { SchemaService } from '@ve-utils/model-schema';
 import { veComponents } from '@ve-components';
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
-import { InstanceValueObject } from '@ve-types/mms';
+import { InstanceValueObject, ViewInstanceSpec } from '@ve-types/mms';
 
 /**
  * @ngdoc component
@@ -100,10 +100,12 @@ export class TranscludeSectionController extends DeletableTransclusion implement
         super.$onInit();
         this.showNumbering = this.rootScopeSvc.veNumberingOn();
         this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_section`);
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons);
-        this.bbApi.setPermission('editor-preview', false);
-        this.bbApi.setPermission('editor-save-continue', false);
-        this.bbApi.setPermission('editor-reset', false);
+        this.buttonBarSvc.registerButtons(editor_buttons);
+        this.bbInit();
+        //this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons );
+        // this.bbApi.setPermission('editor-preview', false);
+        // this.bbApi.setPermission('editor-save-continue', false);
+        // this.bbApi.setPermission('editor-reset', false);
         this.$element.on('click', (e) => {
             if (this.startEdit) this.startEdit();
             if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element);
@@ -122,16 +124,16 @@ export class TranscludeSectionController extends DeletableTransclusion implement
     }
 
     public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
-        if (this.element.specification && this.element.specification.operand) {
+        if (this.element.specification && (this.element as ViewInstanceSpec).specification.operand) {
             const dups = this.presentationSvc.checkForDuplicateInstances(
-                this.element.specification.operand as InstanceValueObject[]
+                (this.element as ViewInstanceSpec).specification.operand as InstanceValueObject[]
             );
             if (dups.length > 0) {
                 this.growl.warning('There are duplicates in this section, duplicates ignored!');
             }
         }
         if (this.element._veNumber) {
-            this.level = this.element._veNumber.split('.').length;
+            this.level = (this.element as ViewInstanceSpec)._veNumber.split('.').length;
         }
         const deferred = this.$q.defer<string>();
         deferred.reject({ status: 200 }); //don't recompile

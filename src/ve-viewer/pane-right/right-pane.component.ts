@@ -1,6 +1,4 @@
-import { IPane } from '@openmbee/pane-layout';
-import { StateService } from '@uirouter/angularjs';
-import { veViewer } from '@ve-viewer';
+import { IPane, IPaneManagerService } from '@openmbee/pane-layout';
 import angular, { IComponentController } from 'angular';
 import _ from 'lodash';
 import Rx from 'rx-lite';
@@ -10,13 +8,11 @@ import { veCoreEvents } from '@ve-core/events';
 import { ToolbarService } from '@ve-core/toolbar';
 import { RootScopeService } from '@ve-utils/application';
 import { EditObject, EditService, EventService } from '@ve-utils/core';
-import { ElementService, PermissionService, ProjectService } from '@ve-utils/mms-api-client';
+import { PermissionService, ProjectService } from '@ve-utils/mms-api-client';
+import { veViewer } from '@ve-viewer';
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import { ElementObject, RefObject, RefsResponse } from '@ve-types/mms';
-import { VeModalService } from '@ve-types/view-editor';
-
-import elementSelectedData = veCoreEvents.elementSelectedData;
 
 class RightPaneController implements IComponentController {
     //Bindings
@@ -40,16 +36,9 @@ class RightPaneController implements IComponentController {
     private toolbarId: string = 'right-toolbar';
 
     static $inject = [
-        '$scope',
-        '$element',
-        '$compile',
-        '$uibModal',
         '$q',
-        '$state',
-        '$timeout',
-        'hotkeys',
+        '$paneManager',
         'growl',
-        'ElementService',
         'ProjectService',
         'PermissionService',
         'RootScopeService',
@@ -60,16 +49,9 @@ class RightPaneController implements IComponentController {
     ];
 
     constructor(
-        private $scope: angular.IScope,
-        private $element: JQuery<HTMLElement>,
-        private $compile: angular.ICompileService,
-        private $uibModal: VeModalService,
         private $q: VeQService,
-        private $state: StateService,
-        private $timeout: angular.ITimeoutService,
-        private hotkeys: angular.hotkeys.HotkeysProvider,
+        private $paneManager: IPaneManagerService,
         private growl: angular.growl.IGrowlService,
-        private elementSvc: ElementService,
         private projectSvc: ProjectService,
         private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
@@ -89,8 +71,10 @@ class RightPaneController implements IComponentController {
         this.eventSvc.resolve<boolean>('spec.ready', true);
 
         this.subs.push(
-            this.$pane.$toggled.subscribe(() => {
-                this.rootScopeSvc.rightPaneClosed(this.$pane.closed);
+            this.$paneManager.$onToggled.subscribe((e) => {
+                if (e.pane === this.$pane.id) {
+                    this.rootScopeSvc.rightPaneClosed(e.closed);
+                }
             })
         );
 

@@ -5,7 +5,7 @@ import { ViewPresentationElemController } from '@ve-components/presentations';
 import { ViewController } from '@ve-components/presentations/view.component';
 import { ComponentService, ExtensionService } from '@ve-components/services';
 import { SpecTool } from '@ve-components/spec-tools';
-import { ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar';
+import { BarButton, ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar';
 import { EditorService } from '@ve-core/editor';
 import { veCoreEvents } from '@ve-core/events';
 import { ImageService } from '@ve-core/image';
@@ -16,7 +16,6 @@ import { SchemaService } from '@ve-utils/model-schema';
 import { handleChange, onChangesCallback } from '@ve-utils/utils';
 
 import { VeComponentOptions, VePromise, VePromiseResponse, VeQService } from '@ve-types/angular';
-import { EditorActions } from '@ve-types/core/editor';
 import { ElementObject, ElementsResponse, ViewObject } from '@ve-types/mms';
 
 export interface ITransclusion extends angular.IComponentController {
@@ -90,7 +89,7 @@ export interface TranscludeScope extends IPaneScope {
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class Transclusion implements ITransclusion, EditorActions {
+export class Transclusion implements ITransclusion {
     //Regex
     fixPreSpanRegex: RegExp = /<\/span>\s*<mms-cf/g;
     fixPostSpanRegex: RegExp = /<\/mms-cf>\s*<span[^>]*>/g;
@@ -170,12 +169,12 @@ export class Transclusion implements ITransclusion, EditorActions {
 
     //Default Toolbar Api
     /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-    cancel(e?): void {}
-    reset(e?): void {}
-    delete(e?): void {}
-    preview(e?): void {}
-    save(e?): void {}
-    saveC(e?): void {}
+    // cancel(e?): void {}
+    // reset(e?): void {}
+    // delete(e?): void {}
+    // preview(e?): void {}
+    // save(e?): void {}
+    // saveC(e?): void {}
     /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
 
     static $inject: string[] = [
@@ -232,30 +231,6 @@ export class Transclusion implements ITransclusion, EditorActions {
         if (this.mmsSpecEditorCtrl && this.mmsSpecEditorCtrl.specApi.elementId === this.mmsElementId) {
             this.editable = (): boolean => this.mmsSpecEditorCtrl.specSvc.editable;
         }
-        //if (this.editTemplate) {
-        this.save = (e: JQuery.ClickEvent): void => {
-            if (e) e.stopPropagation();
-            this.saveAction(false);
-        };
-
-        this.saveC = (): void => {
-            this.saveAction(true);
-        };
-
-        this.cancel = (e?: JQuery.ClickEvent): void => {
-            if (e) e.stopPropagation();
-            this.cancelAction();
-        };
-
-        this.reset = (e?: JQuery.ClickEvent): void => {
-            if (e) e.stopPropagation();
-            this.cleanUpAction(true);
-        };
-
-        this.preview = (): void => {
-            this.previewAction();
-        };
-        //}
     }
 
     $onDestroy(): void {
@@ -396,7 +371,7 @@ export class Transclusion implements ITransclusion, EditorActions {
             }
         };
 
-        const errorCallback = <T>(reason: VePromiseResponse<T>) => {
+        const errorCallback = <T>(reason: VePromiseResponse<T>): void => {
             this.$element.empty();
             //TODO: Add reason/errorMessage handling here.
             this.$transcludeEl = $(
@@ -428,15 +403,45 @@ export class Transclusion implements ITransclusion, EditorActions {
             });
     };
 
-    protected bbInit = (api: ButtonBarApi): void => {
-        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-preview', this));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save', this));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-save-continue', this));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-cancel', this));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-reset', this));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('editor-delete', this));
-        api.setPermission('editor-delete', this.isDeletable);
-    };
+    protected bbInit(api?: ButtonBarApi): void {
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('editor-preview'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('editor-save'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('editor-save-continue'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('editor-cancel'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('editor-reset'));
+        if (this.isDeletable) {
+            this.buttons.push(this.buttonBarSvc.getButtonDefinition('editor-delete'));
+        }
+        this.subs.push(
+            this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
+                switch (data.clicked) {
+                    case 'editor-preview': {
+                        this.previewAction();
+                        break;
+                    }
+                    case 'editor-save': {
+                        if (data.$event) data.$event.stopPropagation();
+                        this.saveAction(data.button, false);
+                        break;
+                    }
+                    case 'editor-save-continue': {
+                        this.saveAction(data.button, true);
+                        break;
+                    }
+                    case 'editor-cancel': {
+                        if (data.$event) data.$event.stopPropagation();
+                        this.cancelAction(data.button);
+                        break;
+                    }
+                    case 'editor-reset': {
+                        if (data.$event) data.$event.stopPropagation();
+                        this.cleanUpAction(true);
+                        break;
+                    }
+                }
+            })
+        );
+    }
 
     /**
      * @name Transclusion#reopenUnsavedElts     * called by transcludes when users have unsaved edits, leaves that view, and comes back to that view.
@@ -531,19 +536,12 @@ export class Transclusion implements ITransclusion, EditorActions {
         }
     }
 
-    protected saveAction(continueEdit?: boolean): void {
+    protected saveAction(button: BarButton, continueEdit?: boolean): void {
         if (this.elementSaving) {
             this.growl.info('Please Wait...');
             return;
         }
         // this.editSvc.clearAutosave(ctrl.element._projectId + ctrl.element._refId + ctrl.element.id, ctrl.edit.type)
-        if (this.bbApi) {
-            if (!continueEdit) {
-                this.bbApi.toggleButtonSpinner('editor-save');
-            } else {
-                this.bbApi.toggleButtonSpinner('editor-save-continue');
-            }
-        }
 
         this.elementSaving = true;
 
@@ -564,25 +562,16 @@ export class Transclusion implements ITransclusion, EditorActions {
             )
             .finally(() => {
                 this.elementSaving = false;
-                if (this.bbApi) {
-                    if (!continueEdit) {
-                        this.bbApi.toggleButtonSpinner('editor-save');
-                    } else {
-                        this.bbApi.toggleButtonSpinner('editor-save-continue');
-                    }
-                }
+                button.handleSpin(false);
             });
     }
 
-    protected cancelAction(): void {
+    protected cancelAction(button: BarButton): void {
         if (this.elementSaving) {
             this.growl.info('Please Wait...');
             return;
         }
 
-        if (this.bbApi) {
-            this.bbApi.toggleButtonSpinner('editor-cancel');
-        }
         // const cancelFn: () => VePromise<boolean> = (): VePromise<boolean> => {
         //     if (ctrl.editorApi && ctrl.editorApi.cancel) {
         //         return ctrl.editorApi.cancel()
@@ -631,9 +620,7 @@ export class Transclusion implements ITransclusion, EditorActions {
                 }
             )
             .finally(() => {
-                if (this.bbApi) {
-                    this.bbApi.toggleButtonSpinner('editor-cancel');
-                }
+                button.handleSpin(false);
             });
     }
 

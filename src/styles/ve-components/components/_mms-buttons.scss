@@ -53,4 +53,20 @@
     right: 0;
     left: auto;
   }
+
+  
 }
+
+button-bar {
+  .dropdown-menu {
+    bar-button {
+      white-space: nowrap;
+    }
+  }
+}
+
+bar-button {
+  display: inline-flex;
+}
+
+

@@ -93,8 +93,6 @@ class SelectModalController implements VeModalController {
     };
 
     public refreshOrgs = (): void => {
-        this.org = null;
-        this.project = null;
         this.orgSpin = true;
         this.orgs.length = 0;
         this.orgSvc
@@ -109,25 +107,26 @@ class SelectModalController implements VeModalController {
 
     public refreshProjects = (): void => {
         this.projSpin = true;
+        const id = this.project.id;
         this.project = null;
         this.orgSvc
             .getOrg(this.org.id, true)
             .then((data) => {
                 this.org = data;
                 this.orgs = this.orgs.filter((org) => {
-                    org.id = this.org.id;
+                    org.id != this.org.id;
                 });
                 this.orgs.push(data);
-                if (
-                    data &&
-                    data.projects.length > 0 &&
-                    data.projects.filter((p) => {
-                        return p.id === this.project.id;
-                    }).length === 0
-                ) {
-                    this.selectProject(data.projects[0]);
-                } else {
-                    //no projects
+                if (data && data.projects.length > 0) {
+                    for (const project of data.projects) {
+                        if (project.id == id) {
+                            this.selectProject(project);
+                            break;
+                        }
+                    }
+                    if (!this.project) {
+                        this.selectProject(data.projects[0]);
+                    }
                 }
             })
             .finally(() => {
@@ -177,14 +176,18 @@ const SelectModalComponent: VeModalComponent = {
                 <div class="input-group-prepend ve-dark-dropdown-wide" role="group" uib-dropdown keyboard-nav>
                 <button id="proj-btn-keyboard-nav" type="button" class="dropdown-toggle" uib-dropdown-toggle
                         ng-disabled="!$ctrl.org || !$ctrl.org.projects.length">
-                    <span ng-hide="$ctrl.org && $ctrl.org.projects.length">No Projects for selected Org</span>
-                    <span ng-hide="!$ctrl.org || $ctrl.project">No selected Project</span>
-                    <span ng-show="$ctrl.org && $ctrl.org.projects.length">{{ $ctrl.project.name }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                    <span ng-show="$ctrl.org && !$ctrl.org.projects.length">No Projects for selected Org</span>
+                    <span ng-show="$ctrl.org && $ctrl.org.projects.length && !$ctrl.project">No selected Project<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+                    <span ng-show="$ctrl.org && $ctrl.org.projects.length && $ctrl.project">{{ $ctrl.project.name }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
                 </button>
                 <div class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu"
                         aria-labelledby="proj-btn-keyboard-nav">
-                        <a ng-repeat="project in $ctrl.projects | orderBy: 'name'" ng-click="$ctrl.selectProject(project)">
-                            <span ng-class="{'checked-list-item': project.name === $ctrl.selectedProject}">{{ project.name }}</span>
+                        <a ng-class="{'checked-list-item': project.name === $ctrl.project.name}" 
+                                ng-repeat="project in $ctrl.org.projects | orderBy: 'name'" 
+                                ng-click="$ctrl.selectProject(project)"
+                                class="dropdown-item"
+                        >
+                            {{ project.name }}
                         </a>
                     </div>
                 </div>

@@ -6,18 +6,17 @@ import Rx from 'rx-lite';
 
 import { veComponentEvents } from '@ve-components/events';
 import { TreeService } from '@ve-components/trees';
-import { IButtonBarButton, ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar';
+import { IButtonBarButton, ButtonBarApi, ButtonBarService } from '@ve-core/button-bar';
 import { veCoreEvents } from '@ve-core/events';
 import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application';
 import { EventService } from '@ve-utils/core';
-import { PermissionService, ViewData, ViewService, URLService } from '@ve-utils/mms-api-client';
+import { PermissionService, ViewData, ViewService } from '@ve-utils/mms-api-client';
 import { veViewer } from '@ve-viewer';
 import { AppUtilsService, FullDocumentApi, FullDocumentService } from '@ve-viewer/services';
 
 import { pane_center_buttons } from './pane-center-buttons.config';
-import { ContentWindowService } from './services/ContentWindow.service';
 
-import { VeComponentOptions, VeHttpService, VePromise, VeQService } from '@ve-types/angular';
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular';
 import { DocumentObject, ElementObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms';
 import { TreeBranch, View2NodeMap } from '@ve-types/tree';
 
@@ -64,17 +63,11 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         '$state',
         '$uiRouterGlobals',
         '$transitions',
-        '$anchorScroll',
-        '$location',
-        '$timeout',
-        '$http',
         'hotkeys',
         'growl',
         'FullDocumentService',
         'ShortUrlService',
         'AppUtilsService',
-        'ContentWindowService',
-        'URLService',
         'UtilsService',
         'PermissionService',
         'RootScopeService',
@@ -90,17 +83,11 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         private $state: StateService,
         private $uiRouterGlobals: UIRouterGlobals,
         private $transitions: TransitionService,
-        private $anchorScroll: angular.IAnchorScrollService,
-        private $location: angular.ILocationService,
-        private $timeout: angular.ITimeoutService,
-        private $http: VeHttpService,
         private hotkeys: angular.hotkeys.HotkeysProvider,
         private growl: angular.growl.IGrowlService,
         private fullDocumentSvc: FullDocumentService,
         private shortUrlSvc: ShortUrlService,
         private appUtilsSvc: AppUtilsService,
-        private contentWindowSvc: ContentWindowService,
-        private uRLSvc: URLService,
         private utilsSvc: UtilsService,
         private permissionSvc: PermissionService,
         private rootScopeSvc: RootScopeService,
@@ -121,16 +108,18 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false);
 
         //Init Toolbar and set pane height
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons);
+        //this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons);
+        this.buttonBarSvc.registerButtons(pane_center_buttons);
+        this.bbInit();
         this._setToolbarHeight();
 
-        this.subs.push(
-            this.eventSvc.$on(this.bbApi.WRAP_EVENT, (data: ButtonWrapEvent) => {
-                if (data.oldSize != data.newSize) {
-                    this._setToolbarHeight();
-                }
-            })
-        );
+        // this.subs.push(
+        //     this.eventSvc.$on(this.bbApi.WRAP_EVENT, (data: ButtonWrapEvent) => {
+        //         if (data.oldSize != data.newSize) {
+        //             this._setToolbarHeight();
+        //         }
+        //     })
+        // );
 
         this.view2Node[this.mmsDocument.id] = {
             label: this.mmsDocument.name,
@@ -194,38 +183,16 @@ class FullDocumentController implements IComponentController, Ng1Controller {
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 switch (data.clicked) {
                     case 'show-comments':
-                        this.bbApi.toggleButton(
-                            'show-comments',
-                            this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn())
-                        );
+                        this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn());
                         break;
-
                     case 'show-elements':
-                        this.bbApi.toggleButton(
-                            'show-elements',
-                            this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn())
-                        );
-                        if (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) {
-                            this.bbApi.toggleButton('show-edits', false);
-                            this.rootScopeSvc.veEditMode(false);
-                        }
+                        this.toggleElementsOn;
                         break;
-
                     case 'show-edits':
-                        this.bbApi.toggleButton(
-                            'show-edits',
-                            this.rootScopeSvc.veEditMode(!this.rootScopeSvc.veEditMode())
-                        );
-                        if (this.rootScopeSvc.veElementsOn() !== this.rootScopeSvc.veEditMode()) {
-                            this.bbApi.toggleButton('show-elements', this.rootScopeSvc.veEditMode());
-                            this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode());
-                        }
+                        this.toggleEditMode();
                         break;
                     case 'show-numbering':
-                        this.bbApi.toggleButton(
-                            'show-numbering',
-                            this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
-                        );
+                        this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn());
                         break;
                     case 'convert-pdf':
                         this.fullDocumentApi.loadRemainingViews(() => {
@@ -280,6 +247,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                 }
             })
         );
+
         this.initViews();
     }
 
@@ -339,35 +307,34 @@ class FullDocumentController implements IComponentController, Ng1Controller {
     uiCanExit(transition: Transition): HookResult {
         //Do nothing
     }
-    public bbInit = (api: ButtonBarApi): void => {
+    public bbInit = (): void => {
         if (
             this.mmsDocument &&
             this.mmsRef.type === 'Branch' &&
             this.permissionSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id)
         ) {
-            api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'));
-            api.toggleButton('show-edits', this.rootScopeSvc.veEditMode());
-
+            const showEdits = this.buttonBarSvc.getButtonDefinition('show-edits');
+            showEdits.toggleEvent = this.rootScopeSvc.constants.VEEDITMODE;
+            this.buttons.push(showEdits);
             this.hotkeys.bindTo(this.$scope).add({
                 combo: 'alt+d',
                 description: 'toggle edit mode',
                 callback: () => {
-                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
-                        clicked: 'show-edits',
-                    });
+                    this.toggleEditMode();
                 },
             });
         }
+        const showElements = this.buttonBarSvc.getButtonDefinition('show-elements');
+        showElements.toggleEvent = this.rootScopeSvc.constants.VEELEMENTSON;
+        const showComments = this.buttonBarSvc.getButtonDefinition('show-comments');
+        showComments.toggleEvent = this.rootScopeSvc.constants.VECOMMENTSON;
+        const showNumbering = this.buttonBarSvc.getButtonDefinition('show-numbering');
+        showNumbering.toggleEvent = this.rootScopeSvc.constants.VENUMBERINGON;
+        this.buttons.push(showElements, showComments, showNumbering);
 
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'));
-        api.toggleButton('show-elements', this.rootScopeSvc.veElementsOn());
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'));
-        api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn());
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'));
-        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn());
-        api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('print'));
-        api.addButton(this.buttonBarSvc.getButtonBarButton('export'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('refresh-numbering'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('print'));
+        this.buttons.push(this.buttonBarSvc.getButtonDefinition('export'));
 
         this.hotkeys
             .bindTo(this.$scope)
@@ -375,20 +342,30 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                 combo: 'alt+c',
                 description: 'toggle show comments',
                 callback: () => {
-                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
-                        clicked: 'show-comments',
-                    });
+                    this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn());
                 },
             })
             .add({
                 combo: 'alt+e',
                 description: 'toggle show elements',
                 callback: () => {
-                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
-                        clicked: 'show-elements',
-                    });
+                    this.toggleElementsOn();
                 },
             });
+    };
+
+    public toggleEditMode = (): void => {
+        this.rootScopeSvc.veEditMode(!this.rootScopeSvc.veEditMode());
+        if (this.rootScopeSvc.veElementsOn() !== this.rootScopeSvc.veEditMode()) {
+            this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode());
+        }
+    };
+
+    public toggleElementsOn = (): void => {
+        this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn());
+        if (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) {
+            this.rootScopeSvc.veEditMode(false);
+        }
     };
 
     private _scroll = (viewId: string): void => {
@@ -543,7 +520,31 @@ const DocumentComponent: VeComponentOptions = {
                 <i class="fa-solid fa-share-from-square"></i></button>
             </div>
             <div class="pane-center-btn-group">
-                <button-bar button-id="$ctrl.bbId" class="bordered-button-bar"></button-bar>
+                <button-bar bar-id="{{$ctrl.bbId}}" class="bordered-button-bar">
+                    <bar-button ng-repeat="button in $ctrl.buttons"
+                            activation-cb="$ctrl.$state.includes(state)"
+                            button-id="{{button.buttonId}}"
+                            icon="{{button.icon}}"
+                            placement="{{button.placement}}"
+                            selectable="button.selectable"
+                            spinnable="button.spinnable"
+                            spin-event="button.spinEvent"
+                            title="{{button.title}}"
+                            tooltip="{{button.tooltip}}"
+                            toggleable="button.toggleable"
+                            toggle-event="button.toggleEvent"
+                            toggled-tooltip="{{button.toggledTooltip}}"
+                            template-url="{{button.templateUrl}}"
+                            disable-caret="button.disableCaret"
+                            dropdown-ids="button.dropdownIds"
+                            api="{{button.api}}"
+                            action="button.action"
+                            class-name="{{button.className ? button.className : ''}}"
+                            label="button.label"
+                            enabled-for="button.enabledFor"
+                            disabled-for="button.disabledFor">
+                    </bar-button>
+                </button-bar>
             </div>
         </div>
     </ng-pane>

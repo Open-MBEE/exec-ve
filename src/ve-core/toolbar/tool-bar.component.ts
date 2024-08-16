@@ -106,18 +106,18 @@ const ToolBarComponent: VeComponentOptions = {
             } else if (this.onClick) {
                 this.onClick(button);
             } else {
-                this.growl.error('Button' + button.id + 'has no click function');
+                this.growl.error('Button' + button.toolId + 'has no click function');
             }
         };
 
         protected onClick: buttonOnClickFn = (button) => {
             if (!button.dynamic) {
                 this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
-                    id: button.id,
+                    id: button.toolId,
                     title: button.tooltip,
                 });
             } else {
-                this.eventSvc.$broadcast<void>(button.id);
+                this.eventSvc.$broadcast<void>(button.toolId);
             }
         };
     },

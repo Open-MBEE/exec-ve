@@ -6,7 +6,7 @@ import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/ap
 import { EventService } from '@ve-utils/core';
 import { onChangesCallback } from '@ve-utils/utils';
 
-import { veApp } from '@ve-app';
+import { veCore } from '@ve-core';
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular';
 import Icon from '@ve-types/icons';
@@ -398,4 +398,4 @@ const ContextBarComponent: VeComponentOptions = {
     controller: ContextBarController,
 };
 
-veApp.component(ContextBarComponent.selector, ContextBarComponent);
+veCore.component(ContextBarComponent.selector, ContextBarComponent);

@@ -8,3 +8,4 @@ export * from './services/ButtonBar.service';
 
 //Components
 import './button-bar.component';
+import './bar-button.component';

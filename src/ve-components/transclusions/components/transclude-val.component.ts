@@ -220,9 +220,11 @@ export class TranscludeValController extends Transclusion implements ITransclusi
     }
 
     $onInit(): void {
-        super.$onInit();
         this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_${this.cfType}`);
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons);
+        this.buttonBarSvc.registerButtons(editor_buttons);
+        this.bbInit();
+
+        super.$onInit();
 
         this.$element.on('click', (e) => {
             e.stopPropagation();
@@ -350,20 +352,20 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         );
     }
 
-    public save = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation();
-        this.saveAction(false);
-    };
+    // public save = (e: JQuery.ClickEvent): void => {
+    //     e.stopPropagation();
+    //     this.saveAction(false);
+    // };
 
-    public saveC = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation();
-        this.saveAction(true);
-    };
+    // public saveC = (e: JQuery.ClickEvent): void => {
+    //     e.stopPropagation();
+    //     this.saveAction(true);
+    // };
 
-    public cancel = (e: JQuery.ClickEvent): void => {
-        e.stopPropagation();
-        this.cancelAction();
-    };
+    // public cancel = (e: JQuery.ClickEvent): void => {
+    //     e.stopPropagation();
+    //     this.cancelAction();
+    // };
 
     public addValue(e: JQueryEventObject): void {
         e.stopPropagation();

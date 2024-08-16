@@ -7,21 +7,15 @@ import { veUtils } from '@ve-utils';
 
 import { VePromise, VeQService } from '@ve-types/angular';
 import veConfig from '@ve-types/config';
-import { EditorActions } from '@ve-types/core/editor';
 import { VeApiObject } from '@ve-types/view-editor';
 
 const default_buttons: IButtonBarButton[] = [
     {
-        id: 'button-bar-menu',
+        buttonId: 'button-bar-menu',
         icon: 'fa-solid fa-bars',
         selectable: false,
         tooltip: 'menu',
         placement: 'bottom-left',
-        dropdown: {
-            icon: 'fa-solid fa-caret-down',
-            toggle_icon: 'fa-solid fa-caret-up',
-            ids: [],
-        },
     },
 ];
 
@@ -38,7 +32,7 @@ export class ButtonBarService {
 
     constructor(private $q: VeQService, private eventSvc: EventService) {
         for (const button of default_buttons) {
-            this.buttons[button.id] = button;
+            this.buttons[button.buttonId] = button;
         }
         if (veConfig.expConfig) {
             for (const ext of Object.keys(veConfig.expConfig)) {
@@ -113,30 +107,30 @@ export class ButtonBarService {
         });
     }
 
-    getButtonBarButton = (buttonId: string, ctrl?: EditorActions): IButtonBarButton => {
-        if (Object.prototype.hasOwnProperty.call(this.buttons, buttonId)) {
-            const newButton = _.cloneDeep(this.buttons[buttonId]);
-            if (this.buttons[buttonId].dropdown) {
-                newButton.dropdown_buttons = [];
-                for (const id of this.buttons[buttonId].dropdown.ids) {
-                    newButton.dropdown_buttons.push(this.getButtonBarButton(id, ctrl));
-                }
-            }
-            if (this.buttons[buttonId].api && ctrl && ctrl[this.buttons[buttonId].api]) {
-                newButton.action = (event): void => {
-                    if (event) event.stopPropagation();
-                    (ctrl[this.buttons[buttonId].api] as () => void)();
-                };
-            }
-            return newButton;
-        } else {
-            return _.cloneDeep(default_buttons[0]);
-        }
-    };
+    // getButtonBarButton = (buttonId: string, ctrl?: EditorActions): IButtonBarButton => {
+    //     if (Object.prototype.hasOwnProperty.call(this.buttons, buttonId)) {
+    //         const newButton = _.cloneDeep(this.buttons[buttonId]);
+    //         if (this.buttons[buttonId].dropdown) {
+    //             newButton.dropdown_buttons = [];
+    //             for (const id of this.buttons[buttonId].dropdown.ids) {
+    //                 newButton.dropdown_buttons.push(this.getButtonBarButton(id, ctrl));
+    //             }
+    //         }
+    //         if (this.buttons[buttonId].api && ctrl && ctrl[this.buttons[buttonId].api]) {
+    //             newButton.action = (event): void => {
+    //                 if (event) event.stopPropagation();
+    //                 (ctrl[this.buttons[buttonId].api] as () => void)();
+    //             };
+    //         }
+    //         return newButton;
+    //     } else {
+    //         return _.cloneDeep(default_buttons[0]);
+    //     }
+    // };
 
     getButtonDefinition = (buttonId: string): IButtonBarButton => {
         if (Object.prototype.hasOwnProperty.call(this.buttons, buttonId)) {
-            return this.buttons[buttonId];
+            return _.cloneDeep(this.buttons[buttonId]);
         }
         return null;
     };
@@ -147,8 +141,8 @@ export class ButtonBarService {
         }
         if (buttons.length > 0) {
             for (const button of buttons) {
-                if (!this.buttons[button.id]) {
-                    this.buttons[button.id] = button;
+                if (!this.buttons[button.buttonId]) {
+                    this.buttons[button.buttonId] = button;
                 }
             }
         }

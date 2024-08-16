@@ -118,7 +118,8 @@ export class TranscludeDocController extends DeletableTransclusion implements IT
         super.$onInit();
 
         this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_${this.cfType}`);
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, editor_buttons);
+        this.buttonBarSvc.registerButtons(editor_buttons);
+        this.bbInit();
 
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) this.startEdit();

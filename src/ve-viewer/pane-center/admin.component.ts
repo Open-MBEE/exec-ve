@@ -312,7 +312,7 @@ const AdminComponent: VeComponentOptions = {
                 <i class="fa-solid fa-share-from-square"></i></button>
             </div>
             <div class="pane-center-btn-group">
-                <button-bar button-id="$ctrl.bbId" class="bordered-button-bar"></button-bar>
+                <button-bar button-id="{{$ctrl.bbId}}" class="bordered-button-bar"></button-bar>
             </div>
         </div>
     </ng-pane>

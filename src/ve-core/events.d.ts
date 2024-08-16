@@ -1,3 +1,5 @@
+import { BarButton } from './button-bar';
+
 import { ElementObject, ElementsRequest } from '@ve-types/mms';
 
 export namespace veCoreEvents {
@@ -13,8 +15,9 @@ export namespace veCoreEvents {
         continueEdit?: boolean;
     }
     interface buttonClicked {
-        $event?: JQuery.ClickEvent;
         clicked: string;
+        button: BarButton;
+        $event?: JQuery.ClickEvent;
     }
 
     interface toolbarClicked {

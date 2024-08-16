@@ -42,6 +42,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
+  labels: {}
 
 ingress:
   enabled: false

@@ -88,7 +88,7 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor';
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 
-class TreesController implements IComponentController {
+export class TreesController implements IComponentController {
     //Bindings
     toolbarId: string = 'toolbar';
     buttonId: string;
@@ -503,7 +503,7 @@ class TreesController implements IComponentController {
             this.currentTitle = data.title ? data.title : inspect.tooltip;
 
             if (!Object.prototype.hasOwnProperty.call(this.show, _.camelCase(data.id))) {
-                this.startTree(data.id);
+                this.startTree(data);
                 this.show[_.camelCase(data.id)] = { tree: true, pe: false };
             } else {
                 this.eventSvc.$broadcast(TreeService.events.RELOAD, data.id);
@@ -512,7 +512,9 @@ class TreesController implements IComponentController {
         }
     };
 
-    private startTree = (id: string): void => {
+    private startTree = (tree: veCoreEvents.toolbarClicked): void => {
+        const id = tree.id;
+        const title = tree.title;
         const tag = this.extensionSvc.getTagByType('treeOf', id);
         const treeId: string = _.camelCase(id);
         const newTree: JQuery = $(`<div id="${treeId}" ng-show="$ctrl.show.${treeId}.tree"></div>`);
@@ -523,7 +525,7 @@ class TreesController implements IComponentController {
             );
         } else {
             newTree.append(
-                `<${tag} show-pe="$ctrl.show.${treeId}.pe" toolbar-id="${this.toolbarId}" button-id="${this.buttonId}"}></${tag}>`
+                `<${tag} show-pe="$ctrl.show.${treeId}.pe" toolbar-id="${this.toolbarId}" button-id="${this.buttonId}" title="${title}"></${tag}>`
             );
         }
 

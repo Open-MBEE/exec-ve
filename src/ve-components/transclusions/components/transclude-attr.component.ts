@@ -91,7 +91,7 @@ export class TranscludeAttrController extends Transclusion implements ITransclus
 
     public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string>();
-        let contentTemplate: string = "";
+        let contentTemplate = '';
         const ids: string[] = [];
         if (
             this.element[this.mmsAttr] ||
@@ -126,7 +126,9 @@ export class TranscludeAttrController extends Transclusion implements ITransclus
             if (ids.length > 0) {
                 ids.forEach((id) => {
                     this.attrValues.push(
-                        `<transclude-name mms-element-id="${id}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" ${this.noClick ? 'no-click="true"' : ''}></transclude-name>`
+                        `<transclude-name mms-element-id="${id}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" ${
+                            this.noClick ? 'no-click="true"' : ''
+                        }></transclude-name>`
                     );
                 });
             }
@@ -134,9 +136,9 @@ export class TranscludeAttrController extends Transclusion implements ITransclus
             this.attrValues.push(`<span class="no-print placeholder">(empty)</span>`);
         }
 
-        contentTemplate += `${this.mmsCfLabel ? '<h4 class="prop-title">{{$ctrl.mmsAttr}}:</h4></br>' : ''}`
+        contentTemplate += `${this.mmsCfLabel ? '<h4 class="prop-title">{{$ctrl.mmsAttr}}:</h4></br>' : ''}`;
         this.attrValues.forEach((value, index) => {
-            const sep = (index == this.attrValues.length - 1) ? '' : ', ';
+            const sep = index == this.attrValues.length - 1 ? '' : ', ';
             contentTemplate += `${value}${this.mmsCfLabel ? '</br>' : sep}`;
         });
         deferred.resolve(contentTemplate);

@@ -10,7 +10,7 @@ import veConfig from '@ve-types/config';
 import { VeApiObject } from '@ve-types/view-editor';
 
 export interface IToolBarButton {
-    id: string;
+    toolId: string;
     icon: string;
     tooltip: string;
     icon_original?: string;
@@ -36,7 +36,7 @@ export interface toolbarInitFn {
 }
 
 export class ToolButton implements IToolBarButton {
-    id: string;
+    toolId: string;
     icon: string = 'fa-gears';
     tooltip: string = 'Generic Button';
     icon_original: string = 'fa-gears';
@@ -52,7 +52,7 @@ export class ToolButton implements IToolBarButton {
     priority: number = 0;
 
     constructor(id: string, tbutton?: IToolBarButton) {
-        this.id = id;
+        this.toolId = id;
         if (tbutton) {
             Object.assign(this, tbutton);
         }
@@ -144,7 +144,7 @@ export class ToolbarService {
 
             //Initialize Toolbar Clicked Subject
             this.eventSvc.resolve<veCoreEvents.toolbarClicked>(id, {
-                id: inspect.id,
+                id: inspect.toolId,
                 title: inspect.tooltip,
             });
         }
@@ -165,8 +165,8 @@ export class ToolbarService {
         }
         if (buttons.length > 0) {
             for (const button of buttons) {
-                if (!this.buttons[button.id]) {
-                    this.buttons[button.id] = button;
+                if (!this.buttons[button.toolId]) {
+                    this.buttons[button.toolId] = button;
                 }
             }
         }
@@ -177,8 +177,8 @@ export class ToolbarService {
         }
         if (dynamicButtons.length > 0) {
             for (const button of dynamicButtons) {
-                if (!this.dynamicButtons[button.id]) {
-                    this.dynamicButtons[button.id] = button;
+                if (!this.dynamicButtons[button.toolId]) {
+                    this.dynamicButtons[button.toolId] = button;
                 }
             }
         }

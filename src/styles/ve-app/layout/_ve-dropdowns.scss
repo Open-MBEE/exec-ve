@@ -84,6 +84,15 @@
   }
 }
 
+.button-dropdown-menu {
+  min-width: 1rem;
+  z-index: 9000;
+
+  // span {
+  //   display: block;
+  // }
+}
+
 // Fix checkbox in multiselect
 .dropdown-multiselect {
   .dropdown-menu {
@@ -185,7 +194,7 @@
   ------------------------------------------------------------------- */
 
   /* Clear padding on top for lists with buttons */
-  ul.list-with-button {
+  div.list-with-button {
     padding-top: 0;
   }
 
@@ -195,7 +204,7 @@
   }
 
   .dropdown-menu.list-with-selected-item {
-    li.dropdown-item {
+    a.dropdown-item {
       /* When a list item is selected, include a check mark before it. Add additional padding to these lists */
       padding-left: 30px;
 
